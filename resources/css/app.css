@@ -1,0 +1,310 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* Global modern UI primitives (shared by Blade + SPA). */
+@layer base {
+    :root {
+        --by-bg: 245 247 255;
+        --by-card: 255 255 255;
+        --by-fg: 15 23 42;
+        --by-muted: 100 116 139;
+        --by-border: 226 232 240;
+        --by-accent: 99 102 241; /* indigo */
+        --by-accent-2: 34 211 238; /* cyan */
+        --by-ring: 99 102 241;
+        --by-cta: 249 115 22; /* orange (purchase) */
+        --by-cta-2: 245 158 11; /* amber */
+    }
+
+    html, body {
+        height: 100%;
+    }
+
+    body {
+        background:
+            radial-gradient(900px 600px at 12% 5%, rgba(99,102,241,0.14), transparent 55%),
+            radial-gradient(800px 520px at 88% 8%, rgba(34,211,238,0.12), transparent 55%),
+            radial-gradient(900px 700px at 40% 92%, rgba(168,85,247,0.10), transparent 55%),
+            rgb(var(--by-bg));
+        color: rgb(var(--by-fg));
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+
+    ::selection {
+        background: rgba(99, 102, 241, 0.22);
+    }
+
+    a {
+        text-underline-offset: 3px;
+    }
+}
+
+@layer components {
+    /* Legacy Blade shim (Bootstrap-ish classes) to prevent broken pages.
+       We still progressively migrate templates, but this keeps UI usable. */
+    .content-shell {
+        @apply mx-auto w-full max-w-[1440px] px-4;
+    }
+
+    .card {
+        @apply rounded-3xl border border-slate-200/80 bg-white/92 shadow-md;
+    }
+
+    .alert {
+        @apply rounded-3xl border border-slate-200/80 bg-white/92 shadow-md p-4 text-sm;
+    }
+    .alert-success { @apply border-emerald-200 bg-emerald-50/70 text-emerald-900; }
+    .alert-danger { @apply border-rose-200 bg-rose-50/70 text-rose-900; }
+    .alert-info { @apply border-sky-200 bg-sky-50/70 text-sky-900; }
+    .alert-light { @apply border-slate-200 bg-white/70 text-slate-700; }
+
+    .form-label { @apply text-xs font-semibold text-slate-600; }
+    .form-control, .form-select {
+        @apply w-full rounded-2xl border border-slate-300/80 bg-white px-4 py-3 text-sm shadow-sm outline-none focus:ring-2;
+        --tw-ring-color: rgb(var(--by-ring));
+    }
+
+    .btn {
+        @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition;
+    }
+    .btn-warning {
+        @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition bg-gradient-to-r from-orange-400 to-amber-400 text-slate-900 shadow-sm hover:opacity-95;
+    }
+    .btn-outline-secondary {
+        @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition border border-slate-200 bg-white/70 text-slate-800 hover:bg-white;
+    }
+    .btn-dark { @apply bg-slate-900 text-white hover:opacity-95; }
+    .btn-success { @apply bg-emerald-600 text-white hover:opacity-95; }
+    .btn-link { @apply px-0 py-0 text-indigo-600 hover:underline; }
+    .w-100 { @apply w-full; }
+
+    .badge { @apply inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700; }
+
+    /* Simplify common layout helpers */
+    .d-flex { @apply flex; }
+    .align-items-center { @apply items-center; }
+    .justify-content-between { @apply justify-between; }
+    .gap-1 { @apply gap-1; }
+    .gap-2 { @apply gap-2; }
+    .gap-3 { @apply gap-3; }
+    .gap-4 { @apply gap-4; }
+
+    .by-container {
+        @apply mx-auto w-full max-w-[1440px] px-4;
+    }
+
+    .by-card {
+        @apply rounded-3xl border border-slate-200/80 bg-white/92 shadow-md;
+    }
+
+    .by-card-hover {
+        @apply transition duration-200 hover:shadow-lg hover:-translate-y-0.5;
+    }
+
+    .by-btn-primary {
+        @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition duration-200 bg-gradient-to-r from-indigo-500 to-cyan-400 text-white shadow-sm hover:opacity-95 hover:shadow-md;
+    }
+
+    .by-btn-cta {
+        @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition duration-200 bg-gradient-to-r from-orange-400 to-amber-400 text-slate-900 shadow-sm hover:opacity-95 hover:shadow-md;
+    }
+
+    .by-btn-secondary {
+        @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition duration-200 border border-slate-200 bg-white/70 text-slate-800 hover:bg-white hover:shadow-sm;
+    }
+
+    .by-badge {
+        @apply inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700;
+    }
+
+    .by-input {
+        @apply w-full rounded-2xl border border-slate-300/80 bg-white px-4 py-3 text-sm shadow-sm outline-none transition duration-200 focus:ring-2 focus:shadow-md;
+        --tw-ring-color: rgb(var(--by-ring));
+    }
+
+    /* Make inputs pop inside tinted surfaces */
+    .by-surface .by-input,
+    .by-surface-indigo .by-input,
+    .by-surface-cyan .by-input,
+    .by-surface-amber .by-input {
+        background: rgba(255, 255, 255, 0.98);
+        border-color: rgba(148, 163, 184, 0.75);
+    }
+
+    .by-surface {
+        @apply rounded-3xl border border-slate-200/80 p-5;
+        background: linear-gradient(180deg, rgba(255,255,255,0.88), rgba(248,250,252,0.88));
+    }
+
+    .by-surface-indigo {
+        @apply rounded-3xl border border-indigo-200/80 p-5;
+        background: linear-gradient(180deg, rgba(238,242,255,0.9), rgba(255,255,255,0.88));
+    }
+
+    .by-surface-cyan {
+        @apply rounded-3xl border border-cyan-200/80 p-5;
+        background: linear-gradient(180deg, rgba(236,254,255,0.9), rgba(255,255,255,0.88));
+    }
+
+    .by-surface-amber {
+        @apply rounded-3xl border border-amber-200/80 p-5;
+        background: linear-gradient(180deg, rgba(255,251,235,0.92), rgba(255,255,255,0.88));
+    }
+
+    .by-section-head {
+        @apply flex items-start justify-between gap-4;
+    }
+
+    .by-section-title {
+        @apply text-xs font-extrabold uppercase tracking-wider;
+    }
+
+    .by-accent-bar {
+        @apply relative;
+    }
+    .by-accent-bar::before {
+        content: '';
+        position: absolute;
+        left: -1px;
+        top: 14px;
+        bottom: 14px;
+        width: 4px;
+        border-radius: 999px;
+        background: linear-gradient(to bottom, rgba(99,102,241,0.9), rgba(34,211,238,0.8));
+    }
+
+    .by-divider {
+        @apply h-px w-full bg-slate-200/80;
+    }
+
+    .by-gradient-border {
+        position: relative;
+        border: 1px solid rgba(226,232,240,0.9);
+    }
+    .by-gradient-border::before {
+        content: '';
+        position: absolute;
+        inset: -1px;
+        border-radius: inherit;
+        padding: 1px;
+        background: linear-gradient(90deg, rgba(99,102,241,0.45), rgba(34,211,238,0.35), rgba(168,85,247,0.25));
+        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+    }
+
+    .by-link {
+        @apply font-semibold text-indigo-600 hover:underline;
+    }
+
+    .by-hero {
+        @apply relative overflow-hidden rounded-[2.25rem] border border-slate-200/70 shadow-sm;
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(14px);
+    }
+
+    .by-hero-slide {
+        @apply absolute inset-0 opacity-0 transition-opacity duration-700;
+    }
+
+    .by-hero-slide.is-active {
+        @apply opacity-100;
+    }
+
+    .by-hero-scrim {
+        background:
+            radial-gradient(900px 520px at 20% 0%, rgba(99,102,241,0.35), transparent 55%),
+            linear-gradient(to bottom, rgba(2,6,23,0.25), rgba(2,6,23,0.35));
+    }
+
+    /* ------------------------------------------------------------
+       Extra legacy (Bootstrap-ish) shims used in account pages
+       ------------------------------------------------------------ */
+
+    /* Typography helpers */
+    .small { @apply text-sm; }
+    .text-muted { @apply text-slate-500; }
+    .fw-semibold { @apply font-semibold; }
+    .fw-bold { @apply font-bold; }
+    .fs-6 { @apply text-base; }
+    .h4 { @apply text-2xl font-extrabold tracking-tight; }
+    .h5 { @apply text-xl font-bold tracking-tight; }
+    .h6 { @apply text-base font-bold; }
+    .text-decoration-none { @apply no-underline; }
+
+    /* Rounded helpers used by legacy markup */
+    .rounded-4 { @apply rounded-3xl; }
+    .rounded-3 { @apply rounded-3xl; }
+
+    /* Grid-ish helpers */
+    .row { @apply flex flex-wrap -mx-2; }
+    .row > * { @apply px-2; }
+    .col-12 { @apply w-full; }
+    .col-md-6 { @apply w-full md:w-1/2; }
+    .col-md-12 { @apply w-full; }
+    .col-lg-7 { @apply w-full lg:w-7/12; }
+    .col-lg-5 { @apply w-full lg:w-5/12; }
+
+    /* Tables */
+    .table { @apply w-full text-sm; border-collapse: separate; border-spacing: 0; }
+    .table thead th { @apply bg-slate-50/80 text-slate-600 font-semibold; }
+    .table th, .table td { @apply px-4 py-3 border-b border-slate-200/70; vertical-align: middle; }
+    .table-hover tbody tr { @apply transition; }
+    .table-hover tbody tr:hover { @apply bg-slate-50/60; }
+    .table-responsive { @apply w-full overflow-x-auto; }
+
+    /* Nav tabs */
+    .nav { @apply flex flex-wrap gap-2; }
+    .nav-tabs { @apply border-b border-slate-200/70; }
+    .nav-item { @apply mb-0; }
+    .nav-link { @apply inline-flex items-center rounded-t-2xl px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50; }
+    .nav-link.active { @apply bg-white text-indigo-900 border border-slate-200/70 border-b-transparent; }
+
+    /* List group */
+    .list-group { @apply overflow-hidden rounded-3xl border border-slate-200/70 bg-white/92; }
+    .list-group-item { @apply px-4 py-3 border-b border-slate-200/70; }
+    .list-group-item:last-child { border-bottom: 0; }
+
+    /* Left drawer (site menu) */
+    [data-left-drawer].is-open { @apply pointer-events-auto; }
+    [data-left-drawer].is-open [data-left-drawer-overlay] { @apply opacity-100; }
+    [data-left-drawer].is-open [data-left-drawer-panel] { @apply translate-x-0; }
+
+    /*
+     * Hesabım paneli: sol sidebar + sağ içerik.
+     * Tailwind’de `md:grid-cols-[280px,1fr]` gibi arbitrary grid sütunları bazen build’e düşmüyor;
+     * bu yüzden yerleşimi düz CSS ile garanti ediyoruz.
+     */
+    .account-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    @media (min-width: 768px) {
+        .account-layout {
+            flex-direction: row;
+            align-items: flex-start;
+        }
+        .account-layout__sidebar {
+            width: 280px;
+            max-width: 280px;
+            flex-shrink: 0;
+        }
+        .account-layout__main {
+            flex: 1 1 0%;
+            min-width: 0;
+        }
+    }
+}

@@ -1,0 +1,128 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\BusinessType;
+use App\Models\Vendor;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+
+class AdminVendorController extends Controller
+{
+    public function index()
+    {
+        $vendors = Vendor::withCount('products')
+            ->with(['user', 'businessTypes'])
+            ->orderBy('name')
+            ->paginate(20);
+
+        return view('admin.vendors.index', compact('vendors'));
+    }
+
+    public function create()
+    {
+        $businessTypes = BusinessType::orderBy('sort_order')->orderBy('name')->get();
+
+        return view('admin.vendors.create', compact('businessTypes'));
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email'],
+            'password' => ['required', 'min:8', 'confirmed'],
+            'phone' => ['nullable', 'string', 'max:50'],
+            'city' => ['nullable', 'string', 'max:100'],
+            'district' => ['nullable', 'string', 'max:100'],
+            'address' => ['nullable', 'string'],
+            'description' => ['nullable', 'string'],
+            'logo' => ['nullable', 'image', 'max:2048'],
+            'is_active' => ['boolean'],
+            'business_types' => ['nullable', 'array'],
+            'business_types.*' => ['exists:business_types,id'],
+        ]);
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role' => 'vendor',
+        ]);
+        $logoPath = null;
+        if ($request->hasFile('logo')) {
+            $logoPath = $request->file('logo')->store('vendors', 'public');
+        }
+        $vendor = Vendor::create([
+            'user_id' => $user->id,
+            'name' => $validated['name'],
+            'slug' => \Illuminate\Support\Str::slug($validated['name']) . '-' . $user->id,
+            'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
+            'city' => $validated['city'] ?? null,
+            'district' => $validated['district'] ?? null,
+            'address' => $validated['address'] ?? null,
+            'logo' => $logoPath,
+            'description' => $validated['description'] ?? null,
+            'is_active' => $request->boolean('is_active'),
+        ]);
+        $user->update(['vendor_id' => $vendor->id]);
+        $vendor->businessTypes()->sync($request->input('business_types', []));
+        return redirect()->route('admin.vendors.index')->with('success', 'Satıcı eklendi.');
+    }
+
+    public function edit(Vendor $vendor)
+    {
+        $vendor->load('businessTypes');
+        $quoteCategories = \App\Models\Category::orderBy('name')->get();
+        $businessTypes = BusinessType::orderBy('sort_order')->orderBy('name')->get();
+
+        return view('admin.vendors.edit', compact('vendor', 'quoteCategories', 'businessTypes'));
+    }
+
+    public function update(Request $request, Vendor $vendor)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email'],
+            'phone' => ['nullable', 'string', 'max:50'],
+            'city' => ['nullable', 'string', 'max:100'],
+            'district' => ['nullable', 'string', 'max:100'],
+            'address' => ['nullable', 'string'],
+            'description' => ['nullable', 'string'],
+            'logo' => ['nullable', 'image', 'max:2048'],
+            'is_active' => ['boolean'],
+            'quote_categories' => ['nullable', 'array'],
+            'quote_categories.*' => ['exists:categories,id'],
+            'business_types' => ['nullable', 'array'],
+            'business_types.*' => ['exists:business_types,id'],
+        ]);
+        $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']) . '-' . $vendor->id;
+        $validated['is_active'] = $request->boolean('is_active');
+        $vendor->quoteCategories()->sync($request->input('quote_categories', []));
+        $vendor->businessTypes()->sync($request->input('business_types', []));
+        if ($request->hasFile('logo')) {
+            if ($vendor->logo) {
+                Storage::disk('public')->delete($vendor->logo);
+            }
+            $validated['logo'] = $request->file('logo')->store('vendors', 'public');
+        }
+        unset($validated['quote_categories'], $validated['business_types']);
+        $vendor->update($validated);
+        if ($vendor->user) {
+            $vendor->user->update(['name' => $validated['name'], 'email' => $validated['email']]);
+        }
+        return redirect()->route('admin.vendors.index')->with('success', 'Satıcı güncellendi.');
+    }
+
+    public function destroy(Vendor $vendor)
+    {
+        if ($vendor->user) {
+            $vendor->user->update(['vendor_id' => null, 'role' => 'customer']);
+        }
+        $vendor->delete();
+        return redirect()->route('admin.vendors.index')->with('success', 'Satıcı silindi.');
+    }
+}

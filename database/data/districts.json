@@ -1,0 +1,5840 @@
+[
+    {
+        "id": 1757,
+        "name": "Aladağ",
+        "provinceId": 1,
+        "postalCode": "01720"
+    },
+    {
+        "id": 1219,
+        "name": "Ceyhan",
+        "provinceId": 1,
+        "postalCode": "01920"
+    },
+    {
+        "id": 2033,
+        "name": "Çukurova",
+        "provinceId": 1,
+        "postalCode": "01360"
+    },
+    {
+        "id": 1329,
+        "name": "Feke",
+        "provinceId": 1,
+        "postalCode": "01660"
+    },
+    {
+        "id": 1806,
+        "name": "İmamoğlu",
+        "provinceId": 1,
+        "postalCode": "01700"
+    },
+    {
+        "id": 1437,
+        "name": "Karaisalı",
+        "provinceId": 1,
+        "postalCode": "01770"
+    },
+    {
+        "id": 1443,
+        "name": "Karataş",
+        "provinceId": 1,
+        "postalCode": "01900"
+    },
+    {
+        "id": 1486,
+        "name": "Kozan",
+        "provinceId": 1,
+        "postalCode": "01530"
+    },
+    {
+        "id": 1580,
+        "name": "Pozantı",
+        "provinceId": 1,
+        "postalCode": "01490"
+    },
+    {
+        "id": 1588,
+        "name": "Saimbeyli",
+        "provinceId": 1,
+        "postalCode": "01740"
+    },
+    {
+        "id": 2032,
+        "name": "Sarıçam",
+        "provinceId": 1,
+        "postalCode": "01410"
+    },
+    {
+        "id": 1104,
+        "name": "Seyhan",
+        "provinceId": 1,
+        "postalCode": "01040"
+    },
+    {
+        "id": 1687,
+        "name": "Tufanbeyli",
+        "provinceId": 1,
+        "postalCode": "01640"
+    },
+    {
+        "id": 1734,
+        "name": "Yumurtalık",
+        "provinceId": 1,
+        "postalCode": "01680"
+    },
+    {
+        "id": 1748,
+        "name": "Yüreğir",
+        "provinceId": 1,
+        "postalCode": "01358"
+    },
+    {
+        "id": 1182,
+        "name": "Besni",
+        "provinceId": 2,
+        "postalCode": "02300"
+    },
+    {
+        "id": 1246,
+        "name": "Çelikhan",
+        "provinceId": 2,
+        "postalCode": "02600"
+    },
+    {
+        "id": 1347,
+        "name": "Gerger",
+        "provinceId": 2,
+        "postalCode": "02700"
+    },
+    {
+        "id": 1354,
+        "name": "Gölbaşı",
+        "provinceId": 2,
+        "postalCode": "02530"
+    },
+    {
+        "id": 1425,
+        "name": "Kahta",
+        "provinceId": 2,
+        "postalCode": "02450"
+    },
+    {
+        "id": 1105,
+        "name": "Merkez",
+        "provinceId": 2,
+        "postalCode": "02230"
+    },
+    {
+        "id": 1592,
+        "name": "Samsat",
+        "provinceId": 2,
+        "postalCode": "02800"
+    },
+    {
+        "id": 1985,
+        "name": "Sincik",
+        "provinceId": 2,
+        "postalCode": "02920"
+    },
+    {
+        "id": 1989,
+        "name": "Tut",
+        "provinceId": 2,
+        "postalCode": "02350"
+    },
+    {
+        "id": 1771,
+        "name": "Başmakçı",
+        "provinceId": 3,
+        "postalCode": "03450"
+    },
+    {
+        "id": 1773,
+        "name": "Bayat",
+        "provinceId": 3,
+        "postalCode": "03780"
+    },
+    {
+        "id": 1200,
+        "name": "Bolvadin",
+        "provinceId": 3,
+        "postalCode": "03300"
+    },
+    {
+        "id": 1239,
+        "name": "Çay",
+        "provinceId": 3,
+        "postalCode": "03700"
+    },
+    {
+        "id": 1906,
+        "name": "Çobanlar",
+        "provinceId": 3,
+        "postalCode": "03060"
+    },
+    {
+        "id": 1267,
+        "name": "Dazkırı",
+        "provinceId": 3,
+        "postalCode": "03950"
+    },
+    {
+        "id": 1281,
+        "name": "Dinar",
+        "provinceId": 3,
+        "postalCode": "03400"
+    },
+    {
+        "id": 1306,
+        "name": "Emirdağ",
+        "provinceId": 3,
+        "postalCode": "03630"
+    },
+    {
+        "id": 1923,
+        "name": "Evciler",
+        "provinceId": 3,
+        "postalCode": "03960"
+    },
+    {
+        "id": 1944,
+        "name": "Hocalar",
+        "provinceId": 3,
+        "postalCode": "03530"
+    },
+    {
+        "id": 1404,
+        "name": "İhsaniye",
+        "provinceId": 3,
+        "postalCode": "03380"
+    },
+    {
+        "id": 1809,
+        "name": "İscehisar",
+        "provinceId": 3,
+        "postalCode": "03750"
+    },
+    {
+        "id": 1961,
+        "name": "Kızılören",
+        "provinceId": 3,
+        "postalCode": "03560"
+    },
+    {
+        "id": 1108,
+        "name": "Merkez",
+        "provinceId": 3,
+        "postalCode": "03217"
+    },
+    {
+        "id": 1594,
+        "name": "Sandıklı",
+        "provinceId": 3,
+        "postalCode": "03510"
+    },
+    {
+        "id": 1626,
+        "name": "Sinanpaşa",
+        "provinceId": 3,
+        "postalCode": "03860"
+    },
+    {
+        "id": 1639,
+        "name": "Sultandağı",
+        "provinceId": 3,
+        "postalCode": "03910"
+    },
+    {
+        "id": 1664,
+        "name": "Şuhut",
+        "provinceId": 3,
+        "postalCode": "03830"
+    },
+    {
+        "id": 1283,
+        "name": "Diyadin",
+        "provinceId": 4,
+        "postalCode": "04900"
+    },
+    {
+        "id": 1287,
+        "name": "Doğubayazıt",
+        "provinceId": 4,
+        "postalCode": "04400"
+    },
+    {
+        "id": 1301,
+        "name": "Eleşkirt",
+        "provinceId": 4,
+        "postalCode": "04600"
+    },
+    {
+        "id": 1379,
+        "name": "Hamur",
+        "provinceId": 4,
+        "postalCode": "04850"
+    },
+    {
+        "id": 1111,
+        "name": "Merkez",
+        "provinceId": 4,
+        "postalCode": "04200"
+    },
+    {
+        "id": 1568,
+        "name": "Patnos",
+        "provinceId": 4,
+        "postalCode": "04500"
+    },
+    {
+        "id": 1667,
+        "name": "Taşlıçay",
+        "provinceId": 4,
+        "postalCode": "04800"
+    },
+    {
+        "id": 1691,
+        "name": "Tutak",
+        "provinceId": 4,
+        "postalCode": "04700"
+    },
+    {
+        "id": 1363,
+        "name": "Göynücek",
+        "provinceId": 5,
+        "postalCode": "05900"
+    },
+    {
+        "id": 1368,
+        "name": "Gümüşhacıköy",
+        "provinceId": 5,
+        "postalCode": "05700"
+    },
+    {
+        "id": 1938,
+        "name": "Hamamözü",
+        "provinceId": 5,
+        "postalCode": "05720"
+    },
+    {
+        "id": 1134,
+        "name": "Merkez",
+        "provinceId": 5,
+        "postalCode": "05200"
+    },
+    {
+        "id": 1524,
+        "name": "Merzifon",
+        "provinceId": 5,
+        "postalCode": "05300"
+    },
+    {
+        "id": 1641,
+        "name": "Suluova",
+        "provinceId": 5,
+        "postalCode": "05500"
+    },
+    {
+        "id": 1668,
+        "name": "Taşova",
+        "provinceId": 5,
+        "postalCode": "05845"
+    },
+    {
+        "id": 1872,
+        "name": "Akyurt",
+        "provinceId": 6,
+        "postalCode": "06750"
+    },
+    {
+        "id": 1130,
+        "name": "Altındağ",
+        "provinceId": 6,
+        "postalCode": "06080"
+    },
+    {
+        "id": 1157,
+        "name": "Ayaş",
+        "provinceId": 6,
+        "postalCode": "06710"
+    },
+    {
+        "id": 1167,
+        "name": "Bala",
+        "provinceId": 6,
+        "postalCode": "06726"
+    },
+    {
+        "id": 1187,
+        "name": "Beypazarı",
+        "provinceId": 6,
+        "postalCode": "06730"
+    },
+    {
+        "id": 1227,
+        "name": "Çamlıdere",
+        "provinceId": 6,
+        "postalCode": "06740"
+    },
+    {
+        "id": 1231,
+        "name": "Çankaya",
+        "provinceId": 6,
+        "postalCode": "06530"
+    },
+    {
+        "id": 1260,
+        "name": "Çubuk",
+        "provinceId": 6,
+        "postalCode": "06760"
+    },
+    {
+        "id": 1302,
+        "name": "Elmadağ",
+        "provinceId": 6,
+        "postalCode": "06780"
+    },
+    {
+        "id": 1922,
+        "name": "Etimesgut",
+        "provinceId": 6,
+        "postalCode": "06794"
+    },
+    {
+        "id": 1924,
+        "name": "Evren",
+        "provinceId": 6,
+        "postalCode": "06770"
+    },
+    {
+        "id": 1744,
+        "name": "Gölbaşı",
+        "provinceId": 6,
+        "postalCode": "06830"
+    },
+    {
+        "id": 1365,
+        "name": "Güdül",
+        "provinceId": 6,
+        "postalCode": "06842"
+    },
+    {
+        "id": 1387,
+        "name": "Haymana",
+        "provinceId": 6,
+        "postalCode": "06860"
+    },
+    {
+        "id": 1815,
+        "name": "Kahramankazan",
+        "provinceId": 6,
+        "postalCode": "06980"
+    },
+    {
+        "id": 1427,
+        "name": "Kalecik",
+        "provinceId": 6,
+        "postalCode": "06870"
+    },
+    {
+        "id": 1745,
+        "name": "Keçiören",
+        "provinceId": 6,
+        "postalCode": "06300"
+    },
+    {
+        "id": 1473,
+        "name": "Kızılcahamam",
+        "provinceId": 6,
+        "postalCode": "06890"
+    },
+    {
+        "id": 1746,
+        "name": "Mamak",
+        "provinceId": 6,
+        "postalCode": "06620"
+    },
+    {
+        "id": 1539,
+        "name": "Nallıhan",
+        "provinceId": 6,
+        "postalCode": "06922"
+    },
+    {
+        "id": 1578,
+        "name": "Polatlı",
+        "provinceId": 6,
+        "postalCode": "06900"
+    },
+    {
+        "id": 2034,
+        "name": "Pursaklar",
+        "provinceId": 6,
+        "postalCode": "06145"
+    },
+    {
+        "id": 1747,
+        "name": "Sincan",
+        "provinceId": 6,
+        "postalCode": "06935"
+    },
+    {
+        "id": 1658,
+        "name": "Şereflikoçhisar",
+        "provinceId": 6,
+        "postalCode": "06950"
+    },
+    {
+        "id": 1723,
+        "name": "Yenimahalle",
+        "provinceId": 6,
+        "postalCode": "06560"
+    },
+    {
+        "id": 1121,
+        "name": "Akseki",
+        "provinceId": 7,
+        "postalCode": "07630"
+    },
+    {
+        "id": 2035,
+        "name": "Aksu",
+        "provinceId": 7,
+        "postalCode": "07112"
+    },
+    {
+        "id": 1126,
+        "name": "Alanya",
+        "provinceId": 7,
+        "postalCode": "07400"
+    },
+    {
+        "id": 1811,
+        "name": "Demre",
+        "provinceId": 7,
+        "postalCode": "07570"
+    },
+    {
+        "id": 2036,
+        "name": "Döşemealtı",
+        "provinceId": 7,
+        "postalCode": "07121"
+    },
+    {
+        "id": 1303,
+        "name": "Elmalı",
+        "provinceId": 7,
+        "postalCode": "07770"
+    },
+    {
+        "id": 1333,
+        "name": "Finike",
+        "provinceId": 7,
+        "postalCode": "07740"
+    },
+    {
+        "id": 1337,
+        "name": "Gazipaşa",
+        "provinceId": 7,
+        "postalCode": "07900"
+    },
+    {
+        "id": 1370,
+        "name": "Gündoğmuş",
+        "provinceId": 7,
+        "postalCode": "07860"
+    },
+    {
+        "id": 1946,
+        "name": "İbradı",
+        "provinceId": 7,
+        "postalCode": "07680"
+    },
+    {
+        "id": 1451,
+        "name": "Kaş",
+        "provinceId": 7,
+        "postalCode": "07976"
+    },
+    {
+        "id": 1959,
+        "name": "Kemer",
+        "provinceId": 7,
+        "postalCode": "07990"
+    },
+    {
+        "id": 2037,
+        "name": "Kepez",
+        "provinceId": 7,
+        "postalCode": "07090"
+    },
+    {
+        "id": 2038,
+        "name": "Konyaaltı",
+        "provinceId": 7,
+        "postalCode": "07070"
+    },
+    {
+        "id": 1483,
+        "name": "Korkuteli",
+        "provinceId": 7,
+        "postalCode": "07810"
+    },
+    {
+        "id": 1492,
+        "name": "Kumluca",
+        "provinceId": 7,
+        "postalCode": "07365"
+    },
+    {
+        "id": 1512,
+        "name": "Manavgat",
+        "provinceId": 7,
+        "postalCode": "07600"
+    },
+    {
+        "id": 2039,
+        "name": "Muratpaşa",
+        "provinceId": 7,
+        "postalCode": "07050"
+    },
+    {
+        "id": 1616,
+        "name": "Serik",
+        "provinceId": 7,
+        "postalCode": "07511"
+    },
+    {
+        "id": 1145,
+        "name": "Ardanuç",
+        "provinceId": 8,
+        "postalCode": "08300"
+    },
+    {
+        "id": 1147,
+        "name": "Arhavi",
+        "provinceId": 8,
+        "postalCode": "08200"
+    },
+    {
+        "id": 1202,
+        "name": "Borçka",
+        "provinceId": 8,
+        "postalCode": "08400"
+    },
+    {
+        "id": 1395,
+        "name": "Hopa",
+        "provinceId": 8,
+        "postalCode": "08600"
+    },
+    {
+        "id": 2105,
+        "name": "Kemalpaşa",
+        "provinceId": 8,
+        "postalCode": "08610"
+    },
+    {
+        "id": 1152,
+        "name": "Merkez",
+        "provinceId": 8,
+        "postalCode": "08000"
+    },
+    {
+        "id": 1828,
+        "name": "Murgul",
+        "provinceId": 8,
+        "postalCode": "08500"
+    },
+    {
+        "id": 1653,
+        "name": "Şavşat",
+        "provinceId": 8,
+        "postalCode": "08790"
+    },
+    {
+        "id": 1736,
+        "name": "Yusufeli",
+        "provinceId": 8,
+        "postalCode": "08890"
+    },
+    {
+        "id": 1206,
+        "name": "Bozdoğan",
+        "provinceId": 9,
+        "postalCode": "09760"
+    },
+    {
+        "id": 1781,
+        "name": "Buharkent",
+        "provinceId": 9,
+        "postalCode": "09670"
+    },
+    {
+        "id": 1256,
+        "name": "Çine",
+        "provinceId": 9,
+        "postalCode": "09520"
+    },
+    {
+        "id": 2000,
+        "name": "Didim",
+        "provinceId": 9,
+        "postalCode": "09295"
+    },
+    {
+        "id": 2076,
+        "name": "Efeler",
+        "provinceId": 9,
+        "postalCode": "09100"
+    },
+    {
+        "id": 1348,
+        "name": "Germencik",
+        "provinceId": 9,
+        "postalCode": "09700"
+    },
+    {
+        "id": 1807,
+        "name": "İncirliova",
+        "provinceId": 9,
+        "postalCode": "09610"
+    },
+    {
+        "id": 1435,
+        "name": "Karacasu",
+        "provinceId": 9,
+        "postalCode": "09380"
+    },
+    {
+        "id": 1957,
+        "name": "Karpuzlu",
+        "provinceId": 9,
+        "postalCode": "09540"
+    },
+    {
+        "id": 1479,
+        "name": "Koçarlı",
+        "provinceId": 9,
+        "postalCode": "09970"
+    },
+    {
+        "id": 1968,
+        "name": "Köşk",
+        "provinceId": 9,
+        "postalCode": "09570"
+    },
+    {
+        "id": 1497,
+        "name": "Kuşadası",
+        "provinceId": 9,
+        "postalCode": "09430"
+    },
+    {
+        "id": 1498,
+        "name": "Kuyucak",
+        "provinceId": 9,
+        "postalCode": "09935"
+    },
+    {
+        "id": 1542,
+        "name": "Nazilli",
+        "provinceId": 9,
+        "postalCode": "09800"
+    },
+    {
+        "id": 1637,
+        "name": "Söke",
+        "provinceId": 9,
+        "postalCode": "09220"
+    },
+    {
+        "id": 1640,
+        "name": "Sultanhisar",
+        "provinceId": 9,
+        "postalCode": "09650"
+    },
+    {
+        "id": 1724,
+        "name": "Yenipazar",
+        "provinceId": 9,
+        "postalCode": "09350"
+    },
+    {
+        "id": 2077,
+        "name": "Altıeylül",
+        "provinceId": 10,
+        "postalCode": "10100"
+    },
+    {
+        "id": 1161,
+        "name": "Ayvalık",
+        "provinceId": 10,
+        "postalCode": "10405"
+    },
+    {
+        "id": 1169,
+        "name": "Balya",
+        "provinceId": 10,
+        "postalCode": "10840"
+    },
+    {
+        "id": 1171,
+        "name": "Bandırma",
+        "provinceId": 10,
+        "postalCode": "10245"
+    },
+    {
+        "id": 1191,
+        "name": "Bigadiç",
+        "provinceId": 10,
+        "postalCode": "10440"
+    },
+    {
+        "id": 1216,
+        "name": "Burhaniye",
+        "provinceId": 10,
+        "postalCode": "10700"
+    },
+    {
+        "id": 1291,
+        "name": "Dursunbey",
+        "provinceId": 10,
+        "postalCode": "10800"
+    },
+    {
+        "id": 1294,
+        "name": "Edremit",
+        "provinceId": 10,
+        "postalCode": "10390"
+    },
+    {
+        "id": 1310,
+        "name": "Erdek",
+        "provinceId": 10,
+        "postalCode": "10500"
+    },
+    {
+        "id": 1928,
+        "name": "Gömeç",
+        "provinceId": 10,
+        "postalCode": "10715"
+    },
+    {
+        "id": 1360,
+        "name": "Gönen",
+        "provinceId": 10,
+        "postalCode": "10900"
+    },
+    {
+        "id": 1384,
+        "name": "Havran",
+        "provinceId": 10,
+        "postalCode": "10565"
+    },
+    {
+        "id": 1418,
+        "name": "İvrindi",
+        "provinceId": 10,
+        "postalCode": "10785"
+    },
+    {
+        "id": 2078,
+        "name": "Karesi",
+        "provinceId": 10,
+        "postalCode": "10085"
+    },
+    {
+        "id": 1462,
+        "name": "Kepsut",
+        "provinceId": 10,
+        "postalCode": "10660"
+    },
+    {
+        "id": 1514,
+        "name": "Manyas",
+        "provinceId": 10,
+        "postalCode": "10480"
+    },
+    {
+        "id": 1824,
+        "name": "Marmara",
+        "provinceId": 10,
+        "postalCode": "10940"
+    },
+    {
+        "id": 1608,
+        "name": "Savaştepe",
+        "provinceId": 10,
+        "postalCode": "10580"
+    },
+    {
+        "id": 1619,
+        "name": "Sındırgı",
+        "provinceId": 10,
+        "postalCode": "10330"
+    },
+    {
+        "id": 1644,
+        "name": "Susurluk",
+        "provinceId": 10,
+        "postalCode": "10610"
+    },
+    {
+        "id": 1210,
+        "name": "Bozüyük",
+        "provinceId": 11,
+        "postalCode": "11300"
+    },
+    {
+        "id": 1359,
+        "name": "Gölpazarı",
+        "provinceId": 11,
+        "postalCode": "11700"
+    },
+    {
+        "id": 1948,
+        "name": "İnhisar",
+        "provinceId": 11,
+        "postalCode": "11640"
+    },
+    {
+        "id": 1192,
+        "name": "Merkez",
+        "provinceId": 11,
+        "postalCode": "11000"
+    },
+    {
+        "id": 1559,
+        "name": "Osmaneli",
+        "provinceId": 11,
+        "postalCode": "11500"
+    },
+    {
+        "id": 1571,
+        "name": "Pazaryeri",
+        "provinceId": 11,
+        "postalCode": "11800"
+    },
+    {
+        "id": 1636,
+        "name": "Söğüt",
+        "provinceId": 11,
+        "postalCode": "11600"
+    },
+    {
+        "id": 1857,
+        "name": "Yenipazar",
+        "provinceId": 11,
+        "postalCode": "11780"
+    },
+    {
+        "id": 1750,
+        "name": "Adaklı",
+        "provinceId": 12,
+        "postalCode": "12600"
+    },
+    {
+        "id": 1344,
+        "name": "Genç",
+        "provinceId": 12,
+        "postalCode": "12500"
+    },
+    {
+        "id": 1446,
+        "name": "Karlıova",
+        "provinceId": 12,
+        "postalCode": "12900"
+    },
+    {
+        "id": 1475,
+        "name": "Kiğı",
+        "provinceId": 12,
+        "postalCode": "12800"
+    },
+    {
+        "id": 1193,
+        "name": "Merkez",
+        "provinceId": 12,
+        "postalCode": "12400"
+    },
+    {
+        "id": 1633,
+        "name": "Solhan",
+        "provinceId": 12,
+        "postalCode": "12700"
+    },
+    {
+        "id": 1855,
+        "name": "Yayladere",
+        "provinceId": 12,
+        "postalCode": "12650"
+    },
+    {
+        "id": 1996,
+        "name": "Yedisu",
+        "provinceId": 12,
+        "postalCode": "12830"
+    },
+    {
+        "id": 1106,
+        "name": "Adilcevaz",
+        "provinceId": 13,
+        "postalCode": "13500"
+    },
+    {
+        "id": 1112,
+        "name": "Ahlat",
+        "provinceId": 13,
+        "postalCode": "13400"
+    },
+    {
+        "id": 1798,
+        "name": "Güroymak",
+        "provinceId": 13,
+        "postalCode": "13810"
+    },
+    {
+        "id": 1394,
+        "name": "Hizan",
+        "provinceId": 13,
+        "postalCode": "13600"
+    },
+    {
+        "id": 1196,
+        "name": "Merkez",
+        "provinceId": 13,
+        "postalCode": "13000"
+    },
+    {
+        "id": 1537,
+        "name": "Mutki",
+        "provinceId": 13,
+        "postalCode": "13700"
+    },
+    {
+        "id": 1669,
+        "name": "Tatvan",
+        "provinceId": 13,
+        "postalCode": "13200"
+    },
+    {
+        "id": 1916,
+        "name": "Dörtdivan",
+        "provinceId": 14,
+        "postalCode": "14910"
+    },
+    {
+        "id": 1346,
+        "name": "Gerede",
+        "provinceId": 14,
+        "postalCode": "14900"
+    },
+    {
+        "id": 1364,
+        "name": "Göynük",
+        "provinceId": 14,
+        "postalCode": "14780"
+    },
+    {
+        "id": 1466,
+        "name": "Kıbrıscık",
+        "provinceId": 14,
+        "postalCode": "14610"
+    },
+    {
+        "id": 1522,
+        "name": "Mengen",
+        "provinceId": 14,
+        "postalCode": "14850"
+    },
+    {
+        "id": 1199,
+        "name": "Merkez",
+        "provinceId": 14,
+        "postalCode": "14300"
+    },
+    {
+        "id": 1531,
+        "name": "Mudurnu",
+        "provinceId": 14,
+        "postalCode": "14800"
+    },
+    {
+        "id": 1610,
+        "name": "Seben",
+        "provinceId": 14,
+        "postalCode": "14750"
+    },
+    {
+        "id": 1997,
+        "name": "Yeniçağa",
+        "provinceId": 14,
+        "postalCode": "14650"
+    },
+    {
+        "id": 1109,
+        "name": "Ağlasun",
+        "provinceId": 15,
+        "postalCode": "15800"
+    },
+    {
+        "id": 1874,
+        "name": "Altınyayla",
+        "provinceId": 15,
+        "postalCode": "15420"
+    },
+    {
+        "id": 1211,
+        "name": "Bucak",
+        "provinceId": 15,
+        "postalCode": "15300"
+    },
+    {
+        "id": 1899,
+        "name": "Çavdır",
+        "provinceId": 15,
+        "postalCode": "15900"
+    },
+    {
+        "id": 1903,
+        "name": "Çeltikçi",
+        "provinceId": 15,
+        "postalCode": "15070"
+    },
+    {
+        "id": 1357,
+        "name": "Gölhisar",
+        "provinceId": 15,
+        "postalCode": "15400"
+    },
+    {
+        "id": 1813,
+        "name": "Karamanlı",
+        "provinceId": 15,
+        "postalCode": "15700"
+    },
+    {
+        "id": 1816,
+        "name": "Kemer",
+        "provinceId": 15,
+        "postalCode": "15090"
+    },
+    {
+        "id": 1215,
+        "name": "Merkez",
+        "provinceId": 15,
+        "postalCode": "15100"
+    },
+    {
+        "id": 1672,
+        "name": "Tefenni",
+        "provinceId": 15,
+        "postalCode": "15600"
+    },
+    {
+        "id": 1728,
+        "name": "Yeşilova",
+        "provinceId": 15,
+        "postalCode": "15500"
+    },
+    {
+        "id": 1783,
+        "name": "Büyükorhan",
+        "provinceId": 16,
+        "postalCode": "16990"
+    },
+    {
+        "id": 1343,
+        "name": "Gemlik",
+        "provinceId": 16,
+        "postalCode": "16600"
+    },
+    {
+        "id": 1935,
+        "name": "Gürsu",
+        "provinceId": 16,
+        "postalCode": "16580"
+    },
+    {
+        "id": 1799,
+        "name": "Harmancık",
+        "provinceId": 16,
+        "postalCode": "16770"
+    },
+    {
+        "id": 1411,
+        "name": "İnegöl",
+        "provinceId": 16,
+        "postalCode": "16415"
+    },
+    {
+        "id": 1420,
+        "name": "İznik",
+        "provinceId": 16,
+        "postalCode": "16870"
+    },
+    {
+        "id": 1434,
+        "name": "Karacabey",
+        "provinceId": 16,
+        "postalCode": "16700"
+    },
+    {
+        "id": 1457,
+        "name": "Keles",
+        "provinceId": 16,
+        "postalCode": "16740"
+    },
+    {
+        "id": 1960,
+        "name": "Kestel",
+        "provinceId": 16,
+        "postalCode": "16460"
+    },
+    {
+        "id": 1530,
+        "name": "Mudanya",
+        "provinceId": 16,
+        "postalCode": "16950"
+    },
+    {
+        "id": 1535,
+        "name": "Mustafakemalpaşa",
+        "provinceId": 16,
+        "postalCode": "16535"
+    },
+    {
+        "id": 1829,
+        "name": "Nilüfer",
+        "provinceId": 16,
+        "postalCode": "16110"
+    },
+    {
+        "id": 1553,
+        "name": "Orhaneli",
+        "provinceId": 16,
+        "postalCode": "16980"
+    },
+    {
+        "id": 1554,
+        "name": "Orhangazi",
+        "provinceId": 16,
+        "postalCode": "16810"
+    },
+    {
+        "id": 1832,
+        "name": "Osmangazi",
+        "provinceId": 16,
+        "postalCode": "16190"
+    },
+    {
+        "id": 1725,
+        "name": "Yenişehir",
+        "provinceId": 16,
+        "postalCode": "16900"
+    },
+    {
+        "id": 1859,
+        "name": "Yıldırım",
+        "provinceId": 16,
+        "postalCode": "16290"
+    },
+    {
+        "id": 1160,
+        "name": "Ayvacık",
+        "provinceId": 17,
+        "postalCode": "17860"
+    },
+    {
+        "id": 1180,
+        "name": "Bayramiç",
+        "provinceId": 17,
+        "postalCode": "17700"
+    },
+    {
+        "id": 1190,
+        "name": "Biga",
+        "provinceId": 17,
+        "postalCode": "17200"
+    },
+    {
+        "id": 1205,
+        "name": "Bozcaada",
+        "provinceId": 17,
+        "postalCode": "17680"
+    },
+    {
+        "id": 1229,
+        "name": "Çan",
+        "provinceId": 17,
+        "postalCode": "17400"
+    },
+    {
+        "id": 1293,
+        "name": "Eceabat",
+        "provinceId": 17,
+        "postalCode": "17900"
+    },
+    {
+        "id": 1326,
+        "name": "Ezine",
+        "provinceId": 17,
+        "postalCode": "17600"
+    },
+    {
+        "id": 1340,
+        "name": "Gelibolu",
+        "provinceId": 17,
+        "postalCode": "17360"
+    },
+    {
+        "id": 1408,
+        "name": "Gökçeada",
+        "provinceId": 17,
+        "postalCode": "17760"
+    },
+    {
+        "id": 1503,
+        "name": "Lapseki",
+        "provinceId": 17,
+        "postalCode": "17810"
+    },
+    {
+        "id": 1230,
+        "name": "Merkez",
+        "provinceId": 17,
+        "postalCode": "17020"
+    },
+    {
+        "id": 1722,
+        "name": "Yenice",
+        "provinceId": 17,
+        "postalCode": "17560"
+    },
+    {
+        "id": 1765,
+        "name": "Atkaracalar",
+        "provinceId": 18,
+        "postalCode": "18310"
+    },
+    {
+        "id": 1885,
+        "name": "Bayramören",
+        "provinceId": 18,
+        "postalCode": "18320"
+    },
+    {
+        "id": 1248,
+        "name": "Çerkeş",
+        "provinceId": 18,
+        "postalCode": "18600"
+    },
+    {
+        "id": 1300,
+        "name": "Eldivan",
+        "provinceId": 18,
+        "postalCode": "18700"
+    },
+    {
+        "id": 1399,
+        "name": "Ilgaz",
+        "provinceId": 18,
+        "postalCode": "18400"
+    },
+    {
+        "id": 1817,
+        "name": "Kızılırmak",
+        "provinceId": 18,
+        "postalCode": "18280"
+    },
+    {
+        "id": 1963,
+        "name": "Korgun",
+        "provinceId": 18,
+        "postalCode": "18260"
+    },
+    {
+        "id": 1494,
+        "name": "Kurşunlu",
+        "provinceId": 18,
+        "postalCode": "18300"
+    },
+    {
+        "id": 1232,
+        "name": "Merkez",
+        "provinceId": 18,
+        "postalCode": "18100"
+    },
+    {
+        "id": 1555,
+        "name": "Orta",
+        "provinceId": 18,
+        "postalCode": "18800"
+    },
+    {
+        "id": 1649,
+        "name": "Şabanözü",
+        "provinceId": 18,
+        "postalCode": "18650"
+    },
+    {
+        "id": 1718,
+        "name": "Yapraklı",
+        "provinceId": 18,
+        "postalCode": "18900"
+    },
+    {
+        "id": 1124,
+        "name": "Alaca",
+        "provinceId": 19,
+        "postalCode": "19600"
+    },
+    {
+        "id": 1177,
+        "name": "Bayat",
+        "provinceId": 19,
+        "postalCode": "19800"
+    },
+    {
+        "id": 1778,
+        "name": "Boğazkale",
+        "provinceId": 19,
+        "postalCode": "19310"
+    },
+    {
+        "id": 1911,
+        "name": "Dodurga",
+        "provinceId": 19,
+        "postalCode": "19060"
+    },
+    {
+        "id": 1414,
+        "name": "İskilip",
+        "provinceId": 19,
+        "postalCode": "19400"
+    },
+    {
+        "id": 1445,
+        "name": "Kargı",
+        "provinceId": 19,
+        "postalCode": "19900"
+    },
+    {
+        "id": 1972,
+        "name": "Laçin",
+        "provinceId": 19,
+        "postalCode": "19020"
+    },
+    {
+        "id": 1520,
+        "name": "Mecitözü",
+        "provinceId": 19,
+        "postalCode": "19700"
+    },
+    {
+        "id": 1259,
+        "name": "Merkez",
+        "provinceId": 19,
+        "postalCode": "19000"
+    },
+    {
+        "id": 1976,
+        "name": "Oğuzlar",
+        "provinceId": 19,
+        "postalCode": "19070"
+    },
+    {
+        "id": 1556,
+        "name": "Ortaköy",
+        "provinceId": 19,
+        "postalCode": "19950"
+    },
+    {
+        "id": 1558,
+        "name": "Osmancık",
+        "provinceId": 19,
+        "postalCode": "19500"
+    },
+    {
+        "id": 1642,
+        "name": "Sungurlu",
+        "provinceId": 19,
+        "postalCode": "19300"
+    },
+    {
+        "id": 1850,
+        "name": "Uğurludağ",
+        "provinceId": 19,
+        "postalCode": "19410"
+    },
+    {
+        "id": 1102,
+        "name": "Acıpayam",
+        "provinceId": 20,
+        "postalCode": "20800"
+    },
+    {
+        "id": 1769,
+        "name": "Babadağ",
+        "provinceId": 20,
+        "postalCode": "20480"
+    },
+    {
+        "id": 1881,
+        "name": "Baklan",
+        "provinceId": 20,
+        "postalCode": "20770"
+    },
+    {
+        "id": 1774,
+        "name": "Bekilli",
+        "provinceId": 20,
+        "postalCode": "20930"
+    },
+    {
+        "id": 1888,
+        "name": "Beyağaç",
+        "provinceId": 20,
+        "postalCode": "20590"
+    },
+    {
+        "id": 1889,
+        "name": "Bozkurt",
+        "provinceId": 20,
+        "postalCode": "20370"
+    },
+    {
+        "id": 1214,
+        "name": "Buldan",
+        "provinceId": 20,
+        "postalCode": "20400"
+    },
+    {
+        "id": 1224,
+        "name": "Çal",
+        "provinceId": 20,
+        "postalCode": "20710"
+    },
+    {
+        "id": 1226,
+        "name": "Çameli",
+        "provinceId": 20,
+        "postalCode": "20980"
+    },
+    {
+        "id": 1233,
+        "name": "Çardak",
+        "provinceId": 20,
+        "postalCode": "20360"
+    },
+    {
+        "id": 1257,
+        "name": "Çivril",
+        "provinceId": 20,
+        "postalCode": "20690"
+    },
+    {
+        "id": 1371,
+        "name": "Güney",
+        "provinceId": 20,
+        "postalCode": "20460"
+    },
+    {
+        "id": 1803,
+        "name": "Honaz",
+        "provinceId": 20,
+        "postalCode": "20330"
+    },
+    {
+        "id": 1426,
+        "name": "Kale",
+        "provinceId": 20,
+        "postalCode": "20570"
+    },
+    {
+        "id": 2079,
+        "name": "Merkezefendi",
+        "provinceId": 20,
+        "postalCode": "20040"
+    },
+    {
+        "id": 1871,
+        "name": "Pamukkale",
+        "provinceId": 20,
+        "postalCode": "20180"
+    },
+    {
+        "id": 1597,
+        "name": "Sarayköy",
+        "provinceId": 20,
+        "postalCode": "20315"
+    },
+    {
+        "id": 1840,
+        "name": "Serinhisar",
+        "provinceId": 20,
+        "postalCode": "20430"
+    },
+    {
+        "id": 1670,
+        "name": "Tavas",
+        "provinceId": 20,
+        "postalCode": "20535"
+    },
+    {
+        "id": 2040,
+        "name": "Bağlar",
+        "provinceId": 21,
+        "postalCode": "21090"
+    },
+    {
+        "id": 1195,
+        "name": "Bismil",
+        "provinceId": 21,
+        "postalCode": "21500"
+    },
+    {
+        "id": 1249,
+        "name": "Çermik",
+        "provinceId": 21,
+        "postalCode": "21600"
+    },
+    {
+        "id": 1253,
+        "name": "Çınar",
+        "provinceId": 21,
+        "postalCode": "21750"
+    },
+    {
+        "id": 1263,
+        "name": "Çüngüş",
+        "provinceId": 21,
+        "postalCode": "21870"
+    },
+    {
+        "id": 1278,
+        "name": "Dicle",
+        "provinceId": 21,
+        "postalCode": "21830"
+    },
+    {
+        "id": 1791,
+        "name": "Eğil",
+        "provinceId": 21,
+        "postalCode": "21470"
+    },
+    {
+        "id": 1315,
+        "name": "Ergani",
+        "provinceId": 21,
+        "postalCode": "21950"
+    },
+    {
+        "id": 1381,
+        "name": "Hani",
+        "provinceId": 21,
+        "postalCode": "21800"
+    },
+    {
+        "id": 1389,
+        "name": "Hazro",
+        "provinceId": 21,
+        "postalCode": "21560"
+    },
+    {
+        "id": 2041,
+        "name": "Kayapınar",
+        "provinceId": 21,
+        "postalCode": "21070"
+    },
+    {
+        "id": 1962,
+        "name": "Kocaköy",
+        "provinceId": 21,
+        "postalCode": "21450"
+    },
+    {
+        "id": 1490,
+        "name": "Kulp",
+        "provinceId": 21,
+        "postalCode": "21900"
+    },
+    {
+        "id": 1504,
+        "name": "Lice",
+        "provinceId": 21,
+        "postalCode": "21700"
+    },
+    {
+        "id": 1624,
+        "name": "Silvan",
+        "provinceId": 21,
+        "postalCode": "21640"
+    },
+    {
+        "id": 2042,
+        "name": "Sur",
+        "provinceId": 21,
+        "postalCode": "21200"
+    },
+    {
+        "id": 2043,
+        "name": "Yenişehir",
+        "provinceId": 21,
+        "postalCode": "21120"
+    },
+    {
+        "id": 1307,
+        "name": "Enez",
+        "provinceId": 22,
+        "postalCode": "22700"
+    },
+    {
+        "id": 1385,
+        "name": "Havsa",
+        "provinceId": 22,
+        "postalCode": "22500"
+    },
+    {
+        "id": 1412,
+        "name": "İpsala",
+        "provinceId": 22,
+        "postalCode": "22490"
+    },
+    {
+        "id": 1464,
+        "name": "Keşan",
+        "provinceId": 22,
+        "postalCode": "22880"
+    },
+    {
+        "id": 1502,
+        "name": "Lalapaşa",
+        "provinceId": 22,
+        "postalCode": "22950"
+    },
+    {
+        "id": 1523,
+        "name": "Meriç",
+        "provinceId": 22,
+        "postalCode": "22610"
+    },
+    {
+        "id": 1295,
+        "name": "Merkez",
+        "provinceId": 22,
+        "postalCode": "22100"
+    },
+    {
+        "id": 1988,
+        "name": "Süloğlu",
+        "provinceId": 22,
+        "postalCode": "22580"
+    },
+    {
+        "id": 1705,
+        "name": "Uzunköprü",
+        "provinceId": 22,
+        "postalCode": "22300"
+    },
+    {
+        "id": 1110,
+        "name": "Ağın",
+        "provinceId": 23,
+        "postalCode": "23960"
+    },
+    {
+        "id": 1873,
+        "name": "Alacakaya",
+        "provinceId": 23,
+        "postalCode": "23410"
+    },
+    {
+        "id": 1762,
+        "name": "Arıcak",
+        "provinceId": 23,
+        "postalCode": "23510"
+    },
+    {
+        "id": 1173,
+        "name": "Baskil",
+        "provinceId": 23,
+        "postalCode": "23800"
+    },
+    {
+        "id": 1438,
+        "name": "Karakoçan",
+        "provinceId": 23,
+        "postalCode": "23600"
+    },
+    {
+        "id": 1455,
+        "name": "Keban",
+        "provinceId": 23,
+        "postalCode": "23700"
+    },
+    {
+        "id": 1820,
+        "name": "Kovancılar",
+        "provinceId": 23,
+        "postalCode": "23850"
+    },
+    {
+        "id": 1506,
+        "name": "Maden",
+        "provinceId": 23,
+        "postalCode": "23400"
+    },
+    {
+        "id": 1298,
+        "name": "Merkez",
+        "provinceId": 23,
+        "postalCode": "23270"
+    },
+    {
+        "id": 1566,
+        "name": "Palu",
+        "provinceId": 23,
+        "postalCode": "23530"
+    },
+    {
+        "id": 1631,
+        "name": "Sivrice",
+        "provinceId": 23,
+        "postalCode": "23900"
+    },
+    {
+        "id": 1243,
+        "name": "Çayırlı",
+        "provinceId": 24,
+        "postalCode": "24500"
+    },
+    {
+        "id": 1406,
+        "name": "İliç",
+        "provinceId": 24,
+        "postalCode": "24700"
+    },
+    {
+        "id": 1459,
+        "name": "Kemah",
+        "provinceId": 24,
+        "postalCode": "24400"
+    },
+    {
+        "id": 1460,
+        "name": "Kemaliye",
+        "provinceId": 24,
+        "postalCode": "24610"
+    },
+    {
+        "id": 1318,
+        "name": "Merkez",
+        "provinceId": 24,
+        "postalCode": "24100"
+    },
+    {
+        "id": 1977,
+        "name": "Otlukbeli",
+        "provinceId": 24,
+        "postalCode": "24515"
+    },
+    {
+        "id": 1583,
+        "name": "Refahiye",
+        "provinceId": 24,
+        "postalCode": "24300"
+    },
+    {
+        "id": 1675,
+        "name": "Tercan",
+        "provinceId": 24,
+        "postalCode": "24870"
+    },
+    {
+        "id": 1853,
+        "name": "Üzümlü",
+        "provinceId": 24,
+        "postalCode": "24160"
+    },
+    {
+        "id": 1153,
+        "name": "Aşkale",
+        "provinceId": 25,
+        "postalCode": "25500"
+    },
+    {
+        "id": 1945,
+        "name": "Aziziye",
+        "provinceId": 25,
+        "postalCode": "25700"
+    },
+    {
+        "id": 1235,
+        "name": "Çat",
+        "provinceId": 25,
+        "postalCode": "25750"
+    },
+    {
+        "id": 1392,
+        "name": "Hınıs",
+        "provinceId": 25,
+        "postalCode": "25600"
+    },
+    {
+        "id": 1396,
+        "name": "Horasan",
+        "provinceId": 25,
+        "postalCode": "25800"
+    },
+    {
+        "id": 1416,
+        "name": "İspir",
+        "provinceId": 25,
+        "postalCode": "25900"
+    },
+    {
+        "id": 1812,
+        "name": "Karaçoban",
+        "provinceId": 25,
+        "postalCode": "25610"
+    },
+    {
+        "id": 1444,
+        "name": "Karayazı",
+        "provinceId": 25,
+        "postalCode": "25830"
+    },
+    {
+        "id": 1967,
+        "name": "Köprüköy",
+        "provinceId": 25,
+        "postalCode": "25320"
+    },
+    {
+        "id": 1540,
+        "name": "Narman",
+        "provinceId": 25,
+        "postalCode": "25530"
+    },
+    {
+        "id": 1550,
+        "name": "Oltu",
+        "provinceId": 25,
+        "postalCode": "25400"
+    },
+    {
+        "id": 1551,
+        "name": "Olur",
+        "provinceId": 25,
+        "postalCode": "25650"
+    },
+    {
+        "id": 2044,
+        "name": "Palandöken",
+        "provinceId": 25,
+        "postalCode": "25090"
+    },
+    {
+        "id": 1567,
+        "name": "Pasinler",
+        "provinceId": 25,
+        "postalCode": "25300"
+    },
+    {
+        "id": 1865,
+        "name": "Pazaryolu",
+        "provinceId": 25,
+        "postalCode": "25930"
+    },
+    {
+        "id": 1657,
+        "name": "Şenkaya",
+        "provinceId": 25,
+        "postalCode": "25370"
+    },
+    {
+        "id": 1674,
+        "name": "Tekman",
+        "provinceId": 25,
+        "postalCode": "25560"
+    },
+    {
+        "id": 1683,
+        "name": "Tortum",
+        "provinceId": 25,
+        "postalCode": "25460"
+    },
+    {
+        "id": 1851,
+        "name": "Uzundere",
+        "provinceId": 25,
+        "postalCode": "25440"
+    },
+    {
+        "id": 2045,
+        "name": "Yakutiye",
+        "provinceId": 25,
+        "postalCode": "25040"
+    },
+    {
+        "id": 1759,
+        "name": "Alpu",
+        "provinceId": 26,
+        "postalCode": "26850"
+    },
+    {
+        "id": 1777,
+        "name": "Beylikova",
+        "provinceId": 26,
+        "postalCode": "26750"
+    },
+    {
+        "id": 1255,
+        "name": "Çifteler",
+        "provinceId": 26,
+        "postalCode": "26700"
+    },
+    {
+        "id": 1934,
+        "name": "Günyüzü",
+        "provinceId": 26,
+        "postalCode": "26663"
+    },
+    {
+        "id": 1939,
+        "name": "Han",
+        "provinceId": 26,
+        "postalCode": "26710"
+    },
+    {
+        "id": 1808,
+        "name": "İnönü",
+        "provinceId": 26,
+        "postalCode": "26670"
+    },
+    {
+        "id": 1508,
+        "name": "Mahmudiye",
+        "provinceId": 26,
+        "postalCode": "26800"
+    },
+    {
+        "id": 1973,
+        "name": "Mihalgazi",
+        "provinceId": 26,
+        "postalCode": "26880"
+    },
+    {
+        "id": 1527,
+        "name": "Mihalıççık",
+        "provinceId": 26,
+        "postalCode": "26940"
+    },
+    {
+        "id": 2046,
+        "name": "Odunpazarı",
+        "provinceId": 26,
+        "postalCode": "26250"
+    },
+    {
+        "id": 1599,
+        "name": "Sarıcakaya",
+        "provinceId": 26,
+        "postalCode": "26870"
+    },
+    {
+        "id": 1618,
+        "name": "Seyitgazi",
+        "provinceId": 26,
+        "postalCode": "26960"
+    },
+    {
+        "id": 1632,
+        "name": "Sivrihisar",
+        "provinceId": 26,
+        "postalCode": "26625"
+    },
+    {
+        "id": 2047,
+        "name": "Tepebaşı",
+        "provinceId": 26,
+        "postalCode": "26170"
+    },
+    {
+        "id": 1139,
+        "name": "Araban",
+        "provinceId": 27,
+        "postalCode": "27650"
+    },
+    {
+        "id": 1415,
+        "name": "İslahiye",
+        "provinceId": 27,
+        "postalCode": "27805"
+    },
+    {
+        "id": 1956,
+        "name": "Karkamış",
+        "provinceId": 27,
+        "postalCode": "27880"
+    },
+    {
+        "id": 1546,
+        "name": "Nizip",
+        "provinceId": 27,
+        "postalCode": "27700"
+    },
+    {
+        "id": 1974,
+        "name": "Nurdağı",
+        "provinceId": 27,
+        "postalCode": "27840"
+    },
+    {
+        "id": 1549,
+        "name": "Oğuzeli",
+        "provinceId": 27,
+        "postalCode": "27910"
+    },
+    {
+        "id": 1841,
+        "name": "Şahinbey",
+        "provinceId": 27,
+        "postalCode": "27270"
+    },
+    {
+        "id": 1844,
+        "name": "Şehitkamil",
+        "provinceId": 27,
+        "postalCode": "27620"
+    },
+    {
+        "id": 1720,
+        "name": "Yavuzeli",
+        "provinceId": 27,
+        "postalCode": "27970"
+    },
+    {
+        "id": 1133,
+        "name": "Alucra",
+        "provinceId": 28,
+        "postalCode": "28700"
+    },
+    {
+        "id": 1212,
+        "name": "Bulancak",
+        "provinceId": 28,
+        "postalCode": "28310"
+    },
+    {
+        "id": 1893,
+        "name": "Çamoluk",
+        "provinceId": 28,
+        "postalCode": "28710"
+    },
+    {
+        "id": 1894,
+        "name": "Çanakçı",
+        "provinceId": 28,
+        "postalCode": "28810"
+    },
+    {
+        "id": 1272,
+        "name": "Dereli",
+        "provinceId": 28,
+        "postalCode": "28950"
+    },
+    {
+        "id": 1912,
+        "name": "Doğankent",
+        "provinceId": 28,
+        "postalCode": "28510"
+    },
+    {
+        "id": 1320,
+        "name": "Espiye",
+        "provinceId": 28,
+        "postalCode": "28600"
+    },
+    {
+        "id": 1324,
+        "name": "Eynesil",
+        "provinceId": 28,
+        "postalCode": "28850"
+    },
+    {
+        "id": 1361,
+        "name": "Görele",
+        "provinceId": 28,
+        "postalCode": "28820"
+    },
+    {
+        "id": 1930,
+        "name": "Güce",
+        "provinceId": 28,
+        "postalCode": "28520"
+    },
+    {
+        "id": 1465,
+        "name": "Keşap",
+        "provinceId": 28,
+        "postalCode": "28900"
+    },
+    {
+        "id": 1352,
+        "name": "Merkez",
+        "provinceId": 28,
+        "postalCode": "28100"
+    },
+    {
+        "id": 1837,
+        "name": "Piraziz",
+        "provinceId": 28,
+        "postalCode": "28340"
+    },
+    {
+        "id": 1654,
+        "name": "Şebinkarahisar",
+        "provinceId": 28,
+        "postalCode": "28400"
+    },
+    {
+        "id": 1678,
+        "name": "Tirebolu",
+        "provinceId": 28,
+        "postalCode": "28500"
+    },
+    {
+        "id": 1854,
+        "name": "Yağlıdere",
+        "provinceId": 28,
+        "postalCode": "28610"
+    },
+    {
+        "id": 1458,
+        "name": "Kelkit",
+        "provinceId": 29,
+        "postalCode": "29600"
+    },
+    {
+        "id": 1822,
+        "name": "Köse",
+        "provinceId": 29,
+        "postalCode": "29650"
+    },
+    {
+        "id": 1971,
+        "name": "Kürtün",
+        "provinceId": 29,
+        "postalCode": "29830"
+    },
+    {
+        "id": 1369,
+        "name": "Merkez",
+        "provinceId": 29,
+        "postalCode": "29200"
+    },
+    {
+        "id": 1660,
+        "name": "Şiran",
+        "provinceId": 29,
+        "postalCode": "29700"
+    },
+    {
+        "id": 1684,
+        "name": "Torul",
+        "provinceId": 29,
+        "postalCode": "29800"
+    },
+    {
+        "id": 1261,
+        "name": "Çukurca",
+        "provinceId": 30,
+        "postalCode": "30700"
+    },
+    {
+        "id": 2107,
+        "name": "Derecik",
+        "provinceId": 30,
+        "postalCode": "30802"
+    },
+    {
+        "id": 1377,
+        "name": "Merkez",
+        "provinceId": 30,
+        "postalCode": "30110"
+    },
+    {
+        "id": 1656,
+        "name": "Şemdinli",
+        "provinceId": 30,
+        "postalCode": "30800"
+    },
+    {
+        "id": 1737,
+        "name": "Yüksekova",
+        "provinceId": 30,
+        "postalCode": "30330"
+    },
+    {
+        "id": 1131,
+        "name": "Altınözü",
+        "provinceId": 31,
+        "postalCode": "31753"
+    },
+    {
+        "id": 2080,
+        "name": "Antakya",
+        "provinceId": 31,
+        "postalCode": "31135"
+    },
+    {
+        "id": 2081,
+        "name": "Arsuz",
+        "provinceId": 31,
+        "postalCode": "31225"
+    },
+    {
+        "id": 1887,
+        "name": "Belen",
+        "provinceId": 31,
+        "postalCode": "31350"
+    },
+    {
+        "id": 2082,
+        "name": "Defne",
+        "provinceId": 31,
+        "postalCode": "31141"
+    },
+    {
+        "id": 1289,
+        "name": "Dörtyol",
+        "provinceId": 31,
+        "postalCode": "31670"
+    },
+    {
+        "id": 1792,
+        "name": "Erzin",
+        "provinceId": 31,
+        "postalCode": "31960"
+    },
+    {
+        "id": 1382,
+        "name": "Hassa",
+        "provinceId": 31,
+        "postalCode": "31720"
+    },
+    {
+        "id": 1413,
+        "name": "İskenderun",
+        "provinceId": 31,
+        "postalCode": "31280"
+    },
+    {
+        "id": 1468,
+        "name": "Kırıkhan",
+        "provinceId": 31,
+        "postalCode": "31440"
+    },
+    {
+        "id": 1970,
+        "name": "Kumlu",
+        "provinceId": 31,
+        "postalCode": "31520"
+    },
+    {
+        "id": 2083,
+        "name": "Payas",
+        "provinceId": 31,
+        "postalCode": "31900"
+    },
+    {
+        "id": 1585,
+        "name": "Reyhanlı",
+        "provinceId": 31,
+        "postalCode": "31500"
+    },
+    {
+        "id": 1591,
+        "name": "Samandağ",
+        "provinceId": 31,
+        "postalCode": "31785"
+    },
+    {
+        "id": 1721,
+        "name": "Yayladağı",
+        "provinceId": 31,
+        "postalCode": "31553"
+    },
+    {
+        "id": 1755,
+        "name": "Aksu",
+        "provinceId": 32,
+        "postalCode": "32510"
+    },
+    {
+        "id": 1154,
+        "name": "Atabey",
+        "provinceId": 32,
+        "postalCode": "32670"
+    },
+    {
+        "id": 1297,
+        "name": "Eğirdir",
+        "provinceId": 32,
+        "postalCode": "32500"
+    },
+    {
+        "id": 1341,
+        "name": "Gelendost",
+        "provinceId": 32,
+        "postalCode": "32900"
+    },
+    {
+        "id": 1929,
+        "name": "Gönen",
+        "provinceId": 32,
+        "postalCode": "32090"
+    },
+    {
+        "id": 1456,
+        "name": "Keçiborlu",
+        "provinceId": 32,
+        "postalCode": "32700"
+    },
+    {
+        "id": 1401,
+        "name": "Merkez",
+        "provinceId": 32,
+        "postalCode": "32040"
+    },
+    {
+        "id": 1615,
+        "name": "Senirkent",
+        "provinceId": 32,
+        "postalCode": "32610"
+    },
+    {
+        "id": 1648,
+        "name": "Sütçüler",
+        "provinceId": 32,
+        "postalCode": "32950"
+    },
+    {
+        "id": 1651,
+        "name": "Şarkikaraağaç",
+        "provinceId": 32,
+        "postalCode": "32810"
+    },
+    {
+        "id": 1699,
+        "name": "Uluborlu",
+        "provinceId": 32,
+        "postalCode": "32650"
+    },
+    {
+        "id": 1717,
+        "name": "Yalvaç",
+        "provinceId": 32,
+        "postalCode": "32430"
+    },
+    {
+        "id": 2001,
+        "name": "Yenişarbademli",
+        "provinceId": 32,
+        "postalCode": "32850"
+    },
+    {
+        "id": 2064,
+        "name": "Akdeniz",
+        "provinceId": 33,
+        "postalCode": "33010"
+    },
+    {
+        "id": 1135,
+        "name": "Anamur",
+        "provinceId": 33,
+        "postalCode": "33630"
+    },
+    {
+        "id": 1766,
+        "name": "Aydıncık",
+        "provinceId": 33,
+        "postalCode": "33840"
+    },
+    {
+        "id": 1779,
+        "name": "Bozyazı",
+        "provinceId": 33,
+        "postalCode": "33830"
+    },
+    {
+        "id": 1892,
+        "name": "Çamlıyayla",
+        "provinceId": 33,
+        "postalCode": "33580"
+    },
+    {
+        "id": 1311,
+        "name": "Erdemli",
+        "provinceId": 33,
+        "postalCode": "33730"
+    },
+    {
+        "id": 1366,
+        "name": "Gülnar",
+        "provinceId": 33,
+        "postalCode": "33715"
+    },
+    {
+        "id": 2065,
+        "name": "Mezitli",
+        "provinceId": 33,
+        "postalCode": "33340"
+    },
+    {
+        "id": 1536,
+        "name": "Mut",
+        "provinceId": 33,
+        "postalCode": "33600"
+    },
+    {
+        "id": 1621,
+        "name": "Silifke",
+        "provinceId": 33,
+        "postalCode": "33940"
+    },
+    {
+        "id": 1665,
+        "name": "Tarsus",
+        "provinceId": 33,
+        "postalCode": "33460"
+    },
+    {
+        "id": 2066,
+        "name": "Toroslar",
+        "provinceId": 33,
+        "postalCode": "33220"
+    },
+    {
+        "id": 2067,
+        "name": "Yenişehir",
+        "provinceId": 33,
+        "postalCode": "33140"
+    },
+    {
+        "id": 1103,
+        "name": "Adalar",
+        "provinceId": 34,
+        "postalCode": "34975"
+    },
+    {
+        "id": 2048,
+        "name": "Arnavutköy",
+        "provinceId": 34,
+        "postalCode": "34275"
+    },
+    {
+        "id": 2049,
+        "name": "Ataşehir",
+        "provinceId": 34,
+        "postalCode": "34758"
+    },
+    {
+        "id": 2003,
+        "name": "Avcılar",
+        "provinceId": 34,
+        "postalCode": "34315"
+    },
+    {
+        "id": 2004,
+        "name": "Bağcılar",
+        "provinceId": 34,
+        "postalCode": "34200"
+    },
+    {
+        "id": 2005,
+        "name": "Bahçelievler",
+        "provinceId": 34,
+        "postalCode": "34180"
+    },
+    {
+        "id": 1166,
+        "name": "Bakırköy",
+        "provinceId": 34,
+        "postalCode": "34158"
+    },
+    {
+        "id": 2050,
+        "name": "Başakşehir",
+        "provinceId": 34,
+        "postalCode": "34494"
+    },
+    {
+        "id": 1886,
+        "name": "Bayrampaşa",
+        "provinceId": 34,
+        "postalCode": "34035"
+    },
+    {
+        "id": 1183,
+        "name": "Beşiktaş",
+        "provinceId": 34,
+        "postalCode": "34353"
+    },
+    {
+        "id": 1185,
+        "name": "Beykoz",
+        "provinceId": 34,
+        "postalCode": "34810"
+    },
+    {
+        "id": 2051,
+        "name": "Beylikdüzü",
+        "provinceId": 34,
+        "postalCode": "34520"
+    },
+    {
+        "id": 1186,
+        "name": "Beyoğlu",
+        "provinceId": 34,
+        "postalCode": "34421"
+    },
+    {
+        "id": 1782,
+        "name": "Büyükçekmece",
+        "provinceId": 34,
+        "postalCode": "34500"
+    },
+    {
+        "id": 1237,
+        "name": "Çatalca",
+        "provinceId": 34,
+        "postalCode": "34550"
+    },
+    {
+        "id": 2052,
+        "name": "Çekmeköy",
+        "provinceId": 34,
+        "postalCode": "34794"
+    },
+    {
+        "id": 2016,
+        "name": "Esenler",
+        "provinceId": 34,
+        "postalCode": "34230"
+    },
+    {
+        "id": 2053,
+        "name": "Esenyurt",
+        "provinceId": 34,
+        "postalCode": "34517"
+    },
+    {
+        "id": 1325,
+        "name": "Eyüpsultan",
+        "provinceId": 34,
+        "postalCode": "34060"
+    },
+    {
+        "id": 1327,
+        "name": "Fatih",
+        "provinceId": 34,
+        "postalCode": "34096"
+    },
+    {
+        "id": 1336,
+        "name": "Gaziosmanpaşa",
+        "provinceId": 34,
+        "postalCode": "34245"
+    },
+    {
+        "id": 2010,
+        "name": "Güngören",
+        "provinceId": 34,
+        "postalCode": "34160"
+    },
+    {
+        "id": 1421,
+        "name": "Kadıköy",
+        "provinceId": 34,
+        "postalCode": "34744"
+    },
+    {
+        "id": 1810,
+        "name": "Kağıthane",
+        "provinceId": 34,
+        "postalCode": "34403"
+    },
+    {
+        "id": 1449,
+        "name": "Kartal",
+        "provinceId": 34,
+        "postalCode": "34862"
+    },
+    {
+        "id": 1823,
+        "name": "Küçükçekmece",
+        "provinceId": 34,
+        "postalCode": "34307"
+    },
+    {
+        "id": 2012,
+        "name": "Maltepe",
+        "provinceId": 34,
+        "postalCode": "34854"
+    },
+    {
+        "id": 1835,
+        "name": "Pendik",
+        "provinceId": 34,
+        "postalCode": "34893"
+    },
+    {
+        "id": 2054,
+        "name": "Sancaktepe",
+        "provinceId": 34,
+        "postalCode": "34885"
+    },
+    {
+        "id": 1604,
+        "name": "Sarıyer",
+        "provinceId": 34,
+        "postalCode": "34396"
+    },
+    {
+        "id": 1622,
+        "name": "Silivri",
+        "provinceId": 34,
+        "postalCode": "34582"
+    },
+    {
+        "id": 2014,
+        "name": "Sultanbeyli",
+        "provinceId": 34,
+        "postalCode": "34920"
+    },
+    {
+        "id": 2055,
+        "name": "Sultangazi",
+        "provinceId": 34,
+        "postalCode": "34265"
+    },
+    {
+        "id": 1659,
+        "name": "Şile",
+        "provinceId": 34,
+        "postalCode": "34990"
+    },
+    {
+        "id": 1663,
+        "name": "Şişli",
+        "provinceId": 34,
+        "postalCode": "34360"
+    },
+    {
+        "id": 2015,
+        "name": "Tuzla",
+        "provinceId": 34,
+        "postalCode": "34959"
+    },
+    {
+        "id": 1852,
+        "name": "Ümraniye",
+        "provinceId": 34,
+        "postalCode": "34773"
+    },
+    {
+        "id": 1708,
+        "name": "Üsküdar",
+        "provinceId": 34,
+        "postalCode": "34660"
+    },
+    {
+        "id": 1739,
+        "name": "Zeytinburnu",
+        "provinceId": 34,
+        "postalCode": "34025"
+    },
+    {
+        "id": 1128,
+        "name": "Aliağa",
+        "provinceId": 35,
+        "postalCode": "35800"
+    },
+    {
+        "id": 2006,
+        "name": "Balçova",
+        "provinceId": 35,
+        "postalCode": "35330"
+    },
+    {
+        "id": 1178,
+        "name": "Bayındır",
+        "provinceId": 35,
+        "postalCode": "35840"
+    },
+    {
+        "id": 2056,
+        "name": "Bayraklı",
+        "provinceId": 35,
+        "postalCode": "35540"
+    },
+    {
+        "id": 1181,
+        "name": "Bergama",
+        "provinceId": 35,
+        "postalCode": "35715"
+    },
+    {
+        "id": 1776,
+        "name": "Beydağ",
+        "provinceId": 35,
+        "postalCode": "35790"
+    },
+    {
+        "id": 1203,
+        "name": "Bornova",
+        "provinceId": 35,
+        "postalCode": "35080"
+    },
+    {
+        "id": 1780,
+        "name": "Buca",
+        "provinceId": 35,
+        "postalCode": "35390"
+    },
+    {
+        "id": 1251,
+        "name": "Çeşme",
+        "provinceId": 35,
+        "postalCode": "35937"
+    },
+    {
+        "id": 2007,
+        "name": "Çiğli",
+        "provinceId": 35,
+        "postalCode": "35640"
+    },
+    {
+        "id": 1280,
+        "name": "Dikili",
+        "provinceId": 35,
+        "postalCode": "35985"
+    },
+    {
+        "id": 1334,
+        "name": "Foça",
+        "provinceId": 35,
+        "postalCode": "35683"
+    },
+    {
+        "id": 2009,
+        "name": "Gaziemir",
+        "provinceId": 35,
+        "postalCode": "35410"
+    },
+    {
+        "id": 2018,
+        "name": "Güzelbahçe",
+        "provinceId": 35,
+        "postalCode": "35310"
+    },
+    {
+        "id": 2057,
+        "name": "Karabağlar",
+        "provinceId": 35,
+        "postalCode": "35140"
+    },
+    {
+        "id": 1432,
+        "name": "Karaburun",
+        "provinceId": 35,
+        "postalCode": "35960"
+    },
+    {
+        "id": 1448,
+        "name": "Karşıyaka",
+        "provinceId": 35,
+        "postalCode": "35600"
+    },
+    {
+        "id": 1461,
+        "name": "Kemalpaşa",
+        "provinceId": 35,
+        "postalCode": "35737"
+    },
+    {
+        "id": 1467,
+        "name": "Kınık",
+        "provinceId": 35,
+        "postalCode": "35990"
+    },
+    {
+        "id": 1477,
+        "name": "Kiraz",
+        "provinceId": 35,
+        "postalCode": "35890"
+    },
+    {
+        "id": 1819,
+        "name": "Konak",
+        "provinceId": 35,
+        "postalCode": "35220"
+    },
+    {
+        "id": 1826,
+        "name": "Menderes",
+        "provinceId": 35,
+        "postalCode": "35479"
+    },
+    {
+        "id": 1521,
+        "name": "Menemen",
+        "provinceId": 35,
+        "postalCode": "35667"
+    },
+    {
+        "id": 2013,
+        "name": "Narlıdere",
+        "provinceId": 35,
+        "postalCode": "35320"
+    },
+    {
+        "id": 1563,
+        "name": "Ödemiş",
+        "provinceId": 35,
+        "postalCode": "35753"
+    },
+    {
+        "id": 1611,
+        "name": "Seferihisar",
+        "provinceId": 35,
+        "postalCode": "35465"
+    },
+    {
+        "id": 1612,
+        "name": "Selçuk",
+        "provinceId": 35,
+        "postalCode": "35925"
+    },
+    {
+        "id": 1677,
+        "name": "Tire",
+        "provinceId": 35,
+        "postalCode": "35910"
+    },
+    {
+        "id": 1682,
+        "name": "Torbalı",
+        "provinceId": 35,
+        "postalCode": "35870"
+    },
+    {
+        "id": 1703,
+        "name": "Urla",
+        "provinceId": 35,
+        "postalCode": "35430"
+    },
+    {
+        "id": 1756,
+        "name": "Akyaka",
+        "provinceId": 36,
+        "postalCode": "36780"
+    },
+    {
+        "id": 1149,
+        "name": "Arpaçay",
+        "provinceId": 36,
+        "postalCode": "36730"
+    },
+    {
+        "id": 1279,
+        "name": "Digor",
+        "provinceId": 36,
+        "postalCode": "36680"
+    },
+    {
+        "id": 1424,
+        "name": "Kağızman",
+        "provinceId": 36,
+        "postalCode": "36700"
+    },
+    {
+        "id": 1447,
+        "name": "Merkez",
+        "provinceId": 36,
+        "postalCode": "36000"
+    },
+    {
+        "id": 1601,
+        "name": "Sarıkamış",
+        "provinceId": 36,
+        "postalCode": "36500"
+    },
+    {
+        "id": 1614,
+        "name": "Selim",
+        "provinceId": 36,
+        "postalCode": "36900"
+    },
+    {
+        "id": 1645,
+        "name": "Susuz",
+        "provinceId": 36,
+        "postalCode": "36760"
+    },
+    {
+        "id": 1101,
+        "name": "Abana",
+        "provinceId": 37,
+        "postalCode": "37970"
+    },
+    {
+        "id": 1867,
+        "name": "Ağlı",
+        "provinceId": 37,
+        "postalCode": "37920"
+    },
+    {
+        "id": 1140,
+        "name": "Araç",
+        "provinceId": 37,
+        "postalCode": "37800"
+    },
+    {
+        "id": 1162,
+        "name": "Azdavay",
+        "provinceId": 37,
+        "postalCode": "37750"
+    },
+    {
+        "id": 1208,
+        "name": "Bozkurt",
+        "provinceId": 37,
+        "postalCode": "37680"
+    },
+    {
+        "id": 1221,
+        "name": "Cide",
+        "provinceId": 37,
+        "postalCode": "37600"
+    },
+    {
+        "id": 1238,
+        "name": "Çatalzeytin",
+        "provinceId": 37,
+        "postalCode": "37940"
+    },
+    {
+        "id": 1264,
+        "name": "Daday",
+        "provinceId": 37,
+        "postalCode": "37870"
+    },
+    {
+        "id": 1277,
+        "name": "Devrekani",
+        "provinceId": 37,
+        "postalCode": "37700"
+    },
+    {
+        "id": 1915,
+        "name": "Doğanyurt",
+        "provinceId": 37,
+        "postalCode": "37550"
+    },
+    {
+        "id": 1940,
+        "name": "Hanönü",
+        "provinceId": 37,
+        "postalCode": "37450"
+    },
+    {
+        "id": 1805,
+        "name": "İhsangazi",
+        "provinceId": 37,
+        "postalCode": "37250"
+    },
+    {
+        "id": 1410,
+        "name": "İnebolu",
+        "provinceId": 37,
+        "postalCode": "37500"
+    },
+    {
+        "id": 1499,
+        "name": "Küre",
+        "provinceId": 37,
+        "postalCode": "37900"
+    },
+    {
+        "id": 1450,
+        "name": "Merkez",
+        "provinceId": 37,
+        "postalCode": "37100"
+    },
+    {
+        "id": 1836,
+        "name": "Pınarbaşı",
+        "provinceId": 37,
+        "postalCode": "37770"
+    },
+    {
+        "id": 1984,
+        "name": "Seydiler",
+        "provinceId": 37,
+        "postalCode": "37270"
+    },
+    {
+        "id": 1845,
+        "name": "Şenpazar",
+        "provinceId": 37,
+        "postalCode": "37650"
+    },
+    {
+        "id": 1666,
+        "name": "Taşköprü",
+        "provinceId": 37,
+        "postalCode": "37400"
+    },
+    {
+        "id": 1685,
+        "name": "Tosya",
+        "provinceId": 37,
+        "postalCode": "37300"
+    },
+    {
+        "id": 1752,
+        "name": "Akkışla",
+        "provinceId": 38,
+        "postalCode": "38830"
+    },
+    {
+        "id": 1218,
+        "name": "Bünyan",
+        "provinceId": 38,
+        "postalCode": "38600"
+    },
+    {
+        "id": 1275,
+        "name": "Develi",
+        "provinceId": 38,
+        "postalCode": "38400"
+    },
+    {
+        "id": 1330,
+        "name": "Felahiye",
+        "provinceId": 38,
+        "postalCode": "38750"
+    },
+    {
+        "id": 1936,
+        "name": "Hacılar",
+        "provinceId": 38,
+        "postalCode": "38210"
+    },
+    {
+        "id": 1409,
+        "name": "İncesu",
+        "provinceId": 38,
+        "postalCode": "38560"
+    },
+    {
+        "id": 1863,
+        "name": "Kocasinan",
+        "provinceId": 38,
+        "postalCode": "38100"
+    },
+    {
+        "id": 1864,
+        "name": "Melikgazi",
+        "provinceId": 38,
+        "postalCode": "38220"
+    },
+    {
+        "id": 1978,
+        "name": "Özvatan",
+        "provinceId": 38,
+        "postalCode": "38770"
+    },
+    {
+        "id": 1576,
+        "name": "Pınarbaşı",
+        "provinceId": 38,
+        "postalCode": "38700"
+    },
+    {
+        "id": 1603,
+        "name": "Sarıoğlan",
+        "provinceId": 38,
+        "postalCode": "38850"
+    },
+    {
+        "id": 1605,
+        "name": "Sarız",
+        "provinceId": 38,
+        "postalCode": "38660"
+    },
+    {
+        "id": 1846,
+        "name": "Talas",
+        "provinceId": 38,
+        "postalCode": "38280"
+    },
+    {
+        "id": 1680,
+        "name": "Tomarza",
+        "provinceId": 38,
+        "postalCode": "38900"
+    },
+    {
+        "id": 1715,
+        "name": "Yahyalı",
+        "provinceId": 38,
+        "postalCode": "38500"
+    },
+    {
+        "id": 1727,
+        "name": "Yeşilhisar",
+        "provinceId": 38,
+        "postalCode": "38800"
+    },
+    {
+        "id": 1163,
+        "name": "Babaeski",
+        "provinceId": 39,
+        "postalCode": "39570"
+    },
+    {
+        "id": 1270,
+        "name": "Demirköy",
+        "provinceId": 39,
+        "postalCode": "39500"
+    },
+    {
+        "id": 1480,
+        "name": "Kofçaz",
+        "provinceId": 39,
+        "postalCode": "39700"
+    },
+    {
+        "id": 1505,
+        "name": "Lüleburgaz",
+        "provinceId": 39,
+        "postalCode": "39770"
+    },
+    {
+        "id": 1471,
+        "name": "Merkez",
+        "provinceId": 39,
+        "postalCode": "39060"
+    },
+    {
+        "id": 1572,
+        "name": "Pehlivanköy",
+        "provinceId": 39,
+        "postalCode": "39640"
+    },
+    {
+        "id": 1577,
+        "name": "Pınarhisar",
+        "provinceId": 39,
+        "postalCode": "39300"
+    },
+    {
+        "id": 1714,
+        "name": "Vize",
+        "provinceId": 39,
+        "postalCode": "39400"
+    },
+    {
+        "id": 1869,
+        "name": "Akçakent",
+        "provinceId": 40,
+        "postalCode": "40720"
+    },
+    {
+        "id": 1754,
+        "name": "Akpınar",
+        "provinceId": 40,
+        "postalCode": "40320"
+    },
+    {
+        "id": 1890,
+        "name": "Boztepe",
+        "provinceId": 40,
+        "postalCode": "40020"
+    },
+    {
+        "id": 1254,
+        "name": "Çiçekdağı",
+        "provinceId": 40,
+        "postalCode": "40700"
+    },
+    {
+        "id": 1429,
+        "name": "Kaman",
+        "provinceId": 40,
+        "postalCode": "40300"
+    },
+    {
+        "id": 1472,
+        "name": "Merkez",
+        "provinceId": 40,
+        "postalCode": "40100"
+    },
+    {
+        "id": 1529,
+        "name": "Mucur",
+        "provinceId": 40,
+        "postalCode": "40500"
+    },
+    {
+        "id": 2058,
+        "name": "Başiskele",
+        "provinceId": 41,
+        "postalCode": "41030"
+    },
+    {
+        "id": 2059,
+        "name": "Çayırova",
+        "provinceId": 41,
+        "postalCode": "41420"
+    },
+    {
+        "id": 2060,
+        "name": "Darıca",
+        "provinceId": 41,
+        "postalCode": "41700"
+    },
+    {
+        "id": 2030,
+        "name": "Derince",
+        "provinceId": 41,
+        "postalCode": "41900"
+    },
+    {
+        "id": 2061,
+        "name": "Dilovası",
+        "provinceId": 41,
+        "postalCode": "41455"
+    },
+    {
+        "id": 1338,
+        "name": "Gebze",
+        "provinceId": 41,
+        "postalCode": "41400"
+    },
+    {
+        "id": 1355,
+        "name": "Gölcük",
+        "provinceId": 41,
+        "postalCode": "41950"
+    },
+    {
+        "id": 2062,
+        "name": "İzmit",
+        "provinceId": 41,
+        "postalCode": "41310"
+    },
+    {
+        "id": 1430,
+        "name": "Kandıra",
+        "provinceId": 41,
+        "postalCode": "41600"
+    },
+    {
+        "id": 1440,
+        "name": "Karamürsel",
+        "provinceId": 41,
+        "postalCode": "41500"
+    },
+    {
+        "id": 2063,
+        "name": "Kartepe",
+        "provinceId": 41,
+        "postalCode": "41320"
+    },
+    {
+        "id": 1821,
+        "name": "Körfez",
+        "provinceId": 41,
+        "postalCode": "41800"
+    },
+    {
+        "id": 1868,
+        "name": "Ahırlı",
+        "provinceId": 42,
+        "postalCode": "42390"
+    },
+    {
+        "id": 1753,
+        "name": "Akören",
+        "provinceId": 42,
+        "postalCode": "42460"
+    },
+    {
+        "id": 1122,
+        "name": "Akşehir",
+        "provinceId": 42,
+        "postalCode": "42580"
+    },
+    {
+        "id": 1760,
+        "name": "Altınekin",
+        "provinceId": 42,
+        "postalCode": "42450"
+    },
+    {
+        "id": 1188,
+        "name": "Beyşehir",
+        "provinceId": 42,
+        "postalCode": "42700"
+    },
+    {
+        "id": 1207,
+        "name": "Bozkır",
+        "provinceId": 42,
+        "postalCode": "42630"
+    },
+    {
+        "id": 1222,
+        "name": "Cihanbeyli",
+        "provinceId": 42,
+        "postalCode": "42860"
+    },
+    {
+        "id": 1902,
+        "name": "Çeltik",
+        "provinceId": 42,
+        "postalCode": "42920"
+    },
+    {
+        "id": 1262,
+        "name": "Çumra",
+        "provinceId": 42,
+        "postalCode": "42520"
+    },
+    {
+        "id": 1907,
+        "name": "Derbent",
+        "provinceId": 42,
+        "postalCode": "42900"
+    },
+    {
+        "id": 1789,
+        "name": "Derebucak",
+        "provinceId": 42,
+        "postalCode": "42485"
+    },
+    {
+        "id": 1285,
+        "name": "Doğanhisar",
+        "provinceId": 42,
+        "postalCode": "42930"
+    },
+    {
+        "id": 1920,
+        "name": "Emirgazi",
+        "provinceId": 42,
+        "postalCode": "42910"
+    },
+    {
+        "id": 1312,
+        "name": "Ereğli",
+        "provinceId": 42,
+        "postalCode": "42320"
+    },
+    {
+        "id": 1933,
+        "name": "Güneysınır",
+        "provinceId": 42,
+        "postalCode": "42490"
+    },
+    {
+        "id": 1375,
+        "name": "Hadim",
+        "provinceId": 42,
+        "postalCode": "42830"
+    },
+    {
+        "id": 1937,
+        "name": "Halkapınar",
+        "provinceId": 42,
+        "postalCode": "42980"
+    },
+    {
+        "id": 1804,
+        "name": "Hüyük",
+        "provinceId": 42,
+        "postalCode": "42690"
+    },
+    {
+        "id": 1400,
+        "name": "Ilgın",
+        "provinceId": 42,
+        "postalCode": "42610"
+    },
+    {
+        "id": 1422,
+        "name": "Kadınhanı",
+        "provinceId": 42,
+        "postalCode": "42810"
+    },
+    {
+        "id": 1441,
+        "name": "Karapınar",
+        "provinceId": 42,
+        "postalCode": "42415"
+    },
+    {
+        "id": 1814,
+        "name": "Karatay",
+        "provinceId": 42,
+        "postalCode": "42050"
+    },
+    {
+        "id": 1491,
+        "name": "Kulu",
+        "provinceId": 42,
+        "postalCode": "42773"
+    },
+    {
+        "id": 1827,
+        "name": "Meram",
+        "provinceId": 42,
+        "postalCode": "42040"
+    },
+    {
+        "id": 1598,
+        "name": "Sarayönü",
+        "provinceId": 42,
+        "postalCode": "42430"
+    },
+    {
+        "id": 1839,
+        "name": "Selçuklu",
+        "provinceId": 42,
+        "postalCode": "42100"
+    },
+    {
+        "id": 1617,
+        "name": "Seydişehir",
+        "provinceId": 42,
+        "postalCode": "42360"
+    },
+    {
+        "id": 1848,
+        "name": "Taşkent",
+        "provinceId": 42,
+        "postalCode": "42960"
+    },
+    {
+        "id": 1990,
+        "name": "Tuzlukçu",
+        "provinceId": 42,
+        "postalCode": "42970"
+    },
+    {
+        "id": 1994,
+        "name": "Yalıhüyük",
+        "provinceId": 42,
+        "postalCode": "42470"
+    },
+    {
+        "id": 1735,
+        "name": "Yunak",
+        "provinceId": 42,
+        "postalCode": "42536"
+    },
+    {
+        "id": 1132,
+        "name": "Altıntaş",
+        "provinceId": 43,
+        "postalCode": "43800"
+    },
+    {
+        "id": 1764,
+        "name": "Aslanapa",
+        "provinceId": 43,
+        "postalCode": "43210"
+    },
+    {
+        "id": 1898,
+        "name": "Çavdarhisar",
+        "provinceId": 43,
+        "postalCode": "43710"
+    },
+    {
+        "id": 1288,
+        "name": "Domaniç",
+        "provinceId": 43,
+        "postalCode": "43860"
+    },
+    {
+        "id": 1790,
+        "name": "Dumlupınar",
+        "provinceId": 43,
+        "postalCode": "43820"
+    },
+    {
+        "id": 1304,
+        "name": "Emet",
+        "provinceId": 43,
+        "postalCode": "43700"
+    },
+    {
+        "id": 1339,
+        "name": "Gediz",
+        "provinceId": 43,
+        "postalCode": "43640"
+    },
+    {
+        "id": 1802,
+        "name": "Hisarcık",
+        "provinceId": 43,
+        "postalCode": "43780"
+    },
+    {
+        "id": 1500,
+        "name": "Merkez",
+        "provinceId": 43,
+        "postalCode": "43020"
+    },
+    {
+        "id": 1979,
+        "name": "Pazarlar",
+        "provinceId": 43,
+        "postalCode": "43530"
+    },
+    {
+        "id": 1625,
+        "name": "Simav",
+        "provinceId": 43,
+        "postalCode": "43590"
+    },
+    {
+        "id": 1843,
+        "name": "Şaphane",
+        "provinceId": 43,
+        "postalCode": "43950"
+    },
+    {
+        "id": 1671,
+        "name": "Tavşanlı",
+        "provinceId": 43,
+        "postalCode": "43410"
+    },
+    {
+        "id": 1114,
+        "name": "Akçadağ",
+        "provinceId": 44,
+        "postalCode": "44600"
+    },
+    {
+        "id": 1143,
+        "name": "Arapgir",
+        "provinceId": 44,
+        "postalCode": "44800"
+    },
+    {
+        "id": 1148,
+        "name": "Arguvan",
+        "provinceId": 44,
+        "postalCode": "44960"
+    },
+    {
+        "id": 1772,
+        "name": "Battalgazi",
+        "provinceId": 44,
+        "postalCode": "44210"
+    },
+    {
+        "id": 1265,
+        "name": "Darende",
+        "provinceId": 44,
+        "postalCode": "44720"
+    },
+    {
+        "id": 1286,
+        "name": "Doğanşehir",
+        "provinceId": 44,
+        "postalCode": "44500"
+    },
+    {
+        "id": 1914,
+        "name": "Doğanyol",
+        "provinceId": 44,
+        "postalCode": "44880"
+    },
+    {
+        "id": 1390,
+        "name": "Hekimhan",
+        "provinceId": 44,
+        "postalCode": "44410"
+    },
+    {
+        "id": 1953,
+        "name": "Kale",
+        "provinceId": 44,
+        "postalCode": "44370"
+    },
+    {
+        "id": 1969,
+        "name": "Kuluncak",
+        "provinceId": 44,
+        "postalCode": "44760"
+    },
+    {
+        "id": 1582,
+        "name": "Pütürge",
+        "provinceId": 44,
+        "postalCode": "44850"
+    },
+    {
+        "id": 1995,
+        "name": "Yazıhan",
+        "provinceId": 44,
+        "postalCode": "44350"
+    },
+    {
+        "id": 1729,
+        "name": "Yeşilyurt",
+        "provinceId": 44,
+        "postalCode": "44915"
+    },
+    {
+        "id": 1751,
+        "name": "Ahmetli",
+        "provinceId": 45,
+        "postalCode": "45450"
+    },
+    {
+        "id": 1118,
+        "name": "Akhisar",
+        "provinceId": 45,
+        "postalCode": "45200"
+    },
+    {
+        "id": 1127,
+        "name": "Alaşehir",
+        "provinceId": 45,
+        "postalCode": "45600"
+    },
+    {
+        "id": 1269,
+        "name": "Demirci",
+        "provinceId": 45,
+        "postalCode": "45900"
+    },
+    {
+        "id": 1793,
+        "name": "Gölmarmara",
+        "provinceId": 45,
+        "postalCode": "45580"
+    },
+    {
+        "id": 1362,
+        "name": "Gördes",
+        "provinceId": 45,
+        "postalCode": "45750"
+    },
+    {
+        "id": 1470,
+        "name": "Kırkağaç",
+        "provinceId": 45,
+        "postalCode": "45730"
+    },
+    {
+        "id": 1965,
+        "name": "Köprübaşı",
+        "provinceId": 45,
+        "postalCode": "45940"
+    },
+    {
+        "id": 1489,
+        "name": "Kula",
+        "provinceId": 45,
+        "postalCode": "45180"
+    },
+    {
+        "id": 1590,
+        "name": "Salihli",
+        "provinceId": 45,
+        "postalCode": "45320"
+    },
+    {
+        "id": 1600,
+        "name": "Sarıgöl",
+        "provinceId": 45,
+        "postalCode": "45470"
+    },
+    {
+        "id": 1606,
+        "name": "Saruhanlı",
+        "provinceId": 45,
+        "postalCode": "45880"
+    },
+    {
+        "id": 1613,
+        "name": "Selendi",
+        "provinceId": 45,
+        "postalCode": "45970"
+    },
+    {
+        "id": 1634,
+        "name": "Soma",
+        "provinceId": 45,
+        "postalCode": "45520"
+    },
+    {
+        "id": 2086,
+        "name": "Şehzadeler",
+        "provinceId": 45,
+        "postalCode": "45060"
+    },
+    {
+        "id": 1689,
+        "name": "Turgutlu",
+        "provinceId": 45,
+        "postalCode": "45400"
+    },
+    {
+        "id": 2087,
+        "name": "Yunusemre",
+        "provinceId": 45,
+        "postalCode": "45125"
+    },
+    {
+        "id": 1107,
+        "name": "Afşin",
+        "provinceId": 46,
+        "postalCode": "46500"
+    },
+    {
+        "id": 1136,
+        "name": "Andırın",
+        "provinceId": 46,
+        "postalCode": "46400"
+    },
+    {
+        "id": 1785,
+        "name": "Çağlayancerit",
+        "provinceId": 46,
+        "postalCode": "46770"
+    },
+    {
+        "id": 2084,
+        "name": "Dulkadiroğlu",
+        "provinceId": 46,
+        "postalCode": "46100"
+    },
+    {
+        "id": 1919,
+        "name": "Ekinözü",
+        "provinceId": 46,
+        "postalCode": "46360"
+    },
+    {
+        "id": 1299,
+        "name": "Elbistan",
+        "provinceId": 46,
+        "postalCode": "46390"
+    },
+    {
+        "id": 1353,
+        "name": "Göksun",
+        "provinceId": 46,
+        "postalCode": "46650"
+    },
+    {
+        "id": 1975,
+        "name": "Nurhak",
+        "provinceId": 46,
+        "postalCode": "46371"
+    },
+    {
+        "id": 2085,
+        "name": "Onikişubat",
+        "provinceId": 46,
+        "postalCode": "46050"
+    },
+    {
+        "id": 1570,
+        "name": "Pazarcık",
+        "provinceId": 46,
+        "postalCode": "46760"
+    },
+    {
+        "id": 1694,
+        "name": "Türkoğlu",
+        "provinceId": 46,
+        "postalCode": "46810"
+    },
+    {
+        "id": 2088,
+        "name": "Artuklu",
+        "provinceId": 47,
+        "postalCode": "47420"
+    },
+    {
+        "id": 1787,
+        "name": "Dargeçit",
+        "provinceId": 47,
+        "postalCode": "47750"
+    },
+    {
+        "id": 1273,
+        "name": "Derik",
+        "provinceId": 47,
+        "postalCode": "47800"
+    },
+    {
+        "id": 1474,
+        "name": "Kızıltepe",
+        "provinceId": 47,
+        "postalCode": "47460"
+    },
+    {
+        "id": 1519,
+        "name": "Mazıdağı",
+        "provinceId": 47,
+        "postalCode": "47700"
+    },
+    {
+        "id": 1526,
+        "name": "Midyat",
+        "provinceId": 47,
+        "postalCode": "47545"
+    },
+    {
+        "id": 1547,
+        "name": "Nusaybin",
+        "provinceId": 47,
+        "postalCode": "47320"
+    },
+    {
+        "id": 1564,
+        "name": "Ömerli",
+        "provinceId": 47,
+        "postalCode": "47570"
+    },
+    {
+        "id": 1609,
+        "name": "Savur",
+        "provinceId": 47,
+        "postalCode": "47860"
+    },
+    {
+        "id": 2002,
+        "name": "Yeşilli",
+        "provinceId": 47,
+        "postalCode": "47650"
+    },
+    {
+        "id": 1197,
+        "name": "Bodrum",
+        "provinceId": 48,
+        "postalCode": "48470"
+    },
+    {
+        "id": 1742,
+        "name": "Dalaman",
+        "provinceId": 48,
+        "postalCode": "48770"
+    },
+    {
+        "id": 1266,
+        "name": "Datça",
+        "provinceId": 48,
+        "postalCode": "48900"
+    },
+    {
+        "id": 1331,
+        "name": "Fethiye",
+        "provinceId": 48,
+        "postalCode": "48375"
+    },
+    {
+        "id": 1958,
+        "name": "Kavaklıdere",
+        "provinceId": 48,
+        "postalCode": "48585"
+    },
+    {
+        "id": 1488,
+        "name": "Köyceğiz",
+        "provinceId": 48,
+        "postalCode": "48803"
+    },
+    {
+        "id": 1517,
+        "name": "Marmaris",
+        "provinceId": 48,
+        "postalCode": "48706"
+    },
+    {
+        "id": 2089,
+        "name": "Menteşe",
+        "provinceId": 48,
+        "postalCode": "48040"
+    },
+    {
+        "id": 1528,
+        "name": "Milas",
+        "provinceId": 48,
+        "postalCode": "48210"
+    },
+    {
+        "id": 1831,
+        "name": "Ortaca",
+        "provinceId": 48,
+        "postalCode": "48840"
+    },
+    {
+        "id": 2090,
+        "name": "Seydikemer",
+        "provinceId": 48,
+        "postalCode": "48360"
+    },
+    {
+        "id": 1695,
+        "name": "Ula",
+        "provinceId": 48,
+        "postalCode": "48650"
+    },
+    {
+        "id": 1719,
+        "name": "Yatağan",
+        "provinceId": 48,
+        "postalCode": "48516"
+    },
+    {
+        "id": 1213,
+        "name": "Bulanık",
+        "provinceId": 49,
+        "postalCode": "49500"
+    },
+    {
+        "id": 1801,
+        "name": "Hasköy",
+        "provinceId": 49,
+        "postalCode": "49700"
+    },
+    {
+        "id": 1964,
+        "name": "Korkut",
+        "provinceId": 49,
+        "postalCode": "49730"
+    },
+    {
+        "id": 1510,
+        "name": "Malazgirt",
+        "provinceId": 49,
+        "postalCode": "49400"
+    },
+    {
+        "id": 1534,
+        "name": "Merkez",
+        "provinceId": 49,
+        "postalCode": "49100"
+    },
+    {
+        "id": 1711,
+        "name": "Varto",
+        "provinceId": 49,
+        "postalCode": "49610"
+    },
+    {
+        "id": 1749,
+        "name": "Acıgöl",
+        "provinceId": 50,
+        "postalCode": "50140"
+    },
+    {
+        "id": 1155,
+        "name": "Avanos",
+        "provinceId": 50,
+        "postalCode": "50500"
+    },
+    {
+        "id": 1274,
+        "name": "Derinkuyu",
+        "provinceId": 50,
+        "postalCode": "50700"
+    },
+    {
+        "id": 1367,
+        "name": "Gülşehir",
+        "provinceId": 50,
+        "postalCode": "50900"
+    },
+    {
+        "id": 1374,
+        "name": "Hacıbektaş",
+        "provinceId": 50,
+        "postalCode": "50800"
+    },
+    {
+        "id": 1485,
+        "name": "Kozaklı",
+        "provinceId": 50,
+        "postalCode": "50600"
+    },
+    {
+        "id": 1543,
+        "name": "Merkez",
+        "provinceId": 50,
+        "postalCode": "50300"
+    },
+    {
+        "id": 1707,
+        "name": "Ürgüp",
+        "provinceId": 50,
+        "postalCode": "50350"
+    },
+    {
+        "id": 1876,
+        "name": "Altunhisar",
+        "provinceId": 51,
+        "postalCode": "51600"
+    },
+    {
+        "id": 1201,
+        "name": "Bor",
+        "provinceId": 51,
+        "postalCode": "51710"
+    },
+    {
+        "id": 1225,
+        "name": "Çamardı",
+        "provinceId": 51,
+        "postalCode": "51660"
+    },
+    {
+        "id": 1904,
+        "name": "Çiftlik",
+        "provinceId": 51,
+        "postalCode": "51810"
+    },
+    {
+        "id": 1544,
+        "name": "Merkez",
+        "provinceId": 51,
+        "postalCode": "51200"
+    },
+    {
+        "id": 1700,
+        "name": "Ulukışla",
+        "provinceId": 51,
+        "postalCode": "51900"
+    },
+    {
+        "id": 1119,
+        "name": "Akkuş",
+        "provinceId": 52,
+        "postalCode": "52950"
+    },
+    {
+        "id": 2103,
+        "name": "Altınordu",
+        "provinceId": 52,
+        "postalCode": "52200"
+    },
+    {
+        "id": 1158,
+        "name": "Aybastı",
+        "provinceId": 52,
+        "postalCode": "52500"
+    },
+    {
+        "id": 1891,
+        "name": "Çamaş",
+        "provinceId": 52,
+        "postalCode": "52430"
+    },
+    {
+        "id": 1897,
+        "name": "Çatalpınar",
+        "provinceId": 52,
+        "postalCode": "52420"
+    },
+    {
+        "id": 1900,
+        "name": "Çaybaşı",
+        "provinceId": 52,
+        "postalCode": "52310"
+    },
+    {
+        "id": 1328,
+        "name": "Fatsa",
+        "provinceId": 52,
+        "postalCode": "52410"
+    },
+    {
+        "id": 1358,
+        "name": "Gölköy",
+        "provinceId": 52,
+        "postalCode": "52600"
+    },
+    {
+        "id": 1795,
+        "name": "Gülyalı",
+        "provinceId": 52,
+        "postalCode": "52010"
+    },
+    {
+        "id": 1797,
+        "name": "Gürgentepe",
+        "provinceId": 52,
+        "postalCode": "52610"
+    },
+    {
+        "id": 1947,
+        "name": "İkizce",
+        "provinceId": 52,
+        "postalCode": "52320"
+    },
+    {
+        "id": 1950,
+        "name": "Kabadüz",
+        "provinceId": 52,
+        "postalCode": "52020"
+    },
+    {
+        "id": 1951,
+        "name": "Kabataş",
+        "provinceId": 52,
+        "postalCode": "52510"
+    },
+    {
+        "id": 1482,
+        "name": "Korgan",
+        "provinceId": 52,
+        "postalCode": "52700"
+    },
+    {
+        "id": 1493,
+        "name": "Kumru",
+        "provinceId": 52,
+        "postalCode": "52800"
+    },
+    {
+        "id": 1525,
+        "name": "Mesudiye",
+        "provinceId": 52,
+        "postalCode": "52900"
+    },
+    {
+        "id": 1573,
+        "name": "Perşembe",
+        "provinceId": 52,
+        "postalCode": "52760"
+    },
+    {
+        "id": 1696,
+        "name": "Ulubey",
+        "provinceId": 52,
+        "postalCode": "52850"
+    },
+    {
+        "id": 1706,
+        "name": "Ünye",
+        "provinceId": 52,
+        "postalCode": "52300"
+    },
+    {
+        "id": 1146,
+        "name": "Ardeşen",
+        "provinceId": 53,
+        "postalCode": "53400"
+    },
+    {
+        "id": 1228,
+        "name": "Çamlıhemşin",
+        "provinceId": 53,
+        "postalCode": "53750"
+    },
+    {
+        "id": 1241,
+        "name": "Çayeli",
+        "provinceId": 53,
+        "postalCode": "53210"
+    },
+    {
+        "id": 1908,
+        "name": "Derepazarı",
+        "provinceId": 53,
+        "postalCode": "53900"
+    },
+    {
+        "id": 1332,
+        "name": "Fındıklı",
+        "provinceId": 53,
+        "postalCode": "53700"
+    },
+    {
+        "id": 1796,
+        "name": "Güneysu",
+        "provinceId": 53,
+        "postalCode": "53350"
+    },
+    {
+        "id": 1943,
+        "name": "Hemşin",
+        "provinceId": 53,
+        "postalCode": "53550"
+    },
+    {
+        "id": 1405,
+        "name": "İkizdere",
+        "provinceId": 53,
+        "postalCode": "53650"
+    },
+    {
+        "id": 1949,
+        "name": "İyidere",
+        "provinceId": 53,
+        "postalCode": "53600"
+    },
+    {
+        "id": 1428,
+        "name": "Kalkandere",
+        "provinceId": 53,
+        "postalCode": "53500"
+    },
+    {
+        "id": 1586,
+        "name": "Merkez",
+        "provinceId": 53,
+        "postalCode": "53950"
+    },
+    {
+        "id": 1569,
+        "name": "Pazar",
+        "provinceId": 53,
+        "postalCode": "53340"
+    },
+    {
+        "id": 2068,
+        "name": "Adapazarı",
+        "provinceId": 54,
+        "postalCode": "54100"
+    },
+    {
+        "id": 1123,
+        "name": "Akyazı",
+        "provinceId": 54,
+        "postalCode": "54400"
+    },
+    {
+        "id": 2069,
+        "name": "Arifiye",
+        "provinceId": 54,
+        "postalCode": "54580"
+    },
+    {
+        "id": 2070,
+        "name": "Erenler",
+        "provinceId": 54,
+        "postalCode": "54200"
+    },
+    {
+        "id": 1925,
+        "name": "Ferizli",
+        "provinceId": 54,
+        "postalCode": "54110"
+    },
+    {
+        "id": 1351,
+        "name": "Geyve",
+        "provinceId": 54,
+        "postalCode": "54950"
+    },
+    {
+        "id": 1391,
+        "name": "Hendek",
+        "provinceId": 54,
+        "postalCode": "54300"
+    },
+    {
+        "id": 1955,
+        "name": "Karapürçek",
+        "provinceId": 54,
+        "postalCode": "54430"
+    },
+    {
+        "id": 1442,
+        "name": "Karasu",
+        "provinceId": 54,
+        "postalCode": "54500"
+    },
+    {
+        "id": 1453,
+        "name": "Kaynarca",
+        "provinceId": 54,
+        "postalCode": "54650"
+    },
+    {
+        "id": 1818,
+        "name": "Kocaali",
+        "provinceId": 54,
+        "postalCode": "54800"
+    },
+    {
+        "id": 1833,
+        "name": "Pamukova",
+        "provinceId": 54,
+        "postalCode": "54900"
+    },
+    {
+        "id": 1595,
+        "name": "Sapanca",
+        "provinceId": 54,
+        "postalCode": "54600"
+    },
+    {
+        "id": 2071,
+        "name": "Serdivan",
+        "provinceId": 54,
+        "postalCode": "54055"
+    },
+    {
+        "id": 1986,
+        "name": "Söğütlü",
+        "provinceId": 54,
+        "postalCode": "54160"
+    },
+    {
+        "id": 1847,
+        "name": "Taraklı",
+        "provinceId": 54,
+        "postalCode": "54750"
+    },
+    {
+        "id": 1830,
+        "name": "19 Mayıs",
+        "provinceId": 55,
+        "postalCode": "55421"
+    },
+    {
+        "id": 1125,
+        "name": "Alaçam",
+        "provinceId": 55,
+        "postalCode": "55800"
+    },
+    {
+        "id": 1763,
+        "name": "Asarcık",
+        "provinceId": 55,
+        "postalCode": "55860"
+    },
+    {
+        "id": 2072,
+        "name": "Atakum",
+        "provinceId": 55,
+        "postalCode": "55200"
+    },
+    {
+        "id": 1879,
+        "name": "Ayvacık",
+        "provinceId": 55,
+        "postalCode": "55550"
+    },
+    {
+        "id": 1164,
+        "name": "Bafra",
+        "provinceId": 55,
+        "postalCode": "55400"
+    },
+    {
+        "id": 2073,
+        "name": "Canik",
+        "provinceId": 55,
+        "postalCode": "55080"
+    },
+    {
+        "id": 1234,
+        "name": "Çarşamba",
+        "provinceId": 55,
+        "postalCode": "55515"
+    },
+    {
+        "id": 1386,
+        "name": "Havza",
+        "provinceId": 55,
+        "postalCode": "55715"
+    },
+    {
+        "id": 2074,
+        "name": "İlkadım",
+        "provinceId": 55,
+        "postalCode": "55070"
+    },
+    {
+        "id": 1452,
+        "name": "Kavak",
+        "provinceId": 55,
+        "postalCode": "55850"
+    },
+    {
+        "id": 1501,
+        "name": "Ladik",
+        "provinceId": 55,
+        "postalCode": "55760"
+    },
+    {
+        "id": 1838,
+        "name": "Salıpazarı",
+        "provinceId": 55,
+        "postalCode": "55530"
+    },
+    {
+        "id": 1849,
+        "name": "Tekkeköy",
+        "provinceId": 55,
+        "postalCode": "55320"
+    },
+    {
+        "id": 1676,
+        "name": "Terme",
+        "provinceId": 55,
+        "postalCode": "55600"
+    },
+    {
+        "id": 1712,
+        "name": "Vezirköprü",
+        "provinceId": 55,
+        "postalCode": "55900"
+    },
+    {
+        "id": 1993,
+        "name": "Yakakent",
+        "provinceId": 55,
+        "postalCode": "55810"
+    },
+    {
+        "id": 1179,
+        "name": "Baykan",
+        "provinceId": 56,
+        "postalCode": "56460"
+    },
+    {
+        "id": 1317,
+        "name": "Eruh",
+        "provinceId": 56,
+        "postalCode": "56800"
+    },
+    {
+        "id": 1495,
+        "name": "Kurtalan",
+        "provinceId": 56,
+        "postalCode": "56540"
+    },
+    {
+        "id": 1620,
+        "name": "Merkez",
+        "provinceId": 56,
+        "postalCode": "56210"
+    },
+    {
+        "id": 1575,
+        "name": "Pervari",
+        "provinceId": 56,
+        "postalCode": "56700"
+    },
+    {
+        "id": 1662,
+        "name": "Şirvan",
+        "provinceId": 56,
+        "postalCode": "56760"
+    },
+    {
+        "id": 1878,
+        "name": "Tillo",
+        "provinceId": 56,
+        "postalCode": "56870"
+    },
+    {
+        "id": 1156,
+        "name": "Ayancık",
+        "provinceId": 57,
+        "postalCode": "57400"
+    },
+    {
+        "id": 1204,
+        "name": "Boyabat",
+        "provinceId": 57,
+        "postalCode": "57200"
+    },
+    {
+        "id": 1910,
+        "name": "Dikmen",
+        "provinceId": 57,
+        "postalCode": "57660"
+    },
+    {
+        "id": 1290,
+        "name": "Durağan",
+        "provinceId": 57,
+        "postalCode": "57700"
+    },
+    {
+        "id": 1314,
+        "name": "Erfelek",
+        "provinceId": 57,
+        "postalCode": "57800"
+    },
+    {
+        "id": 1349,
+        "name": "Gerze",
+        "provinceId": 57,
+        "postalCode": "57600"
+    },
+    {
+        "id": 1627,
+        "name": "Merkez",
+        "provinceId": 57,
+        "postalCode": "57000"
+    },
+    {
+        "id": 1981,
+        "name": "Saraydüzü",
+        "provinceId": 57,
+        "postalCode": "57300"
+    },
+    {
+        "id": 1693,
+        "name": "Türkeli",
+        "provinceId": 57,
+        "postalCode": "57900"
+    },
+    {
+        "id": 1870,
+        "name": "Akıncılar",
+        "provinceId": 58,
+        "postalCode": "58550"
+    },
+    {
+        "id": 1875,
+        "name": "Altınyayla",
+        "provinceId": 58,
+        "postalCode": "58470"
+    },
+    {
+        "id": 1282,
+        "name": "Divriği",
+        "provinceId": 58,
+        "postalCode": "58300"
+    },
+    {
+        "id": 1913,
+        "name": "Doğanşar",
+        "provinceId": 58,
+        "postalCode": "58780"
+    },
+    {
+        "id": 1342,
+        "name": "Gemerek",
+        "provinceId": 58,
+        "postalCode": "58840"
+    },
+    {
+        "id": 1927,
+        "name": "Gölova",
+        "provinceId": 58,
+        "postalCode": "58640"
+    },
+    {
+        "id": 1373,
+        "name": "Gürün",
+        "provinceId": 58,
+        "postalCode": "58800"
+    },
+    {
+        "id": 1376,
+        "name": "Hafik",
+        "provinceId": 58,
+        "postalCode": "58760"
+    },
+    {
+        "id": 1407,
+        "name": "İmranlı",
+        "provinceId": 58,
+        "postalCode": "58980"
+    },
+    {
+        "id": 1431,
+        "name": "Kangal",
+        "provinceId": 58,
+        "postalCode": "58900"
+    },
+    {
+        "id": 1484,
+        "name": "Koyulhisar",
+        "provinceId": 58,
+        "postalCode": "58660"
+    },
+    {
+        "id": 1628,
+        "name": "Merkez",
+        "provinceId": 58,
+        "postalCode": "58030"
+    },
+    {
+        "id": 1646,
+        "name": "Suşehri",
+        "provinceId": 58,
+        "postalCode": "58600"
+    },
+    {
+        "id": 1650,
+        "name": "Şarkışla",
+        "provinceId": 58,
+        "postalCode": "58400"
+    },
+    {
+        "id": 1991,
+        "name": "Ulaş",
+        "provinceId": 58,
+        "postalCode": "58380"
+    },
+    {
+        "id": 1731,
+        "name": "Yıldızeli",
+        "provinceId": 58,
+        "postalCode": "58500"
+    },
+    {
+        "id": 1738,
+        "name": "Zara",
+        "provinceId": 58,
+        "postalCode": "58700"
+    },
+    {
+        "id": 1250,
+        "name": "Çerkezköy",
+        "provinceId": 59,
+        "postalCode": "59500"
+    },
+    {
+        "id": 1258,
+        "name": "Çorlu",
+        "provinceId": 59,
+        "postalCode": "59850"
+    },
+    {
+        "id": 2094,
+        "name": "Ergene",
+        "provinceId": 59,
+        "postalCode": "59930"
+    },
+    {
+        "id": 1388,
+        "name": "Hayrabolu",
+        "provinceId": 59,
+        "postalCode": "59410"
+    },
+    {
+        "id": 2095,
+        "name": "Kapaklı",
+        "provinceId": 59,
+        "postalCode": "59510"
+    },
+    {
+        "id": 1511,
+        "name": "Malkara",
+        "provinceId": 59,
+        "postalCode": "59320"
+    },
+    {
+        "id": 1825,
+        "name": "Marmaraereğlisi",
+        "provinceId": 59,
+        "postalCode": "59740"
+    },
+    {
+        "id": 1538,
+        "name": "Muratlı",
+        "provinceId": 59,
+        "postalCode": "59700"
+    },
+    {
+        "id": 1596,
+        "name": "Saray",
+        "provinceId": 59,
+        "postalCode": "59600"
+    },
+    {
+        "id": 2096,
+        "name": "Süleymanpaşa",
+        "provinceId": 59,
+        "postalCode": "59100"
+    },
+    {
+        "id": 1652,
+        "name": "Şarköy",
+        "provinceId": 59,
+        "postalCode": "59570"
+    },
+    {
+        "id": 1129,
+        "name": "Almus",
+        "provinceId": 60,
+        "postalCode": "60900"
+    },
+    {
+        "id": 1151,
+        "name": "Artova",
+        "provinceId": 60,
+        "postalCode": "60670"
+    },
+    {
+        "id": 1883,
+        "name": "Başçiftlik",
+        "provinceId": 60,
+        "postalCode": "60620"
+    },
+    {
+        "id": 1308,
+        "name": "Erbaa",
+        "provinceId": 60,
+        "postalCode": "60500"
+    },
+    {
+        "id": 1679,
+        "name": "Merkez",
+        "provinceId": 60,
+        "postalCode": "60230"
+    },
+    {
+        "id": 1545,
+        "name": "Niksar",
+        "provinceId": 60,
+        "postalCode": "60630"
+    },
+    {
+        "id": 1834,
+        "name": "Pazar",
+        "provinceId": 60,
+        "postalCode": "60800"
+    },
+    {
+        "id": 1584,
+        "name": "Reşadiye",
+        "provinceId": 60,
+        "postalCode": "60730"
+    },
+    {
+        "id": 1987,
+        "name": "Sulusaray",
+        "provinceId": 60,
+        "postalCode": "60870"
+    },
+    {
+        "id": 1690,
+        "name": "Turhal",
+        "provinceId": 60,
+        "postalCode": "60300"
+    },
+    {
+        "id": 1858,
+        "name": "Yeşilyurt",
+        "provinceId": 60,
+        "postalCode": "60860"
+    },
+    {
+        "id": 1740,
+        "name": "Zile",
+        "provinceId": 60,
+        "postalCode": "60400"
+    },
+    {
+        "id": 1113,
+        "name": "Akçaabat",
+        "provinceId": 61,
+        "postalCode": "61300"
+    },
+    {
+        "id": 1141,
+        "name": "Araklı",
+        "provinceId": 61,
+        "postalCode": "61700"
+    },
+    {
+        "id": 1150,
+        "name": "Arsin",
+        "provinceId": 61,
+        "postalCode": "61900"
+    },
+    {
+        "id": 1775,
+        "name": "Beşikdüzü",
+        "provinceId": 61,
+        "postalCode": "61800"
+    },
+    {
+        "id": 1896,
+        "name": "Çarşıbaşı",
+        "provinceId": 61,
+        "postalCode": "61420"
+    },
+    {
+        "id": 1244,
+        "name": "Çaykara",
+        "provinceId": 61,
+        "postalCode": "61940"
+    },
+    {
+        "id": 1909,
+        "name": "Dernekpazarı",
+        "provinceId": 61,
+        "postalCode": "61950"
+    },
+    {
+        "id": 1917,
+        "name": "Düzköy",
+        "provinceId": 61,
+        "postalCode": "61390"
+    },
+    {
+        "id": 1942,
+        "name": "Hayrat",
+        "provinceId": 61,
+        "postalCode": "61470"
+    },
+    {
+        "id": 1966,
+        "name": "Köprübaşı",
+        "provinceId": 61,
+        "postalCode": "61630"
+    },
+    {
+        "id": 1507,
+        "name": "Maçka",
+        "provinceId": 61,
+        "postalCode": "61750"
+    },
+    {
+        "id": 1548,
+        "name": "Of",
+        "provinceId": 61,
+        "postalCode": "61830"
+    },
+    {
+        "id": 2097,
+        "name": "Ortahisar",
+        "provinceId": 61,
+        "postalCode": "61000"
+    },
+    {
+        "id": 1647,
+        "name": "Sürmene",
+        "provinceId": 61,
+        "postalCode": "61530"
+    },
+    {
+        "id": 1842,
+        "name": "Şalpazarı",
+        "provinceId": 61,
+        "postalCode": "61670"
+    },
+    {
+        "id": 1681,
+        "name": "Tonya",
+        "provinceId": 61,
+        "postalCode": "61510"
+    },
+    {
+        "id": 1709,
+        "name": "Vakfıkebir",
+        "provinceId": 61,
+        "postalCode": "61400"
+    },
+    {
+        "id": 1732,
+        "name": "Yomra",
+        "provinceId": 61,
+        "postalCode": "61290"
+    },
+    {
+        "id": 1247,
+        "name": "Çemişgezek",
+        "provinceId": 62,
+        "postalCode": "62600"
+    },
+    {
+        "id": 1397,
+        "name": "Hozat",
+        "provinceId": 62,
+        "postalCode": "62400"
+    },
+    {
+        "id": 1518,
+        "name": "Mazgirt",
+        "provinceId": 62,
+        "postalCode": "62800"
+    },
+    {
+        "id": 1688,
+        "name": "Merkez",
+        "provinceId": 62,
+        "postalCode": "62000"
+    },
+    {
+        "id": 1541,
+        "name": "Nazımiye",
+        "provinceId": 62,
+        "postalCode": "62950"
+    },
+    {
+        "id": 1562,
+        "name": "Ovacık",
+        "provinceId": 62,
+        "postalCode": "62900"
+    },
+    {
+        "id": 1574,
+        "name": "Pertek",
+        "provinceId": 62,
+        "postalCode": "62500"
+    },
+    {
+        "id": 1581,
+        "name": "Pülümür",
+        "provinceId": 62,
+        "postalCode": "62710"
+    },
+    {
+        "id": 1115,
+        "name": "Akçakale",
+        "provinceId": 63,
+        "postalCode": "63500"
+    },
+    {
+        "id": 1194,
+        "name": "Birecik",
+        "provinceId": 63,
+        "postalCode": "63420"
+    },
+    {
+        "id": 1209,
+        "name": "Bozova",
+        "provinceId": 63,
+        "postalCode": "63850"
+    },
+    {
+        "id": 1220,
+        "name": "Ceylanpınar",
+        "provinceId": 63,
+        "postalCode": "63570"
+    },
+    {
+        "id": 2091,
+        "name": "Eyyübiye",
+        "provinceId": 63,
+        "postalCode": "63250"
+    },
+    {
+        "id": 1378,
+        "name": "Halfeti",
+        "provinceId": 63,
+        "postalCode": "63986"
+    },
+    {
+        "id": 2092,
+        "name": "Haliliye",
+        "provinceId": 63,
+        "postalCode": "63050"
+    },
+    {
+        "id": 1800,
+        "name": "Harran",
+        "provinceId": 63,
+        "postalCode": "63510"
+    },
+    {
+        "id": 1393,
+        "name": "Hilvan",
+        "provinceId": 63,
+        "postalCode": "63900"
+    },
+    {
+        "id": 2093,
+        "name": "Karaköprü",
+        "provinceId": 63,
+        "postalCode": "63330"
+    },
+    {
+        "id": 1630,
+        "name": "Siverek",
+        "provinceId": 63,
+        "postalCode": "63614"
+    },
+    {
+        "id": 1643,
+        "name": "Suruç",
+        "provinceId": 63,
+        "postalCode": "63800"
+    },
+    {
+        "id": 1713,
+        "name": "Viranşehir",
+        "provinceId": 63,
+        "postalCode": "63700"
+    },
+    {
+        "id": 1170,
+        "name": "Banaz",
+        "provinceId": 64,
+        "postalCode": "64500"
+    },
+    {
+        "id": 1323,
+        "name": "Eşme",
+        "provinceId": 64,
+        "postalCode": "64600"
+    },
+    {
+        "id": 1436,
+        "name": "Karahallı",
+        "provinceId": 64,
+        "postalCode": "64700"
+    },
+    {
+        "id": 1704,
+        "name": "Merkez",
+        "provinceId": 64,
+        "postalCode": "64300"
+    },
+    {
+        "id": 1629,
+        "name": "Sivaslı",
+        "provinceId": 64,
+        "postalCode": "64800"
+    },
+    {
+        "id": 1697,
+        "name": "Ulubey",
+        "provinceId": 64,
+        "postalCode": "64900"
+    },
+    {
+        "id": 1770,
+        "name": "Bahçesaray",
+        "provinceId": 65,
+        "postalCode": "65710"
+    },
+    {
+        "id": 1175,
+        "name": "Başkale",
+        "provinceId": 65,
+        "postalCode": "65600"
+    },
+    {
+        "id": 1786,
+        "name": "Çaldıran",
+        "provinceId": 65,
+        "postalCode": "65970"
+    },
+    {
+        "id": 1236,
+        "name": "Çatak",
+        "provinceId": 65,
+        "postalCode": "65870"
+    },
+    {
+        "id": 1918,
+        "name": "Edremit",
+        "provinceId": 65,
+        "postalCode": "65170"
+    },
+    {
+        "id": 1309,
+        "name": "Erciş",
+        "provinceId": 65,
+        "postalCode": "65440"
+    },
+    {
+        "id": 1350,
+        "name": "Gevaş",
+        "provinceId": 65,
+        "postalCode": "65700"
+    },
+    {
+        "id": 1372,
+        "name": "Gürpınar",
+        "provinceId": 65,
+        "postalCode": "65900"
+    },
+    {
+        "id": 2098,
+        "name": "İpekyolu",
+        "provinceId": 65,
+        "postalCode": "65130"
+    },
+    {
+        "id": 1533,
+        "name": "Muradiye",
+        "provinceId": 65,
+        "postalCode": "65500"
+    },
+    {
+        "id": 1565,
+        "name": "Özalp",
+        "provinceId": 65,
+        "postalCode": "65570"
+    },
+    {
+        "id": 1980,
+        "name": "Saray",
+        "provinceId": 65,
+        "postalCode": "65830"
+    },
+    {
+        "id": 2099,
+        "name": "Tuşba",
+        "provinceId": 65,
+        "postalCode": "65040"
+    },
+    {
+        "id": 1117,
+        "name": "Akdağmadeni",
+        "provinceId": 66,
+        "postalCode": "66300"
+    },
+    {
+        "id": 1877,
+        "name": "Aydıncık",
+        "provinceId": 66,
+        "postalCode": "66510"
+    },
+    {
+        "id": 1198,
+        "name": "Boğazlıyan",
+        "provinceId": 66,
+        "postalCode": "66400"
+    },
+    {
+        "id": 1895,
+        "name": "Çandır",
+        "provinceId": 66,
+        "postalCode": "66620"
+    },
+    {
+        "id": 1242,
+        "name": "Çayıralan",
+        "provinceId": 66,
+        "postalCode": "66600"
+    },
+    {
+        "id": 1245,
+        "name": "Çekerek",
+        "provinceId": 66,
+        "postalCode": "66500"
+    },
+    {
+        "id": 1952,
+        "name": "Kadışehri",
+        "provinceId": 66,
+        "postalCode": "66540"
+    },
+    {
+        "id": 1733,
+        "name": "Merkez",
+        "provinceId": 66,
+        "postalCode": "66000"
+    },
+    {
+        "id": 1982,
+        "name": "Saraykent",
+        "provinceId": 66,
+        "postalCode": "66320"
+    },
+    {
+        "id": 1602,
+        "name": "Sarıkaya",
+        "provinceId": 66,
+        "postalCode": "66650"
+    },
+    {
+        "id": 1635,
+        "name": "Sorgun",
+        "provinceId": 66,
+        "postalCode": "66710"
+    },
+    {
+        "id": 1655,
+        "name": "Şefaatli",
+        "provinceId": 66,
+        "postalCode": "66800"
+    },
+    {
+        "id": 1998,
+        "name": "Yenifakılı",
+        "provinceId": 66,
+        "postalCode": "66470"
+    },
+    {
+        "id": 1726,
+        "name": "Yerköy",
+        "provinceId": 66,
+        "postalCode": "66900"
+    },
+    {
+        "id": 1758,
+        "name": "Alaplı",
+        "provinceId": 67,
+        "postalCode": "67850"
+    },
+    {
+        "id": 1240,
+        "name": "Çaycuma",
+        "provinceId": 67,
+        "postalCode": "67900"
+    },
+    {
+        "id": 1276,
+        "name": "Devrek",
+        "provinceId": 67,
+        "postalCode": "67830"
+    },
+    {
+        "id": 1313,
+        "name": "Ereğli",
+        "provinceId": 67,
+        "postalCode": "67300"
+    },
+    {
+        "id": 1926,
+        "name": "Gökçebey",
+        "provinceId": 67,
+        "postalCode": "67680"
+    },
+    {
+        "id": 2100,
+        "name": "Kilimli",
+        "provinceId": 67,
+        "postalCode": "67500"
+    },
+    {
+        "id": 2101,
+        "name": "Kozlu",
+        "provinceId": 67,
+        "postalCode": "67600"
+    },
+    {
+        "id": 1741,
+        "name": "Merkez",
+        "provinceId": 67,
+        "postalCode": "67980"
+    },
+    {
+        "id": 1860,
+        "name": "Ağaçören",
+        "provinceId": 68,
+        "postalCode": "68600"
+    },
+    {
+        "id": 1921,
+        "name": "Eskil",
+        "provinceId": 68,
+        "postalCode": "68800"
+    },
+    {
+        "id": 1932,
+        "name": "Gülağaç",
+        "provinceId": 68,
+        "postalCode": "68940"
+    },
+    {
+        "id": 1861,
+        "name": "Güzelyurt",
+        "provinceId": 68,
+        "postalCode": "68500"
+    },
+    {
+        "id": 1120,
+        "name": "Merkez",
+        "provinceId": 68,
+        "postalCode": "68120"
+    },
+    {
+        "id": 1557,
+        "name": "Ortaköy",
+        "provinceId": 68,
+        "postalCode": "68400"
+    },
+    {
+        "id": 1866,
+        "name": "Sarıyahşi",
+        "provinceId": 68,
+        "postalCode": "68700"
+    },
+    {
+        "id": 2106,
+        "name": "Sultanhanı",
+        "provinceId": 68,
+        "postalCode": "68190"
+    },
+    {
+        "id": 1767,
+        "name": "Aydıntepe",
+        "provinceId": 69,
+        "postalCode": "69500"
+    },
+    {
+        "id": 1788,
+        "name": "Demirözü",
+        "provinceId": 69,
+        "postalCode": "69400"
+    },
+    {
+        "id": 1176,
+        "name": "Merkez",
+        "provinceId": 69,
+        "postalCode": "69300"
+    },
+    {
+        "id": 1768,
+        "name": "Ayrancı",
+        "provinceId": 70,
+        "postalCode": "70500"
+    },
+    {
+        "id": 1884,
+        "name": "Başyayla",
+        "provinceId": 70,
+        "postalCode": "70700"
+    },
+    {
+        "id": 1316,
+        "name": "Ermenek",
+        "provinceId": 70,
+        "postalCode": "70400"
+    },
+    {
+        "id": 1862,
+        "name": "Kazımkarabekir",
+        "provinceId": 70,
+        "postalCode": "70600"
+    },
+    {
+        "id": 1439,
+        "name": "Merkez",
+        "provinceId": 70,
+        "postalCode": "70110"
+    },
+    {
+        "id": 1983,
+        "name": "Sarıveliler",
+        "provinceId": 70,
+        "postalCode": "70810"
+    },
+    {
+        "id": 1880,
+        "name": "Bahşılı",
+        "provinceId": 71,
+        "postalCode": "71460"
+    },
+    {
+        "id": 1882,
+        "name": "Balışeyh",
+        "provinceId": 71,
+        "postalCode": "71520"
+    },
+    {
+        "id": 1901,
+        "name": "Çelebi",
+        "provinceId": 71,
+        "postalCode": "71810"
+    },
+    {
+        "id": 1268,
+        "name": "Delice",
+        "provinceId": 71,
+        "postalCode": "71670"
+    },
+    {
+        "id": 1954,
+        "name": "Karakeçili",
+        "provinceId": 71,
+        "postalCode": "71500"
+    },
+    {
+        "id": 1463,
+        "name": "Keskin",
+        "provinceId": 71,
+        "postalCode": "71800"
+    },
+    {
+        "id": 1469,
+        "name": "Merkez",
+        "provinceId": 71,
+        "postalCode": "71100"
+    },
+    {
+        "id": 1638,
+        "name": "Sulakyurt",
+        "provinceId": 71,
+        "postalCode": "71900"
+    },
+    {
+        "id": 1992,
+        "name": "Yahşihan",
+        "provinceId": 71,
+        "postalCode": "71450"
+    },
+    {
+        "id": 1184,
+        "name": "Beşiri",
+        "provinceId": 72,
+        "postalCode": "72200"
+    },
+    {
+        "id": 1345,
+        "name": "Gercüş",
+        "provinceId": 72,
+        "postalCode": "72300"
+    },
+    {
+        "id": 1941,
+        "name": "Hasankeyf",
+        "provinceId": 72,
+        "postalCode": "72350"
+    },
+    {
+        "id": 1487,
+        "name": "Kozluk",
+        "provinceId": 72,
+        "postalCode": "72400"
+    },
+    {
+        "id": 1174,
+        "name": "Merkez",
+        "provinceId": 72,
+        "postalCode": "72000"
+    },
+    {
+        "id": 1607,
+        "name": "Sason",
+        "provinceId": 72,
+        "postalCode": "72500"
+    },
+    {
+        "id": 1189,
+        "name": "Beytüşşebap",
+        "provinceId": 73,
+        "postalCode": "73800"
+    },
+    {
+        "id": 1223,
+        "name": "Cizre",
+        "provinceId": 73,
+        "postalCode": "73200"
+    },
+    {
+        "id": 1931,
+        "name": "Güçlükonak",
+        "provinceId": 73,
+        "postalCode": "73710"
+    },
+    {
+        "id": 1403,
+        "name": "İdil",
+        "provinceId": 73,
+        "postalCode": "73300"
+    },
+    {
+        "id": 1661,
+        "name": "Merkez",
+        "provinceId": 73,
+        "postalCode": "73000"
+    },
+    {
+        "id": 1623,
+        "name": "Silopi",
+        "provinceId": 73,
+        "postalCode": "73400"
+    },
+    {
+        "id": 1698,
+        "name": "Uludere",
+        "provinceId": 73,
+        "postalCode": "73620"
+    },
+    {
+        "id": 1761,
+        "name": "Amasra",
+        "provinceId": 74,
+        "postalCode": "74300"
+    },
+    {
+        "id": 1496,
+        "name": "Kurucaşile",
+        "provinceId": 74,
+        "postalCode": "74500"
+    },
+    {
+        "id": 1172,
+        "name": "Merkez",
+        "provinceId": 74,
+        "postalCode": "74100"
+    },
+    {
+        "id": 1701,
+        "name": "Ulus",
+        "provinceId": 74,
+        "postalCode": "74610"
+    },
+    {
+        "id": 1252,
+        "name": "Çıldır",
+        "provinceId": 75,
+        "postalCode": "75400"
+    },
+    {
+        "id": 2008,
+        "name": "Damal",
+        "provinceId": 75,
+        "postalCode": "75600"
+    },
+    {
+        "id": 1356,
+        "name": "Göle",
+        "provinceId": 75,
+        "postalCode": "75700"
+    },
+    {
+        "id": 1380,
+        "name": "Hanak",
+        "provinceId": 75,
+        "postalCode": "75900"
+    },
+    {
+        "id": 1144,
+        "name": "Merkez",
+        "provinceId": 75,
+        "postalCode": "75000"
+    },
+    {
+        "id": 1579,
+        "name": "Posof",
+        "provinceId": 75,
+        "postalCode": "75800"
+    },
+    {
+        "id": 1142,
+        "name": "Aralık",
+        "provinceId": 76,
+        "postalCode": "76500"
+    },
+    {
+        "id": 2011,
+        "name": "Karakoyunlu",
+        "provinceId": 76,
+        "postalCode": "76700"
+    },
+    {
+        "id": 1398,
+        "name": "Merkez",
+        "provinceId": 76,
+        "postalCode": "76410"
+    },
+    {
+        "id": 1692,
+        "name": "Tuzluca",
+        "provinceId": 76,
+        "postalCode": "76900"
+    },
+    {
+        "id": 2019,
+        "name": "Altınova",
+        "provinceId": 77,
+        "postalCode": "77730"
+    },
+    {
+        "id": 2020,
+        "name": "Armutlu",
+        "provinceId": 77,
+        "postalCode": "77500"
+    },
+    {
+        "id": 2021,
+        "name": "Çınarcık",
+        "provinceId": 77,
+        "postalCode": "77300"
+    },
+    {
+        "id": 2022,
+        "name": "Çiftlikköy",
+        "provinceId": 77,
+        "postalCode": "77600"
+    },
+    {
+        "id": 1716,
+        "name": "Merkez",
+        "provinceId": 77,
+        "postalCode": "77200"
+    },
+    {
+        "id": 2026,
+        "name": "Termal",
+        "provinceId": 77,
+        "postalCode": "77400"
+    },
+    {
+        "id": 1296,
+        "name": "Eflani",
+        "provinceId": 78,
+        "postalCode": "78300"
+    },
+    {
+        "id": 1321,
+        "name": "Eskipazar",
+        "provinceId": 78,
+        "postalCode": "78400"
+    },
+    {
+        "id": 1433,
+        "name": "Merkez",
+        "provinceId": 78,
+        "postalCode": "78050"
+    },
+    {
+        "id": 1561,
+        "name": "Ovacık",
+        "provinceId": 78,
+        "postalCode": "78500"
+    },
+    {
+        "id": 1587,
+        "name": "Safranbolu",
+        "provinceId": 78,
+        "postalCode": "78610"
+    },
+    {
+        "id": 1856,
+        "name": "Yenice",
+        "provinceId": 78,
+        "postalCode": "78700"
+    },
+    {
+        "id": 2023,
+        "name": "Elbeyli",
+        "provinceId": 79,
+        "postalCode": "79500"
+    },
+    {
+        "id": 1476,
+        "name": "Merkez",
+        "provinceId": 79,
+        "postalCode": "79000"
+    },
+    {
+        "id": 2024,
+        "name": "Musabeyli",
+        "provinceId": 79,
+        "postalCode": "79600"
+    },
+    {
+        "id": 2025,
+        "name": "Polateli",
+        "provinceId": 79,
+        "postalCode": "79700"
+    },
+    {
+        "id": 1165,
+        "name": "Bahçe",
+        "provinceId": 80,
+        "postalCode": "80500"
+    },
+    {
+        "id": 1743,
+        "name": "Düziçi",
+        "provinceId": 80,
+        "postalCode": "80710"
+    },
+    {
+        "id": 2027,
+        "name": "Hasanbeyli",
+        "provinceId": 80,
+        "postalCode": "80850"
+    },
+    {
+        "id": 1423,
+        "name": "Kadirli",
+        "provinceId": 80,
+        "postalCode": "80760"
+    },
+    {
+        "id": 1560,
+        "name": "Merkez",
+        "provinceId": 80,
+        "postalCode": "80010"
+    },
+    {
+        "id": 2028,
+        "name": "Sumbas",
+        "provinceId": 80,
+        "postalCode": "80940"
+    },
+    {
+        "id": 2029,
+        "name": "Toprakkale",
+        "provinceId": 80,
+        "postalCode": "80950"
+    },
+    {
+        "id": 1116,
+        "name": "Akçakoca",
+        "provinceId": 81,
+        "postalCode": "81650"
+    },
+    {
+        "id": 1784,
+        "name": "Cumayeri",
+        "provinceId": 81,
+        "postalCode": "81700"
+    },
+    {
+        "id": 1905,
+        "name": "Çilimli",
+        "provinceId": 81,
+        "postalCode": "81750"
+    },
+    {
+        "id": 1794,
+        "name": "Gölyaka",
+        "provinceId": 81,
+        "postalCode": "81800"
+    },
+    {
+        "id": 2017,
+        "name": "Gümüşova",
+        "provinceId": 81,
+        "postalCode": "81850"
+    },
+    {
+        "id": 2031,
+        "name": "Kaynaşlı",
+        "provinceId": 81,
+        "postalCode": "81900"
+    },
+    {
+        "id": 1292,
+        "name": "Merkez",
+        "provinceId": 81,
+        "postalCode": "81010"
+    },
+    {
+        "id": 1730,
+        "name": "Yığılca",
+        "provinceId": 81,
+        "postalCode": "81950"
+    }
+]

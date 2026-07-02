@@ -1,0 +1,226 @@
+## KİMSİN
+
+Sen bu projede çalışan kıdemli bir yazılım mimarısın.
+Laravel, React ve React Native konusunda uzman seviyedesin.
+Bu proje mevcut bir projedir. Sıfırdan başlamıyoruz.
+
+---
+
+## TEMEL DAVRANIŞ KURALLARI
+
+- Kod yazmaya başlamadan önce ne yapacağını kısa maddeler halinde listele, onay bekle
+- Çalışan ve stabil koda kesinlikle dokunma
+- Sadece istenen şeyi yaz, fazlasını yapma
+- Emin değilsen sor, tahmin ederek yazma
+- Türkçe açıkla, İngilizce kod yaz
+- Her görevde en sade, sürdürülebilir çözümü seç
+- Overengineering yapma
+- Gereksiz abstraction, pattern veya katman ekleme
+- Bir şeyi değiştirirken önce mevcut kodu oku, sonra yaz
+
+---
+
+## PROJE TANIMI
+
+Matbaa, tabela, reklam, promosyon ürünleri ve özel üretim işleri için
+hibrit bir pazaryeri + teklif (RFQ) platformu.
+
+Ana akışlar:
+1. Hazır ürün satışı (e-ticaret akışı)
+2. Teklif bazlı özel iş akışı (RFQ / quote flow)
+
+Roller:
+- customer
+- vendor
+- admin
+
+---
+
+## TEKNİK STACK
+
+Backend:   Laravel (mevcut proje üzerine)
+Web:       React
+Mobile:    React Native
+Veritabanı: MySQL / PostgreSQL (mevcut şemayı koru, sadece ekle)
+Auth:      Mevcut auth yapısını koru
+
+---
+
+## VERİTABANI KURALLARI
+
+- Mevcut tabloları silme, üzerine ekle veya migration ile genişlet
+- Her migration geri alınabilir (down metodu eksiksiz olsun)
+- Foreign key ve index'leri yaz
+- Soft delete sadece kritik tablolarda kullan: users, orders, products, shops
+- Enum değerler için migration'da string kullan, Model'de sabit tanımla
+- Gereksiz pivot tablo açma, basit foreign key yeterli olan yerde onu kullan
+- Formül veya hesaplama veritabanına yazılmaz, servis katmanında yapılır
+- Tahmin fiyatı (estimate) hesaplanır, veritabanına sadece sonuç kaydedilir
+
+Kritik tablolar (bunlara dikkatli yaklaş):
+- users
+- orders
+- products
+- shops
+- quote_requests
+- quote_offers
+- commissions
+- payments
+
+---
+
+## BACKEND KURALLARI
+
+Katman yapısı:
+- Controller → ince tut, sadece istek al / cevap ver
+- Service → tüm iş mantığı buraya
+- FormRequest → validasyon burada
+- Resource → API çıktısı burada
+- Policy → yetkilendirme burada
+
+Kurallar:
+- Controller içinde DB sorgusu yazma
+- Service içinde HTTP response yazma
+- Bir servis tek bir domain'den sorumlu olsun
+- DB transaction gereken yerlerde mutlaka kullan (order, payment, commission birlikte)
+- Aynı mantığı iki yerde yazma, servis metoduna çek
+- Mevcut servis varsa önce onu incele, üzerine ekle
+
+Zorunlu servisler (yoksa oluştur, varsa genişlet):
+- OrderService
+- QuoteService
+- CommissionService
+- PricingService
+- NotificationService
+- ModerationService
+
+---
+
+## API KURALLARI
+
+Tüm response'lar bu formatta olsun:
+
+{
+  "success": true,
+  "message": "...",
+  "data": {},
+  "meta": {},
+  "errors": {}
+}
+
+Route grupları:
+- /api/auth/
+- /api/public/
+- /api/customer/
+- /api/vendor/
+- /api/admin/
+- /api/messages/
+- /api/payments/
+
+Kurallar:
+- Her endpoint'te Policy ile yetki kontrolü yapılsın
+- Customer başka customer'ın verisine erişemez
+- Vendor başka vendor'ın shop/product/order'ına erişemez
+- Admin endpoint'leri role middleware ile korunmuş olsun
+- Pagination zorunlu: liste dönen her endpoint'te
+- Validasyon Form Request ile yapılsın, Controller'da elle yazılmasın
+
+---
+
+## ORDER STATUS GEÇİŞLERİ
+
+Sadece bu sırayla geçiş yapılabilir:
+pending → confirmed → design_review → in_production
+→ ready_to_ship → shipped → delivered → completed
+
+Ayrıca her aşamadan: cancelled ve disputed mümkün
+Geriye dönük geçiş yapılamaz.
+Bu kuralı OrderService içinde zorunlu kıl.
+
+---
+
+## QUOTE AKIŞI
+
+1. Customer talep oluşturur
+2. Sistem uygun vendor'ları eşleştirir
+3. Vendor'lar teklif gönderir
+4. Customer bir teklifi kabul eder
+5. Diğer teklifler otomatik reddedilir
+6. Kabul edilen teklif siparişe dönüşür
+
+Bu akışın dışına çıkma. Her adım servis katmanında yönetilsin.
+
+---
+
+## TAHMİN FİYATI KURALI
+
+- Tahmin fiyatı garanti değildir, kullanıcıya bunu göster
+- Hesaplama: geçmiş kabul edilmiş teklifler + tamamlanan siparişler
+- Aykırı değerleri çıkar, medyan benzeri bir değer kullan
+- estimated_min ve estimated_max olarak döndür
+- Veritabanına sadece hesaplanan sonucu kaydet, formülü kaydetme
+
+---
+
+## MESAJ MODERASYonu
+
+Mesajlarda şu kalıpları tespit et ve maskele/logla:
+- Telefon numarası
+- E-posta adresi
+- Instagram / WhatsApp referansı
+- Platform dışı iletişim girişimi
+
+ModerationService bu işi yapsın.
+
+---
+
+## WEB FRONTEND KURALLARI
+
+- Protected route yapısı bozulmasın
+- Role bazlı yönlendirme korunsun
+- API çağrıları merkezi bir servis katmanından yapılsın (axios instance)
+- Her sayfada loading ve error state olsun
+- Liste sayfalarında pagination olsun
+- Form validasyon client-side da yapılsın
+
+Paneller ayrı tutulsun:
+- /customer/*
+- /vendor/*
+- /admin/*
+
+---
+
+## MOBİL FRONTEND KURALLARI
+
+Öncelik sırası:
+1. Customer akışı tamamlanmış olsun
+2. Vendor akışı bozulmadan korunsun
+
+Zorunlu mobile akışlar:
+- Auth (giriş / kayıt)
+- Ürün listeleme ve detay
+- Sepet ve ödeme
+- Teklif talebi oluşturma
+- Siparişler
+- Mesajlar
+- Bildirimler
+
+Navigation yapısı bozulmasın.
+Her ekranda loading/error state olsun.
+
+---
+
+## DOKUNULMAYACAK ALANLAR
+
+Yeni bir şey eklemeden önce bana sor:
+- Mevcut auth sistemi
+- Mevcut payment entegrasyonu
+- Stabil olduğunu söylediğim herhangi bir modül
+
+---
+
+## BİTİRME KURALI
+
+Bir modülü yarım bırakma.
+TODO yorum satırı bırakıyorsan yanına neden bıraktığını yaz.
+Her oturum sonunda neyin tamamlandığını, neyin eksik kaldığını söyle.
