@@ -61,15 +61,24 @@ async function collectVendors(): Promise<Vendor[]> {
 /**
  * Yalnizca Next'in sundugu sayfalar. Blade'de duran kurumsal sayfalar
  * Laravel tarafindan listelenmeye devam eder.
+ *
+ * Coolify build sirasinda API gecici olarak ulasilamazsa sadece sabit
+ * sayfalar yazilir; runtime ISR sonradan urun/satici ekler.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const [products, vendors] = await Promise.all([collectProducts(), collectVendors()]);
+    const staticEntries = [entry('/', 'daily'), entry('/urunler', 'daily'), entry('/saticilar', 'weekly')];
 
-    return [
-        entry('/', 'daily'),
-        entry('/urunler', 'daily'),
-        entry('/saticilar', 'weekly'),
-        ...products.map((product) => entry({ pathname: '/urun/[slug]', params: { slug: product.slug } }, 'weekly')),
-        ...vendors.map((vendor) => entry({ pathname: '/satici/[slug]', params: { slug: vendor.slug } }, 'weekly')),
-    ];
+    try {
+        const [products, vendors] = await Promise.all([collectProducts(), collectVendors()]);
+
+        return [
+            ...staticEntries,
+            ...products.map((product) =>
+                entry({ pathname: '/urun/[slug]', params: { slug: product.slug } }, 'weekly'),
+            ),
+            ...vendors.map((vendor) => entry({ pathname: '/satici/[slug]', params: { slug: vendor.slug } }, 'weekly')),
+        ];
+    } catch {
+        return staticEntries;
+    }
 }

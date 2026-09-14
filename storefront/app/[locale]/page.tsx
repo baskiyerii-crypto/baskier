@@ -28,11 +28,19 @@ export default async function HomePage({ params }: PageProps) {
     setRequestLocale(locale);
 
     const t = await getTranslations({ locale, namespace: 'home' });
-    const { data } = await getHome();
 
-    const categories = data.categories ?? [];
-    const featured = data.featured_products ?? [];
-    const digital = data.digital_products ?? [];
+    let categories: Awaited<ReturnType<typeof getHome>>['data']['categories'] = [];
+    let featured: Awaited<ReturnType<typeof getHome>>['data']['featured_products'] = [];
+    let digital: Awaited<ReturnType<typeof getHome>>['data']['digital_products'] = [];
+
+    try {
+        const { data } = await getHome();
+        categories = data.categories ?? [];
+        featured = data.featured_products ?? [];
+        digital = data.digital_products ?? [];
+    } catch {
+        // Coolify build aninda API yoksa sayfa yine uretilir; ISR sonradan dolar.
+    }
 
     return (
         <div className="by-container space-y-10 py-8">

@@ -21,6 +21,21 @@ npm run dev
 
 `npm run build` sirasinda ana sayfa ve sitemap on-render edildigi icin
 **Laravel API erisilebilir olmali**. Headless mimarinin normal davranisi.
+API gecici yoksa sayfalar bos icerikle yine uretilir (Coolify guvenlik agi).
+
+## Coolify
+
+Adim adim: [`deploy/coolify-storefront.md`](../deploy/coolify-storefront.md)
+
+Kisa ozet:
+
+1. Ayni repodan **yeni** Application, Base Directory = `/storefront`, Build Pack = Dockerfile
+2. Port `3000`
+3. Env (buildtime+runtime): `LARAVEL_API_URL`, `LARAVEL_WEB_URL`, `NEXT_PUBLIC_SITE_URL`
+4. Ilk yayin: `vitrin.SENIN-DOMAIN.com` (canli siteyi bozmaz)
+
+Mevcut Laravel Coolify app'ine Base Directory veya domain degistirme;
+vitrin ayri app olarak calisir.
 
 ## Dil (TR / EN)
 

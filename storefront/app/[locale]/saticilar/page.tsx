@@ -31,7 +31,13 @@ export default async function VendorsPage({ params, searchParams }: PageProps) {
     const currentPage = Number.parseInt(page ?? '1', 10) || 1;
 
     const t = await getTranslations({ locale, namespace: 'vendors' });
-    const { data: vendors } = await getVendors(currentPage);
+
+    let vendors: Awaited<ReturnType<typeof getVendors>>['data'] = [];
+    try {
+        vendors = (await getVendors(currentPage)).data;
+    } catch {
+        // Coolify build aninda API yoksa bos liste ile uretilir.
+    }
 
     return (
         <div className="by-container py-6">

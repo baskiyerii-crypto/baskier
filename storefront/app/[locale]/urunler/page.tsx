@@ -40,10 +40,22 @@ export default async function ProductsPage({ params, searchParams }: PageProps) 
 
     const t = await getTranslations({ locale, namespace: 'products' });
     const nav = await getTranslations({ locale, namespace: 'nav' });
-    const [{ data: categories }, { data: products, meta }] = await Promise.all([
-        getCategories(),
-        getProducts({ q, categoryId, type, page: currentPage }),
-    ]);
+
+    let categories: Awaited<ReturnType<typeof getCategories>>['data'] = [];
+    let products: Awaited<ReturnType<typeof getProducts>>['data'] = [];
+    let meta: Awaited<ReturnType<typeof getProducts>>['meta'] = null;
+
+    try {
+        const [categoryResult, productResult] = await Promise.all([
+            getCategories(),
+            getProducts({ q, categoryId, type, page: currentPage }),
+        ]);
+        categories = categoryResult.data;
+        products = productResult.data;
+        meta = productResult.meta;
+    } catch {
+        // Coolify build aninda API yoksa bos liste ile uretilir.
+    }
 
     const activeCategoryId = categoryId ? Number.parseInt(categoryId, 10) : null;
     const searchAction = getPathname({ href: '/urunler', locale: locale as Locale });
