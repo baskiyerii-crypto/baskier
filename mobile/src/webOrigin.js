@@ -9,7 +9,16 @@ export const WEB_ORIGIN =
         .replace(/\/$/, '') ||
     'http://127.0.0.1:8000';
 
+/**
+ * Mobil arayüz Türkçe; web görünümü de Türkçe kalsın.
+ * Next.js vitrini IP'ye göre dil seçtiği için yurt dışı IP'de İngilizce'ye
+ * düşmemesi adına `lang=tr` gönderiyoruz. Blade sayfaları bunu yok sayar.
+ */
+export const WEB_LANG = 'tr';
+
 export function webUrl(path) {
     const p = path.startsWith('/') ? path : `/${path}`;
-    return `${WEB_ORIGIN}${p}`;
+    const separator = p.includes('?') ? '&' : '?';
+
+    return `${WEB_ORIGIN}${p}${separator}lang=${WEB_LANG}`;
 }

@@ -41,9 +41,6 @@ use App\Http\Controllers\VendorController;
 use Illuminate\Support\Facades\Route;
 
 // Genel
-Route::view('/app', 'spa');
-Route::view('/app/{any}', 'spa')->where('any', '.*');
-
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/urunler', [ProductController::class, 'index'])->name('products.index');
 Route::get('/urun/{slug}', [ProductController::class, 'show'])->name('products.show');

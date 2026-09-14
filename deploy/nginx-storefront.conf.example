@@ -1,0 +1,111 @@
+# BaskiYeri - hibrit yonlendirme ornegi
+#
+# Ayni domain: Next.js vitrin + Laravel (API, Blade paneller).
+# Bir sayfa Next'te yayina girdikce location listesine eklenir.
+#
+# Laravel route'lari SILINMEZ: resources/views icindeki ~15 Blade dosyasi
+# route('home'), route('products.index'), route('products.show') gibi
+# yardimcilari kullaniyor (layouts/app, layouts/account, cart, favorites...).
+# Route'lar kaldirilirsa panel sayfalari RouteNotFoundException verir.
+# Disaridan hangi tarafin cevap verecegini bu proxy belirler.
+
+upstream baskiyeri_laravel {
+    server 127.0.0.1:8000;
+}
+
+upstream baskiyeri_storefront {
+    server 127.0.0.1:3000;
+}
+
+# Cloudflare arkasindaysa cf-ipcountry zaten geliyor.
+# Dogrudan nginx ile calisiyorsaniz ngx_http_geoip2_module ile doldurun:
+#
+# geoip2 /usr/share/GeoIP/GeoLite2-Country.mmdb {
+#     $geoip2_country_code country iso_code;
+# }
+
+server {
+    listen 80;
+    server_name baskiyeri.example.com;
+
+    client_max_body_size 64m;
+
+    # ---- Laravel (dokunulmuyor) ----
+    location ^~ /api/ {
+        proxy_pass http://baskiyeri_laravel;
+        include /etc/nginx/proxy_params;
+    }
+
+    location ^~ /storage/ {
+        proxy_pass http://baskiyeri_laravel;
+        include /etc/nginx/proxy_params;
+    }
+
+    location ^~ /build/ {
+        proxy_pass http://baskiyeri_laravel;
+        include /etc/nginx/proxy_params;
+    }
+
+    # ---- Next.js vitrin ----
+    location ^~ /_next/ {
+        proxy_pass http://baskiyeri_storefront;
+        include /etc/nginx/proxy_params;
+    }
+
+    location = /sitemap.xml {
+        proxy_pass http://baskiyeri_storefront;
+        include /etc/nginx/proxy_params;
+    }
+
+    location = /robots.txt {
+        proxy_pass http://baskiyeri_storefront;
+        include /etc/nginx/proxy_params;
+    }
+
+    # Ana sayfa (sadece tam eslesme; diger yollari yutmasin)
+    location = / {
+        proxy_pass http://baskiyeri_storefront;
+        include /etc/nginx/proxy_params;
+        proxy_set_header X-Country-Code $http_cf_ipcountry;
+        # geoip2 kullaniyorsaniz: proxy_set_header X-Country-Code $geoip2_country_code;
+    }
+
+    location ^~ /urunler {
+        proxy_pass http://baskiyeri_storefront;
+        include /etc/nginx/proxy_params;
+        proxy_set_header X-Country-Code $http_cf_ipcountry;
+    }
+
+    location ^~ /urun/ {
+        proxy_pass http://baskiyeri_storefront;
+        include /etc/nginx/proxy_params;
+        proxy_set_header X-Country-Code $http_cf_ipcountry;
+    }
+
+    location ^~ /saticilar {
+        proxy_pass http://baskiyeri_storefront;
+        include /etc/nginx/proxy_params;
+        proxy_set_header X-Country-Code $http_cf_ipcountry;
+    }
+
+    location ^~ /satici/ {
+        proxy_pass http://baskiyeri_storefront;
+        include /etc/nginx/proxy_params;
+        proxy_set_header X-Country-Code $http_cf_ipcountry;
+    }
+
+    # Tum Ingilizce yollar Next'te
+    location ^~ /en {
+        proxy_pass http://baskiyeri_storefront;
+        include /etc/nginx/proxy_params;
+        proxy_set_header X-Country-Code $http_cf_ipcountry;
+    }
+
+    # ---- Geri kalan her sey Laravel (Blade paneller, auth, sepet, odeme) ----
+    # /giris /kayit /sepet /odeme /hesap /hesabim /satici-panel /admin
+    # /teklif-talebi /is-ilanlari /hakkimizda /gizlilik /kullanim-kosullari /sozlesme
+    location / {
+        proxy_pass http://baskiyeri_laravel;
+        include /etc/nginx/proxy_params;
+    }
+}
