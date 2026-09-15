@@ -18,6 +18,11 @@
             <input type="number" name="commission_wait_days" class="form-control" value="{{ old('commission_wait_days', $commission_wait_days) }}" min="0" max="90" required>
             <div class="form-text">Teslimden sonra kaç gün beklenir (örn: 15).</div>
         </div>
+        <div class="mb-3">
+            <label class="form-label fw-semibold">{{ __('panel.contract_acceptance_days') }}</label>
+            <input type="number" name="contract_acceptance_days" class="form-control" value="{{ old('contract_acceptance_days', $contract_acceptance_days) }}" min="1" max="90" required>
+            <div class="form-text">{{ __('panel.contract_acceptance_days_help') }}</div>
+        </div>
         <div class="mb-4">
             <label class="form-label fw-semibold">Tabela görüşme ücreti (₺)</label>
             <input type="number" name="meeting_fee" class="form-control" value="{{ old('meeting_fee', $meeting_fee) }}" min="0" max="1000" step="0.01" required>

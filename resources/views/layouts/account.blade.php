@@ -19,10 +19,13 @@
                         <span>Hesabım</span>
                     </a>
                     <div class="flex items-center gap-2">
+                        @include('partials.locale-switcher')
+                        <span class="hidden sm:inline text-xs font-mono text-slate-500">{{ auth()->user()?->publicCode() }}</span>
                         <a href="{{ route('products.index') }}" class="hidden sm:inline-flex by-btn-secondary">Alışveriş</a>
+                        <a href="{{ route('otp.show') }}" class="hidden sm:inline-flex by-btn-secondary">{{ __('panel.verify_account') }}</a>
                         <a href="{{ route('cart.index') }}" class="by-btn-primary px-4 py-2.5">Sepet</a>
                         <form method="POST" action="{{ route('logout') }}">@csrf
-                            <button type="submit" class="by-btn-secondary">Çıkış</button>
+                            <button type="submit" class="by-btn-secondary">{{ __('panel.logout') }}</button>
                         </form>
                     </div>
                 </div>

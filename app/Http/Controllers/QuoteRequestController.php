@@ -172,10 +172,8 @@ class QuoteRequestController extends Controller
         $quote->quoteRequest->quotes()->where('id', '!=', $quote->id)->update(['status' => 'rejected']);
         $quoteRequest->update(['status' => 'closed', 'closed_at' => now()]);
 
-        $rate = Setting::commissionRate();
-        $subtotal = $quote->amount;
-        $commissionAmount = round($subtotal * $rate / 100, 2);
-        $vendorAmount = $subtotal - $commissionAmount;
+        $commissions = app(\App\Services\CommissionService::class);
+        [$rate, $commissionAmount, $vendorAmount] = $commissions->calculate((float) $quote->amount, 'quote');
         $waitDays = Setting::commissionWaitDays();
 
         $order = Order::create([
@@ -185,7 +183,7 @@ class QuoteRequestController extends Controller
             'type' => 'quote',
             'quote_id' => $quote->id,
             'status' => 'paid',
-            'subtotal' => $subtotal,
+            'subtotal' => $quote->amount,
             'commission_rate' => $rate,
             'commission_amount' => $commissionAmount,
             'vendor_amount' => $vendorAmount,
@@ -196,7 +194,7 @@ class QuoteRequestController extends Controller
 
         $order->items()->create([
             'name' => $quoteRequest->title,
-            'price' => $subtotal,
+            'price' => $quote->amount,
             'quantity' => 1,
         ]);
 

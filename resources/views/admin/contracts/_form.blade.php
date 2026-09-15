@@ -23,11 +23,17 @@
         <label class="form-label">Sürüm</label>
         <input type="number" name="version" class="form-control" value="{{ old('version', $contract->version ?? 1) }}" min="1" max="9999" required>
     </div>
-    <div class="col-md-4 d-flex align-items-end">
+    <div class="col-md-4 d-flex align-items-end gap-3">
         <div class="form-check">
             <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" @checked(old('is_active', $contract->is_active ?? true))>
             <label class="form-check-label" for="is_active">Aktif</label>
         </div>
+        @if($isEdit)
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="republish" name="republish" value="1" @checked(old('republish'))>
+            <label class="form-check-label" for="republish">Satıcılara yeniden yayınla</label>
+        </div>
+        @endif
     </div>
     <div class="col-12">
         <label class="form-label">İçerik (HTML)</label>

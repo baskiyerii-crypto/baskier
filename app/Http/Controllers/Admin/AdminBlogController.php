@@ -29,6 +29,51 @@ class AdminBlogController extends Controller
         return view('admin.blog.index', compact('posts'));
     }
 
+    public function create()
+    {
+        return view('admin.blog.create', ['post' => new Post(['status' => 'draft'])]);
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $this->validated($request);
+        $validated['slug'] = $this->uniqueSlug($validated['slug'] ?? $validated['title']);
+        $validated['ai_humanized'] = false;
+        if ($validated['status'] === 'published' && empty($validated['published_at'])) {
+            $validated['published_at'] = now();
+        }
+        Post::create($validated);
+
+        return redirect()->route('admin.blog.index')->with('success', __('panel.blog_created'));
+    }
+
+    public function edit(Post $post)
+    {
+        return view('admin.blog.edit', compact('post'));
+    }
+
+    public function update(Request $request, Post $post)
+    {
+        $validated = $this->validated($request, $post);
+        $validated['slug'] = $this->uniqueSlug($validated['slug'] ?? $validated['title'], $post->id);
+        if ($validated['status'] === 'published' && empty($validated['published_at'])) {
+            $validated['published_at'] = $post->published_at ?? now();
+        }
+        if ($validated['status'] === 'draft') {
+            $validated['published_at'] = null;
+        }
+        $post->update($validated);
+
+        return redirect()->route('admin.blog.index')->with('success', __('panel.blog_updated'));
+    }
+
+    public function destroy(Post $post)
+    {
+        $post->delete();
+
+        return redirect()->route('admin.blog.index')->with('success', __('panel.blog_deleted'));
+    }
+
     public function importForm()
     {
         return view('admin.blog.import');
@@ -87,5 +132,36 @@ class AdminBlogController extends Controller
         fclose($handle);
 
         return redirect()->route('admin.blog.index')->with('success', "{$count} yazı içe aktarıldı.");
+    }
+
+    private function validated(Request $request, ?Post $post = null): array
+    {
+        return $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'slug' => ['nullable', 'string', 'max:255'],
+            'category' => ['nullable', 'string', 'max:120'],
+            'meta_title' => ['nullable', 'string', 'max:255'],
+            'meta_description' => ['nullable', 'string', 'max:500'],
+            'body' => ['required', 'string'],
+            'status' => ['required', 'in:draft,published'],
+            'published_at' => ['nullable', 'date'],
+        ]);
+    }
+
+    private function uniqueSlug(string $base, ?int $ignoreId = null): string
+    {
+        $slug = Str::slug($base) ?: 'yazi';
+        $candidate = $slug;
+        $i = 1;
+        while (
+            Post::query()
+                ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
+                ->where('slug', $candidate)
+                ->exists()
+        ) {
+            $candidate = $slug.'-'.$i++;
+        }
+
+        return $candidate;
     }
 }

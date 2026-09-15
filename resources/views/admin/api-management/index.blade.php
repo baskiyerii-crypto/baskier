@@ -48,7 +48,23 @@
                 <input type="text" name="openai_model" class="form-control" value="{{ $openai_model }}">
             </div>
         </div>
-        <button class="btn btn-primary">Kaydet</button>
+        <h2 class="h6 mt-4">Evolution WhatsApp (OTP)</h2>
+        <p class="small text-muted">Proje içi <code>docker compose up -d evolution</code> ile ayağa kalkar.</p>
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <label class="form-label">Base URL</label>
+                <input type="text" name="evolution_base_url" class="form-control" value="{{ $evolution_base_url }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">API Key</label>
+                <input type="password" name="evolution_api_key" class="form-control" value="{{ $evolution_api_key }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Instance</label>
+                <input type="text" name="evolution_instance" class="form-control" value="{{ $evolution_instance }}">
+            </div>
+        </div>
+        <button class="btn btn-primary">{{ __('panel.save') }}</button>
     </form>
 </div>
 @endsection

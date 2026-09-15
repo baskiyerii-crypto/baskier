@@ -44,9 +44,10 @@ use App\Http\Controllers\Vendor\VendorPayoutRequestWebController;
 use App\Http\Controllers\Vendor\VendorProductController;
 use App\Http\Controllers\Vendor\VendorQuoteRequestController;
 use App\Http\Controllers\Vendor\VendorSubscriptionController;
-use App\Http\Controllers\Vendor\VendorTabelaController;
-use App\Http\Controllers\VendorController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Vendor\VendorContractController;
+use App\Http\Controllers\Vendor\VendorCategoryRequestController;
+use App\Http\Controllers\Admin\AdminVendorCategoryRequestController;
+use App\Http\Controllers\Auth\OtpVerificationController;
 
 // Genel
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -164,6 +165,10 @@ Route::middleware(['auth', 'role:vendor'])->prefix('satici-panel')->name('vendor
     Route::post('tabela/gorusme', [VendorTabelaController::class, 'startMeeting'])->name('tabela.meeting');
     Route::get('abonelikler', [VendorSubscriptionController::class, 'index'])->name('subscriptions.index');
     Route::post('abonelikler/aktiflestir', [VendorSubscriptionController::class, 'activate'])->name('subscriptions.activate');
+    Route::get('sozlesmeler', [VendorContractController::class, 'index'])->name('contracts.index');
+    Route::post('sozlesmeler/{acceptance}/onayla', [VendorContractController::class, 'accept'])->name('contracts.accept');
+    Route::get('kategorilerim', [VendorCategoryRequestController::class, 'index'])->name('categories.index');
+    Route::post('kategorilerim', [VendorCategoryRequestController::class, 'store'])->name('categories.store');
 });
 
 // Yönetici paneli
@@ -186,8 +191,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('finans/giderler', [AdminFinanceController::class, 'updateExpenses'])->name('finance.expenses');
     Route::get('finans/export', [AdminFinanceController::class, 'export'])->name('finance.export');
     Route::get('blog', [AdminBlogController::class, 'index'])->name('blog.index');
+    Route::get('blog/yeni', [AdminBlogController::class, 'create'])->name('blog.create');
+    Route::post('blog', [AdminBlogController::class, 'store'])->name('blog.store');
     Route::get('blog/ice-aktar', [AdminBlogController::class, 'importForm'])->name('blog.import');
     Route::post('blog/ice-aktar', [AdminBlogController::class, 'import'])->name('blog.import.store');
+    Route::get('blog/{post}/duzenle', [AdminBlogController::class, 'edit'])->name('blog.edit');
+    Route::put('blog/{post}', [AdminBlogController::class, 'update'])->name('blog.update');
+    Route::delete('blog/{post}', [AdminBlogController::class, 'destroy'])->name('blog.destroy');
     Route::get('api-yonetimi', [AdminApiManagementController::class, 'index'])->name('api-management.index');
     Route::post('api-yonetimi', [AdminApiManagementController::class, 'update'])->name('api-management.update');
     Route::get('payouts', [AdminPayoutController::class, 'index'])->name('payouts.index');
@@ -200,5 +210,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('satici-odeme-talepleri', [AdminVendorPayoutRequestController::class, 'index'])->name('vendor-payout-requests.index');
     Route::post('satici-odeme-talepleri/{payoutRequest}/onayla', [AdminVendorPayoutRequestController::class, 'approve'])->name('vendor-payout-requests.approve');
     Route::post('satici-odeme-talepleri/{payoutRequest}/reddet', [AdminVendorPayoutRequestController::class, 'reject'])->name('vendor-payout-requests.reject');
+    Route::get('satici-kategori-talepleri', [AdminVendorCategoryRequestController::class, 'index'])->name('vendor-category-requests.index');
+    Route::post('satici-kategori-talepleri/{vendorCategoryRequest}/onayla', [AdminVendorCategoryRequestController::class, 'approve'])->name('vendor-category-requests.approve');
+    Route::post('satici-kategori-talepleri/{vendorCategoryRequest}/reddet', [AdminVendorCategoryRequestController::class, 'reject'])->name('vendor-category-requests.reject');
     Route::resource('contracts', AdminContractController::class)->only(['index', 'create', 'store', 'edit', 'update']);
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/dogrulama', [OtpVerificationController::class, 'show'])->name('otp.show');
+    Route::post('/dogrulama/gonder', [OtpVerificationController::class, 'send'])->name('otp.send');
+    Route::post('/dogrulama/onayla', [OtpVerificationController::class, 'verify'])->name('otp.verify');
 });

@@ -228,8 +228,14 @@
             </a>
             <a href="{{ route('admin.contracts.index') }}" class="nav-link {{ request()->routeIs('admin.contracts.*') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                <span>Sözleşmeler</span>
+                <span>{{ __('panel.nav_contracts') }}</span>
             </a>
+            @if(Route::has('admin.vendor-category-requests.index'))
+            <a href="{{ route('admin.vendor-category-requests.index') }}" class="nav-link {{ request()->routeIs('admin.vendor-category-requests.*') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                <span>{{ __('panel.nav_category_requests') }}</span>
+            </a>
+            @endif
         </nav>
         <div class="user-footer">
             <form method="POST" action="{{ route('logout') }}" class="d-inline w-100">
@@ -245,12 +251,15 @@
         <header class="admin-header">
             <h1 class="page-title mb-0">@yield('title', 'Yönetim')</h1>
             <div class="user-menu">
-                <a href="{{ route('home') }}" target="_blank">Siteyi görüntüle</a>
+                @include('partials.locale-switcher')
+                <span class="sep"></span>
+                <span class="text-muted small">{{ auth()->user()?->publicCode() }}</span>
+                <a href="{{ route('home') }}" target="_blank">{{ __('panel.view_site') }}</a>
                 <span class="sep"></span>
                 <span class="text-muted small">{{ auth()->user()->name ?? '' }}</span>
                 <form method="POST" action="{{ route('logout') }}" class="d-inline">
                     @csrf
-                    <button type="submit" class="btn-out-admin">Çıkış</button>
+                    <button type="submit" class="btn-out-admin">{{ __('panel.logout') }}</button>
                 </form>
             </div>
         </header>

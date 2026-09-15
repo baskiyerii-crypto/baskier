@@ -13,14 +13,31 @@ use Illuminate\Support\Facades\Storage;
 
 class AdminVendorController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $allVendors = Vendor::orderBy('name')->get(['id', 'name']);
         $vendors = Vendor::withCount('products')
             ->with(['user', 'businessTypes'])
+            ->when($request->filled('vendor_ids'), function ($q) use ($request) {
+                $ids = array_filter((array) $request->input('vendor_ids'));
+                if ($ids) {
+                    $q->whereIn('id', $ids);
+                }
+            })
+            ->when($request->filled('q'), function ($q) use ($request) {
+                $term = '%'.$request->string('q').'%';
+                $q->where(function ($inner) use ($term) {
+                    $inner->where('name', 'like', $term)
+                        ->orWhere('email', 'like', $term)
+                        ->orWhereHas('user', fn ($u) => $u->where('public_id', 'like', str_replace('%', '', $term).'%')
+                            ->orWhere('name', 'like', $term));
+                });
+            })
             ->orderBy('name')
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
 
-        return view('admin.vendors.index', compact('vendors'));
+        return view('admin.vendors.index', compact('vendors', 'allVendors'));
     }
 
     public function show(Vendor $vendor, \App\Services\VendorRiskService $riskService)

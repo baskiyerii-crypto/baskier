@@ -38,6 +38,7 @@ class Vendor extends Model
         'tabela_expires_at',
         'risk_band',
         'risk_score',
+        'contract_suspended_at',
     ];
 
     protected $casts = [
@@ -48,6 +49,7 @@ class Vendor extends Model
         'balance' => 'decimal:2',
         'rating_average' => 'decimal:2',
         'risk_score' => 'decimal:2',
+        'contract_suspended_at' => 'datetime',
         'freelancer_expires_at' => 'datetime',
         'quotes_expires_at' => 'datetime',
         'tabela_expires_at' => 'datetime',

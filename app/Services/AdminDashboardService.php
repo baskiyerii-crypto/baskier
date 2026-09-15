@@ -123,4 +123,18 @@ class AdminDashboardService
 
         return compact('labels', 'values');
     }
+
+    public function orderStatusBreakdown(): array
+    {
+        $rows = Order::query()
+            ->selectRaw('status, COUNT(*) as c')
+            ->groupBy('status')
+            ->pluck('c', 'status')
+            ->toArray();
+
+        return [
+            'labels' => array_keys($rows),
+            'values' => array_map('intval', array_values($rows)),
+        ];
+    }
 }

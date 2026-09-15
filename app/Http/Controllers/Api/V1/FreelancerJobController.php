@@ -101,10 +101,8 @@ class FreelancerJobController extends Controller
             $job->bids()->where('id', '!=', $bid->id)->update(['status' => 'rejected']);
             $job->update(['status' => 'closed', 'closed_at' => now()]);
 
-            $rate = Setting::commissionRate();
-            $subtotal = $bid->amount;
-            $commissionAmount = round($subtotal * $rate / 100, 2);
-            $vendorAmount = $subtotal - $commissionAmount;
+            $commissions = app(\App\Services\CommissionService::class);
+            [$rate, $commissionAmount, $vendorAmount] = $commissions->calculate((float) $bid->amount, 'freelancer');
             $waitDays = Setting::commissionWaitDays();
 
             $order = Order::create([
@@ -115,7 +113,7 @@ class FreelancerJobController extends Controller
                 'type' => 'freelancer',
                 'freelancer_job_id' => $job->id,
                 'status' => 'paid',
-                'subtotal' => $subtotal,
+                'subtotal' => $bid->amount,
                 'commission_rate' => $rate,
                 'commission_amount' => $commissionAmount,
                 'vendor_amount' => $vendorAmount,
@@ -126,7 +124,7 @@ class FreelancerJobController extends Controller
 
             $order->items()->create([
                 'name' => $job->title . ' (freelancer)',
-                'price' => $subtotal,
+                'price' => $bid->amount,
                 'quantity' => 1,
             ]);
 

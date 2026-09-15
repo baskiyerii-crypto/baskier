@@ -138,6 +138,18 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                 <span>Modüller & Abonelik</span>
             </a>
+            @if(Route::has('vendor.categories.index'))
+            <a href="{{ route('vendor.categories.index') }}" class="nav-link {{ request()->routeIs('vendor.categories.*') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                <span>{{ __('panel.nav_my_categories') }}</span>
+            </a>
+            @endif
+            @if(Route::has('vendor.contracts.index'))
+            <a href="{{ route('vendor.contracts.index') }}" class="nav-link {{ request()->routeIs('vendor.contracts.*') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>{{ __('panel.nav_contracts_vendor') }}</span>
+            </a>
+            @endif
             @if(auth()->user()->vendor)
             <a href="{{ route('vendors.show', auth()->user()->vendor->slug) }}" target="_blank" rel="noopener" class="nav-link text-muted">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/></svg>
@@ -175,11 +187,14 @@
                 <h1 class="page-title mb-0">@yield('title', 'Panel')</h1>
             </div>
             <div class="user-menu">
-                <a href="{{ route('home') }}" target="_blank">Pazaryerine Git ↗</a>
+                @include('partials.locale-switcher')
+                <span class="sep"></span>
+                <span class="text-muted small">{{ auth()->user()?->publicCode() }}</span>
+                <a href="{{ route('home') }}" target="_blank">{{ __('panel.view_site') }} ↗</a>
                 <span class="sep"></span>
                 <span class="text-muted small fw-medium">{{ auth()->user()->name ?? '' }}</span>
                 <form method="POST" action="{{ route('logout') }}" class="d-inline">@csrf
-                    <button type="submit" class="btn-out-vendor">Çıkış</button>
+                    <button type="submit" class="btn-out-vendor">{{ __('panel.logout') }}</button>
                 </form>
             </div>
         </header>
@@ -197,6 +212,7 @@
         document.getElementById('sidebarBackdrop').classList.toggle('show');
     }
 </script>
+@stack('scripts')
 @include('partials.pwa-install')
 </body>
 </html>

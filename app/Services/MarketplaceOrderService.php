@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\DB;
 
 class MarketplaceOrderService
 {
+    public function __construct(
+        private CommissionService $commissions
+    ) {}
+
     /**
      * @return list<Order>
      */
@@ -25,11 +29,10 @@ class MarketplaceOrderService
             throw new \InvalidArgumentException('Sepetiniz boş.');
         }
 
-        $rate = Setting::commissionRate();
         $waitDays = Setting::commissionWaitDays();
         $shippingText = $shippingAddress->formatted . ' | ' . $shippingAddress->full_name . ' | ' . $shippingAddress->phone;
 
-        return DB::transaction(function () use ($user, $items, $rate, $waitDays, $shippingText, $shippingAddress, $billingAddress, $invoiceData, $paymentData) {
+        return DB::transaction(function () use ($user, $items, $waitDays, $shippingText, $shippingAddress, $billingAddress, $invoiceData, $paymentData) {
             $byVendor = $items->groupBy(fn (CartItem $ci) => $ci->product->vendor_id);
             $orders = [];
 
@@ -41,8 +44,7 @@ class MarketplaceOrderService
                     $subtotal = bcadd($subtotal, $line, 2);
                 }
 
-                $commissionAmount = round((float) $subtotal * $rate / 100, 2);
-                $vendorAmount = round((float) $subtotal - $commissionAmount, 2);
+                [$rate, $commissionAmount, $vendorAmount] = $this->commissions->calculate((float) $subtotal, 'product');
 
                 $order = Order::create([
                     'order_number' => Order::generateOrderNumber(),
