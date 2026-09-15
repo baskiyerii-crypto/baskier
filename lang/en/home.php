@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'title' => 'BaskiYeri – Home',
+    'badge' => 'Print · Signage · Ads · Freelancer',
+    'hero_line_1' => 'Buy products,',
+    'hero_line_2' => 'collect quotes',
+    'hero_line_3' => ', move to production fast.',
+    'hero_body' => 'Ready-made catalogue + RFQ for custom jobs. Reach the right vendor the shortest way.',
+    'search_placeholder' => 'Search products or services (business cards, brochures, signs...)',
+    'search' => 'Search',
+    'quote' => 'Get a quote',
+    'products' => 'Products',
+    'vendors' => 'Vendors',
+    'freelancer' => 'Freelancer',
+    'ready_eyebrow' => 'Ready product',
+    'ready_title' => 'Buy from the catalogue',
+    'ready_body' => 'Cart → checkout → order.',
+    'custom_eyebrow' => 'Custom job',
+    'custom_title' => 'Collect quotes via RFQ',
+    'custom_body' => 'Let vendors compete.',
+    'vendor_eyebrow' => 'Right producer',
+    'vendor_title' => 'Compare vendors',
+    'vendor_body' => 'Check profiles, products and reviews.',
+];

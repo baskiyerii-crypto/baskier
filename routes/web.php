@@ -25,6 +25,7 @@ use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\FreelancerJobController;
 use App\Http\Controllers\FreelancerJobWebController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\QuoteRequestController;
@@ -42,6 +43,9 @@ use Illuminate\Support\Facades\Route;
 
 // Genel
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/dil/{locale}', [LocaleController::class, 'switch'])
+    ->whereIn('locale', ['tr', 'en'])
+    ->name('locale.switch');
 Route::get('/urunler', [ProductController::class, 'index'])->name('products.index');
 Route::get('/urun/{slug}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/saticilar', [VendorController::class, 'index'])->name('vendors.index');
