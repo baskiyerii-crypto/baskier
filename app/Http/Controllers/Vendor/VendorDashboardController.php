@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Vendor;
 
+use App\Domain\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\QuoteRequest;
@@ -20,7 +21,33 @@ class VendorDashboardController extends Controller
         $products = $vendor->products()->with('category')->latest()->limit(10)->get();
 
         $ordersCount = Order::where('vendor_id', $vendor->id)->count();
-        $ordersPending = Order::where('vendor_id', $vendor->id)->whereIn('status', ['paid', 'in_progress'])->count();
+
+        $ordersPending = Order::where('vendor_id', $vendor->id)
+            ->whereIn('status', [
+                OrderStatus::CONFIRMED,
+                OrderStatus::DESIGN_REVIEW,
+                OrderStatus::IN_PRODUCTION,
+                OrderStatus::READY_TO_SHIP,
+                OrderStatus::SHIPPED,
+            ])->count();
+
+        $proofPendingCount = Order::where('vendor_id', $vendor->id)
+            ->where('status', OrderStatus::DESIGN_REVIEW)
+            ->count();
+
+        $readyToShipCount = Order::where('vendor_id', $vendor->id)
+            ->whereIn('status', [OrderStatus::IN_PRODUCTION, OrderStatus::READY_TO_SHIP])
+            ->count();
+
+        $totalRevenue = (float) Order::where('vendor_id', $vendor->id)
+            ->whereNotIn('status', [OrderStatus::CANCELLED, OrderStatus::PENDING])
+            ->sum('vendor_amount');
+
+        $recentOrders = Order::where('vendor_id', $vendor->id)
+            ->with(['user', 'items.product'])
+            ->latest()
+            ->limit(5)
+            ->get();
 
         $openQuoteRequestsCount = 0;
         if ($vendor->hasActiveQuotesModule()) {
@@ -55,6 +82,10 @@ class VendorDashboardController extends Controller
             'products',
             'ordersCount',
             'ordersPending',
+            'proofPendingCount',
+            'readyToShipCount',
+            'totalRevenue',
+            'recentOrders',
             'openQuoteRequestsCount',
             'upcomingPayouts',
             'moduleEnds'
