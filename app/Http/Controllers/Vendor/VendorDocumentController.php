@@ -27,9 +27,13 @@ class VendorDocumentController extends Controller
         }
 
         $validated = $request->validate([
-            'document_type' => ['required', 'in:tax_plate'],
-            'file' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:'.config('uploads.max_kb', 5120)],
+            'document_type' => ['required', 'in:tax_plate,certificate,diploma,course,other'],
+            'file' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:'.config('uploads.max_kb', 12288)],
         ]);
+
+        if ($validated['document_type'] === 'tax_plate' && ! $vendor->hasPhysicalTrack()) {
+            return back()->with('error', __('panel.tax_plate_only_physical'));
+        }
 
         $path = $request->file('file')->store('vendor-documents/'.$vendor->id, 'public');
 
@@ -40,8 +44,10 @@ class VendorDocumentController extends Controller
             'status' => 'pending',
         ]);
 
-        $vendor->update(['verification_status' => 'pending']);
+        if ($validated['document_type'] === 'tax_plate') {
+            $vendor->update(['verification_status' => 'pending']);
+        }
 
-        return back()->with('success', 'Belge yüklendi. Yönetici onayı bekleniyor.');
+        return back()->with('success', __('panel.document_uploaded'));
     }
 }

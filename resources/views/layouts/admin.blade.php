@@ -38,7 +38,28 @@
             z-index: 40;
             display: flex;
             flex-direction: column;
+            transition: transform 0.2s ease;
         }
+        .admin-sidebar.is-collapsed { transform: translateX(-100%); }
+        .admin-main { flex: 1; margin-left: 280px; min-height: 100vh; display: flex; flex-direction: column; transition: margin-left 0.2s ease; }
+        .admin-shell.nav-collapsed .admin-main { margin-left: 0; }
+        .admin-sidebar details.nav-acc { border-radius: 10px; }
+        .admin-sidebar details.nav-acc > summary {
+            list-style: none; cursor: pointer; padding: 10px 14px; color: var(--side-text); font-weight: 600; font-size: 0.875rem;
+            border-radius: 10px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .admin-sidebar details.nav-acc > summary::-webkit-details-marker { display: none; }
+        .admin-sidebar details.nav-acc[open] > summary { background: rgba(99,102,241,.08); color: var(--side-active-text); }
+        .admin-sidebar details.nav-acc .nav-acc-body { display: flex; flex-direction: column; gap: 2px; padding: 4px 0 8px 8px; }
+        .sidebar-backdrop { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.35); z-index: 35; }
+        .sidebar-backdrop.show { display: block; }
+        @media (max-width: 991.98px) {
+            .admin-sidebar { transform: translateX(-100%); }
+            .admin-sidebar.is-open { transform: translateX(0); }
+            .admin-main { margin-left: 0; }
+        }
+        .metric-card, .card { transition: transform .15s ease, box-shadow .15s ease; }
+        .metric-card:hover, .card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(15,23,42,.08) !important; }
         .admin-sidebar .brand {
             padding: 1.5rem 1.25rem;
             border-bottom: 1px solid var(--side-border);
@@ -109,13 +130,6 @@
             background: #fef2f2;
             border-color: #fecaca;
         }
-        .admin-main {
-            flex: 1;
-            margin-left: 280px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
         .admin-header {
             height: 64px;
             background: var(--header-bg);
@@ -158,98 +172,88 @@
             background: #fef2f2;
             border-color: #fecaca;
         }
+        .admin-nav-toggle {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--side-border);
+            background: #fff; color: #475569; cursor: pointer;
+        }
         .admin-content { flex: 1; padding: 1.5rem; }
         .admin-content .card {
             border: 1px solid var(--side-border);
             border-radius: var(--card-radius);
             box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-        }
-        @media (max-width: 991.98px) {
-            .admin-sidebar { width: 72px; }
-            .admin-sidebar .brand span:not(.accent), .admin-sidebar .nav-link span { display: none; }
-            .admin-sidebar .nav-link { justify-content: center; padding: 12px; }
-            .admin-sidebar .user-footer .btn-logout span { display: none; }
-            .admin-main { margin-left: 72px; }
+            background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
         }
     </style>
 </head>
 <body class="min-h-screen">
-<div class="admin-shell">
-    <aside class="admin-sidebar">
-        <div class="brand">
+<div class="sidebar-backdrop" id="adminSidebarBackdrop" onclick="toggleAdminNav()"></div>
+<div class="admin-shell" id="adminShell">
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="brand d-flex justify-content-between align-items-center">
             <a href="{{ route('admin.dashboard') }}">Baskı<span class="accent">Yeri</span> <span class="accent">Admin</span></a>
+            <button type="button" class="btn-close d-lg-none" onclick="toggleAdminNav()" aria-label="Kapat"></button>
         </div>
         <nav class="nav">
             <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
-                <span>Dashboard</span>
+                <span>{{ __('panel.nav_dashboard') }}</span>
             </a>
-            <a href="{{ route('admin.categories.index') }}" class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                <span>Kategoriler</span>
-            </a>
-            <a href="{{ route('admin.business-types.index') }}" class="nav-link {{ request()->routeIs('admin.business-types.*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
-                <span>İş kolları</span>
-            </a>
-            <a href="{{ route('admin.vendors.index') }}" class="nav-link {{ request()->routeIs('admin.vendors.*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                <span>Satıcılar</span>
-            </a>
-            @if(Route::has('admin.finance.index'))
-            <a href="{{ route('admin.finance.index') }}" class="nav-link {{ request()->routeIs('admin.finance.*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                <span>Finans</span>
-            </a>
-            @endif
-            @if(Route::has('admin.blog.index'))
-            <a href="{{ route('admin.blog.index') }}" class="nav-link {{ request()->routeIs('admin.blog.*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                <span>Blog</span>
-            </a>
-            @endif
-            @if(Route::has('admin.api-management.index'))
-            <a href="{{ route('admin.api-management.index') }}" class="nav-link {{ request()->routeIs('admin.api-management.*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
-                <span>API yönetimi</span>
-            </a>
-            @endif
-            <a href="{{ route('admin.products.index') }}" class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                <span>Ürünler</span>
-            </a>
-            <a href="{{ route('admin.settings.index') }}" class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                <span>Ayarlar</span>
-            </a>
-            <a href="{{ route('admin.payouts.index') }}" class="nav-link {{ request()->routeIs('admin.payouts.*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                <span>Hakedişler</span>
-            </a>
-            <a href="{{ route('admin.contracts.index') }}" class="nav-link {{ request()->routeIs('admin.contracts.*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                <span>{{ __('panel.nav_contracts') }}</span>
-            </a>
-            @if(Route::has('admin.vendor-category-requests.index'))
-            <a href="{{ route('admin.vendor-category-requests.index') }}" class="nav-link {{ request()->routeIs('admin.vendor-category-requests.*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                <span>{{ __('panel.nav_category_requests') }}</span>
-            </a>
-            @endif
+            <details class="nav-acc" @if(request()->routeIs('admin.vendors.*','admin.customers.*','admin.vendor-updates.*','admin.vendor-category-requests.*')) open @endif>
+                <summary>{{ __('panel.nav_people') }} <span>▾</span></summary>
+                <div class="nav-acc-body">
+                    <a href="{{ route('admin.vendors.index') }}" class="nav-link {{ request()->routeIs('admin.vendors.*') ? 'active' : '' }}"><span>{{ __('panel.nav_vendors') }}</span></a>
+                    <a href="{{ route('admin.customers.index') }}" class="nav-link {{ request()->routeIs('admin.customers.*') ? 'active' : '' }}"><span>{{ __('panel.nav_customers') }}</span></a>
+                    <a href="{{ route('admin.vendor-updates.index') }}" class="nav-link {{ request()->routeIs('admin.vendor-updates.*') ? 'active' : '' }}"><span>{{ __('panel.nav_vendor_updates') }}</span></a>
+                    @if(Route::has('admin.vendor-category-requests.index'))
+                    <a href="{{ route('admin.vendor-category-requests.index') }}" class="nav-link {{ request()->routeIs('admin.vendor-category-requests.*') ? 'active' : '' }}"><span>{{ __('panel.nav_category_requests') }}</span></a>
+                    @endif
+                </div>
+            </details>
+            <details class="nav-acc" @if(request()->routeIs('admin.categories.*','admin.business-types.*','admin.products.*','admin.blog.*')) open @endif>
+                <summary>{{ __('panel.nav_catalog') }} <span>▾</span></summary>
+                <div class="nav-acc-body">
+                    <a href="{{ route('admin.categories.index') }}" class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}"><span>{{ __('panel.nav_categories') }}</span></a>
+                    <a href="{{ route('admin.business-types.index') }}" class="nav-link {{ request()->routeIs('admin.business-types.*') ? 'active' : '' }}"><span>{{ __('panel.nav_business_types') }}</span></a>
+                    <a href="{{ route('admin.products.index') }}" class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}"><span>{{ __('panel.nav_products') }}</span></a>
+                    @if(Route::has('admin.blog.index'))
+                    <a href="{{ route('admin.blog.index') }}" class="nav-link {{ request()->routeIs('admin.blog.*') ? 'active' : '' }}"><span>{{ __('panel.nav_blog') }}</span></a>
+                    @endif
+                </div>
+            </details>
+            <details class="nav-acc" @if(request()->routeIs('admin.finance.*','admin.payouts.*','admin.contracts.*','admin.settings.*','admin.api-management.*')) open @endif>
+                <summary>{{ __('panel.nav_ops') }} <span>▾</span></summary>
+                <div class="nav-acc-body">
+                    @if(Route::has('admin.finance.index'))
+                    <a href="{{ route('admin.finance.index') }}" class="nav-link {{ request()->routeIs('admin.finance.*') ? 'active' : '' }}"><span>{{ __('panel.nav_finance') }}</span></a>
+                    @endif
+                    <a href="{{ route('admin.payouts.index') }}" class="nav-link {{ request()->routeIs('admin.payouts.*') ? 'active' : '' }}"><span>{{ __('panel.nav_payouts') }}</span></a>
+                    <a href="{{ route('admin.contracts.index') }}" class="nav-link {{ request()->routeIs('admin.contracts.*') ? 'active' : '' }}"><span>{{ __('panel.nav_contracts') }}</span></a>
+                    <a href="{{ route('admin.settings.index') }}" class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}"><span>{{ __('panel.nav_settings') }}</span></a>
+                    @if(Route::has('admin.api-management.index'))
+                    <a href="{{ route('admin.api-management.index') }}" class="nav-link {{ request()->routeIs('admin.api-management.*') ? 'active' : '' }}"><span>{{ __('panel.nav_api') }}</span></a>
+                    @endif
+                </div>
+            </details>
         </nav>
         <div class="user-footer">
             <form method="POST" action="{{ route('logout') }}" class="d-inline w-100">
                 @csrf
                 <button type="submit" class="btn-logout w-100">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                    <span>Çıkış yap</span>
+                    <span>{{ __('panel.logout') }}</span>
                 </button>
             </form>
         </div>
     </aside>
     <main class="admin-main">
         <header class="admin-header">
-            <h1 class="page-title mb-0">@yield('title', 'Yönetim')</h1>
+            <div class="d-flex align-items-center gap-2">
+                <button type="button" class="admin-nav-toggle" onclick="toggleAdminNav()" aria-label="{{ __('panel.toggle_nav') }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                </button>
+                <h1 class="page-title mb-0">@yield('title', 'Yönetim')</h1>
+            </div>
             <div class="user-menu">
                 @include('partials.locale-switcher')
                 <span class="sep"></span>
@@ -271,6 +275,21 @@
     </main>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function toggleAdminNav() {
+        const sidebar = document.getElementById('adminSidebar');
+        const shell = document.getElementById('adminShell');
+        const backdrop = document.getElementById('adminSidebarBackdrop');
+        const isMobile = window.matchMedia('(max-width: 991.98px)').matches;
+        if (isMobile) {
+            sidebar.classList.toggle('is-open');
+            backdrop.classList.toggle('show');
+        } else {
+            sidebar.classList.toggle('is-collapsed');
+            shell.classList.toggle('nav-collapsed');
+        }
+    }
+</script>
 @stack('scripts')
 @include('partials.pwa-install')
 </body>

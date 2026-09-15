@@ -27,7 +27,7 @@
     <div class="col-md-3"><div class="card p-3"><div class="small text-muted">Bakiye</div><div class="h5 mb-0">₺{{ number_format($vendor->balance, 2, ',', '.') }}</div></div></div>
     <div class="col-md-3"><div class="card p-3"><div class="small text-muted">Ürün</div><div class="h5 mb-0">{{ $vendor->products->count() }}</div></div></div>
     <div class="col-md-3"><div class="card p-3"><div class="small text-muted">Puan</div><div class="h5 mb-0">{{ $vendor->rating_average ? number_format($vendor->rating_average, 1) : '—' }}</div></div></div>
-    <div class="col-md-3"><div class="card p-3"><div class="small text-muted">Doğrulama</div><div class="h6 mb-0">{{ $vendor->verification_status ?? '—' }}</div></div></div>
+    <div class="col-md-3"><div class="card p-3"><div class="small text-muted">Doğrulama</div><div class="h6 mb-0">{{ \App\Support\UiLabels::verificationStatus($vendor->verification_status) }}</div></div></div>
 </div>
 
 <div class="row g-4">
@@ -44,8 +44,8 @@
             <h3 class="h6">Belgeler</h3>
             @forelse($vendor->documents as $doc)
                 <div class="small mb-2 d-flex justify-content-between">
-                    <span>{{ $doc->document_type }}</span>
-                    <span class="badge bg-light text-dark border">{{ $doc->status }}</span>
+                    <span>{{ \App\Support\UiLabels::documentType($doc->document_type) }}</span>
+                    <span class="badge bg-light text-dark border">{{ \App\Support\UiLabels::status($doc->status) }}</span>
                 </div>
             @empty
                 <p class="small text-muted mb-0">Belge yok.</p>
@@ -71,7 +71,7 @@
                         <tr>
                             <td class="small">#{{ $o->order_number }}</td>
                             <td>₺{{ number_format($o->subtotal, 2, ',', '.') }}</td>
-                            <td>{{ $o->status }}</td>
+                            <td>{{ \App\Support\UiLabels::orderStatus($o->status) }}</td>
                             <td class="small">{{ optional($o->termin_due_at)->format('d.m.Y') ?? '—' }}</td>
                         </tr>
                     @endforeach

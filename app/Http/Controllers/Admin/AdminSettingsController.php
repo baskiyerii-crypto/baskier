@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AdminSettingsController extends Controller
 {
@@ -18,6 +19,15 @@ class AdminSettingsController extends Controller
             'meeting_fee' => Setting::get('meeting_fee', 50),
             'freelancer_monthly_fee' => Setting::get('freelancer_monthly_fee', 299),
             'quotes_monthly_fee' => Setting::get('quotes_monthly_fee', 199),
+            'platform_logo' => Setting::get('platform_logo'),
+            'platform_address' => Setting::get('platform_address'),
+            'platform_phone' => Setting::get('platform_phone'),
+            'platform_email' => Setting::get('platform_email'),
+            'platform_map_embed_url' => Setting::get('platform_map_embed_url'),
+            'platform_map_lat' => Setting::get('platform_map_lat'),
+            'platform_map_lng' => Setting::get('platform_map_lng'),
+            'platform_social_instagram' => Setting::get('platform_social_instagram'),
+            'platform_social_website' => Setting::get('platform_social_website'),
         ]);
     }
 
@@ -31,10 +41,31 @@ class AdminSettingsController extends Controller
             'meeting_fee' => ['required', 'numeric', 'min:0', 'max:1000'],
             'freelancer_monthly_fee' => ['required', 'numeric', 'min:0', 'max:100000'],
             'quotes_monthly_fee' => ['required', 'numeric', 'min:0', 'max:100000'],
+            'platform_logo' => ['nullable', 'image', 'max:2048'],
+            'platform_address' => ['nullable', 'string', 'max:500'],
+            'platform_phone' => ['nullable', 'string', 'max:32'],
+            'platform_email' => ['nullable', 'email', 'max:255'],
+            'platform_map_embed_url' => ['nullable', 'string', 'max:1000'],
+            'platform_map_lat' => ['nullable', 'numeric'],
+            'platform_map_lng' => ['nullable', 'numeric'],
+            'platform_social_instagram' => ['nullable', 'string', 'max:255'],
+            'platform_social_website' => ['nullable', 'url', 'max:255'],
         ]);
+
+        if ($request->hasFile('platform_logo')) {
+            $old = Setting::get('platform_logo');
+            if ($old) {
+                Storage::disk('public')->delete($old);
+            }
+            $validated['platform_logo'] = $request->file('platform_logo')->store('platform', 'public');
+        } else {
+            unset($validated['platform_logo']);
+        }
+
         foreach ($validated as $key => $value) {
             Setting::set($key, $value);
         }
+
         return redirect()->route('admin.settings.index')->with('success', __('panel.settings_saved'));
     }
 }

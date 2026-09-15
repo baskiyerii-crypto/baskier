@@ -134,8 +134,9 @@
                 <div class="flex items-center gap-2">
                     @include('partials.locale-switcher')
 
-                    <button type="button" data-left-drawer-open class="by-btn-secondary px-4 py-2.5">
-                        {{ __('ui.menu') }}
+                    <button type="button" data-left-drawer-open class="by-btn-secondary px-3 py-2.5 inline-flex items-center gap-2" aria-label="{{ __('ui.menu') }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="sm:hidden"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                        <span class="hidden sm:inline">{{ __('ui.menu') }}</span>
                     </button>
 
                     @auth

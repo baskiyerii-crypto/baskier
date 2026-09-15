@@ -18,7 +18,7 @@
                 @forelse($categories as $c)
                     <tr>
                         <td>{{ $c->name }}</td>
-                        <td><span class="badge bg-light text-dark border">{{ $c->channel ?? 'physical_quote' }}</span></td>
+                        <td><span class="badge bg-light text-dark border">{{ \App\Support\UiLabels::channel($c->channel ?? 'physical_quote') }}</span></td>
                         <td>{{ $c->termin_days ?? $c->delivery_days ?? '—' }}</td>
                         <td>{{ $c->parent?->name ?? '—' }}</td>
                         <td>{{ $c->products_count }}</td>

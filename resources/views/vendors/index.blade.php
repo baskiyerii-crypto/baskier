@@ -37,7 +37,7 @@
                     <p class="text-sm text-slate-600">Satıcı bulunamadı.</p>
                 </div>
             @else
-                <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
                     @foreach($vendors as $vendor)
                         <a href="{{ route('vendors.show', $vendor->slug) }}" class="group by-card by-card-hover p-5">
                             <div class="flex items-start gap-3">

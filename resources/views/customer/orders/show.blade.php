@@ -7,7 +7,7 @@
     <h1 class="h5 mb-3">Sipariş #{{ $order->order_number }}</h1>
     <div class="bg-white rounded-4 shadow-sm p-4 mb-3">
         <div class="row small">
-            <div class="col-md-6 mb-2"><strong>Durum:</strong> {{ $order->status }}</div>
+            <div class="col-md-6 mb-2"><strong>Durum:</strong> {{ \App\Support\UiLabels::orderStatus($order->status) }}</div>
             <div class="col-md-6 mb-2"><strong>Tutar:</strong> ₺{{ number_format($order->subtotal, 2, ',', '.') }}</div>
             <div class="col-12 mb-2"><strong>Satıcı:</strong> {{ $order->vendor?->name ?? '—' }}</div>
             @if($order->contractor)

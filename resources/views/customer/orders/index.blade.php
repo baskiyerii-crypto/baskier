@@ -14,7 +14,7 @@
                         <td>{{ $o->type }}</td>
                         <td>{{ $o->vendor?->name ?? '—' }}</td>
                         <td>₺{{ number_format($o->subtotal, 2, ',', '.') }}</td>
-                        <td><span class="badge bg-light text-dark">{{ $o->status }}</span></td>
+                        <td><span class="badge bg-light text-dark">{{ \App\Support\UiLabels::orderStatus($o->status) }}</span></td>
                         <td class="text-end"><a href="{{ route('account.orders.show', $o) }}" class="btn btn-sm btn-outline-dark">Detay</a></td>
                     </tr>
                 @empty

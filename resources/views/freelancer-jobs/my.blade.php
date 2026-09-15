@@ -12,7 +12,7 @@
                 @forelse($jobs as $j)
                     <tr>
                         <td>{{ Str::limit($j->title, 50) }}</td>
-                        <td>{{ $j->status }}</td>
+                        <td>{{ \App\Support\UiLabels::status($j->status) }}</td>
                         <td>{{ $j->bids_count }}</td>
                         <td class="text-end"><a href="{{ route('freelancer-jobs.show', $j) }}" class="btn btn-sm btn-outline-dark">Görüntüle</a></td>
                     </tr>

@@ -66,7 +66,7 @@
         @if($products->isEmpty())
             <p class="mt-3 text-sm text-slate-500">Bu satıcıya ait ürün bulunamadı.</p>
         @else
-            <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div class="mt-4 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
                 @foreach($products as $product)
                     <a href="{{ route('products.show', $product->slug) }}" class="group by-card by-card-hover overflow-hidden">
                         <div class="aspect-[4/3] bg-slate-100">

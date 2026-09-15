@@ -39,6 +39,13 @@ class Vendor extends Model
         'risk_band',
         'risk_score',
         'contract_suspended_at',
+        'registration_tracks',
+        'freelancer_tier',
+        'profile_pending_payload',
+        'map_embed_url',
+        'map_lat',
+        'map_lng',
+        'social_links',
     ];
 
     protected $casts = [
@@ -53,7 +60,32 @@ class Vendor extends Model
         'freelancer_expires_at' => 'datetime',
         'quotes_expires_at' => 'datetime',
         'tabela_expires_at' => 'datetime',
+        'registration_tracks' => 'array',
+        'profile_pending_payload' => 'array',
+        'social_links' => 'array',
+        'map_lat' => 'decimal:7',
+        'map_lng' => 'decimal:7',
     ];
+
+    public function hasTrack(string $track): bool
+    {
+        return in_array($track, $this->registration_tracks ?? [], true);
+    }
+
+    public function hasPhysicalTrack(): bool
+    {
+        $tracks = $this->registration_tracks ?? [];
+        if ($tracks === [] || $tracks === null) {
+            return true;
+        }
+
+        return $this->hasTrack('physical_products') || $this->hasTrack('physical_quote');
+    }
+
+    public function hasFreelancerTrack(): bool
+    {
+        return $this->hasTrack('freelancer');
+    }
 
     public function hasActiveFreelancerModule(): bool
     {

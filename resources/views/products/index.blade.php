@@ -79,7 +79,7 @@
                             <a href="{{ route('products.index') }}" class="mt-4 inline-flex by-btn-secondary">Filtreleri temizle</a>
                         </div>
                     @else
-                        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
                             @foreach($products as $product)
                                 <a href="{{ route('products.show', $product->slug) }}" class="group by-card by-card-hover overflow-hidden">
                                     <div class="aspect-[4/3] bg-slate-100">

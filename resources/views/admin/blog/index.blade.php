@@ -24,7 +24,7 @@
             <tr>
                 <td>{{ $post->title }}</td>
                 <td>{{ $post->category ?? '—' }}</td>
-                <td>{{ $post->status }}</td>
+                <td>{{ \App\Support\UiLabels::status($post->status) }}</td>
                 <td>{{ $post->ai_humanized ? __('panel.yes') : __('panel.no') }}</td>
                 <td class="small">{{ optional($post->published_at ?? $post->created_at)->format('d.m.Y') }}</td>
                 <td class="text-end text-nowrap">

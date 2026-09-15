@@ -67,7 +67,7 @@
                                     <td class="small">{{ $o->user?->name ?? '—' }} <code class="small">{{ $o->user?->publicCode() }}</code></td>
                                     <td class="small">{{ $o->vendor?->name ?? '—' }}</td>
                                     <td>₺{{ number_format($o->subtotal, 2, ',', '.') }}</td>
-                                    <td><span class="badge bg-light text-dark">{{ $o->status }}</span></td>
+                                    <td><span class="badge bg-light text-dark">{{ \App\Support\UiLabels::orderStatus($o->status) }}</span></td>
                                 </tr>
                             @endforeach
                         </tbody>

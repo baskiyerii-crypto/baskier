@@ -4,94 +4,160 @@ namespace App\Support;
 
 final class UiLabels
 {
-    /**
-     * @return array<string, string>
-     */
     public static function orderStatuses(): array
     {
         return [
-            'pending' => 'Beklemede',
-            'confirmed' => 'Onaylandı',
-            'design_review' => 'Tasarım inceleme',
-            'in_production' => 'Üretimde',
-            'ready_to_ship' => 'Kargoya hazır',
-            'shipped' => 'Kargoda',
-            'delivered' => 'Teslim edildi',
-            'completed' => 'Tamamlandı',
-            'cancelled' => 'İptal',
-            'disputed' => 'Uyuşmazlık',
+            'pending' => __('panel.status_pending'),
+            'paid' => __('panel.status_paid'),
+            'confirmed' => __('panel.status_confirmed'),
+            'design_review' => __('panel.status_design_review'),
+            'in_production' => __('panel.status_in_production'),
+            'ready_to_ship' => __('panel.status_ready_to_ship'),
+            'shipped' => __('panel.status_shipped'),
+            'delivered' => __('panel.status_delivered'),
+            'completed' => __('panel.status_completed'),
+            'cancelled' => __('panel.status_cancelled'),
+            'disputed' => __('panel.status_disputed'),
         ];
     }
 
     public static function orderStatus(?string $status): string
     {
-        if ($status === null || $status === '') {
-            return '—';
-        }
-
-        return self::orderStatuses()[$status] ?? $status;
+        return self::orderStatuses()[$status] ?? ($status ?: '—');
     }
 
-    /**
-     * @return array<string, string>
-     */
     public static function designApprovalStatuses(): array
     {
         return [
-            'pending' => 'Onay bekliyor',
-            'approved' => 'Onaylandı',
-            'revision_requested' => 'Revizyon istendi',
+            'pending' => __('panel.status_pending'),
+            'approved' => __('panel.status_approved'),
+            'revision_requested' => __('panel.status_revision'),
         ];
     }
 
     public static function designApprovalStatus(?string $status): string
     {
-        if ($status === null || $status === '') {
-            return '—';
-        }
-
-        return self::designApprovalStatuses()[$status] ?? $status;
+        return self::designApprovalStatuses()[$status] ?? ($status ?: '—');
     }
 
-    /**
-     * @return array<string, string>
-     */
     public static function supportTicketStatuses(): array
     {
         return [
-            'open' => 'Açık',
-            'pending' => 'Beklemede',
-            'closed' => 'Kapatıldı',
+            'open' => __('panel.status_open'),
+            'pending' => __('panel.status_pending'),
+            'closed' => __('panel.status_closed'),
         ];
     }
 
     public static function supportTicketStatus(?string $status): string
     {
-        if ($status === null || $status === '') {
-            return '—';
-        }
-
-        return self::supportTicketStatuses()[$status] ?? $status;
+        return self::supportTicketStatuses()[$status] ?? ($status ?: '—');
     }
 
-    /**
-     * @return array<string, string>
-     */
     public static function payoutRequestStatuses(): array
     {
         return [
-            'pending' => 'Bekliyor',
-            'approved' => 'Onaylandı',
-            'rejected' => 'Reddedildi',
+            'pending' => __('panel.status_pending'),
+            'approved' => __('panel.status_approved'),
+            'rejected' => __('panel.status_rejected'),
         ];
     }
 
     public static function payoutRequestStatus(?string $status): string
     {
-        if ($status === null || $status === '') {
-            return '—';
-        }
+        return self::payoutRequestStatuses()[$status] ?? ($status ?: '—');
+    }
 
-        return self::payoutRequestStatuses()[$status] ?? $status;
+    public static function channels(): array
+    {
+        return [
+            'physical_quote' => __('panel.channel_physical'),
+            'freelancer' => __('panel.channel_freelancer'),
+            'tabela' => __('panel.channel_tabela'),
+        ];
+    }
+
+    public static function channel(?string $channel): string
+    {
+        return self::channels()[$channel] ?? ($channel ?: '—');
+    }
+
+    public static function documentTypes(): array
+    {
+        return [
+            'tax_plate' => __('panel.doc_tax_plate'),
+            'certificate' => __('panel.doc_certificate'),
+            'diploma' => __('panel.doc_diploma'),
+            'course' => __('panel.doc_course'),
+            'other' => __('panel.doc_other'),
+        ];
+    }
+
+    public static function documentType(?string $type): string
+    {
+        return self::documentTypes()[$type] ?? ($type ?: '—');
+    }
+
+    public static function verificationStatuses(): array
+    {
+        return [
+            'pending' => __('panel.status_pending'),
+            'verified' => __('panel.status_verified'),
+            'approved' => __('panel.status_approved'),
+            'rejected' => __('panel.status_rejected'),
+        ];
+    }
+
+    public static function verificationStatus(?string $status): string
+    {
+        return self::verificationStatuses()[$status] ?? ($status ?: '—');
+    }
+
+    public static function genericStatuses(): array
+    {
+        return [
+            'pending' => __('panel.status_pending'),
+            'approved' => __('panel.status_approved'),
+            'rejected' => __('panel.status_rejected'),
+            'open' => __('panel.status_open'),
+            'closed' => __('panel.status_closed'),
+            'expired' => __('panel.status_expired'),
+            'accepted' => __('panel.status_accepted'),
+            'draft' => __('panel.draft'),
+            'published' => __('panel.published'),
+        ];
+    }
+
+    public static function status(?string $status): string
+    {
+        return self::genericStatuses()[$status] ?? ($status ?: '—');
+    }
+
+    public static function freelancerTiers(): array
+    {
+        return [
+            'standard' => __('panel.tier_standard'),
+            'medium' => __('panel.tier_medium'),
+            'professional' => __('panel.tier_professional'),
+        ];
+    }
+
+    public static function freelancerTier(?string $tier): string
+    {
+        return self::freelancerTiers()[$tier] ?? ($tier ?: '—');
+    }
+
+    public static function tracks(): array
+    {
+        return [
+            'physical_products' => __('panel.track_physical_products'),
+            'physical_quote' => __('panel.track_physical_quote'),
+            'freelancer' => __('panel.track_freelancer'),
+        ];
+    }
+
+    public static function track(?string $track): string
+    {
+        return self::tracks()[$track] ?? ($track ?: '—');
     }
 }

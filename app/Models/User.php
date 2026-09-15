@@ -27,11 +27,12 @@ class User extends Authenticatable
         'password',
         'role',
         'vendor_id',
-        'is_freelancer',
+            'is_freelancer',
         'public_id',
         'phone',
         'email_verified_at',
         'phone_verified_at',
+        'is_active',
     ];
 
     /**
@@ -55,6 +56,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'phone_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
     }
 

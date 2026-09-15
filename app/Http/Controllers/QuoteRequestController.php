@@ -166,11 +166,32 @@ class QuoteRequestController extends Controller
             abort(403);
         }
         if ($quote->quote_request_id !== $quoteRequest->id || $quote->status !== 'pending') {
-            abort(400, 'Bu teklif seçilemez.');
+            abort(400, __('panel.quote_not_selectable'));
         }
+
+        $validated = $request->validate([
+            'share_my_contact' => ['accepted'],
+            'accept_vendor_contact' => ['accepted'],
+        ]);
+
         $quote->update(['status' => 'selected']);
         $quote->quoteRequest->quotes()->where('id', '!=', $quote->id)->update(['status' => 'rejected']);
         $quoteRequest->update(['status' => 'closed', 'closed_at' => now()]);
+
+        $isTabela = ($quoteRequest->request_type ?? '') === 'tabela';
+        try {
+            app(\App\Services\ContactShareService::class)->shareAfterAccept(
+                $request->user(),
+                $quote->vendor,
+                'quote_request',
+                $quoteRequest->id,
+                true,
+                true,
+                $isTabela
+            );
+        } catch (\Throwable $e) {
+            return back()->with('error', $e->getMessage());
+        }
 
         $commissions = app(\App\Services\CommissionService::class);
         [$rate, $commissionAmount, $vendorAmount] = $commissions->calculate((float) $quote->amount, 'quote');
@@ -198,6 +219,7 @@ class QuoteRequestController extends Controller
             'quantity' => 1,
         ]);
 
-        return redirect()->route('quote-requests.show', $quoteRequest)->with('success', 'Teklif seçildi. Sipariş #' . $order->order_number . ' oluşturuldu.');
+        return redirect()->route('quote-requests.show', $quoteRequest)
+            ->with('success', __('panel.quote_selected', ['number' => $order->order_number]));
     }
 }

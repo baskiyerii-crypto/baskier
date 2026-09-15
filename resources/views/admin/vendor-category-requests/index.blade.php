@@ -17,9 +17,9 @@
             <tr>
                 <td>{{ $row->id }}</td>
                 <td>{{ $row->vendor?->name }} <code class="small">{{ $row->vendor?->user?->publicCode() }}</code></td>
-                <td>{{ $row->channel }}</td>
+                <td>{{ \App\Support\UiLabels::channel($row->channel) }}</td>
                 <td class="small">{{ implode(', ', $row->category_ids ?? []) }}</td>
-                <td>{{ $row->status }}</td>
+                <td>{{ \App\Support\UiLabels::status($row->status) }}</td>
                 <td class="text-end">
                     @if($row->status === 'pending')
                         <form method="post" action="{{ route('admin.vendor-category-requests.approve', $row) }}" class="d-inline">@csrf

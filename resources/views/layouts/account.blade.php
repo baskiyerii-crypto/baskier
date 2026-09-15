@@ -35,11 +35,16 @@
         <div class="by-container py-8 flex-1">
             <div class="account-layout">
                 <aside class="account-layout__sidebar by-card overflow-hidden">
-                    <div class="p-5 border-b border-slate-200/70">
-                        <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Hesabım</p>
-                        <p class="mt-1 text-sm font-semibold text-slate-900">{{ auth()->user()->name ?? '' }}</p>
+                    <div class="p-5 border-b border-slate-200/70 flex items-center justify-between gap-2">
+                        <div>
+                            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Hesabım</p>
+                            <p class="mt-1 text-sm font-semibold text-slate-900">{{ auth()->user()->name ?? '' }}</p>
+                        </div>
+                        <button type="button" class="md:hidden by-btn-secondary px-3 py-2" data-account-nav-toggle aria-label="{{ __('panel.toggle_nav') }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                        </button>
                     </div>
-                    <nav class="p-2">
+                    <nav class="p-2 account-nav" data-account-nav>
                         @php
                             $items = [
                                 ['label' => 'Özet', 'route' => 'customer.dashboard', 'match' => 'customer.dashboard'],
@@ -48,6 +53,7 @@
                                 ['label' => 'Favorilerim', 'route' => 'favorites.index', 'match' => 'favorites.*'],
                                 ['label' => 'Adreslerim', 'route' => 'account.adresler.index', 'match' => 'account.adresler.*'],
                                 ['label' => 'Teklif taleplerim', 'route' => 'quote-requests.index', 'match' => 'quote-requests.*'],
+                                ['label' => __('panel.direct_quotes'), 'route' => 'customer.direct-quotes.index', 'match' => 'customer.direct-quotes.*'],
                                 ['label' => 'Destek talepleri', 'route' => 'account.support.index', 'match' => 'account.support.*'],
                                 ['label' => 'İş ilanları', 'route' => 'freelancer-jobs.index', 'match' => 'freelancer-jobs.index'],
                                 ['label' => 'İlanlarım', 'route' => 'freelancer-jobs.my', 'match' => 'freelancer-jobs.my'],
@@ -81,5 +87,16 @@
 
         @stack('scripts')
     </div>
+    <style>
+        @media (max-width: 767.98px) {
+            .account-nav { display: none; }
+            .account-nav.is-open { display: block; }
+        }
+    </style>
+    <script>
+        document.querySelector('[data-account-nav-toggle]')?.addEventListener('click', () => {
+            document.querySelector('[data-account-nav]')?.classList.toggle('is-open');
+        });
+    </script>
 </body>
 </html>

@@ -26,7 +26,7 @@
             <h2 class="h6">Ödemeler</h2>
             @forelse($payments as $p)
                 <div class="small d-flex justify-content-between mb-2 border-bottom pb-2">
-                    <span>#{{ $p->order?->order_number }} · {{ $p->provider }} · {{ $p->status }}</span>
+                    <span>#{{ $p->order?->order_number }} · {{ $p->provider }} · {{ \App\Support\UiLabels::status($p->status) }}</span>
                     <strong>₺{{ number_format($p->amount, 2, ',', '.') }}</strong>
                 </div>
             @empty

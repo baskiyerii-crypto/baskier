@@ -114,7 +114,7 @@
                     <p class="text-sm text-slate-600">Kategori bulunamadı.</p>
                 </div>
             @else
-                <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div class="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
                     @foreach($categories as $category)
                         <a href="{{ route('products.index', ['category' => $category->slug]) }}" class="group by-card by-card-hover overflow-hidden">
                             <div class="aspect-[4/3] bg-slate-100">
@@ -139,7 +139,7 @@
             <a href="{{ route('freelancer-jobs.index') }}" class="by-btn-secondary">Tüm ilanlar</a>
         </div>
 
-            <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            <div class="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
                 @foreach($freelancerCategories ?? [] as $cat)
                     <div class="by-card by-card-hover overflow-hidden">
                         <a href="{{ route('freelancer-jobs.index', ['category' => $cat['key']]) }}" class="block">
@@ -183,7 +183,7 @@
             <a href="{{ route('products.index', ['type' => 'digital']) }}" class="by-btn-secondary">Tümünü gör</a>
         </div>
             @if(isset($digitalProducts) && $digitalProducts->isNotEmpty())
-                <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div class="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
                     @foreach($digitalProducts as $product)
                         <a href="{{ route('products.show', $product->slug) }}" class="group by-card by-card-hover overflow-hidden">
                             <div class="aspect-[4/3] bg-slate-100">
@@ -225,7 +225,7 @@
                 <p class="text-sm text-slate-600">Henüz ürün yok.</p>
             </div>
         @else
-            <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
                 @foreach($featuredProducts as $product)
                     <a href="{{ route('products.show', $product->slug) }}" class="group by-card by-card-hover overflow-hidden">
                         <div class="aspect-[4/3] bg-slate-100">
