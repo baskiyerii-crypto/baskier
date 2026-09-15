@@ -4,12 +4,8 @@ namespace App\Services;
 
 use App\Domain\OrderStatus;
 use App\Models\Order;
-use App\Models\Setting;
 use App\Models\User;
-use App\Models\Vendor;
-use App\Models\VendorBalanceTransaction;
-use App\Models\VendorPayoutRequest;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class OrderService
 {
@@ -19,6 +15,10 @@ class OrderService
 
     public function setTerminDueAt(Order $order): void
     {
+        if (! Schema::hasColumn('orders', 'termin_due_at')) {
+            return;
+        }
+
         $days = 0;
         $order->loadMissing(['items.product.category']);
         foreach ($order->items as $item) {
@@ -42,7 +42,7 @@ class OrderService
             $this->setTerminDueAt($order->fresh());
         }
 
-        if ($to === OrderStatus::SHIPPED) {
+        if ($to === OrderStatus::SHIPPED && Schema::hasColumn('orders', 'shipped_at')) {
             $order->update(['shipped_at' => now()]);
         }
     }

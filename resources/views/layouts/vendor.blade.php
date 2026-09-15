@@ -9,7 +9,9 @@
     <meta name="theme-color" content="#059669">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @endif
     <style>
         :root {
             --side-bg: #f8fafc;
@@ -108,13 +110,13 @@
                 <span>Toplu üretim / Teklifler</span>
             </a>
             @endif
-            @if(auth()->user()->vendor?->hasActiveFreelancerModule())
+            @if(auth()->user()->vendor?->hasActiveFreelancerModule() && Route::has('vendor.freelancer.index'))
             <a href="{{ route('vendor.freelancer.index') }}" class="nav-link {{ request()->routeIs('vendor.freelancer.*') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
                 <span>Freelancerım</span>
             </a>
             @endif
-            @if(auth()->user()->vendor?->hasActiveTabelaModule())
+            @if(auth()->user()->vendor?->hasActiveTabelaModule() && Route::has('vendor.tabela.index'))
             <a href="{{ route('vendor.tabela.index') }}" class="nav-link {{ request()->routeIs('vendor.tabela.*') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 20h10"/></svg>
                 <span>Tabela</span>

@@ -6,12 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Models\Post;
 use App\Services\AiContentService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class AdminBlogController extends Controller
 {
     public function index(Request $request)
     {
+        if (! Schema::hasTable('posts')) {
+            $posts = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
+
+            return view('admin.blog.index', compact('posts'));
+        }
+
         $posts = Post::query()
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
             ->when($request->filled('category'), fn ($q) => $q->where('category', $request->category))

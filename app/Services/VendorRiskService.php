@@ -4,15 +4,23 @@ namespace App\Services;
 
 use App\Models\Order;
 use App\Models\Vendor;
+use Illuminate\Support\Facades\Schema;
 
 class VendorRiskService
 {
     public function recalculate(Vendor $vendor): Vendor
     {
-        $orders = Order::query()
-            ->where('vendor_id', $vendor->id)
-            ->whereNotNull('termin_due_at')
-            ->get();
+        if (! Schema::hasColumn('vendors', 'risk_band') || ! Schema::hasColumn('vendors', 'risk_score')) {
+            return $vendor;
+        }
+
+        $orders = collect();
+        if (Schema::hasColumn('orders', 'termin_due_at')) {
+            $orders = Order::query()
+                ->where('vendor_id', $vendor->id)
+                ->whereNotNull('termin_due_at')
+                ->get();
+        }
 
         $terminScore = 70.0;
         if ($orders->isNotEmpty()) {

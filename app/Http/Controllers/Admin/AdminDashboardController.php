@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Services\AdminDashboardService;
+use Illuminate\Support\Facades\Schema;
 
 class AdminDashboardController extends Controller
 {
@@ -27,7 +28,14 @@ class AdminDashboardController extends Controller
         ];
         $recentProducts = Product::with(['vendor', 'category'])->latest()->limit(10)->get();
         $recentOrders = Order::with(['user', 'vendor'])->latest()->limit(8)->get();
-        $riskyVendors = Vendor::query()->where('risk_band', 'risky')->orderBy('risk_score')->limit(8)->get();
+        $riskyVendors = collect();
+        if (Schema::hasColumn('vendors', 'risk_band')) {
+            $riskyVendors = Vendor::query()
+                ->where('risk_band', 'risky')
+                ->when(Schema::hasColumn('vendors', 'risk_score'), fn ($q) => $q->orderBy('risk_score'))
+                ->limit(8)
+                ->get();
+        }
 
         return view('admin.dashboard', compact('stats', 'metrics', 'trend', 'recentProducts', 'recentOrders', 'riskyVendors'));
     }
