@@ -117,4 +117,9 @@ class Vendor extends Model
     {
         return $this->hasMany(VendorDocument::class);
     }
+
+    public function payoutRequests(): HasMany
+    {
+        return $this->hasMany(PayoutRequest::class);
+    }
 }

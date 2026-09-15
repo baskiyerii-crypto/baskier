@@ -26,7 +26,22 @@ class VendorProductController extends Controller
     public function index(Request $request)
     {
         $vendor = $this->getVendor($request);
-        $products = $vendor->products()->with('category')->latest()->paginate(20);
+        $query = $vendor->products()->with('category')->latest();
+
+        if ($request->filled('q')) {
+            $search = $request->input('q');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('short_description', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('is_active', $request->input('status') === 'active');
+        }
+
+        $products = $query->paginate(20)->withQueryString();
+
         return view('vendor.products.index', compact('vendor', 'products'));
     }
 

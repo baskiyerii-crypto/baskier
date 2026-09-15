@@ -40,14 +40,14 @@
                     <option value="digital" @selected(old('product_type') == 'digital') @disabled(!$freelancerModuleActive)>Dijital (Freelancer)</option>
                 </select>
             </div>
-            <div class="mb-3 product-digital-field">
+            <div class="mb-3">
                 <label class="form-label fw-semibold">Ürün görseli</label>
                 <input type="file" name="main_image" class="form-control" accept="image/*">
-                <div class="form-text">JPG, PNG, en fazla 2 MB.</div>
+                <div class="form-text">JPG, PNG veya WebP, en fazla 2 MB.</div>
                 @error('main_image')<div class="text-danger small">{{ $message }}</div>@enderror
             </div>
             <div class="mb-3 product-digital-link-field" style="display:none;">
-                <label class="form-label fw-semibold">Dijital ürün linki (indirme/erişim)</label>
+                <label class="form-label fw-semibold">Dijital ürün indirme/erişim linki</label>
                 <input type="url" name="digital_link" class="form-control" value="{{ old('digital_link') }}" placeholder="https://...">
                 @error('digital_link')<div class="text-danger small">{{ $message }}</div>@enderror
             </div>
@@ -68,5 +68,16 @@
             <a href="{{ route('vendor.products.index') }}" class="btn btn-outline-secondary">İptal</a>
         </form>
 </div>
-<script>document.querySelector('[name=product_type]').addEventListener('change', function(){ var isDigital = this.value==='digital'; document.querySelector('.product-digital-field').style.display = isDigital ? 'none' : 'block'; document.querySelector('.product-digital-link-field').style.display = isDigital ? 'block' : 'none'; }); if(document.querySelector('[name=product_type]').value==='digital'){ document.querySelector('.product-digital-field').style.display='none'; document.querySelector('.product-digital-link-field').style.display='block'; }</script>
+<script>
+    (function(){
+        var select = document.querySelector('[name=product_type]');
+        var linkField = document.querySelector('.product-digital-link-field');
+        if(!select || !linkField) return;
+        function update(){
+            linkField.style.display = select.value === 'digital' ? 'block' : 'none';
+        }
+        select.addEventListener('change', update);
+        update();
+    })();
+</script>
 @endsection

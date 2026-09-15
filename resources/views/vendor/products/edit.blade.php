@@ -41,14 +41,15 @@
                     <option value="digital" @selected(old('product_type', $product->product_type ?? 'physical') == 'digital') @disabled(!$freelancerModuleActive)>Dijital (Freelancer)</option>
                 </select>
             </div>
-            <div class="mb-3 product-digital-field">
+            <div class="mb-3">
                 <label class="form-label fw-semibold">Ürün görseli</label>
                 @if($product->main_image)<div class="mb-2"><img src="{{ asset('storage/'.$product->main_image) }}" alt="" class="rounded" style="max-height:80px;"></div>@endif
                 <input type="file" name="main_image" class="form-control" accept="image/*">
+                <div class="form-text">Değiştirmek istemiyorsanız boş bırakın. (JPG, PNG veya WebP, max 2MB)</div>
             </div>
             <div class="mb-3 product-digital-link-field" style="display:{{ ($product->product_type ?? 'physical') === 'digital' ? 'block' : 'none' }};">
-                <label class="form-label fw-semibold">Dijital ürün linki</label>
-                <input type="url" name="digital_link" class="form-control" value="{{ old('digital_link', $product->digital_link) }}">
+                <label class="form-label fw-semibold">Dijital ürün indirme/erişim linki</label>
+                <input type="url" name="digital_link" class="form-control" value="{{ old('digital_link', $product->digital_link) }}" placeholder="https://...">
             </div>
             <div class="mb-3">
                 <label class="form-label fw-semibold">Kısa açıklama</label>
@@ -65,11 +66,22 @@
             </div>
             <div class="mb-4 form-check">
                 <input type="checkbox" name="is_active" value="1" class="form-check-input" @checked(old('is_active', $product->is_active))>
-                <label class="form-check-label">Aktif (sitede görünsün)</label>
+                <label class="form-check-label">Aktif (sitede ve vitrinde görünsün)</label>
             </div>
             <button type="submit" class="btn btn-success">Güncelle</button>
             <a href="{{ route('vendor.products.index') }}" class="btn btn-outline-secondary">İptal</a>
         </form>
 </div>
-<script>document.querySelector('[name=product_type]').addEventListener('change', function(){ var isDigital = this.value==='digital'; document.querySelector('.product-digital-field').style.display = isDigital ? 'none' : 'block'; document.querySelector('.product-digital-link-field').style.display = isDigital ? 'block' : 'none'; });</script>
+<script>
+    (function(){
+        var select = document.querySelector('[name=product_type]');
+        var linkField = document.querySelector('.product-digital-link-field');
+        if(!select || !linkField) return;
+        function update(){
+            linkField.style.display = select.value === 'digital' ? 'block' : 'none';
+        }
+        select.addEventListener('change', update);
+        update();
+    })();
+</script>
 @endsection
