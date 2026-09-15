@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Resources\Api\V1\ProductResource;
 use App\Models\Category;
 use App\Models\Product;
 use App\Services\PricingEstimateService;
@@ -39,6 +40,11 @@ class ProductController extends ApiController
         }
 
         $products = $query->latest()->paginate(20);
+        $products->setCollection(
+            $products->getCollection()->map(
+                fn (Product $product) => (new ProductResource($product))->resolve()
+            )
+        );
 
         return $this->ok($products);
     }
@@ -50,7 +56,9 @@ class ProductController extends ApiController
             ->with(['vendor', 'category'])
             ->firstOrFail();
 
-        return $this->ok($product);
+        $this->authorize('view', $product);
+
+        return $this->ok(new ProductResource($product));
     }
 
     public function priceEstimate(string $slug, PricingEstimateService $pricing)
@@ -59,6 +67,8 @@ class ProductController extends ApiController
             ->where('is_active', true)
             ->with(['vendor', 'category'])
             ->firstOrFail();
+
+        $this->authorize('view', $product);
 
         return $this->ok($pricing->estimateForProduct($product));
     }

@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\V1\CategoryResource;
 use App\Models\BusinessType;
 use App\Models\Category;
 use Illuminate\Http\Request;
 
-class CategoryController extends Controller
+class CategoryController extends ApiController
 {
     public function index(Request $request)
     {
@@ -17,13 +17,13 @@ class CategoryController extends Controller
             ->orderBy('name')
             ->get();
 
-        return response()->json($categories);
+        return $this->ok(CategoryResource::collection($categories));
     }
 
     public function businessTypes()
     {
         $types = BusinessType::orderBy('sort_order')->get(['id', 'slug', 'name']);
 
-        return response()->json($types);
+        return $this->ok($types);
     }
 }

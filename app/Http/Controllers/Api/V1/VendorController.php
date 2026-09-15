@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\V1\VendorResource;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
 
-class VendorController extends Controller
+class VendorController extends ApiController
 {
     public function index(Request $request)
     {
@@ -17,8 +17,13 @@ class VendorController extends Controller
         }
 
         $vendors = $query->orderBy('name')->paginate(20);
+        $vendors->setCollection(
+            $vendors->getCollection()->map(
+                fn (Vendor $vendor) => (new VendorResource($vendor))->resolve()
+            )
+        );
 
-        return response()->json($vendors);
+        return $this->ok($vendors);
     }
 
     public function show(string $slug)
@@ -28,6 +33,6 @@ class VendorController extends Controller
             ->with(['businessTypes', 'products' => fn ($q) => $q->where('is_active', true)->limit(50)])
             ->firstOrFail();
 
-        return response()->json($vendor);
+        return $this->ok(new VendorResource($vendor));
     }
 }

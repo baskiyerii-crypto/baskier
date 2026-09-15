@@ -2,31 +2,19 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
-use App\Models\BusinessType;
+use App\Http\Requests\Api\V1\LoginRequest;
+use App\Http\Requests\Api\V1\RegisterRequest;
 use App\Models\User;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Str;
 
-class AuthController extends Controller
+class AuthController extends ApiController
 {
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $rules = [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'confirmed', Password::defaults()],
-            'role' => ['required', 'in:customer,vendor'],
-            'device_name' => ['required', 'string', 'max:255'],
-            'business_type_ids' => ['nullable', 'array'],
-            'business_type_ids.*' => ['exists:business_types,id'],
-        ];
-        if ($request->input('role') === 'vendor' && BusinessType::query()->exists()) {
-            $rules['business_type_ids'] = ['required', 'array', 'min:1'];
-        }
-        $validated = $request->validate($rules);
+        $validated = $request->validated();
 
         $user = User::create([
             'name' => $validated['name'],
@@ -39,7 +27,7 @@ class AuthController extends Controller
             $vendor = Vendor::create([
                 'user_id' => $user->id,
                 'name' => $validated['name'],
-                'slug' => \Illuminate\Support\Str::slug($validated['name']) . '-' . $user->id,
+                'slug' => Str::slug($validated['name']).'-'.$user->id,
                 'email' => $validated['email'],
                 'is_active' => false,
             ]);
@@ -49,30 +37,26 @@ class AuthController extends Controller
 
         $token = $user->createToken($validated['device_name'])->plainTextToken;
 
-        return response()->json([
+        return $this->ok([
             'token' => $token,
             'token_type' => 'Bearer',
             'user' => $this->userPayload($user->fresh()),
-        ], 201);
+        ], null, null, 201);
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $validated = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-            'device_name' => ['required', 'string', 'max:255'],
-        ]);
+        $validated = $request->validated();
 
         $user = User::where('email', $validated['email'])->first();
         if (! $user || ! Hash::check($validated['password'], $user->password)) {
-            return response()->json(['message' => 'Geçersiz giriş bilgileri.'], 422);
+            return $this->fail('Geçersiz giriş bilgileri.', null, 422);
         }
 
         $user->tokens()->delete();
         $token = $user->createToken($validated['device_name'])->plainTextToken;
 
-        return response()->json([
+        return $this->ok([
             'token' => $token,
             'token_type' => 'Bearer',
             'user' => $this->userPayload($user),
@@ -81,14 +65,14 @@ class AuthController extends Controller
 
     public function user(Request $request)
     {
-        return response()->json($this->userPayload($request->user()));
+        return $this->ok($this->userPayload($request->user()));
     }
 
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json(['message' => 'Çıkış yapıldı.']);
+        return $this->ok(null, 'Çıkış yapıldı.');
     }
 
     private function userPayload(User $user): array

@@ -39,10 +39,12 @@ Roller:
 ## TEKNİK STACK
 
 Backend:   Laravel (mevcut proje üzerine)
-Web:       React
-Mobile:    React Native
+Web:       Laravel Blade (TR|EN dil seçici cookie/session)
+Mobile:    React Native / Expo
 Veritabanı: MySQL / PostgreSQL (mevcut şemayı koru, sadece ekle)
-Auth:      Mevcut auth yapısını koru
+Auth:      Mevcut Sanctum auth yapısını koru
+
+Not: Next.js storefront / React SPA vitrin yok. Ölü SPA kaldırıldı.
 
 ---
 
@@ -108,14 +110,15 @@ Tüm response'lar bu formatta olsun:
   "errors": {}
 }
 
-Route grupları:
-- /api/auth/
-- /api/public/
-- /api/customer/
-- /api/vendor/
-- /api/admin/
-- /api/messages/
-- /api/payments/
+Route grupları (gerçeklik — hepsi `/api/v1` altında, role middleware ile ayrılır):
+- /api/v1/auth/*
+- /api/v1/* (public: products, vendors, categories, home, …)
+- /api/v1/* (customer: cart, checkout, addresses, orders, quote-requests, …)
+- /api/v1/vendor/*
+- /api/v1/admin/*
+- /api/v1/conversations, /api/v1/support-tickets, …
+
+Yeni prefix (`/api/customer/`, `/api/public/` vb.) AÇMA. Mevcut v1 sözleşmesini koru.
 
 Kurallar:
 - Her endpoint'te Policy ile yetki kontrolü yapılsın
@@ -176,16 +179,16 @@ ModerationService bu işi yapsın.
 
 ## WEB FRONTEND KURALLARI
 
-- Protected route yapısı bozulmasın
-- Role bazlı yönlendirme korunsun
-- API çağrıları merkezi bir servis katmanından yapılsın (axios instance)
-- Her sayfada loading ve error state olsun
+- Vitrin ve paneller Laravel Blade
+- Dil: SetLocale middleware + `/dil/{locale}` (tr|en); paneller TR kalabilir
+- Protected route / role middleware bozulmasın
+- Her sayfada loading ve error state (Blade flash / empty states)
 - Liste sayfalarında pagination olsun
 - Form validasyon client-side da yapılsın
 
 Paneller ayrı tutulsun:
-- /customer/*
-- /vendor/*
+- /hesabim, /hesap/* (müşteri)
+- /satici-panel/*
 - /admin/*
 
 ---

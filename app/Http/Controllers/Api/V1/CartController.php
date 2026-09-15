@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\CartAddRequest;
+use App\Http\Requests\Api\V1\CartUpdateRequest;
 use App\Models\CartItem;
 use App\Models\Product;
-use Illuminate\Http\Request;
 
-class CartController extends Controller
+class CartController extends ApiController
 {
-    public function index(Request $request)
+    public function index(\Illuminate\Http\Request $request)
     {
         $items = CartItem::where('user_id', $request->user()->id)
             ->with(['product.vendor', 'product.category'])
@@ -20,22 +20,19 @@ class CartController extends Controller
             $total = bcadd($total, bcmul((string) $item->product->price, (string) $item->quantity, 2), 2);
         }
 
-        return response()->json(['items' => $items, 'total' => $total]);
+        return $this->ok(['items' => $items, 'total' => $total]);
     }
 
-    public function add(Request $request)
+    public function add(CartAddRequest $request)
     {
-        $validated = $request->validate([
-            'product_id' => ['required', 'exists:products,id'],
-            'quantity' => ['nullable', 'integer', 'min:1', 'max:999'],
-        ]);
+        $validated = $request->validated();
         $product = Product::findOrFail($validated['product_id']);
         if (! $product->is_active) {
-            return response()->json(['message' => 'Ürün satışta değil.'], 422);
+            return $this->fail('Ürün satışta değil.', null, 422);
         }
         $qty = $validated['quantity'] ?? 1;
         if ($product->stock < $qty) {
-            return response()->json(['message' => 'Yetersiz stok.'], 422);
+            return $this->fail('Yetersiz stok.', null, 422);
         }
 
         $row = CartItem::firstOrNew([
@@ -44,40 +41,32 @@ class CartController extends Controller
         ]);
         $newQty = ($row->exists ? $row->quantity : 0) + $qty;
         if ($product->stock < $newQty) {
-            return response()->json(['message' => 'Sepet miktarı stoku aşamaz.'], 422);
+            return $this->fail('Sepet miktarı stoku aşamaz.', null, 422);
         }
         $row->quantity = $newQty;
         $row->save();
 
-        return response()->json(['message' => 'Sepete eklendi.', 'item' => $row->load('product')]);
+        return $this->ok(['item' => $row->load('product')], 'Sepete eklendi.');
     }
 
-    public function update(Request $request, CartItem $cartItem)
+    public function update(CartUpdateRequest $request, CartItem $cartItem)
     {
-        $this->guard($request, $cartItem);
-        $validated = $request->validate([
-            'quantity' => ['required', 'integer', 'min:1', 'max:999'],
-        ]);
+        $validated = $request->validated();
         if ($cartItem->product->stock < $validated['quantity']) {
-            return response()->json(['message' => 'Yetersiz stok.'], 422);
+            return $this->fail('Yetersiz stok.', null, 422);
         }
         $cartItem->update(['quantity' => $validated['quantity']]);
 
-        return response()->json(['message' => 'Güncellendi.', 'item' => $cartItem->load('product')]);
+        return $this->ok(['item' => $cartItem->load('product')], 'Güncellendi.');
     }
 
-    public function remove(Request $request, CartItem $cartItem)
-    {
-        $this->guard($request, $cartItem);
-        $cartItem->delete();
-
-        return response()->json(['message' => 'Silindi.']);
-    }
-
-    private function guard(Request $request, CartItem $cartItem): void
+    public function remove(\Illuminate\Http\Request $request, CartItem $cartItem)
     {
         if ($cartItem->user_id !== $request->user()->id) {
             abort(403);
         }
+        $cartItem->delete();
+
+        return $this->ok(['deleted' => true], 'Silindi.');
     }
 }
