@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\QuoteRequestStoreRequest;
 use App\Models\Order;
 use App\Models\Quote;
 use App\Models\QuoteRequest;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 
-class QuoteRequestController extends Controller
+class QuoteRequestController extends ApiController
 {
     public function index(Request $request)
     {
@@ -18,45 +18,32 @@ class QuoteRequestController extends Controller
             ->latest()
             ->paginate(20);
 
-        return response()->json($requests);
+        return $this->ok($requests);
     }
 
     public function show(Request $request, QuoteRequest $quoteRequest)
     {
-        if ($quoteRequest->user_id !== $request->user()->id) {
-            abort(403);
-        }
+        $this->authorize('view', $quoteRequest);
         $quoteRequest->load(['category', 'quotes.vendor']);
 
-        return response()->json($quoteRequest);
+        return $this->ok($quoteRequest);
     }
 
-    public function store(Request $request)
+    public function store(QuoteRequestStoreRequest $request)
     {
-        $validated = $request->validate([
-            'category_id' => ['required', 'exists:categories,id'],
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'city' => ['nullable', 'string', 'max:100'],
-            'district' => ['nullable', 'string', 'max:100'],
-            'address' => ['nullable', 'string'],
-            'contact_phone' => ['nullable', 'string', 'max:50'],
-        ]);
-
+        $validated = $request->validated();
         $validated['user_id'] = $request->user()->id;
         $validated['status'] = 'open';
         $qr = QuoteRequest::create($validated);
 
-        return response()->json($qr->load('category'), 201);
+        return $this->ok($qr->load('category'), null, null, 201);
     }
 
     public function selectQuote(Request $request, QuoteRequest $quoteRequest, Quote $quote)
     {
-        if ($quoteRequest->user_id !== $request->user()->id) {
-            abort(403);
-        }
+        $this->authorize('view', $quoteRequest);
         if ($quote->quote_request_id !== $quoteRequest->id || $quote->status !== 'pending') {
-            return response()->json(['message' => 'Bu teklif seçilemez.'], 400);
+            return $this->fail('Bu teklif seçilemez.', null, 400);
         }
 
         $quote->update(['status' => 'selected']);
@@ -90,6 +77,9 @@ class QuoteRequestController extends Controller
             'quantity' => 1,
         ]);
 
-        return response()->json(['order' => $order, 'quote_request' => $quoteRequest->fresh()]);
+        return $this->ok([
+            'order' => $order,
+            'quote_request' => $quoteRequest->fresh(),
+        ]);
     }
 }

@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { api, setToken as persistToken } from '../api';
+import { api, setToken as persistToken, unwrapData } from '../api';
 
 const AuthContext = createContext(null);
 
@@ -17,7 +17,7 @@ export function AuthProvider({ children }) {
             return;
         }
         try {
-            const u = await api('/auth/user');
+            const u = unwrapData(await api('/auth/user'));
             setUser(u);
         } catch {
             await persistToken(null);
@@ -40,10 +40,10 @@ export function AuthProvider({ children }) {
     }, []);
 
     const login = useCallback(async (email, password) => {
-        const data = await api('/auth/login', {
+        const data = unwrapData(await api('/auth/login', {
             method: 'POST',
             body: JSON.stringify({ email, password, device_name: 'expo-app' }),
-        });
+        }));
         await persistToken(data.token);
         setTokenState(data.token);
         setUser(data.user);
@@ -51,10 +51,10 @@ export function AuthProvider({ children }) {
     }, []);
 
     const register = useCallback(async (payload) => {
-        const data = await api('/auth/register', {
+        const data = unwrapData(await api('/auth/register', {
             method: 'POST',
             body: JSON.stringify({ ...payload, device_name: 'expo-app' }),
-        });
+        }));
         await persistToken(data.token);
         setTokenState(data.token);
         setUser(data.user);
@@ -74,7 +74,7 @@ export function AuthProvider({ children }) {
 
     const refreshUser = useCallback(async () => {
         try {
-            const u = await api('/auth/user');
+            const u = unwrapData(await api('/auth/user'));
             setUser(u);
             return u;
         } catch {

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>@yield('title', 'BaskıYeri – Matbaa & Reklam Pazaryeri')</title>
+    <title>@yield('title', __('ui.default_title'))</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,7 +23,7 @@
                         <span class="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-cyan-400 text-white shadow-sm">B</span>
                         <span>BaskıYeri</span>
                     </a>
-                    <button data-left-drawer-close class="by-btn-secondary px-3 py-2" type="button" aria-label="Menüyü kapat">
+                    <button data-left-drawer-close class="by-btn-secondary px-3 py-2" type="button" aria-label="{{ __('ui.close_menu') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                     </button>
                 </div>
@@ -31,7 +31,7 @@
                 <div class="p-4">
                     <form action="{{ route('products.index') }}">
                         <div class="relative">
-                            <input class="by-input pl-11" name="q" value="{{ request('q') }}" placeholder="Ürün ara (kartvizit, broşür, tabela...)" />
+                            <input class="by-input pl-11" name="q" value="{{ request('q') }}" placeholder="{{ __('ui.search_drawer') }}" />
                             <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                             </span>
@@ -40,43 +40,50 @@
                 </div>
 
                 <div class="px-4 pb-4">
-                    <p class="text-xs font-extrabold uppercase tracking-wider text-slate-500">Menü</p>
+                    <p class="text-xs font-extrabold uppercase tracking-wider text-slate-500">{{ __('ui.menu') }}</p>
                     <div class="mt-2 grid gap-2">
-                        <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('home') }}">Anasayfa</a>
-                        <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('products.index') }}">Ürünler</a>
-                        <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('vendors.index') }}">Satıcılar</a>
-                        <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('freelancer-jobs.index') }}">İş ilanları</a>
+                        <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('home') }}">{{ __('ui.home') }}</a>
+                        <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('products.index') }}">{{ __('ui.products') }}</a>
+                        <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('vendors.index') }}">{{ __('ui.vendors') }}</a>
+                        <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('freelancer-jobs.index') }}">{{ __('ui.jobs') }}</a>
                     </div>
                 </div>
 
                 <div class="px-4 pb-4">
-                    <p class="text-xs font-extrabold uppercase tracking-wider text-slate-500">Hesap</p>
+                    <p class="text-xs font-extrabold uppercase tracking-wider text-slate-500">{{ __('ui.account') }}</p>
                     <div class="mt-2 grid gap-2">
                         @auth
-                            <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('cart.index') }}">Sepet</a>
-                            <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('account.orders.index') }}">Siparişlerim</a>
+                            <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('cart.index') }}">{{ __('ui.cart') }}</a>
+                            <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('account.orders.index') }}">{{ __('ui.orders') }}</a>
                             @if(auth()->user()->isAdmin())
-                                <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('admin.dashboard') }}">Yönetici Paneli</a>
+                                <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('admin.dashboard') }}">{{ __('ui.admin') }}</a>
                             @endif
                             @if(auth()->user()->isVendor())
-                                <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('vendor.dashboard') }}">Satıcı Paneli</a>
+                                <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('vendor.dashboard') }}">{{ __('ui.vendor_panel') }}</a>
                             @endif
                             @if(auth()->user()->isCustomer())
-                                <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('customer.dashboard') }}">Hesabım</a>
+                                <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('customer.dashboard') }}">{{ __('ui.account') }}</a>
                             @endif
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <button type="submit" class="w-full by-btn-secondary">Çıkış</button>
+                                <button type="submit" class="w-full by-btn-secondary">{{ __('ui.logout') }}</button>
                             </form>
                         @else
-                            <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('login') }}">Giriş Yap</a>
-                            <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('register') }}">Kayıt Ol</a>
+                            <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('login') }}">{{ __('ui.login_full') }}</a>
+                            <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('register') }}">{{ __('ui.register') }}</a>
                         @endauth
                     </div>
                 </div>
 
+                <div class="px-4 pb-4">
+                    <p class="text-xs font-extrabold uppercase tracking-wider text-slate-500">{{ __('ui.language') }}</p>
+                    <div class="mt-2">
+                        @include('partials.locale-switcher')
+                    </div>
+                </div>
+
                 <div class="px-4 pb-6">
-                    <p class="text-xs font-extrabold uppercase tracking-wider text-slate-500">Kategoriler</p>
+                    <p class="text-xs font-extrabold uppercase tracking-wider text-slate-500">{{ __('ui.categories') }}</p>
                     <div class="mt-2 max-h-[38vh] overflow-auto pr-1">
                         @if(!empty($headerCategories) && $headerCategories->isNotEmpty())
                             <div class="grid gap-1.5">
@@ -94,7 +101,7 @@
                                 @endforeach
                             </div>
                         @else
-                            <p class="px-2 py-2 text-sm text-slate-500">Kategori bulunamadı.</p>
+                            <p class="px-2 py-2 text-sm text-slate-500">{{ __('ui.no_categories') }}</p>
                         @endif
                     </div>
                 </div>
@@ -112,7 +119,7 @@
 
                 <form action="{{ route('products.index') }}" class="hidden flex-1 lg:block">
                     <div class="relative">
-                        <input class="by-input pl-11" name="q" value="{{ request('q') }}" placeholder="Ürün ara (kartvizit, broşür, tabela...)" />
+                        <input class="by-input pl-11" name="q" value="{{ request('q') }}" placeholder="{{ __('ui.search_placeholder') }}" />
                         <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                         </span>
@@ -120,37 +127,39 @@
                 </form>
 
                 <div class="flex items-center gap-2">
+                    @include('partials.locale-switcher')
+
                     <button type="button" data-left-drawer-open class="by-btn-secondary px-4 py-2.5">
-                        Menü
+                        {{ __('ui.menu') }}
                     </button>
 
                     @auth
                         @if(auth()->user()->isAdmin())
-                            <a href="{{ route('admin.dashboard') }}" class="hidden sm:inline-flex by-btn-secondary">Yönetim</a>
+                            <a href="{{ route('admin.dashboard') }}" class="hidden sm:inline-flex by-btn-secondary">{{ __('ui.management') }}</a>
                         @elseif(auth()->user()->isVendor())
-                            <a href="{{ route('vendor.dashboard') }}" class="hidden sm:inline-flex by-btn-secondary">Satıcı</a>
+                            <a href="{{ route('vendor.dashboard') }}" class="hidden sm:inline-flex by-btn-secondary">{{ __('ui.vendor_short') }}</a>
                         @else
-                            <a href="{{ route('customer.dashboard') }}" class="hidden sm:inline-flex by-btn-secondary">Hesabım</a>
+                            <a href="{{ route('customer.dashboard') }}" class="hidden sm:inline-flex by-btn-secondary">{{ __('ui.account') }}</a>
                         @endif
                     @else
-                        <a href="{{ route('login') }}" class="hidden sm:inline-flex by-btn-secondary">Giriş</a>
+                        <a href="{{ route('login') }}" class="hidden sm:inline-flex by-btn-secondary">{{ __('ui.login') }}</a>
                     @endauth
 
                     @auth
                         <a href="{{ route('cart.index') }}" class="by-btn-primary px-4 py-2.5">
-                            Sepet
+                            {{ __('ui.cart') }}
                             <span class="rounded-full bg-white/20 px-2 py-0.5 text-xs font-bold">
                                 {{ auth()->user()->cartItems()->count() }}
                             </span>
                         </a>
                     @else
-                        <a href="{{ route('login') }}" class="by-btn-primary px-4 py-2.5">Sepet</a>
+                        <a href="{{ route('login') }}" class="by-btn-primary px-4 py-2.5">{{ __('ui.cart') }}</a>
                     @endauth
                 </div>
             </div>
 
             <form action="{{ route('products.index') }}" class="mt-4 lg:hidden">
-                <input class="by-input" name="q" value="{{ request('q') }}" placeholder="Ürün ara..." />
+                <input class="by-input" name="q" value="{{ request('q') }}" placeholder="{{ __('ui.search_placeholder_short') }}" />
             </form>
         </div>
     </header>
@@ -179,17 +188,17 @@
             <div class="by-card by-gradient-border p-6 md:p-8 mb-10">
                 <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
-                        <p class="text-xs font-extrabold uppercase tracking-wider text-slate-500">Satıcı mısın?</p>
+                        <p class="text-xs font-extrabold uppercase tracking-wider text-slate-500">{{ __('ui.vendor_cta_eyebrow') }}</p>
                         <p class="mt-2 text-xl font-extrabold tracking-tight text-slate-900">
-                            BaskıYeri’nde mağazanı aç, tekliflere cevap ver, sipariş al.
+                            {{ __('ui.vendor_cta_title') }}
                         </p>
                         <p class="mt-2 text-sm text-slate-600">
-                            Satıcı hesabı oluşturup iş kolunu seçerek başvurunu tamamla.
+                            {{ __('ui.vendor_cta_body') }}
                         </p>
                     </div>
                     <div class="flex flex-wrap gap-2">
-                        <a href="{{ route('register', ['role' => 'vendor']) }}" class="by-btn-cta px-7 py-3 text-base">Satıcı ol</a>
-                        <a href="{{ route('vendors.index') }}" class="by-btn-secondary px-7 py-3 text-base">Satıcıları gör</a>
+                        <a href="{{ route('register', ['role' => 'vendor']) }}" class="by-btn-cta px-7 py-3 text-base">{{ __('ui.vendor_cta_primary') }}</a>
+                        <a href="{{ route('vendors.index') }}" class="by-btn-secondary px-7 py-3 text-base">{{ __('ui.vendor_cta_secondary') }}</a>
                     </div>
                 </div>
             </div>
@@ -201,34 +210,33 @@
                         <span>BaskıYeri</span>
                     </div>
                     <p class="mt-3 max-w-md text-sm leading-relaxed text-slate-600">
-                        Matbaa, tabela, promosyon ve özel üretim işleriniz için modern pazaryeri + teklif (RFQ) platformu.
+                        {{ __('ui.tagline') }}
                     </p>
                 </div>
                 <div>
-                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Keşfet</p>
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('ui.discover') }}</p>
                     <div class="mt-3 space-y-2 text-sm">
-                        <a class="block text-slate-700 hover:text-slate-900" href="{{ route('products.index') }}">Ürünler</a>
-                        <a class="block text-slate-700 hover:text-slate-900" href="{{ route('vendors.index') }}">Satıcılar</a>
-                        <a class="block text-slate-700 hover:text-slate-900" href="{{ route('freelancer-jobs.index') }}">İş ilanları</a>
+                        <a class="block text-slate-700 hover:text-slate-900" href="{{ route('products.index') }}">{{ __('ui.products') }}</a>
+                        <a class="block text-slate-700 hover:text-slate-900" href="{{ route('vendors.index') }}">{{ __('ui.vendors') }}</a>
+                        <a class="block text-slate-700 hover:text-slate-900" href="{{ route('freelancer-jobs.index') }}">{{ __('ui.jobs') }}</a>
                     </div>
                 </div>
                 <div>
-                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Kurumsal</p>
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('ui.corporate') }}</p>
                     <div class="mt-3 space-y-2 text-sm">
-                        <a class="block text-slate-700 hover:text-slate-900" href="{{ route('pages.about') }}">Hakkımızda</a>
-                        <a class="block text-slate-700 hover:text-slate-900" href="{{ route('pages.terms') }}">Kullanım koşulları</a>
-                        <a class="block text-slate-700 hover:text-slate-900" href="{{ route('pages.privacy') }}">Gizlilik</a>
+                        <a class="block text-slate-700 hover:text-slate-900" href="{{ route('pages.about') }}">{{ __('ui.about') }}</a>
+                        <a class="block text-slate-700 hover:text-slate-900" href="{{ route('pages.terms') }}">{{ __('ui.terms') }}</a>
+                        <a class="block text-slate-700 hover:text-slate-900" href="{{ route('pages.privacy') }}">{{ __('ui.privacy') }}</a>
                     </div>
                 </div>
             </div>
 
             <div class="mt-10 flex flex-col gap-2 border-t border-slate-200 pt-6 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
-                <p>© {{ date('Y') }} BaskıYeri. Tüm hakları saklıdır.</p>
-                <p>Türkiye</p>
+                <p>{{ __('ui.rights', ['year' => date('Y')]) }}</p>
+                <p>{{ __('ui.country') }}</p>
             </div>
         </div>
     </footer>
 </div>
 </body>
 </html>
-

@@ -2,42 +2,32 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\CheckoutStoreRequest;
+use App\Http\Resources\Api\V1\OrderResource;
 use App\Models\Address;
 use App\Services\MarketplaceOrderService;
-use Illuminate\Http\Request;
 
-class CheckoutController extends Controller
+class CheckoutController extends ApiController
 {
     public function __construct(
         private MarketplaceOrderService $orderService
     ) {}
 
-    public function store(Request $request)
+    public function store(CheckoutStoreRequest $request)
     {
-        $validated = $request->validate([
-            'address_id' => ['required', 'exists:addresses,id'],
-        ]);
-        $address = Address::findOrFail($validated['address_id']);
-        if ($address->user_id !== $request->user()->id) {
-            abort(403);
-        }
+        $address = Address::findOrFail($request->validated('address_id'));
 
         try {
-            // For now, use same address for shipping & billing in API checkout.
-            // Web checkout can pass a separate billing address when available.
             $orders = $this->orderService->createPaidOrdersFromCart($request->user(), $address, $address);
         } catch (\InvalidArgumentException $e) {
-            return response()->json(['message' => $e->getMessage()], 422);
+            return $this->fail($e->getMessage(), null, 422);
         }
 
-        return response()->json([
-            'message' => 'Sipariş oluşturuldu.',
-            'orders' => collect($orders)->map(fn ($o) => [
-                'id' => $o->id,
-                'order_number' => $o->order_number,
-                'subtotal' => $o->subtotal,
-            ]),
-        ], 201);
+        return $this->ok(
+            OrderResource::collection(collect($orders))->resolve(),
+            'Sipariş oluşturuldu.',
+            null,
+            201
+        );
     }
 }

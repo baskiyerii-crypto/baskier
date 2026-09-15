@@ -16,7 +16,7 @@ import {
     View,
 } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { api, listFromApi } from './src/api';
+import { api, listFromApi, unwrapData } from './src/api';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import WebMirrorScreen from './src/WebMirrorScreen';
 import {
@@ -122,7 +122,7 @@ function RegisterScreen({ navigation }) {
         let cancelled = false;
         (async () => {
             try {
-                const rows = await api('/business-types');
+                const rows = unwrapData(await api('/business-types'));
                 if (!cancelled && Array.isArray(rows)) setBusinessTypes(rows);
             } catch {
                 /* public endpoint; ignore */
@@ -254,7 +254,7 @@ function CategoriesScreen() {
     useEffect(() => {
         (async () => {
             try {
-                const rows = await api('/categories');
+                const rows = unwrapData(await api('/categories'));
                 setCategories(Array.isArray(rows) ? rows : []);
             } catch {
                 setCategories([]);
@@ -510,7 +510,9 @@ function CustomerCartScreen() {
     const load = useCallback(async () => {
         setErr('');
         try {
-            const [c, a] = await Promise.all([api('/cart'), api('/addresses')]);
+            const [cRaw, aRaw] = await Promise.all([api('/cart'), api('/addresses')]);
+            const c = unwrapData(cRaw) || {};
+            const a = unwrapData(aRaw);
             setCart({ items: c.items || [], total: c.total || '0' });
             const list = Array.isArray(a) ? a : [];
             setAddresses(list);
@@ -958,7 +960,7 @@ function VendorProductsScreen() {
     useEffect(() => {
         (async () => {
             try {
-                const c = await api('/categories');
+                const c = unwrapData(await api('/categories'));
                 if (Array.isArray(c)) setCats(c);
             } catch {
                 setCats([]);

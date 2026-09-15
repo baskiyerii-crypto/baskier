@@ -8,10 +8,18 @@ const API_URL =
 
 export { API_URL };
 
+/** ApiResponse zarfı {success,data,...} veya düz JSON. */
+export function unwrapData(payload) {
+    if (payload && typeof payload.success === 'boolean' && 'data' in payload) {
+        return payload.data;
+    }
+    return payload;
+}
+
 export function listFromApi(payload) {
     // Supports either Laravel paginator or {success,data:{data:[]}} wrappers.
     if (!payload) return [];
-    const d = payload.data && typeof payload.success === 'boolean' ? payload.data : payload;
+    const d = unwrapData(payload);
     if (Array.isArray(d)) return d;
     if (Array.isArray(d?.data)) return d.data;
     if (Array.isArray(d?.items)) return d.items;

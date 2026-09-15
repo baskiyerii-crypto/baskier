@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'title' => 'BaskıYeri – Anasayfa',
+    'badge' => 'Baskı · Tabela · Reklam · Freelancer',
+    'hero_line_1' => 'Ürün al,',
+    'hero_line_2' => 'teklif topla',
+    'hero_line_3' => ', hızlıca üretime geç.',
+    'hero_body' => 'Hazır ürün kataloğu + özel işler için RFQ. En doğru satıcıya en kısa yoldan ulaş.',
+    'search_placeholder' => 'Ürün veya hizmet ara (kartvizit, broşür, tabela...)',
+    'search' => 'Ara',
+    'quote' => 'Teklif al',
+    'products' => 'Ürünler',
+    'vendors' => 'Satıcılar',
+    'freelancer' => 'Freelancer',
+    'ready_eyebrow' => 'Hazır ürün',
+    'ready_title' => 'Katalogtan satın al',
+    'ready_body' => 'Sepet → ödeme → sipariş.',
+    'custom_eyebrow' => 'Özel iş',
+    'custom_title' => 'RFQ ile teklif topla',
+    'custom_body' => 'Satıcılar rekabet etsin.',
+    'vendor_eyebrow' => 'Doğru üretici',
+    'vendor_title' => 'Satıcıları karşılaştır',
+    'vendor_body' => 'Profil, ürün ve değerlendirmeleri incele.',
+];

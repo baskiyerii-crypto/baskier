@@ -22,7 +22,7 @@ import {
     View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { API_URL, api, apiMultipart, listFromApi } from './api';
+import { API_URL, api, apiMultipart, listFromApi, unwrapData } from './api';
 
 const SITE_ORIGIN = API_URL.replace(/\/api\/v1\/?$/, '');
 
@@ -260,7 +260,7 @@ export function HomeScreen() {
 
     const load = useCallback(async () => {
         try {
-            const h = await api('/home');
+            const h = unwrapData(await api('/home'));
             setData(h);
         } catch {
             setData(null);
@@ -276,7 +276,7 @@ export function HomeScreen() {
             return;
         }
         try {
-            const c = await api('/cart');
+            const c = unwrapData(await api('/cart'));
             const n = (c.items || []).reduce((s, row) => s + (row.quantity || 0), 0);
             setCartCount(n);
         } catch {
@@ -1224,7 +1224,7 @@ export function AddressesScreen() {
 
     const load = useCallback(async () => {
         try {
-            const data = await api('/addresses');
+            const data = unwrapData(await api('/addresses'));
             setList(Array.isArray(data) ? data : []);
         } catch {
             setList([]);
@@ -1749,7 +1749,7 @@ export function CreateQuoteRequestScreen() {
     useEffect(() => {
         (async () => {
             try {
-                const rows = await api('/categories');
+                const rows = unwrapData(await api('/categories'));
                 setCategories(flattenCatIds(rows));
             } catch {
                 setCategories([]);
@@ -1896,7 +1896,8 @@ export function CustomerPriceEstimateScreen() {
 
     useEffect(() => {
         api('/categories')
-            .then((d) => {
+            .then((raw) => {
+                const d = unwrapData(raw);
                 const rows = Array.isArray(d) ? d : [];
                 const flat = [];
                 rows.forEach((p) => {

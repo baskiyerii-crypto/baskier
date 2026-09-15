@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Domain\OrderStatus;
+use App\Http\Requests\Api\V1\DesignApprovalRevisionRequest;
+use App\Http\Requests\Api\V1\DesignApprovalStoreRequest;
 use App\Models\DesignApproval;
 use App\Models\Order;
 use App\Services\OrderWorkflowService;
@@ -18,15 +20,9 @@ class DesignApprovalController extends ApiController
         return $this->ok($order->designApprovals()->latest('id')->get());
     }
 
-    public function vendorStore(Request $request, Order $order, OrderWorkflowService $workflow)
+    public function vendorStore(DesignApprovalStoreRequest $request, Order $order, OrderWorkflowService $workflow)
     {
-        $this->authorize('designAct', $order);
-
-        $validated = $request->validate([
-            'file' => ['required', 'file', 'max:10240', 'mimes:pdf,jpg,jpeg,png,zip'],
-            'vendor_note' => ['nullable', 'string', 'max:2000'],
-        ]);
-
+        $validated = $request->validated();
         $path = $request->file('file')->store('designs/'.$order->id, 'public');
 
         DB::transaction(function () use ($request, $order, $workflow, $validated, $path) {
@@ -53,7 +49,7 @@ class DesignApprovalController extends ApiController
     public function approve(Request $request, DesignApproval $designApproval, OrderWorkflowService $workflow)
     {
         $order = $designApproval->order;
-        $this->authorize('designRespond', $order);
+        $this->authorize('respond', $designApproval);
 
         if ($designApproval->status !== 'pending') {
             return $this->fail('Bu tasarım onayı artık işlem yapılamaz.', null, 422);
@@ -70,18 +66,15 @@ class DesignApprovalController extends ApiController
         return $this->ok($order->fresh()->load('designApprovals'), 'Tasarım onaylandı.');
     }
 
-    public function revision(Request $request, DesignApproval $designApproval)
+    public function revision(DesignApprovalRevisionRequest $request, DesignApproval $designApproval)
     {
         $order = $designApproval->order;
-        $this->authorize('designRespond', $order);
 
         if ($designApproval->status !== 'pending') {
             return $this->fail('Bu tasarım onayı için revizyon istenemez.', null, 422);
         }
 
-        $validated = $request->validate([
-            'customer_feedback' => ['required', 'string', 'max:2000'],
-        ]);
+        $validated = $request->validated();
 
         $designApproval->update([
             'status' => 'revision_requested',

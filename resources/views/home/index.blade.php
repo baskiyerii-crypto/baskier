@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'BaskıYeri – Anasayfa')
+@section('title', __('home.title'))
 
 @section('content')
     <section class="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
@@ -22,29 +22,28 @@
                 <div class="relative grid items-center gap-10 p-7 md:p-10 lg:grid-cols-12 lg:min-h-[560px]">
                     <div class="lg:col-span-7">
                         <p class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white/90 backdrop-blur">
-                            Baskı · Tabela · Reklam · Freelancer
+                            {{ __('home.badge') }}
                         </p>
                         <h1 class="mt-4 text-4xl font-extrabold tracking-tight text-white md:text-6xl">
-                            Ürün al,
-                            <span class="bg-gradient-to-r from-cyan-200 to-white bg-clip-text text-transparent">teklif topla</span>,
-                            hızlıca üretime geç.
+                            {{ __('home.hero_line_1') }}
+                            <span class="bg-gradient-to-r from-cyan-200 to-white bg-clip-text text-transparent">{{ __('home.hero_line_2') }}</span>{{ __('home.hero_line_3') }}
                         </h1>
                         <p class="mt-4 max-w-xl text-base leading-relaxed text-white/80">
-                            Hazır ürün kataloğu + özel işler için RFQ. En doğru satıcıya en kısa yoldan ulaş.
+                            {{ __('home.hero_body') }}
                         </p>
 
                         <div class="mt-7 by-card border-white/15 bg-white/10 p-5 backdrop-blur">
                             <form action="{{ route('products.index') }}">
                                 <div class="flex flex-col gap-3 md:flex-row">
-                                    <input class="by-input md:flex-1 bg-white/90" name="q" value="{{ request('q') }}" placeholder="Ürün veya hizmet ara (kartvizit, broşür, tabela...)" />
-                                    <button class="by-btn-primary">Ara</button>
-                                    <a class="by-btn-cta" href="{{ route('quote-requests.create') }}">Teklif al</a>
+                                    <input class="by-input md:flex-1 bg-white/90" name="q" value="{{ request('q') }}" placeholder="{{ __('home.search_placeholder') }}" />
+                                    <button class="by-btn-primary">{{ __('home.search') }}</button>
+                                    <a class="by-btn-cta" href="{{ route('quote-requests.create') }}">{{ __('home.quote') }}</a>
                                 </div>
                             </form>
                             <div class="mt-3 flex flex-wrap gap-2">
-                                <a class="by-badge border-white/15 bg-white/10 text-white hover:bg-white/15" href="{{ route('products.index') }}">Ürünler</a>
-                                <a class="by-badge border-white/15 bg-white/10 text-white hover:bg-white/15" href="{{ route('vendors.index') }}">Satıcılar</a>
-                                <a class="by-badge border-white/15 bg-white/10 text-white hover:bg-white/15" href="{{ route('freelancer-jobs.index') }}">Freelancer</a>
+                                <a class="by-badge border-white/15 bg-white/10 text-white hover:bg-white/15" href="{{ route('products.index') }}">{{ __('home.products') }}</a>
+                                <a class="by-badge border-white/15 bg-white/10 text-white hover:bg-white/15" href="{{ route('vendors.index') }}">{{ __('home.vendors') }}</a>
+                                <a class="by-badge border-white/15 bg-white/10 text-white hover:bg-white/15" href="{{ route('freelancer-jobs.index') }}">{{ __('home.freelancer') }}</a>
                             </div>
                         </div>
                     </div>
@@ -52,19 +51,19 @@
                     <div class="lg:col-span-5">
                         <div class="grid gap-3 sm:grid-cols-2">
                             <a href="{{ route('products.index') }}" class="by-card border-white/15 bg-white/10 p-5 text-white backdrop-blur hover:bg-white/15">
-                                <p class="text-xs font-bold uppercase tracking-wider text-white/70">Hazır ürün</p>
-                                <p class="mt-2 text-lg font-bold">Katalogtan satın al</p>
-                                <p class="mt-2 text-sm text-white/75">Sepet → ödeme → sipariş.</p>
+                                <p class="text-xs font-bold uppercase tracking-wider text-white/70">{{ __('home.ready_eyebrow') }}</p>
+                                <p class="mt-2 text-lg font-bold">{{ __('home.ready_title') }}</p>
+                                <p class="mt-2 text-sm text-white/75">{{ __('home.ready_body') }}</p>
                             </a>
                             <a href="{{ route('quote-requests.create') }}" class="by-card border-white/15 bg-white/10 p-5 text-white backdrop-blur hover:bg-white/15">
-                                <p class="text-xs font-bold uppercase tracking-wider text-white/70">Özel iş</p>
-                                <p class="mt-2 text-lg font-bold">RFQ ile teklif topla</p>
-                                <p class="mt-2 text-sm text-white/75">Satıcılar rekabet etsin.</p>
+                                <p class="text-xs font-bold uppercase tracking-wider text-white/70">{{ __('home.custom_eyebrow') }}</p>
+                                <p class="mt-2 text-lg font-bold">{{ __('home.custom_title') }}</p>
+                                <p class="mt-2 text-sm text-white/75">{{ __('home.custom_body') }}</p>
                             </a>
                             <a href="{{ route('vendors.index') }}" class="by-card border-white/15 bg-white/10 p-5 text-white backdrop-blur hover:bg-white/15 sm:col-span-2">
-                                <p class="text-xs font-bold uppercase tracking-wider text-white/70">Doğru üretici</p>
-                                <p class="mt-2 text-lg font-bold">Satıcıları karşılaştır</p>
-                                <p class="mt-2 text-sm text-white/75">Profil, ürün ve değerlendirmeleri incele.</p>
+                                <p class="text-xs font-bold uppercase tracking-wider text-white/70">{{ __('home.vendor_eyebrow') }}</p>
+                                <p class="mt-2 text-lg font-bold">{{ __('home.vendor_title') }}</p>
+                                <p class="mt-2 text-sm text-white/75">{{ __('home.vendor_body') }}</p>
                             </a>
                         </div>
                         <div class="mt-5 flex items-center gap-2">

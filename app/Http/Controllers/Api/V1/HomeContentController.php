@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\V1\CategoryResource;
+use App\Http\Resources\Api\V1\ProductResource;
 use App\Models\Category;
 use App\Models\FreelancerJobListing;
 use App\Models\Product;
@@ -11,7 +12,7 @@ use Illuminate\Http\Request;
 /**
  * Web ana sayfası (/) ile aynı veri — mobil uygulama için JSON.
  */
-class HomeContentController extends Controller
+class HomeContentController extends ApiController
 {
     public function index(Request $request)
     {
@@ -71,11 +72,11 @@ class HomeContentController extends Controller
             ];
         }
 
-        return response()->json([
-            'featured_categories' => $featuredCategories,
-            'categories' => $categories,
-            'featured_products' => $featuredProducts,
-            'digital_products' => $digitalProducts,
+        return $this->ok([
+            'featured_categories' => CategoryResource::collection($featuredCategories)->resolve(),
+            'categories' => CategoryResource::collection($categories)->resolve(),
+            'featured_products' => ProductResource::collection($featuredProducts)->resolve(),
+            'digital_products' => ProductResource::collection($digitalProducts)->resolve(),
             'freelancer_jobs' => $freelancerJobs,
             'freelancer_categories' => $freelancerCategories,
         ]);
