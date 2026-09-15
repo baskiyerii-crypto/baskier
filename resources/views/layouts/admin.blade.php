@@ -43,14 +43,39 @@
         .admin-sidebar.is-collapsed { transform: translateX(-100%); }
         .admin-main { flex: 1; margin-left: 280px; min-height: 100vh; display: flex; flex-direction: column; transition: margin-left 0.2s ease; }
         .admin-shell.nav-collapsed .admin-main { margin-left: 0; }
-        .admin-sidebar details.nav-acc { border-radius: 10px; }
+        .admin-sidebar .nav {
+            flex: 1;
+            min-height: 0;
+            padding: 1rem 0.75rem;
+            overflow-x: hidden;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            gap: var(--nav-gap);
+            width: 100%;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 transparent;
+        }
+        .admin-sidebar .nav::-webkit-scrollbar { width: 6px; }
+        .admin-sidebar .nav::-webkit-scrollbar-track { background: transparent; }
+        .admin-sidebar .nav::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 999px;
+        }
+        .admin-sidebar .nav::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .admin-sidebar details.nav-acc {
+            width: 100%;
+            flex: 0 0 auto;
+            border-radius: 10px;
+        }
         .admin-sidebar details.nav-acc > summary {
             list-style: none; cursor: pointer; padding: 10px 14px; color: var(--side-text); font-weight: 600; font-size: 0.875rem;
             border-radius: 10px; display: flex; justify-content: space-between; align-items: center;
         }
         .admin-sidebar details.nav-acc > summary::-webkit-details-marker { display: none; }
         .admin-sidebar details.nav-acc[open] > summary { background: rgba(99,102,241,.08); color: var(--side-active-text); }
-        .admin-sidebar details.nav-acc .nav-acc-body { display: flex; flex-direction: column; gap: 2px; padding: 4px 0 8px 8px; }
+        .admin-sidebar details.nav-acc .nav-acc-body { display: flex; flex-direction: column; flex-wrap: nowrap; gap: 2px; padding: 4px 0 8px 8px; width: 100%; }
         .sidebar-backdrop { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.35); z-index: 35; }
         .sidebar-backdrop.show { display: block; }
         @media (max-width: 991.98px) {
@@ -72,14 +97,6 @@
             letter-spacing: -0.02em;
         }
         .admin-sidebar .brand .accent { color: var(--side-accent); }
-        .admin-sidebar .nav {
-            flex: 1;
-            padding: 1rem 0.75rem;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: var(--nav-gap);
-        }
         .admin-sidebar .nav-link {
             display: flex;
             align-items: center;

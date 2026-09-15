@@ -24,10 +24,7 @@
         <div data-left-drawer-panel class="absolute left-0 top-0 h-full w-[340px] max-w-[88vw] -translate-x-full transition-transform duration-200">
             <div class="h-full bg-white/95 backdrop-blur border-r border-slate-200 shadow-xl">
                 <div class="p-4 border-b border-slate-200/70 flex items-center justify-between gap-2">
-                    <a href="{{ route('home') }}" class="flex items-center gap-2 text-sm font-extrabold tracking-tight text-slate-900">
-                        <span class="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-cyan-400 text-white shadow-sm">B</span>
-                        <span>BaskıYeri</span>
-                    </a>
+                    @include('partials.platform-brand', ['compact' => true])
                     <button data-left-drawer-close class="by-btn-secondary px-3 py-2" type="button" aria-label="{{ __('ui.close_menu') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                     </button>
@@ -117,10 +114,7 @@
     <header class="sticky top-0 z-50 border-b border-slate-200/70 bg-white/70 backdrop-blur">
         <div class="by-container py-4">
             <div class="flex items-center justify-between gap-4">
-                <a href="{{ route('home') }}" class="flex items-center gap-2 text-sm font-extrabold tracking-tight text-slate-900">
-                    <span class="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-cyan-400 text-white shadow-sm">B</span>
-                    <span>BaskıYeri</span>
-                </a>
+                @include('partials.platform-brand', ['compact' => true])
 
                 <form action="{{ route('products.index') }}" class="hidden flex-1 lg:block">
                     <div class="relative">
@@ -211,13 +205,11 @@
 
             <div class="grid gap-8 md:grid-cols-4">
                 <div class="md:col-span-2">
-                    <div class="flex items-center gap-2 text-base font-extrabold tracking-tight text-slate-900">
-                        <span class="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-cyan-400 text-white shadow-sm">B</span>
-                        <span>BaskıYeri</span>
-                    </div>
+                    @include('partials.platform-brand')
                     <p class="mt-3 max-w-md text-sm leading-relaxed text-slate-600">
                         {{ __('ui.tagline') }}
                     </p>
+                    @include('partials.platform-contact')
                 </div>
                 <div>
                     <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('ui.discover') }}</p>

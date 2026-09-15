@@ -41,13 +41,37 @@
         }
         .vendor-sidebar details.nav-acc > summary::-webkit-details-marker { display: none; }
         .vendor-sidebar details.nav-acc[open] > summary { background: rgba(5,150,105,.08); color: var(--side-active-text); }
-        .vendor-sidebar details.nav-acc .nav-acc-body { display: flex; flex-direction: column; gap: 2px; padding: 4px 0 8px 6px; }
+        .vendor-sidebar details.nav-acc .nav-acc-body { display: flex; flex-direction: column; flex-wrap: nowrap; gap: 2px; padding: 4px 0 8px 6px; width: 100%; }
         .vendor-content .card { transition: transform .15s ease, box-shadow .15s ease; background: linear-gradient(180deg,#fff,#f8fafc); }
         .vendor-content .card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(15,23,42,.08) !important; }
         .vendor-sidebar .brand { padding: 1.25rem 1.25rem; border-bottom: 1px solid var(--side-border); }
         .vendor-sidebar .brand a { font-weight: 700; font-size: 1.15rem; color: var(--side-text-hover); text-decoration: none; }
         .vendor-sidebar .brand .accent { color: var(--side-accent); }
-        .vendor-sidebar .nav { flex: 1; padding: 0.75rem 0.65rem; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; }
+        .vendor-sidebar .nav {
+            flex: 1;
+            min-height: 0;
+            padding: 0.75rem 0.65rem;
+            overflow-x: hidden;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            gap: 3px;
+            width: 100%;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 transparent;
+        }
+        .vendor-sidebar .nav::-webkit-scrollbar { width: 6px; }
+        .vendor-sidebar .nav::-webkit-scrollbar-track { background: transparent; }
+        .vendor-sidebar .nav::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 999px;
+        }
+        .vendor-sidebar .nav::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .vendor-sidebar details.nav-acc {
+            width: 100%;
+            flex: 0 0 auto;
+        }
         .vendor-sidebar .nav-link {
             display: flex; align-items: center; gap: 10px; padding: 9px 12px;
             color: var(--side-text); text-decoration: none; font-size: 0.875rem; font-weight: 500;
