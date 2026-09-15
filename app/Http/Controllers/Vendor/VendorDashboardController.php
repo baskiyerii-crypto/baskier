@@ -37,13 +37,27 @@ class VendorDashboardController extends Controller
             $openQuoteRequestsCount = $openQuotesQuery->count();
         }
 
+        $upcomingPayouts = Order::where('vendor_id', $vendor->id)
+            ->whereNotNull('commission_ready_at')
+            ->where('commission_ready_at', '<=', now()->addDays(14))
+            ->where('payout_approved', false)
+            ->sum('vendor_amount');
+
+        $moduleEnds = collect([
+            'freelancer' => $vendor->freelancer_expires_at,
+            'quotes' => $vendor->quotes_expires_at,
+            'tabela' => $vendor->tabela_expires_at,
+        ])->filter(fn ($d) => $d && $d->isFuture() && $d->lte(now()->addDays(14)));
+
         return view('vendor.dashboard', compact(
             'vendor',
             'productsCount',
             'products',
             'ordersCount',
             'ordersPending',
-            'openQuoteRequestsCount'
+            'openQuoteRequestsCount',
+            'upcomingPayouts',
+            'moduleEnds'
         ));
     }
 }

@@ -70,4 +70,21 @@ function initLeftDrawer() {
 document.addEventListener('DOMContentLoaded', () => {
     initHeroSlider();
     initLeftDrawer();
+    initPhoneInputs();
 });
+
+function initPhoneInputs() {
+    const nodes = document.querySelectorAll('input[name="phone"], input[name="invoice_phone"], input[name="contact_phone"], input[data-phone]');
+    nodes.forEach((input) => {
+        input.setAttribute('inputmode', 'numeric');
+        input.setAttribute('autocomplete', 'tel');
+        input.setAttribute('pattern', '[0-9]*');
+        input.setAttribute('maxlength', '11');
+        const sanitize = () => {
+            input.value = String(input.value || '').replace(/\D/g, '').slice(0, 11);
+        };
+        input.addEventListener('input', sanitize);
+        input.addEventListener('blur', sanitize);
+        sanitize();
+    });
+}

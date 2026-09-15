@@ -11,10 +11,12 @@ class QuoteRequest extends Model
     protected $fillable = [
         'user_id', 'category_id', 'title', 'description',
         'city', 'district', 'address', 'contact_phone', 'status', 'closed_at',
+        'request_type', 'show_customer_profile',
     ];
 
     protected $casts = [
         'closed_at' => 'datetime',
+        'show_customer_profile' => 'boolean',
     ];
 
     public function user(): BelongsTo

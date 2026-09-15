@@ -10,7 +10,14 @@
         <div class="mb-3">
             <label class="form-label fw-semibold">Ad</label>
             <input type="text" name="name" class="form-control" value="{{ old('name', $category->name) }}" required>
-            @error('name')<div class="text-danger small">{{ $message }}</div>@enderror
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Kanal</label>
+            <select name="channel" class="form-select" required>
+                <option value="physical_quote" @selected(old('channel', $category->channel ?? 'physical_quote') === 'physical_quote')>Fiziksel + Teklif</option>
+                <option value="freelancer" @selected(old('channel', $category->channel ?? '') === 'freelancer')>Freelancer</option>
+                <option value="tabela" @selected(old('channel', $category->channel ?? '') === 'tabela')>Tabela</option>
+            </select>
         </div>
         <div class="mb-3">
             <label class="form-label fw-semibold">Üst kategori</label>
@@ -23,11 +30,9 @@
             <label class="form-label fw-semibold">Açıklama</label>
             <textarea name="description" class="form-control" rows="3">{{ old('description', $category->description) }}</textarea>
         </div>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label class="form-label fw-semibold">Teslimat süresi (iş günü)</label>
-                <input type="number" name="delivery_days" class="form-control" value="{{ old('delivery_days', $category->delivery_days) }}" min="0">
-            </div>
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Termin süresi (iş günü)</label>
+            <input type="number" name="termin_days" class="form-control" value="{{ old('termin_days', $category->termin_days ?? $category->delivery_days) }}" min="0">
         </div>
         <div class="mb-3 form-check">
             <input type="checkbox" name="requires_quote" value="1" class="form-check-input" @checked(old('requires_quote', $category->requires_quote))>
@@ -36,18 +41,16 @@
         <div class="mb-3">
             <label class="form-label fw-semibold">Görsel</label>
             @if($category->image)
-                <div class="mb-2"><img src="{{ asset('storage/'.$category->image) }}" alt="" class="rounded" style="max-height:120px; max-width:200px; object-fit:cover;"></div>
+                <div class="mb-2"><img src="{{ asset('storage/'.$category->image) }}" alt="" class="rounded" style="max-height:120px;"></div>
             @endif
             <input type="file" name="image" class="form-control" accept="image/*">
-            <div class="form-text">Değiştirmek için yeni dosya seçin. JPG, PNG, en fazla 2 MB.</div>
-            @error('image')<div class="text-danger small">{{ $message }}</div>@enderror
         </div>
         <div class="mb-4 form-check">
             <input type="checkbox" name="is_active" value="1" class="form-check-input" @checked(old('is_active', $category->is_active))>
             <label class="form-check-label">Aktif</label>
         </div>
         <button type="submit" class="btn btn-primary">Güncelle</button>
-        <a href="{{ route('admin.categories.index') }}" class="btn btn-outline-secondary">İptal</a>
+        <a href="{{ route('admin.categories.index', ['channel' => $category->channel ?? 'physical_quote']) }}" class="btn btn-outline-secondary">İptal</a>
     </form>
 </div>
 @endsection

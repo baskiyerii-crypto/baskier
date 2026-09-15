@@ -7,8 +7,8 @@
             <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Özel iş / RFQ</p>
             <div class="mt-2 flex flex-wrap items-end justify-between gap-4">
                 <div>
-                    <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">Teklif al</h1>
-                    <p class="mt-2 text-sm text-slate-600">Kalem kalem yaz, satıcılar net teklif versin. Dosya ekle, ölçüyü belirt, işi hızlandır.</p>
+                    <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">{{ ($type ?? '') === 'freelancer' ? 'Hizmet al' : 'Teklif al' }}</h1>
+                    <p class="mt-2 text-sm text-slate-600">{{ ($type ?? '') === 'freelancer' ? 'İhtiyacınızı yazın; freelancerlar fiyat teklifi versin.' : 'Kalem kalem yaz, satıcılar net teklif versin. Dosya ekle, ölçüyü belirt, işi hızlandır.' }}</p>
                 </div>
                 <div class="hidden md:flex items-center gap-2">
                     <span class="by-badge border-indigo-200 bg-indigo-50 text-indigo-900">1) Kalem</span>
@@ -34,6 +34,16 @@
             <div class="by-card p-6 md:p-8">
                 <form method="POST" action="{{ route('quote-requests.store') }}" class="space-y-6" enctype="multipart/form-data">
                 @csrf
+                <input type="hidden" name="request_type" value="{{ $type ?? 'physical_quote' }}">
+                @if(($type ?? '') === 'freelancer')
+                    <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-4 text-sm text-indigo-900">
+                        Hizmet talebi oluşturuyorsunuz. Sabit fiyatlı ilan yoktur; freelancerlar size teklif verecektir.
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" name="show_customer_profile" value="1" class="form-check-input" id="show_profile" @checked(old('show_customer_profile'))>
+                        <label for="show_profile" class="form-check-label text-sm">Teklif veren freelancerlar müşteri profilimi görsün</label>
+                    </div>
+                @endif
 
                 <div class="by-surface-indigo by-accent-bar">
                     <div class="flex items-start justify-between gap-4">

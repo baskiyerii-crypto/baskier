@@ -43,7 +43,7 @@
                             <div class="mt-3 flex flex-wrap gap-2">
                                 <a class="by-badge border-white/15 bg-white/10 text-white hover:bg-white/15" href="{{ route('products.index') }}">{{ __('home.products') }}</a>
                                 <a class="by-badge border-white/15 bg-white/10 text-white hover:bg-white/15" href="{{ route('vendors.index') }}">{{ __('home.vendors') }}</a>
-                                <a class="by-badge border-white/15 bg-white/10 text-white hover:bg-white/15" href="{{ route('freelancer-jobs.index') }}">{{ __('home.freelancer') }}</a>
+                                <a class="by-badge border-white/15 bg-white/10 text-white hover:bg-white/15" href="{{ route('quote-requests.create', ['type' => 'freelancer']) }}">Hizmet al</a>
                             </div>
                         </div>
                     </div>
@@ -91,11 +91,11 @@
                 <p class="mt-2 text-sm text-slate-600">Kısa brief yaz, uygun satıcılar teklif versin.</p>
                 <p class="mt-4 text-sm font-semibold text-orange-600">Teklif al →</p>
             </a>
-            <a href="{{ route('freelancer-jobs.index') }}" class="by-card by-card-hover p-6">
+            <a href="{{ route('quote-requests.create', ['type' => 'freelancer']) }}" class="by-card by-card-hover p-6">
                 <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Freelancer</p>
-                <p class="mt-2 text-lg font-bold tracking-tight text-slate-900">Hızlı hizmet bul</p>
-                <p class="mt-2 text-sm text-slate-600">Tasarım, web, tabela işleri için ilanları incele.</p>
-                <p class="mt-4 text-sm font-semibold text-indigo-600">İlanlara git →</p>
+                <p class="mt-2 text-lg font-bold tracking-tight text-slate-900">Hizmet al</p>
+                <p class="mt-2 text-sm text-slate-600">İhtiyacınızı yazın, ilgili freelancerlar fiyat teklifi versin.</p>
+                <p class="mt-4 text-sm font-semibold text-indigo-600">Hizmet talebi oluştur →</p>
             </a>
         </div>
     </section>

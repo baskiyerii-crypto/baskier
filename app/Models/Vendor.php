@@ -34,16 +34,23 @@ class Vendor extends Model
         'freelancer_expires_at',
         'quotes_enabled',
         'quotes_expires_at',
+        'tabela_enabled',
+        'tabela_expires_at',
+        'risk_band',
+        'risk_score',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'freelancer_enabled' => 'boolean',
         'quotes_enabled' => 'boolean',
+        'tabela_enabled' => 'boolean',
         'balance' => 'decimal:2',
         'rating_average' => 'decimal:2',
+        'risk_score' => 'decimal:2',
         'freelancer_expires_at' => 'datetime',
         'quotes_expires_at' => 'datetime',
+        'tabela_expires_at' => 'datetime',
     ];
 
     public function hasActiveFreelancerModule(): bool
@@ -56,6 +63,24 @@ class Vendor extends Model
     {
         return $this->quotes_enabled
             && ($this->quotes_expires_at === null || $this->quotes_expires_at->isFuture());
+    }
+
+    public function hasActiveTabelaModule(): bool
+    {
+        return (bool) $this->tabela_enabled
+            && ($this->tabela_expires_at === null || $this->tabela_expires_at->isFuture());
+    }
+
+    public function hasApprovedTaxPlate(): bool
+    {
+        if (($this->verification_status ?? null) === 'verified') {
+            return true;
+        }
+
+        return $this->documents()
+            ->where('document_type', 'tax_plate')
+            ->where('status', 'approved')
+            ->exists();
     }
 
     public function recalculateRating(): void

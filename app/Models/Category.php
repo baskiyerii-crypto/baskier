@@ -21,14 +21,31 @@ class Category extends Model
         'image',
         'parent_id',
         'is_active',
+        'channel',
+        'termin_days',
         'delivery_days',
         'requires_quote',
     ];
+
+    public const CHANNEL_PHYSICAL_QUOTE = 'physical_quote';
+
+    public const CHANNEL_FREELANCER = 'freelancer';
+
+    public const CHANNEL_TABELA = 'tabela';
 
     protected $casts = [
         'is_active' => 'boolean',
         'requires_quote' => 'boolean',
     ];
+
+    public function getTerminDaysAttribute($value): ?int
+    {
+        if ($value !== null) {
+            return (int) $value;
+        }
+
+        return $this->attributes['delivery_days'] ?? null;
+    }
 
     public function parent(): BelongsTo
     {

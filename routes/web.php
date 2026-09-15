@@ -1,9 +1,13 @@
 <?php
 
+use App\Http\Controllers\BlogController;
+use App\Http\Controllers\Admin\AdminApiManagementController;
+use App\Http\Controllers\Admin\AdminBlogController;
 use App\Http\Controllers\Admin\AdminBusinessTypeController;
 use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminContractController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminFinanceController;
 use App\Http\Controllers\Admin\AdminPayoutController;
 use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\AdminSettingsController;
@@ -31,6 +35,8 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\QuoteRequestController;
 use App\Http\Controllers\Vendor\VendorBalanceController;
 use App\Http\Controllers\Vendor\VendorDashboardController;
+use App\Http\Controllers\Vendor\VendorDocumentController;
+use App\Http\Controllers\Vendor\VendorFreelancerController;
 use App\Http\Controllers\Vendor\VendorMessageController;
 use App\Http\Controllers\Vendor\VendorOrderController;
 use App\Http\Controllers\Vendor\VendorOrderDesignController;
@@ -38,11 +44,14 @@ use App\Http\Controllers\Vendor\VendorPayoutRequestWebController;
 use App\Http\Controllers\Vendor\VendorProductController;
 use App\Http\Controllers\Vendor\VendorQuoteRequestController;
 use App\Http\Controllers\Vendor\VendorSubscriptionController;
+use App\Http\Controllers\Vendor\VendorTabelaController;
 use App\Http\Controllers\VendorController;
 use Illuminate\Support\Facades\Route;
 
 // Genel
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 Route::get('/dil/{locale}', [LocaleController::class, 'switch'])
     ->whereIn('locale', ['tr', 'en'])
     ->name('locale.switch');
@@ -148,6 +157,11 @@ Route::middleware(['auth', 'role:vendor'])->prefix('satici-panel')->name('vendor
     Route::get('mesajlar', [VendorMessageController::class, 'index'])->name('messages.index');
     Route::get('mesajlar/{conversation}', [VendorMessageController::class, 'show'])->name('messages.show');
     Route::post('mesajlar/{conversation}', [VendorMessageController::class, 'store'])->name('messages.store');
+    Route::get('belgeler', [VendorDocumentController::class, 'index'])->name('documents.index');
+    Route::post('belgeler', [VendorDocumentController::class, 'store'])->name('documents.store');
+    Route::get('freelancerim', [VendorFreelancerController::class, 'index'])->name('freelancer.index');
+    Route::get('tabela', [VendorTabelaController::class, 'index'])->name('tabela.index');
+    Route::post('tabela/gorusme', [VendorTabelaController::class, 'startMeeting'])->name('tabela.meeting');
     Route::get('abonelikler', [VendorSubscriptionController::class, 'index'])->name('subscriptions.index');
     Route::post('abonelikler/aktiflestir', [VendorSubscriptionController::class, 'activate'])->name('subscriptions.activate');
 });
@@ -157,7 +171,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::resource('categories', AdminCategoryController::class)->except('show');
     Route::resource('business-types', AdminBusinessTypeController::class)->except(['show']);
-    Route::resource('vendors', AdminVendorController::class)->except('show');
+    Route::resource('vendors', AdminVendorController::class);
     Route::post('vendors/{vendor}/verify/approve', [AdminVendorController::class, 'approveVerification'])->name('vendors.verify.approve');
     Route::post('vendors/{vendor}/verify/reject', [AdminVendorController::class, 'rejectVerification'])->name('vendors.verify.reject');
     Route::get('products', [AdminProductController::class, 'index'])->name('products.index');
@@ -168,6 +182,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::delete('products/{product}', [AdminProductController::class, 'destroy'])->name('products.destroy');
     Route::get('settings', [AdminSettingsController::class, 'index'])->name('settings.index');
     Route::post('settings', [AdminSettingsController::class, 'update'])->name('settings.update');
+    Route::get('finans', [AdminFinanceController::class, 'index'])->name('finance.index');
+    Route::post('finans/giderler', [AdminFinanceController::class, 'updateExpenses'])->name('finance.expenses');
+    Route::get('finans/export', [AdminFinanceController::class, 'export'])->name('finance.export');
+    Route::get('blog', [AdminBlogController::class, 'index'])->name('blog.index');
+    Route::get('blog/ice-aktar', [AdminBlogController::class, 'importForm'])->name('blog.import');
+    Route::post('blog/ice-aktar', [AdminBlogController::class, 'import'])->name('blog.import.store');
+    Route::get('api-yonetimi', [AdminApiManagementController::class, 'index'])->name('api-management.index');
+    Route::post('api-yonetimi', [AdminApiManagementController::class, 'update'])->name('api-management.update');
     Route::get('payouts', [AdminPayoutController::class, 'index'])->name('payouts.index');
     Route::post('payouts/approve', [AdminPayoutController::class, 'approve'])->name('payouts.approve');
     Route::get('destek-talepleri', [AdminSupportTicketWebController::class, 'index'])->name('support-tickets.index');

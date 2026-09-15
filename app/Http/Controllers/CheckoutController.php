@@ -4,14 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Address;
 use App\Models\BillingProfile;
+use App\Models\Contract;
+use App\Models\OrderContractAcceptance;
 use App\Services\MarketplaceOrderService;
+use App\Services\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class CheckoutController extends Controller
 {
     public function __construct(
-        private MarketplaceOrderService $orderService
+        private MarketplaceOrderService $orderService,
+        private PaymentService $paymentService
     ) {}
 
     public function index(Request $request)
@@ -28,8 +32,10 @@ class CheckoutController extends Controller
         $addresses = $user->addresses()->orderByDesc('is_default')->get();
         $defaultBillingAddress = $user->addresses()->where('is_billing_default', true)->latest()->first();
         $billingProfile = $user->billingProfiles()->latest('updated_at')->first();
+        $distanceSalesContract = Contract::query()->where('key', 'distance_sales')->where('is_active', true)->first();
+        $carriers = app(\App\Services\BasitKargoService::class)->carriers();
 
-        return view('checkout.index', compact('items', 'total', 'addresses', 'billingProfile', 'defaultBillingAddress'));
+        return view('checkout.index', compact('items', 'total', 'addresses', 'billingProfile', 'defaultBillingAddress', 'distanceSalesContract', 'carriers'));
     }
 
     public function store(Request $request)
@@ -48,7 +54,7 @@ class CheckoutController extends Controller
             'invoice_type' => ['required', Rule::in(['individual', 'corporate'])],
             'invoice_full_name' => ['required', 'string', 'max:255'],
             'invoice_email' => ['required', 'email', 'max:190'],
-            'invoice_phone' => ['required', 'string', 'max:32'],
+            'invoice_phone' => ['required', 'string', 'max:11', 'regex:/^[0-9]{10,11}$/'],
             'invoice_identity_number' => ['nullable', 'string', 'max:16'],
             'invoice_company_name' => ['nullable', 'string', 'max:255'],
             'invoice_tax_number' => ['nullable', 'string', 'max:16'],
@@ -135,6 +141,35 @@ class CheckoutController extends Controller
                 $invoiceData,
                 $paymentData
             );
+
+            $contract = Contract::query()->where('key', 'distance_sales')->where('is_active', true)->first();
+            foreach ($orders as $order) {
+                if ($contract) {
+                    OrderContractAcceptance::create([
+                        'user_id' => $request->user()->id,
+                        'order_id' => $order->id,
+                        'contract_id' => $contract->id,
+                        'ip' => $request->ip(),
+                        'scrolled_at' => $request->input('contract_scrolled_at') ? now() : now(),
+                        'accepted_at' => now(),
+                    ]);
+                }
+                if (($paymentData['payment_method'] ?? '') === 'credit_card') {
+                    try {
+                        $this->paymentService->chargeCard($order, [
+                            'card_holder_name' => $validated['card_holder_name'] ?? '',
+                            'card_number' => $validated['card_number'] ?? '',
+                            'card_expiry' => $validated['card_expiry'] ?? '',
+                            'card_cvc' => $validated['card_cvc'] ?? '',
+                        ]);
+                    } catch (\Throwable $e) {
+                        return redirect()->route('account.orders.index')
+                            ->with('error', 'Sipariş oluşturuldu ancak kart ödemesi başarısız: '.$e->getMessage());
+                    }
+                } else {
+                    $this->paymentService->recordDemoPayment($order);
+                }
+            }
         } catch (\InvalidArgumentException $e) {
             return redirect()->route('cart.index')->with('error', $e->getMessage());
         }

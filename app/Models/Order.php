@@ -10,8 +10,9 @@ class Order extends Model
 {
     protected $fillable = [
         'order_number', 'user_id', 'vendor_id', 'contractor_user_id', 'type', 'quote_id', 'freelancer_job_id',
-        'status', 'subtotal', 'commission_rate', 'commission_amount', 'vendor_amount', 'payment_method',
-        'paid_at', 'delivered_at', 'commission_ready_at', 'payout_approved', 'payout_at',
+        'status', 'payment_status', 'subtotal', 'commission_rate', 'commission_amount', 'vendor_amount', 'payment_method',
+        'paid_at', 'delivered_at', 'shipped_at', 'termin_due_at', 'tracking_number', 'shipping_label_path', 'carrier_code',
+        'commission_ready_at', 'payout_approved', 'payout_at',
         'shipping_address', 'billing_address_id', 'shipping_address_id',
         'invoice_type', 'invoice_full_name', 'invoice_company_name', 'invoice_tax_number',
         'invoice_identity_number', 'invoice_tax_office', 'invoice_email', 'invoice_phone',
@@ -25,6 +26,8 @@ class Order extends Model
         'vendor_amount' => 'decimal:2',
         'paid_at' => 'datetime',
         'delivered_at' => 'datetime',
+        'shipped_at' => 'datetime',
+        'termin_due_at' => 'datetime',
         'commission_ready_at' => 'datetime',
         'payout_approved' => 'boolean',
         'payout_at' => 'datetime',

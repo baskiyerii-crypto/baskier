@@ -5,7 +5,7 @@
 @section('content')
 <div class="content-shell py-4">
     <h1 class="h5 mb-4">Ödeme</h1>
-    <p class="small text-muted">Demo ortamında sipariş, seçtiğiniz adres ile <strong>anında onaylı</strong> oluşturulur (gerçek ödeme entegrasyonu yok).</p>
+    <p class="small text-muted">Kart ödemesi iyzico üzerinden işlenir. API anahtarları tanımlı değilse sandbox/demo kaydı oluşur.</p>
 
     @if($items->isEmpty())
         <p><a href="{{ route('cart.index') }}">Sepete dön</a></p>
@@ -149,15 +149,32 @@
                     <hr>
                     <div class="bg-light rounded-3 p-3 small mb-3">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="accept-distance-sales" name="accept_distance_sales" value="1" @checked(old('accept_distance_sales')) required>
+                            <input class="form-check-input" type="checkbox" id="accept-distance-sales" name="accept_distance_sales" value="1" disabled>
                             <label class="form-check-label" for="accept-distance-sales">
                                 <strong>Mesafeli Satış Sözleşmesi</strong>'ni okudum ve kabul ediyorum.
-                                <a href="{{ route('contracts.show', 'distance_sales') }}" target="_blank" class="ms-1">Görüntüle</a>
+                                <button type="button" class="btn btn-link btn-sm p-0 align-baseline" id="open-distance-sales">Sözleşmeyi aç</button>
                             </label>
                         </div>
+                        <input type="hidden" name="contract_scrolled_at" id="contract_scrolled_at" value="">
+                        <div class="form-text">Onay kutusu, sözleşmeyi sonuna kadar okuduktan sonra aktif olur.</div>
                     </div>
-                    <button type="submit" class="btn btn-warning rounded-pill px-5">Siparişi tamamla</button>
+                    <button type="submit" class="btn btn-warning rounded-pill px-5" id="checkout-submit" disabled>Siparişi tamamla</button>
                 </form>
+
+                <div id="distanceSalesModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 p-4">
+                    <div class="flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl">
+                        <div class="flex items-center justify-between border-b px-4 py-3">
+                            <h5 class="m-0 text-base font-semibold">Mesafeli Satış Sözleşmesi</h5>
+                            <button type="button" id="close-distance-sales" class="btn btn-sm btn-outline-secondary">Kapat</button>
+                        </div>
+                        <div class="flex-1 overflow-auto p-4" id="distance-sales-body" style="max-height:55vh;">
+                            {!! $distanceSalesContract?->content_html ?? '<p>Sözleşme metni henüz tanımlanmadı. Lütfen yönetici panelinden ekleyin.</p>' !!}
+                        </div>
+                        <div class="flex justify-end gap-2 border-t px-4 py-3">
+                            <button type="button" class="btn btn-primary" id="confirm-distance-sales" disabled>Okudum, onayla</button>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="col-lg-5">
                 <div class="bg-white rounded-4 shadow-sm p-4">
@@ -255,6 +272,60 @@
         toggleBillingBox();
         toggleInvoiceType();
         togglePaymentMethod();
+
+        const distanceCheckbox = document.getElementById('accept-distance-sales');
+        const openDistanceBtn = document.getElementById('open-distance-sales');
+        const confirmDistanceBtn = document.getElementById('confirm-distance-sales');
+        const distanceBody = document.getElementById('distance-sales-body');
+        const checkoutSubmit = document.getElementById('checkout-submit');
+        const scrolledAtInput = document.getElementById('contract_scrolled_at');
+        const modalEl = document.getElementById('distanceSalesModal');
+        const closeDistanceBtn = document.getElementById('close-distance-sales');
+        let scrolledToEnd = false;
+
+        function openModal() {
+            if (!modalEl) return;
+            modalEl.classList.remove('hidden');
+            modalEl.classList.add('flex');
+        }
+        function closeModal() {
+            if (!modalEl) return;
+            modalEl.classList.add('hidden');
+            modalEl.classList.remove('flex');
+        }
+        function syncCheckoutSubmit() {
+            if (checkoutSubmit) checkoutSubmit.disabled = !(distanceCheckbox && distanceCheckbox.checked);
+        }
+
+        if (distanceBody) {
+            distanceBody.addEventListener('scroll', function () {
+                if (distanceBody.scrollTop + distanceBody.clientHeight >= distanceBody.scrollHeight - 8) {
+                    scrolledToEnd = true;
+                    if (confirmDistanceBtn) confirmDistanceBtn.disabled = false;
+                    if (scrolledAtInput && !scrolledAtInput.value) scrolledAtInput.value = new Date().toISOString();
+                }
+            });
+        }
+        openDistanceBtn?.addEventListener('click', function (e) {
+            e.preventDefault();
+            openModal();
+        });
+        closeDistanceBtn?.addEventListener('click', closeModal);
+        distanceCheckbox?.addEventListener('click', function (e) {
+            if (!distanceCheckbox.checked && !scrolledToEnd) {
+                e.preventDefault();
+                openModal();
+            }
+            syncCheckoutSubmit();
+        });
+        confirmDistanceBtn?.addEventListener('click', function () {
+            if (!scrolledToEnd) return;
+            distanceCheckbox.disabled = false;
+            distanceCheckbox.checked = true;
+            syncCheckoutSubmit();
+            closeModal();
+        });
+        syncCheckoutSubmit();
     });
 </script>
 @endsection

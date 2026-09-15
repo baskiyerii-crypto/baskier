@@ -70,7 +70,7 @@
     <div class="card p-4">
         <h3 class="h6 mb-3">Teklif ver</h3>
         @if($myQuote)
-            <p class="small text-muted">Verdiğiniz teklif: ₺{{ number_format($myQuote->amount, 2, ',', '.') }} @if($myQuote->delivery_days)({{ $myQuote->delivery_days }} gün)@endif</p>
+            <p class="small text-muted">Verdiğiniz teklif: ₺{{ number_format($myQuote->amount, 2, ',', '.') }} @if($myQuote->delivery_days)(Termin: {{ $myQuote->delivery_days }} gün)@endif</p>
             <p class="small">Güncellemek için aşağıdan yeni değer gönderin.</p>
         @endif
         <form method="POST" action="{{ route('vendor.quote-requests.submit-quote', $quoteRequest) }}">
@@ -81,7 +81,7 @@
                     <input type="number" name="amount" step="0.01" min="0" class="form-control form-control-sm" value="{{ old('amount', $myQuote->amount ?? '') }}" required>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label small">Teslim süresi (gün)</label>
+                    <label class="form-label small">Termin süresi (gün)</label>
                     <input type="number" name="delivery_days" min="1" class="form-control form-control-sm" value="{{ old('delivery_days', $myQuote->delivery_days ?? '') }}">
                 </div>
             </div>

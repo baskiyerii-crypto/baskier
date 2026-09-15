@@ -57,6 +57,10 @@ class CartController extends Controller
         $row->quantity = $newQty;
         $row->save();
 
+        if ($request->boolean('buy_now')) {
+            return redirect()->route('checkout.index')->with('success', 'Ürün sepete eklendi. Ödemeye devam edin.');
+        }
+
         return back()->with('success', 'Ürün sepete eklendi.');
     }
 

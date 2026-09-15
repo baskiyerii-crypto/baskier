@@ -4,13 +4,10 @@
 
 @section('content')
 <div class="card p-4" style="max-width:640px;">
-        @if(!$freelancerModuleActive)
-            <div class="alert alert-warning small">
-                Dijital/freelancer ürün eklemek için <a href="{{ route('vendor.subscriptions.index') }}">modül aboneliğini</a> aktifleştirmelisiniz.
-            </div>
-        @endif
+        <p class="small text-muted mb-3">Yalnızca fiziksel ürün ekleyebilirsiniz. Teklif ve freelancer hizmetleri ilgili modüller üzerinden alınır.</p>
         <form method="POST" action="{{ route('vendor.products.store') }}" enctype="multipart/form-data">
             @csrf
+            <input type="hidden" name="product_type" value="physical">
             <div class="mb-3">
                 <label class="form-label small fw-semibold">Ürün adı</label>
                 <input type="text" name="name" class="form-control rounded-3" value="{{ old('name') }}" required>
@@ -34,22 +31,10 @@
                 </div>
             </div>
             <div class="mb-3">
-                <label class="form-label fw-semibold">Ürün tipi</label>
-                <select name="product_type" class="form-select">
-                    <option value="physical" @selected(old('product_type') == 'physical')>Fiziksel</option>
-                    <option value="digital" @selected(old('product_type') == 'digital') @disabled(!$freelancerModuleActive)>Dijital (Freelancer)</option>
-                </select>
-            </div>
-            <div class="mb-3 product-digital-field">
                 <label class="form-label fw-semibold">Ürün görseli</label>
-                <input type="file" name="main_image" class="form-control" accept="image/*">
-                <div class="form-text">JPG, PNG, en fazla 2 MB.</div>
+                <input type="file" name="main_image" class="form-control" accept="image/jpeg,image/png,image/webp">
+                <div class="form-text">JPG, PNG veya WebP · en fazla 2 MB · önerilen oran 4:3</div>
                 @error('main_image')<div class="text-danger small">{{ $message }}</div>@enderror
-            </div>
-            <div class="mb-3 product-digital-link-field" style="display:none;">
-                <label class="form-label fw-semibold">Dijital ürün linki (indirme/erişim)</label>
-                <input type="url" name="digital_link" class="form-control" value="{{ old('digital_link') }}" placeholder="https://...">
-                @error('digital_link')<div class="text-danger small">{{ $message }}</div>@enderror
             </div>
             <div class="mb-3">
                 <label class="form-label fw-semibold">Kısa açıklama</label>
@@ -68,5 +53,4 @@
             <a href="{{ route('vendor.products.index') }}" class="btn btn-outline-secondary">İptal</a>
         </form>
 </div>
-<script>document.querySelector('[name=product_type]').addEventListener('change', function(){ var isDigital = this.value==='digital'; document.querySelector('.product-digital-field').style.display = isDigital ? 'none' : 'block'; document.querySelector('.product-digital-link-field').style.display = isDigital ? 'block' : 'none'; }); if(document.querySelector('[name=product_type]').value==='digital'){ document.querySelector('.product-digital-field').style.display='none'; document.querySelector('.product-digital-link-field').style.display='block'; }</script>
 @endsection

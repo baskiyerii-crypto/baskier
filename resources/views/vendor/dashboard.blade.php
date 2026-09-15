@@ -20,18 +20,26 @@
     </div>
     <div class="col-6 col-md-3">
         <div class="card p-3 h-100 border-0 shadow-sm" style="background:linear-gradient(135deg,#fff7ed,#fff);">
-            <div class="small text-muted">Aktif sipariş</div>
-            <div class="h4 mb-0">{{ $ordersPending }}</div>
+            <div class="small text-muted">Bakiye</div>
+            <div class="h4 mb-0">₺{{ number_format($vendor->balance, 2, ',', '.') }}</div>
+            <a href="{{ route('vendor.balance.index') }}" class="small text-decoration-none">Yükle →</a>
         </div>
     </div>
     <div class="col-6 col-md-3">
         <div class="card p-3 h-100 border-0 shadow-sm" style="background:linear-gradient(135deg,#faf5ff,#fff);">
-            <div class="small text-muted">Açık teklif talebi</div>
-            <div class="h4 mb-0">{{ $openQuoteRequestsCount }}</div>
-            <a href="{{ route('vendor.quote-requests.index') }}" class="small text-decoration-none">İncele →</a>
+            <div class="small text-muted">Yaklaşan hakediş</div>
+            <div class="h5 mb-0">₺{{ number_format($upcomingPayouts ?? 0, 2, ',', '.') }}</div>
         </div>
     </div>
 </div>
+
+@if(($moduleEnds ?? collect())->isNotEmpty())
+<div class="alert alert-warning small">Yaklaşan abonelik bitişleri:
+    @foreach($moduleEnds as $mod => $date)
+        <strong>{{ $mod }}</strong> {{ $date->format('d.m.Y') }}{{ !$loop->last ? ',' : '' }}
+    @endforeach
+</div>
+@endif
 
 <div class="card p-4 mb-4">
     <h2 class="h6 mb-3">Modül Durumu</h2>

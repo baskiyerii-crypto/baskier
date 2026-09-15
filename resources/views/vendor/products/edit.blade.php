@@ -4,15 +4,10 @@
 
 @section('content')
 <div class="card p-4" style="max-width:640px;">
-        @if(!$freelancerModuleActive)
-            <div class="alert alert-warning small">
-                Freelancer modülü pasif. Dijital ürün seçeneğini kullanmak için
-                <a href="{{ route('vendor.subscriptions.index') }}">aboneliği aktif edin</a>.
-            </div>
-        @endif
         <form method="POST" action="{{ route('vendor.products.update', $product) }}" enctype="multipart/form-data">
             @csrf
             @method('PUT')
+            <input type="hidden" name="product_type" value="physical">
             <div class="mb-3">
                 <label class="form-label small fw-semibold">Ürün adı</label>
                 <input type="text" name="name" class="form-control rounded-3" value="{{ old('name', $product->name) }}" required>
@@ -35,20 +30,10 @@
                 </div>
             </div>
             <div class="mb-3">
-                <label class="form-label fw-semibold">Ürün tipi</label>
-                <select name="product_type" class="form-select">
-                    <option value="physical" @selected(old('product_type', $product->product_type ?? 'physical') == 'physical')>Fiziksel</option>
-                    <option value="digital" @selected(old('product_type', $product->product_type ?? 'physical') == 'digital') @disabled(!$freelancerModuleActive)>Dijital (Freelancer)</option>
-                </select>
-            </div>
-            <div class="mb-3 product-digital-field">
                 <label class="form-label fw-semibold">Ürün görseli</label>
                 @if($product->main_image)<div class="mb-2"><img src="{{ asset('storage/'.$product->main_image) }}" alt="" class="rounded" style="max-height:80px;"></div>@endif
-                <input type="file" name="main_image" class="form-control" accept="image/*">
-            </div>
-            <div class="mb-3 product-digital-link-field" style="display:{{ ($product->product_type ?? 'physical') === 'digital' ? 'block' : 'none' }};">
-                <label class="form-label fw-semibold">Dijital ürün linki</label>
-                <input type="url" name="digital_link" class="form-control" value="{{ old('digital_link', $product->digital_link) }}">
+                <input type="file" name="main_image" class="form-control" accept="image/jpeg,image/png,image/webp">
+                <div class="form-text">JPG, PNG veya WebP · en fazla 2 MB · önerilen oran 4:3</div>
             </div>
             <div class="mb-3">
                 <label class="form-label fw-semibold">Kısa açıklama</label>
@@ -71,5 +56,4 @@
             <a href="{{ route('vendor.products.index') }}" class="btn btn-outline-secondary">İptal</a>
         </form>
 </div>
-<script>document.querySelector('[name=product_type]').addEventListener('change', function(){ var isDigital = this.value==='digital'; document.querySelector('.product-digital-field').style.display = isDigital ? 'none' : 'block'; document.querySelector('.product-digital-link-field').style.display = isDigital ? 'block' : 'none'; });</script>
 @endsection

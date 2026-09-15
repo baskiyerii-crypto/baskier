@@ -104,6 +104,11 @@ class MarketplaceOrderService
 
             CartItem::where('user_id', $user->id)->delete();
 
+            $orderService = app(\App\Services\OrderService::class);
+            foreach ($orders as $created) {
+                $orderService->setTerminDueAt($created);
+            }
+
             return $orders;
         });
     }

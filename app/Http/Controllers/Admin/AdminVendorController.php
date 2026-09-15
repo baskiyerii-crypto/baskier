@@ -23,6 +23,16 @@ class AdminVendorController extends Controller
         return view('admin.vendors.index', compact('vendors'));
     }
 
+    public function show(Vendor $vendor, \App\Services\VendorRiskService $riskService)
+    {
+        $riskService->recalculate($vendor);
+        $vendor->load(['user', 'businessTypes', 'documents', 'products.category']);
+        $orders = $vendor->orders()->with('user')->latest()->paginate(15, ['*'], 'orders_page');
+        $transactions = $vendor->balanceTransactions()->latest()->paginate(15, ['*'], 'tx_page');
+
+        return view('admin.vendors.show', compact('vendor', 'orders', 'transactions'));
+    }
+
     public function create()
     {
         $businessTypes = BusinessType::orderBy('sort_order')->orderBy('name')->get();

@@ -78,12 +78,13 @@
                         @endif
 
                         @if($product->stock > 0)
-                            <form action="{{ route('cart.add', $product) }}" method="post" class="mt-4 space-y-3">
+                            <form id="product-buy-form" action="{{ route('cart.add', $product) }}" method="post" class="mt-4 space-y-3">
                                 @csrf
+                                <input type="hidden" name="buy_now" id="buy_now_flag" value="0">
                                 @if($product->variants->isNotEmpty())
                                     <div>
                                         <label class="text-xs font-semibold text-slate-600">Varyant</label>
-                                        <select name="variant_id" class="mt-1 w-full rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm">
+                                        <select name="variant_id" class="by-input mt-1 w-full">
                                             @foreach($product->variants as $variant)
                                                 @php $variantPrice = (float) $product->price + (float) $variant->price_adjustment; @endphp
                                                 <option value="{{ $variant->id }}">
@@ -93,14 +94,14 @@
                                         </select>
                                     </div>
                                 @endif
-                                <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                                    <div class="sm:col-span-1">
-                                        <label class="text-xs font-semibold text-slate-600">Adet</label>
-                                        <input type="number" name="quantity" value="1" min="1" max="999"
-                                               class="mt-1 w-full rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm outline-none ring-orange-400 focus:ring-2">
+                                <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+                                    <div class="w-full sm:w-28 shrink-0">
+                                        <label class="text-xs font-semibold text-slate-600" for="product-qty">Adet</label>
+                                        <input id="product-qty" type="number" name="quantity" value="1" min="1" max="999"
+                                               class="by-input mt-1 w-full min-h-[48px]">
                                     </div>
-                                    <div class="sm:col-span-2 flex items-end">
-                                        <button type="submit" class="w-full by-btn-primary">Sepete ekle</button>
+                                    <div class="flex-1">
+                                        <button type="submit" class="w-full by-btn-primary min-h-[48px]" onclick="document.getElementById('buy_now_flag').value='0'">Sepete ekle</button>
                                     </div>
                                 </div>
                             </form>
@@ -113,7 +114,9 @@
                                     {{ $isFavorited ? '♥ Favoride' : '♡ Favorilere ekle' }}
                                 </button>
                             </form>
-                            <a href="{{ route('checkout.index') }}" class="by-btn-secondary">Hızlı satın al</a>
+                            @if($product->stock > 0)
+                                <button type="button" class="by-btn-secondary" onclick="document.getElementById('buy_now_flag').value='1'; document.getElementById('product-buy-form').submit();">Hızlı satın al</button>
+                            @endif
                         </div>
                     @else
                         <p class="mt-3 text-sm text-slate-600">

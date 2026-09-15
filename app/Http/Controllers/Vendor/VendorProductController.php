@@ -33,41 +33,43 @@ class VendorProductController extends Controller
     public function create(Request $request)
     {
         $vendor = $this->getVendor($request);
-        $categories = Category::where('is_active', true)->orderBy('name')->get();
-        $freelancerModuleActive = $vendor->hasActiveFreelancerModule();
+        if (! $vendor->hasApprovedTaxPlate()) {
+            return redirect()->route('vendor.documents.index')
+                ->with('error', 'Fiziksel ürün eklemek için onaylı vergi levhası yüklemelisiniz.');
+        }
+        $categories = Category::where('is_active', true)
+            ->where(function ($q) {
+                $q->whereNull('channel')->orWhere('channel', 'physical_quote');
+            })
+            ->orderBy('name')->get();
 
-        return view('vendor.products.create', compact('categories', 'freelancerModuleActive'));
+        return view('vendor.products.create', compact('categories'));
     }
 
     public function store(Request $request)
     {
         $vendor = $this->getVendor($request);
+        if (! $vendor->hasApprovedTaxPlate()) {
+            return redirect()->route('vendor.documents.index')
+                ->with('error', 'Fiziksel ürün eklemek için onaylı vergi levhası yüklemelisiniz.');
+        }
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'category_id' => ['required', 'exists:categories,id'],
             'price' => ['required', 'numeric', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
             'short_description' => ['nullable', 'string'],
-            'product_type' => ['nullable', 'in:physical,digital'],
-            'digital_link' => ['nullable', 'url', 'max:500'],
-            'main_image' => ['nullable', 'image', 'max:2048'],
+            'main_image' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
             'description' => ['nullable', 'string'],
             'variant_lines' => ['nullable', 'string'],
         ]);
         $validated['vendor_id'] = $vendor->id;
         $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']) . '-' . time();
         $validated['is_active'] = true;
-        $validated['product_type'] = $validated['product_type'] ?? 'physical';
-        if ($validated['product_type'] === 'digital' && ! $vendor->hasActiveFreelancerModule()) {
-            return back()
-                ->withInput()
-                ->with('error', 'Dijital/freelancer ürün için önce modül aboneliğini aktif etmelisiniz.');
-        }
+        $validated['product_type'] = 'physical';
+        $validated['digital_link'] = null;
         if ($request->hasFile('main_image')) {
             $validated['main_image'] = $request->file('main_image')->store('products', 'public');
-        }
-        if (($validated['product_type'] ?? '') === 'digital') {
-            $validated['digital_link'] = $request->digital_link;
         }
         $product = Product::create($validated);
         $this->syncVariants($product, (string) $request->input('variant_lines', ''));
@@ -81,10 +83,13 @@ class VendorProductController extends Controller
             abort(403, 'Bu ürün size ait değil.');
         }
         $product->load('variants');
-        $categories = Category::where('is_active', true)->orderBy('name')->get();
-        $freelancerModuleActive = $vendor->hasActiveFreelancerModule();
+        $categories = Category::where('is_active', true)
+            ->where(function ($q) {
+                $q->whereNull('channel')->orWhere('channel', 'physical_quote');
+            })
+            ->orderBy('name')->get();
 
-        return view('vendor.products.edit', compact('product', 'categories', 'freelancerModuleActive'));
+        return view('vendor.products.edit', compact('product', 'categories'));
     }
 
     public function update(Request $request, Product $product)
@@ -100,28 +105,19 @@ class VendorProductController extends Controller
             'stock' => ['required', 'integer', 'min:0'],
             'short_description' => ['nullable', 'string'],
             'is_active' => ['boolean'],
-            'product_type' => ['nullable', 'in:physical,digital'],
-            'digital_link' => ['nullable', 'url', 'max:500'],
-            'main_image' => ['nullable', 'image', 'max:2048'],
+            'main_image' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
             'description' => ['nullable', 'string'],
             'variant_lines' => ['nullable', 'string'],
         ]);
         $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']) . '-' . $product->id;
         $validated['is_active'] = $request->boolean('is_active');
-        $validated['product_type'] = $validated['product_type'] ?? 'physical';
-        if ($validated['product_type'] === 'digital' && ! $vendor->hasActiveFreelancerModule()) {
-            return back()
-                ->withInput()
-                ->with('error', 'Dijital/freelancer ürün için önce modül aboneliğini aktif etmelisiniz.');
-        }
+        $validated['product_type'] = 'physical';
+        $validated['digital_link'] = null;
         if ($request->hasFile('main_image')) {
             if ($product->main_image) {
                 Storage::disk('public')->delete($product->main_image);
             }
             $validated['main_image'] = $request->file('main_image')->store('products', 'public');
-        }
-        if (($validated['product_type'] ?? '') === 'digital') {
-            $validated['digital_link'] = $request->digital_link;
         }
         $product->update($validated);
         $this->syncVariants($product, (string) $request->input('variant_lines', ''));

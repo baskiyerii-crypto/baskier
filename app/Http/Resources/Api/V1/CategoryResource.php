@@ -18,7 +18,9 @@ class CategoryResource extends JsonResource
             'image' => $this->image,
             'parent_id' => $this->parent_id,
             'requires_quote' => $this->requires_quote ?? false,
-            'delivery_days' => $this->delivery_days,
+            'channel' => $this->channel ?? 'physical_quote',
+            'termin_days' => $this->termin_days ?? $this->delivery_days,
+            'delivery_days' => $this->termin_days ?? $this->delivery_days,
             'children' => CategoryResource::collection($this->whenLoaded('children')),
         ];
     }

@@ -52,4 +52,19 @@ class Setting extends Model
     {
         return (float) self::get('quotes_monthly_fee', 199);
     }
+
+    public static function tabelaMonthlyFee(): float
+    {
+        return (float) self::get('tabela_monthly_fee', 149);
+    }
+
+    public static function tabelaMeetingFee(): float
+    {
+        return (float) self::get('tabela_meeting_fee', 50);
+    }
+
+    public static function platformExpenses(): float
+    {
+        return (float) self::get('platform_expenses', 0);
+    }
 }

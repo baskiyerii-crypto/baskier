@@ -60,7 +60,10 @@
                 <div class="col-md-6">
                     <div class="card shadow-sm border-0 rounded-4 p-4 h-100">
                         <strong>{{ $q->vendor?->name }}</strong>
-                        <p class="mb-1 mt-2">₺{{ number_format($q->amount, 2, ',', '.') }} @if($q->delivery_days)| {{ $q->delivery_days }} gün @endif</p>
+                        @if($q->vendor)
+                            <a href="{{ route('vendors.show', $q->vendor->slug) }}" class="small ms-2">Mağaza profili</a>
+                        @endif
+                        <p class="mb-1 mt-2">₺{{ number_format($q->amount, 2, ',', '.') }} @if($q->delivery_days)| Termin: {{ $q->delivery_days }} gün @endif</p>
                         @if($q->note)<p class="small text-muted mb-2">{{ $q->note }}</p>@endif
                         @if($quoteRequest->status === 'open' && $q->status === 'pending')
                             <form method="POST" action="{{ route('quote-requests.select-quote', [$quoteRequest, $q]) }}" class="d-inline">

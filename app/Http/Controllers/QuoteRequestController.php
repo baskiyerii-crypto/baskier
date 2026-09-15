@@ -13,9 +13,20 @@ use Illuminate\Support\Facades\DB;
 
 class QuoteRequestController extends Controller
 {
-    public function create()
+    public function create(Request $request)
     {
-        $categories = Category::where('is_active', true)->where('requires_quote', true)->orderBy('name')->get();
+        $type = $request->get('type', 'physical_quote');
+        $channel = $type === 'freelancer' ? 'freelancer' : 'physical_quote';
+
+        $categories = Category::where('is_active', true)
+            ->where(function ($q) use ($channel) {
+                $q->where('channel', $channel)->orWhereNull('channel');
+            })
+            ->when($type !== 'freelancer', fn ($q) => $q->where(function ($q2) {
+                $q2->where('requires_quote', true)->orWhere('channel', 'physical_quote');
+            }))
+            ->orderBy('name')->get();
+
         if ($categories->isEmpty()) {
             $categories = Category::where('is_active', true)->orderBy('name')->get();
         }
@@ -24,7 +35,7 @@ class QuoteRequestController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('quote-requests.create', compact('categories', 'products'));
+        return view('quote-requests.create', compact('categories', 'products', 'type'));
     }
 
     public function store(Request $request)
@@ -39,7 +50,9 @@ class QuoteRequestController extends Controller
             'city' => ['nullable', 'string', 'max:100'],
             'district' => ['nullable', 'string', 'max:100'],
             'address' => ['nullable', 'string'],
-            'contact_phone' => ['nullable', 'string', 'max:50'],
+            'contact_phone' => ['nullable', 'string', 'max:11', 'regex:/^[0-9]{10,11}$/'],
+            'request_type' => ['nullable', 'in:physical_quote,freelancer,tabela'],
+            'show_customer_profile' => ['nullable', 'boolean'],
 
             // Multi-item RFQ
             'items' => [$hasItems ? 'required' : 'nullable', 'array', 'min:1'],
@@ -49,8 +62,11 @@ class QuoteRequestController extends Controller
             'items.*.unit' => ['nullable', 'string', 'max:32'],
             'items.*.spec' => ['nullable', 'string', 'max:5000'],
             'items.*.files' => ['nullable', 'array', 'max:10'],
-            'items.*.files.*' => ['file', 'max:12288'],
+            'items.*.files.*' => ['file', 'mimes:jpg,jpeg,png,pdf,zip', 'max:'.config('uploads.max_kb', 5120)],
         ]);
+
+        $validated['request_type'] = $validated['request_type'] ?? 'physical_quote';
+        $validated['show_customer_profile'] = $request->boolean('show_customer_profile');
 
         $items = $hasItems ? ($validated['items'] ?? []) : [];
         if ($hasItems) {
@@ -138,7 +154,9 @@ class QuoteRequestController extends Controller
         if ($quoteRequest->user_id !== $request->user()->id) {
             abort(403);
         }
-        $quoteRequest->load(['category', 'quotes.vendor', 'items.category', 'items.product', 'items.files']);
+        $quoteRequest->load(['category', 'quotes' => fn ($q) => $q->whereIn('status', ['pending', 'selected', 'rejected'])->with('vendor'), 'items.category', 'items.product', 'items.files']);
+        // Müşteri yalnızca teklif vermiş satıcıları görür
+        $quoteRequest->setRelation('quotes', $quoteRequest->quotes);
         return view('quote-requests.show', compact('quoteRequest'));
     }
 
@@ -173,6 +191,7 @@ class QuoteRequestController extends Controller
             'vendor_amount' => $vendorAmount,
             'paid_at' => now(),
             'commission_ready_at' => now()->addDays($waitDays),
+            'termin_due_at' => now()->addDays(max(1, (int) ($quote->delivery_days ?? 7))),
         ]);
 
         $order->items()->create([

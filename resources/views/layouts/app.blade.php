@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>@yield('title', __('ui.default_title'))</title>
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#ea580c">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -238,5 +241,7 @@
         </div>
     </footer>
 </div>
+@include('partials.review-prompt')
+@include('partials.pwa-install')
 </body>
 </html>

@@ -59,7 +59,7 @@ class Address extends Model
         return [
             'label' => ['nullable', 'string', 'max:50'],
             'full_name' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'max:32'],
+            'phone' => ['required', 'string', 'max:11', 'regex:/^[0-9]{10,11}$/'],
             'turkiye_district_id' => ['required', 'integer'],
             'turkiye_neighborhood_id' => ['required', 'integer'],
             'cadde' => ['nullable', 'string', 'max:120'],

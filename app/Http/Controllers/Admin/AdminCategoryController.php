@@ -9,16 +9,20 @@ use Illuminate\Support\Facades\Storage;
 
 class AdminCategoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Category::withCount('products')->with('parent')->orderBy('name')->paginate(20);
-        return view('admin.categories.index', compact('categories'));
+        $channel = $request->get('channel', 'physical_quote');
+        $categories = Category::withCount('products')->with('parent')
+            ->when($channel !== 'all', fn ($q) => $q->where('channel', $channel))
+            ->orderBy('name')->paginate(20)->withQueryString();
+        return view('admin.categories.index', compact('categories', 'channel'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        $parents = Category::whereNull('parent_id')->orderBy('name')->get();
-        return view('admin.categories.create', compact('parents'));
+        $channel = $request->get('channel', 'physical_quote');
+        $parents = Category::whereNull('parent_id')->where('channel', $channel)->orderBy('name')->get();
+        return view('admin.categories.create', compact('parents', 'channel'));
     }
 
     public function store(Request $request)
@@ -29,23 +33,28 @@ class AdminCategoryController extends Controller
             'description' => ['nullable', 'string'],
             'image' => ['nullable', 'image', 'max:2048'],
             'is_active' => ['boolean'],
+            'channel' => ['required', 'in:physical_quote,freelancer,tabela'],
+            'termin_days' => ['nullable', 'integer', 'min:0'],
             'delivery_days' => ['nullable', 'integer', 'min:0'],
             'requires_quote' => ['boolean'],
         ]);
         $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
         $validated['is_active'] = $request->boolean('is_active');
         $validated['requires_quote'] = $request->boolean('requires_quote');
+        $validated['termin_days'] = $validated['termin_days'] ?? $validated['delivery_days'] ?? null;
+        $validated['delivery_days'] = $validated['termin_days'];
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('categories', 'public');
         }
         Category::create($validated);
-        return redirect()->route('admin.categories.index')->with('success', 'Kategori eklendi.');
+        return redirect()->route('admin.categories.index', ['channel' => $validated['channel']])->with('success', 'Kategori eklendi.');
     }
 
     public function edit(Category $category)
     {
-        $parents = Category::whereNull('parent_id')->where('id', '!=', $category->id)->orderBy('name')->get();
-        return view('admin.categories.edit', compact('category', 'parents'));
+        $parents = Category::whereNull('parent_id')->where('id', '!=', $category->id)->where('channel', $category->channel ?? 'physical_quote')->orderBy('name')->get();
+        $channel = $category->channel ?? 'physical_quote';
+        return view('admin.categories.edit', compact('category', 'parents', 'channel'));
     }
 
     public function update(Request $request, Category $category)
@@ -56,12 +65,16 @@ class AdminCategoryController extends Controller
             'description' => ['nullable', 'string'],
             'image' => ['nullable', 'image', 'max:2048'],
             'is_active' => ['boolean'],
+            'channel' => ['required', 'in:physical_quote,freelancer,tabela'],
+            'termin_days' => ['nullable', 'integer', 'min:0'],
             'delivery_days' => ['nullable', 'integer', 'min:0'],
             'requires_quote' => ['boolean'],
         ]);
         $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
         $validated['is_active'] = $request->boolean('is_active');
         $validated['requires_quote'] = $request->boolean('requires_quote');
+        $validated['termin_days'] = $validated['termin_days'] ?? $validated['delivery_days'] ?? null;
+        $validated['delivery_days'] = $validated['termin_days'];
         if ($request->hasFile('image')) {
             if ($category->image) {
                 Storage::disk('public')->delete($category->image);
@@ -69,7 +82,7 @@ class AdminCategoryController extends Controller
             $validated['image'] = $request->file('image')->store('categories', 'public');
         }
         $category->update($validated);
-        return redirect()->route('admin.categories.index')->with('success', 'Kategori güncellendi.');
+        return redirect()->route('admin.categories.index', ['channel' => $validated['channel']])->with('success', 'Kategori güncellendi.');
     }
 
     public function destroy(Category $category)

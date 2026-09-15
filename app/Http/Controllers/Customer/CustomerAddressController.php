@@ -119,7 +119,7 @@ class CustomerAddressController extends Controller
             'invoice_type' => ['required', Rule::in(['individual', 'corporate'])],
             'invoice_full_name' => ['required', 'string', 'max:255'],
             'invoice_email' => ['required', 'email', 'max:190'],
-            'invoice_phone' => ['required', 'string', 'max:32'],
+            'invoice_phone' => ['required', 'string', 'max:11', 'regex:/^[0-9]{10,11}$/'],
             'invoice_company_name' => ['required_if:invoice_type,corporate', 'nullable', 'string', 'max:255'],
             'invoice_company_address' => ['required_if:invoice_type,corporate', 'nullable', 'string', 'max:255'],
             'invoice_tax_number' => ['required_if:invoice_type,corporate', 'nullable', 'string', 'max:16'],
