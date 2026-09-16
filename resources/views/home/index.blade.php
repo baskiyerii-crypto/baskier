@@ -8,13 +8,16 @@
             <div class="by-hero" data-hero-slider>
                 <div class="absolute inset-0">
                     <div class="by-hero-slide is-active" data-slide>
-                        <img class="h-full w-full object-cover" src="{{ asset('images/home/hero-slide-1.png') }}" alt="BaskıYeri">
+                        <img class="h-full w-full object-cover" src="{{ asset('images/home/hero-slide-1.png') }}" alt="Matbaa">
                     </div>
                     <div class="by-hero-slide" data-slide>
-                        <img class="h-full w-full object-cover" src="{{ asset('images/home/hero-slide-2.png') }}" alt="BaskıYeri">
+                        <img class="h-full w-full object-cover" src="{{ asset('images/home/hero-slide-2.png') }}" alt="Baskı">
                     </div>
                     <div class="by-hero-slide" data-slide>
-                        <img class="h-full w-full object-cover" src="{{ asset('images/home/hero-slide-3.png') }}" alt="BaskıYeri">
+                        <img class="h-full w-full object-cover" src="{{ asset('images/home/hero-slide-3.png') }}" alt="Tabela">
+                    </div>
+                    <div class="by-hero-slide" data-slide>
+                        <img class="h-full w-full object-cover" src="{{ asset('images/home/hero-slide-4.png') }}" alt="Tasarım">
                     </div>
                     <div class="absolute inset-0 by-hero-scrim"></div>
                 </div>
@@ -68,6 +71,7 @@
                         </div>
                         <div class="mt-5 flex items-center gap-2">
                             <button type="button" class="h-2.5 w-10 rounded-full bg-white/90" data-dot></button>
+                            <button type="button" class="h-2.5 w-2.5 rounded-full bg-white/40" data-dot></button>
                             <button type="button" class="h-2.5 w-2.5 rounded-full bg-white/40" data-dot></button>
                             <button type="button" class="h-2.5 w-2.5 rounded-full bg-white/40" data-dot></button>
                         </div>
