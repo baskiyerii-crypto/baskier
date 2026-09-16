@@ -8,13 +8,13 @@
             <div class="by-hero" data-hero-slider>
                 <div class="absolute inset-0">
                     <div class="by-hero-slide is-active" data-slide>
-                        <img class="h-full w-full object-cover" src="https://picsum.photos/1800/1000?random=hero1" alt="BaskıYeri">
+                        <img class="h-full w-full object-cover" src="{{ asset('images/home/hero-slide-1.png') }}" alt="BaskıYeri">
                     </div>
                     <div class="by-hero-slide" data-slide>
-                        <img class="h-full w-full object-cover" src="https://picsum.photos/1800/1000?random=hero2" alt="BaskıYeri">
+                        <img class="h-full w-full object-cover" src="{{ asset('images/home/hero-slide-2.png') }}" alt="BaskıYeri">
                     </div>
                     <div class="by-hero-slide" data-slide>
-                        <img class="h-full w-full object-cover" src="https://picsum.photos/1800/1000?random=hero3" alt="BaskıYeri">
+                        <img class="h-full w-full object-cover" src="{{ asset('images/home/hero-slide-3.png') }}" alt="BaskıYeri">
                     </div>
                     <div class="absolute inset-0 by-hero-scrim"></div>
                 </div>
