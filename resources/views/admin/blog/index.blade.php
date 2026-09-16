@@ -13,7 +13,7 @@
     </form>
     <a href="{{ route('admin.blog.import') }}" class="btn btn-primary btn-sm">Excel/CSV içe aktar</a>
 </div>
-<div class="card overflow-hidden">
+<div class="card table-responsive">
     <table class="table mb-0">
         <thead><tr><th>Başlık</th><th>Kategori</th><th>Durum</th><th>AI</th><th>Tarih</th></tr></thead>
         <tbody>

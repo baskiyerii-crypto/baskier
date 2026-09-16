@@ -63,7 +63,7 @@
         <p class="small mb-2">Talep detayını (adres, iletişim) görmek ve teklif vermek için görüşme ücreti (₺{{ number_format(\App\Models\Setting::meetingFee(), 2, ',', '.') }}) bakiyenizden düşülür.</p>
         <form method="POST" action="{{ route('vendor.quote-requests.accept-meeting', $quoteRequest) }}">
             @csrf
-            <button type="submit" class="btn btn-success">Bu talebe gidiyorum / Teklif vereceğim</button>
+            <button type="submit" class="btn btn-success">Görüşme hakkı al · ₺{{ number_format(\App\Models\Setting::meetingFee(), 2, ',', '.') }}</button>
         </form>
     </div>
 @else
@@ -93,5 +93,5 @@
         </form>
     </div>
 @endif
-<a href="{{ route('vendor.quote-requests.index') }}" class="btn btn-outline-secondary btn-sm mt-3">← Listeye dön</a>
+<a href="{{ route($quoteRequest->request_type === 'freelancer' ? 'vendor.freelancer.index' : 'vendor.quote-requests.index') }}" class="btn btn-outline-secondary btn-sm mt-3">← Listeye dön</a>
 @endsection

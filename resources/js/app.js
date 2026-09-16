@@ -24,53 +24,91 @@ function initHeroSlider() {
     dots.forEach((dot, i) => dot.addEventListener('click', () => apply(i)));
 
     apply(0);
-    window.setInterval(() => apply(idx + 1), 6500);
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        window.setInterval(() => {
+            if (!document.hidden && !root.matches(':hover, :focus-within')) apply(idx + 1);
+        }, 6500);
+    }
+}
+
+function initNavigationDrawer({ panel, overlay, openButtons, closeButtons, root, mobileOnly = false }) {
+    if (!panel) return;
+    const media = window.matchMedia('(max-width: 991.98px)');
+    let opened = false;
+    let returnFocus = null;
+    const focusable = () => [...panel.querySelectorAll('a[href], button, input, select, textarea, [tabindex="0"]')]
+        .filter((node) => !node.disabled && node.getClientRects().length);
+    const setOpen = (next, restore = true) => {
+        opened = next;
+        const hidden = !opened && (!mobileOnly || media.matches);
+        panel.inert = hidden;
+        panel.setAttribute('aria-hidden', String(hidden));
+        if (root) {
+            root.inert = hidden;
+            root.setAttribute('aria-hidden', String(hidden));
+            root.classList.toggle('is-open', opened);
+        }
+        panel.classList.toggle('show', opened);
+        overlay?.classList.toggle('show', opened);
+        openButtons.forEach((button) => button.setAttribute('aria-expanded', String(opened)));
+        document.documentElement.classList.toggle('overflow-hidden', opened);
+        document.body.classList.toggle('overflow-hidden', opened);
+        if (opened) {
+            returnFocus = document.activeElement;
+            (focusable()[0] || panel).focus();
+        } else if (restore && returnFocus) {
+            returnFocus.focus();
+            returnFocus = null;
+        }
+    };
+    openButtons.forEach((button) => button.addEventListener('click', () => setOpen(true)));
+    closeButtons.forEach((button) => button.addEventListener('click', () => setOpen(false)));
+    overlay?.addEventListener('click', () => setOpen(false));
+    document.addEventListener('keydown', (event) => {
+        if (!opened) return;
+        if (event.key === 'Escape') setOpen(false);
+        if (event.key === 'Tab') {
+            const nodes = focusable();
+            const first = nodes[0] || panel;
+            const last = nodes[nodes.length - 1] || panel;
+            if (event.shiftKey && (document.activeElement === first || document.activeElement === panel)) {
+                event.preventDefault(); last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault(); first.focus();
+            }
+        }
+    });
+    panel.addEventListener('click', (event) => {
+        if (event.target.closest('a[href]') && opened) setOpen(false);
+    });
+    media.addEventListener('change', () => setOpen(false, false));
+    setOpen(false, false);
 }
 
 function initLeftDrawer() {
-    const drawer = document.querySelector('[data-left-drawer]');
-    if (!drawer) return;
-
-    const panel = drawer.querySelector('[data-left-drawer-panel]');
-    const overlay = drawer.querySelector('[data-left-drawer-overlay]');
-    const openBtns = Array.from(document.querySelectorAll('[data-left-drawer-open]'));
-    const closeBtns = Array.from(drawer.querySelectorAll('[data-left-drawer-close]'));
-
-    const setOpen = (open) => {
-        drawer.classList.toggle('is-open', open);
-        if (open) {
-            document.documentElement.classList.add('overflow-hidden');
-            document.body.classList.add('overflow-hidden');
-        } else {
-            document.documentElement.classList.remove('overflow-hidden');
-            document.body.classList.remove('overflow-hidden');
-        }
-    };
-
-    openBtns.forEach((btn) => btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        setOpen(true);
-    }));
-    closeBtns.forEach((btn) => btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        setOpen(false);
-    }));
-    overlay?.addEventListener('click', () => setOpen(false));
-
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') setOpen(false);
+    const root = document.querySelector('[data-left-drawer]');
+    initNavigationDrawer({
+        root,
+        panel: root?.querySelector('[data-left-drawer-panel]'),
+        overlay: root?.querySelector('[data-left-drawer-overlay]'),
+        openButtons: [...document.querySelectorAll('[data-left-drawer-open]')],
+        closeButtons: [...document.querySelectorAll('[data-left-drawer-close]')],
     });
-
-    panel?.addEventListener('click', (e) => {
-        const el = e.target;
-        if (el && el.tagName === 'A') setOpen(false);
+    initNavigationDrawer({
+        panel: document.querySelector('[data-panel-sidebar]'),
+        overlay: document.querySelector('[data-panel-backdrop]'),
+        openButtons: [...document.querySelectorAll('[data-panel-open]')],
+        closeButtons: [...document.querySelectorAll('[data-panel-close]')],
+        mobileOnly: true,
     });
+    document.querySelectorAll('nav a.active').forEach((link) => link.setAttribute('aria-current', 'page'));
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     initHeroSlider();
     initLeftDrawer();
     initPhoneInputs();
+    document.querySelector('[data-validation-summary]')?.focus();
 });
 
 function initPhoneInputs() {

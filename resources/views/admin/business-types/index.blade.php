@@ -7,7 +7,7 @@
     <p class="text-muted small mb-0">Pazaryerinde satıcıların bağlandığı iş kolu etiketleri (matbaa, tabela vb.).</p>
     <a href="{{ route('admin.business-types.create') }}" class="btn btn-primary btn-sm">Yeni iş kolu</a>
 </div>
-<div class="card overflow-hidden">
+<div class="card table-responsive">
     <table class="table table-hover mb-0">
         <thead>
             <tr>

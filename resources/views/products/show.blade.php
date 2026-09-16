@@ -18,11 +18,14 @@
 
         <div class="grid gap-6 lg:grid-cols-2">
             <div class="by-card overflow-hidden">
-                <div class="aspect-[4/3] bg-slate-100">
+                <div class="aspect-[4/3] bg-slate-100 flex items-center justify-center">
                     @if($product->main_image)
                         <img src="{{ asset('storage/'.$product->main_image) }}" alt="{{ $product->name }}" class="h-full w-full object-cover">
                     @else
-                        <img src="https://picsum.photos/1200/900?random=detay{{ $product->id }}" alt="{{ $product->name }}" class="h-full w-full object-cover">
+                        <div class="h-full w-full flex flex-col items-center justify-center text-slate-400 bg-slate-100/80 p-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mb-2 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                            <span class="text-sm font-medium text-slate-500">Görsel hazırlanıyor</span>
+                        </div>
                     @endif
                 </div>
             </div>
@@ -32,14 +35,12 @@
                     <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ $product->category?->name ?? 'Kategori' }}</p>
                     <h1 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">{{ $product->name }}</h1>
                     <div class="mt-4 flex flex-wrap items-center gap-3">
-                        <span class="rounded-full bg-orange-50 px-4 py-2 text-xl font-extrabold text-orange-900">
+                        <span class="rounded-full bg-orange-50 px-4 py-2 text-xl font-extrabold text-orange-900" id="product-display-price" data-base-price="{{ (float) $product->price }}">
                             ₺{{ number_format($product->price, 2, ',', '.') }}
                         </span>
-                        @if($product->stock > 0)
-                            <span class="by-badge border-emerald-200 bg-emerald-50 text-emerald-800">Stokta</span>
-                        @else
-                            <span class="by-badge">Stok yok</span>
-                        @endif
+                        <span id="product-display-stock" class="by-badge {{ $product->stock > 0 ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-slate-200 bg-slate-50 text-slate-600' }}" data-base-stock="{{ (int) $product->stock }}">
+                            {{ $product->stock > 0 ? 'Stokta (' . $product->stock . ' adet)' : 'Stok yok' }}
+                        </span>
                     </div>
 
                     @if($product->vendor)
@@ -83,11 +84,14 @@
                                 <input type="hidden" name="buy_now" id="buy_now_flag" value="0">
                                 @if($product->variants->isNotEmpty())
                                     <div>
-                                        <label class="text-xs font-semibold text-slate-600">Varyant</label>
-                                        <select name="variant_id" class="by-input mt-1 w-full">
+                                        <label class="text-xs font-semibold text-slate-600" for="variant-selector">Varyant Seçimi</label>
+                                        <select name="variant_id" id="variant-selector" class="by-input mt-1 w-full">
                                             @foreach($product->variants as $variant)
                                                 @php $variantPrice = (float) $product->price + (float) $variant->price_adjustment; @endphp
-                                                <option value="{{ $variant->id }}">
+                                                <option value="{{ $variant->id }}"
+                                                        data-price="{{ $variantPrice }}"
+                                                        data-stock="{{ (int) $variant->stock }}"
+                                                        @selected($loop->first)>
                                                     {{ $variant->name }} — ₺{{ number_format($variantPrice, 2, ',', '.') }} (Stok: {{ $variant->stock }})
                                                 </option>
                                             @endforeach
@@ -97,7 +101,7 @@
                                 <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
                                     <div class="w-full sm:w-28 shrink-0">
                                         <label class="text-xs font-semibold text-slate-600" for="product-qty">Adet</label>
-                                        <input id="product-qty" type="number" name="quantity" value="1" min="1" max="999"
+                                        <input id="product-qty" type="number" name="quantity" value="1" min="1" max="{{ $product->variants->first()?->stock ?? $product->stock }}"
                                                class="by-input mt-1 w-full min-h-[48px]">
                                     </div>
                                     <div class="flex-1">
@@ -115,7 +119,7 @@
                                 </button>
                             </form>
                             @if($product->stock > 0)
-                                <button type="button" class="by-btn-secondary" onclick="document.getElementById('buy_now_flag').value='1'; document.getElementById('product-buy-form').submit();">Hızlı satın al</button>
+                                <button type="button" id="btn-buy-now" class="by-btn-secondary" onclick="document.getElementById('buy_now_flag').value='1'; document.getElementById('product-buy-form').submit();">Hızlı satın al</button>
                             @endif
                         </div>
                     @else
@@ -153,7 +157,7 @@
         @auth
             <p class="mt-3 text-sm text-slate-600">
                 Satın aldığınız ürünü sipariş tesliminden sonra
-                <a href="{{ route('account.orders.index') }}">Siparişlerim</a>
+                <a href="{{ route('account.orders.index') }}" class="text-orange-600 hover:underline">Siparişlerim</a>
                 üzerinden puanlayabilirsiniz; sipariş başına tek değerlendirme kaydedilir.
             </p>
         @else
@@ -188,11 +192,14 @@
             <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 @foreach($alsoBought->take(4) as $item)
                     <a href="{{ route('products.show', $item->slug) }}" class="group by-card by-card-hover overflow-hidden">
-                        <div class="aspect-[4/3] bg-slate-100">
+                        <div class="aspect-[4/3] bg-slate-100 flex items-center justify-center">
                             @if($item->main_image)
                                 <img src="{{ asset('storage/'.$item->main_image) }}" alt="{{ $item->name }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
                             @else
-                                <img src="https://picsum.photos/800/600?random=beraber{{ $item->id }}" alt="{{ $item->name }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
+                                <div class="h-full w-full flex flex-col items-center justify-center text-slate-400 bg-slate-100 p-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mb-1 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                    <span class="text-xs text-slate-400">Görsel yok</span>
+                                </div>
                             @endif
                         </div>
                         <div class="p-4">
@@ -211,11 +218,14 @@
             <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 @foreach($related as $item)
                     <a href="{{ route('products.show', $item->slug) }}" class="group by-card by-card-hover overflow-hidden">
-                        <div class="aspect-[4/3] bg-slate-100">
+                        <div class="aspect-[4/3] bg-slate-100 flex items-center justify-center">
                             @if($item->main_image)
                                 <img src="{{ asset('storage/'.$item->main_image) }}" alt="{{ $item->name }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
                             @else
-                                <img src="https://picsum.photos/800/600?random=benzer{{ $item->id }}" alt="{{ $item->name }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
+                                <div class="h-full w-full flex flex-col items-center justify-center text-slate-400 bg-slate-100 p-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mb-1 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                    <span class="text-xs text-slate-400">Görsel yok</span>
+                                </div>
                             @endif
                         </div>
                         <div class="p-4">
@@ -228,5 +238,52 @@
         </div>
     @endif
     </div>
-@endsection
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const variantSelect = document.getElementById('variant-selector');
+            const priceEl = document.getElementById('product-display-price');
+            const stockEl = document.getElementById('product-display-stock');
+            const qtyInput = document.getElementById('product-qty');
+            const submitBtn = document.querySelector('#product-buy-form button[type="submit"]');
+            const buyNowBtn = document.getElementById('btn-buy-now');
+
+            function formatMoney(amount) {
+                return '₺' + Number(amount).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            function updateVariant() {
+                if (!variantSelect) return;
+                const opt = variantSelect.selectedOptions[0];
+                if (!opt) return;
+
+                const price = parseFloat(opt.dataset.price);
+                const stock = parseInt(opt.dataset.stock, 10);
+
+                if (priceEl && !isNaN(price)) {
+                    priceEl.textContent = formatMoney(price);
+                }
+
+                if (stockEl && !isNaN(stock)) {
+                    if (stock > 0) {
+                        stockEl.className = 'by-badge border-emerald-200 bg-emerald-50 text-emerald-800';
+                        stockEl.textContent = 'Stokta (' + stock + ' adet)';
+                        if (qtyInput) qtyInput.max = stock;
+                        if (submitBtn) submitBtn.disabled = false;
+                        if (buyNowBtn) buyNowBtn.disabled = false;
+                    } else {
+                        stockEl.className = 'by-badge border-red-200 bg-red-50 text-red-700';
+                        stockEl.textContent = 'Stok tükendi';
+                        if (submitBtn) submitBtn.disabled = true;
+                        if (buyNowBtn) buyNowBtn.disabled = true;
+                    }
+                }
+            }
+
+            if (variantSelect) {
+                variantSelect.addEventListener('change', updateVariant);
+                updateVariant();
+            }
+        });
+    </script>
+@endsection

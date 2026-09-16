@@ -12,7 +12,7 @@ class CustomerDashboardController extends Controller
     {
         $user = $request->user();
         $ordersCount = Order::where('user_id', $user->id)->count();
-        $cartCount = $user->cartItems()->count();
+        $cartCount = $user->cartItems()->sum('quantity');
         $favoritesCount = $user->favorites()->count();
 
         return view('customer.dashboard', compact('user', 'ordersCount', 'cartCount', 'favoritesCount'));

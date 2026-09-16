@@ -21,6 +21,12 @@ class OrderWorkflowService
                 OrderStatus::CANCELLED,
                 OrderStatus::DISPUTED,
             ],
+            'paid' => [
+                OrderStatus::DESIGN_REVIEW,
+                OrderStatus::IN_PRODUCTION,
+                OrderStatus::CANCELLED,
+                OrderStatus::DISPUTED,
+            ],
             OrderStatus::DESIGN_REVIEW => [
                 OrderStatus::IN_PRODUCTION,
                 OrderStatus::DISPUTED,

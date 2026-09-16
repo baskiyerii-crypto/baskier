@@ -12,11 +12,6 @@
         </div>
 
         <div class="by-card p-6 md:p-8">
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    @foreach ($errors->all() as $err) <div>{{ $err }}</div> @endforeach
-                </div>
-            @endif
 
             <form method="POST" action="{{ route('login') }}" class="mt-4 space-y-4">
                 @csrf

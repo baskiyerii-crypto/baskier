@@ -99,6 +99,7 @@ class VendorOrderWorkflowTest extends TestCase
         ]);
         $response->assertRedirect();
         $this->assertEquals(OrderStatus::READY_TO_SHIP, $order->fresh()->status);
+        $this->assertNull($order->fresh()->shipped_at, 'Creating a label does not mean the order has shipped.');
 
         // 3. Ready To Ship -> Shipped (Kargo Bilgileri ile)
         $response = $this->actingAs($user)->put(route('vendor.orders.update-status', $order), [
@@ -108,6 +109,7 @@ class VendorOrderWorkflowTest extends TestCase
         ]);
         $response->assertRedirect();
         $this->assertEquals(OrderStatus::SHIPPED, $order->fresh()->status);
+        $this->assertNotNull($order->fresh()->shipped_at);
 
         // Shipment kaydı oluşmuş mu kontrol et
         $shipment = Shipment::where('order_id', $order->id)->first();
@@ -302,8 +304,11 @@ class VendorOrderWorkflowTest extends TestCase
         $resPassive->assertSee('Logo Tasarım Paketi');
         $resPassive->assertDontSee('Özel Baskılı Koli');
 
-        // Create form view
-        $this->actingAs($user)->get(route('vendor.products.create'))->assertOk();
+        // Unverified vendors must complete verification before publishing products.
+        $this->actingAs($user)->get(route('vendor.products.create'))
+            ->assertRedirect(route('vendor.documents.index'));
+        $vendor->update(['verification_status' => 'verified']);
+        $this->actingAs($user->fresh())->get(route('vendor.products.create'))->assertOk();
     }
 
     public function test_vendor_payout_request_flow_and_overdraft_prevention(): void

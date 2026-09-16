@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen font-sans">
+<body class="storefront min-h-screen font-sans">
     <div class="min-h-screen flex flex-col">
         <header class="sticky top-0 z-50 border-b border-slate-200/70 bg-white/70 backdrop-blur">
             <div class="by-container py-4">
@@ -37,7 +37,7 @@
                     <nav class="p-2">
                         @php
                             $items = [
-                                ['label' => 'Özet', 'route' => 'customer.dashboard', 'match' => 'customer.dashboard'],
+                                ['label' => 'Özet', 'route' => auth()->user()->isAdmin() ? 'admin.dashboard' : (auth()->user()->isVendor() ? 'vendor.dashboard' : 'customer.dashboard'), 'match' => '*.dashboard'],
                                 ['label' => 'Siparişlerim', 'route' => 'account.orders.index', 'match' => 'account.orders.*'],
                                 ['label' => 'Sepet', 'route' => 'cart.index', 'match' => 'cart.*'],
                                 ['label' => 'Favorilerim', 'route' => 'favorites.index', 'match' => 'favorites.*'],
@@ -69,6 +69,7 @@
                     @if(session('success') && !request()->routeIs('account.adresler.index'))<div class="alert alert-success">{{ session('success') }}</div>@endif
                     @if(session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
                     @if(session('info'))<div class="alert alert-info">{{ session('info') }}</div>@endif
+                    @include('partials.validation-errors')
                     @yield('content')
                 </main>
             </div>

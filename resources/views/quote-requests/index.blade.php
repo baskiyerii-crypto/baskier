@@ -10,7 +10,7 @@
     @if($requests->isEmpty())
         <p class="text-muted">Henuz teklif talebiniz yok.</p>
     @else
-        <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+        <div class="card shadow-sm border-0 rounded-4 table-responsive">
             <table class="table table-hover mb-0">
                 <thead><tr><th>Baslik</th><th>Kategori</th><th>Durum</th><th>Tarih</th><th></th></tr></thead>
                 <tbody>

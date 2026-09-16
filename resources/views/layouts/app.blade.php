@@ -15,11 +15,11 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen font-sans">
+<body class="storefront min-h-screen font-sans">
 <div class="min-h-screen flex flex-col">
-    <div data-left-drawer class="fixed inset-0 z-[60] pointer-events-none">
+    <div data-left-drawer id="site-menu" inert aria-hidden="true" class="fixed inset-0 z-[60] pointer-events-none">
         <div data-left-drawer-overlay class="absolute inset-0 bg-slate-900/40 opacity-0 transition-opacity duration-200"></div>
-        <div data-left-drawer-panel class="absolute left-0 top-0 h-full w-[340px] max-w-[88vw] -translate-x-full transition-transform duration-200">
+        <div data-left-drawer-panel role="dialog" aria-modal="true" aria-label="Menü" tabindex="-1" class="absolute left-0 top-0 h-full w-[340px] max-w-[88vw] -translate-x-full transition-transform duration-200">
             <div class="h-full bg-white/95 backdrop-blur border-r border-slate-200 shadow-xl">
                 <div class="p-4 border-b border-slate-200/70 flex items-center justify-between gap-2">
                     <a href="{{ route('home') }}" class="flex items-center gap-2 text-sm font-extrabold tracking-tight text-slate-900">
@@ -114,7 +114,7 @@
 
     <header class="sticky top-0 z-50 border-b border-slate-200/70 bg-white/70 backdrop-blur">
         <div class="by-container py-4">
-            <div class="flex items-center justify-between gap-4">
+            <div class="storefront-header flex items-center justify-between gap-4">
                 <a href="{{ route('home') }}" class="flex items-center gap-2 text-sm font-extrabold tracking-tight text-slate-900">
                     <span class="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-cyan-400 text-white shadow-sm">B</span>
                     <span>BaskıYeri</span>
@@ -130,9 +130,9 @@
                 </form>
 
                 <div class="flex items-center gap-2">
-                    @include('partials.locale-switcher')
+                    <div class="hidden sm:block">@include('partials.locale-switcher')</div>
 
-                    <button type="button" data-left-drawer-open class="by-btn-secondary px-4 py-2.5">
+                    <button type="button" data-left-drawer-open aria-controls="site-menu" aria-expanded="false" class="by-btn-secondary px-4 py-2.5">
                         {{ __('ui.menu') }}
                     </button>
 
@@ -152,7 +152,7 @@
                         <a href="{{ route('cart.index') }}" class="by-btn-primary px-4 py-2.5">
                             {{ __('ui.cart') }}
                             <span class="rounded-full bg-white/20 px-2 py-0.5 text-xs font-bold">
-                                {{ auth()->user()->cartItems()->count() }}
+                                {{ auth()->user()->cartItems()->sum('quantity') }}
                             </span>
                         </a>
                     @else
@@ -183,11 +183,13 @@
                 <div class="by-card border-sky-200 bg-sky-50/70 p-4 text-sm text-sky-900">{{ session('info') }}</div>
             </div>
         @endif
+        <div class="by-container">@include('partials.validation-errors')</div>
         @yield('content')
     </main>
 
     <footer class="mt-16 border-t border-slate-200/70 bg-white/60 backdrop-blur">
         <div class="by-container py-12">
+            @unless(request()->routeIs('cart.*', 'checkout.*', 'login', 'register') || auth()->user()?->isVendor() || auth()->user()?->isAdmin())
             <div class="by-card by-gradient-border p-6 md:p-8 mb-10">
                 <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
@@ -206,6 +208,7 @@
                 </div>
             </div>
 
+            @endunless
             <div class="grid gap-8 md:grid-cols-4">
                 <div class="md:col-span-2">
                     <div class="flex items-center gap-2 text-base font-extrabold tracking-tight text-slate-900">
@@ -243,5 +246,6 @@
 </div>
 @include('partials.review-prompt')
 @include('partials.pwa-install')
+@stack('scripts')
 </body>
 </html>

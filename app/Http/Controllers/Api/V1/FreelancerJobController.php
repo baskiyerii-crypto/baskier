@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Domain\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\FreelancerJobBid;
 use App\Models\FreelancerJobListing;
@@ -114,7 +115,8 @@ class FreelancerJobController extends Controller
                 'contractor_user_id' => $bid->user_id,
                 'type' => 'freelancer',
                 'freelancer_job_id' => $job->id,
-                'status' => 'paid',
+                'status' => OrderStatus::CONFIRMED,
+                'payment_status' => 'paid',
                 'subtotal' => $subtotal,
                 'commission_rate' => $rate,
                 'commission_amount' => $commissionAmount,

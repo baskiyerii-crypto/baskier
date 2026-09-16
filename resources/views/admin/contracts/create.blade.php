@@ -14,11 +14,6 @@
     <div class="card p-3">
         <form method="POST" action="{{ route('admin.contracts.store') }}">
             @csrf
-            @if ($errors->any())
-                <div class="alert alert-danger small">
-                    @foreach($errors->all() as $e)<div>{{ $e }}</div>@endforeach
-                </div>
-            @endif
 
             @include('admin.contracts._form')
 

@@ -19,12 +19,6 @@
             @csrf
             @method('PUT')
 
-            @if ($errors->any())
-                <div class="alert alert-danger small">
-                    @foreach($errors->all() as $e)<div>{{ $e }}</div>@endforeach
-                </div>
-            @endif
-
             @include('admin.contracts._form', ['contract' => $contract])
 
             <div class="mt-3">

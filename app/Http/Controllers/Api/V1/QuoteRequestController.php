@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Domain\OrderStatus;
 use App\Http\Requests\Api\V1\QuoteRequestStoreRequest;
 use App\Models\Order;
 use App\Models\Quote;
@@ -62,7 +63,8 @@ class QuoteRequestController extends ApiController
             'vendor_id' => $quote->vendor_id,
             'type' => 'quote',
             'quote_id' => $quote->id,
-            'status' => 'paid',
+            'status' => OrderStatus::CONFIRMED,
+            'payment_status' => 'paid',
             'subtotal' => $subtotal,
             'commission_rate' => $rate,
             'commission_amount' => $commissionAmount,

@@ -5,7 +5,10 @@
 @section('content')
 <div class="content-shell py-4">
     <h1 class="h5 mb-4">Ödeme</h1>
-    <p class="small text-muted">Kart ödemesi iyzico üzerinden işlenir. API anahtarları tanımlı değilse sandbox/demo kaydı oluşur.</p>
+    <p class="small text-muted mb-4">Teslimat ve fatura bilgilerinizi kontrol edin, ardından ödeme yönteminizi seçin.</p>
+    @if(!app(\App\Services\PaymentService::class)->isConfigured() || app(\App\Services\PaymentService::class)->mode() !== 'live')
+        <div class="alert alert-warning mb-4" role="status">Kart ödemesi test modunda. Gerçek kart bilgilerinizi kullanmayın; bu modda gerçek tahsilat yapılmaz.</div>
+    @endif
 
     @if($items->isEmpty())
         <p><a href="{{ route('cart.index') }}">Sepete dön</a></p>
@@ -208,6 +211,7 @@
         const shippingRadios = Array.from(document.querySelectorAll('input[name="shipping_address_id"]'));
         const hiddenBillingInput = document.getElementById('billing-address-hidden');
         const useShippingCheckbox = document.getElementById('use-shipping-for-billing');
+        if (!useShippingCheckbox) return;
         const billingBox = document.getElementById('billing-address-box');
         const billingVisibleRadios = Array.from(document.querySelectorAll('.billing-visible-radio'));
         const invoiceTypeSelect = document.getElementById('invoice-type');
@@ -287,6 +291,7 @@
             if (!modalEl) return;
             modalEl.classList.remove('hidden');
             modalEl.classList.add('flex');
+            checkContractScroll();
         }
         function closeModal() {
             if (!modalEl) return;
@@ -297,15 +302,16 @@
             if (checkoutSubmit) checkoutSubmit.disabled = !(distanceCheckbox && distanceCheckbox.checked);
         }
 
-        if (distanceBody) {
-            distanceBody.addEventListener('scroll', function () {
+        function checkContractScroll() {
+            if (distanceBody) {
                 if (distanceBody.scrollTop + distanceBody.clientHeight >= distanceBody.scrollHeight - 8) {
                     scrolledToEnd = true;
                     if (confirmDistanceBtn) confirmDistanceBtn.disabled = false;
                     if (scrolledAtInput && !scrolledAtInput.value) scrolledAtInput.value = new Date().toISOString();
                 }
-            });
+            }
         }
+        distanceBody?.addEventListener('scroll', checkContractScroll);
         openDistanceBtn?.addEventListener('click', function (e) {
             e.preventDefault();
             openModal();

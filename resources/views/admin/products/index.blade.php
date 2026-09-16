@@ -29,7 +29,7 @@
         </div>
     </form>
 </div>
-<div class="card overflow-hidden">
+<div class="card table-responsive">
         <table class="table table-hover mb-0">
             <thead><tr><th>Ürün</th><th>Satıcı</th><th>Kategori</th><th>Fiyat</th><th>Stok</th><th></th></tr></thead>
             <tbody>

@@ -23,11 +23,21 @@ class CustomerOrderController extends Controller
         if ($order->user_id !== $request->user()->id) {
             abort(403);
         }
-        $order->load(['vendor', 'items.product', 'quote', 'contractor']);
-        $existingReview = $order->vendor->reviews()
-            ->where('user_id', $request->user()->id)
-            ->where('order_id', $order->id)
-            ->first();
+        $order->load([
+            'vendor',
+            'items.product',
+            'quote.quoteRequest',
+            'contractor',
+            'designApprovals' => fn ($q) => $q->latest('id'),
+            'latestShipment',
+            'shippingAddress',
+        ]);
+        $existingReview = $order->vendor
+            ? $order->vendor->reviews()
+                ->where('user_id', $request->user()->id)
+                ->where('order_id', $order->id)
+                ->first()
+            : null;
 
         $reviewProductChoices = $order->items
             ->filter(fn ($line) => $line->product_id !== null)

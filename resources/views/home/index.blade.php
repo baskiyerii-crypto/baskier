@@ -87,8 +87,8 @@
             </a>
             <a href="{{ route('quote-requests.create') }}" class="by-card by-card-hover p-6">
                 <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Teklif</p>
-                <p class="mt-2 text-lg font-bold tracking-tight text-slate-900">Özel iş için RFQ aç</p>
-                <p class="mt-2 text-sm text-slate-600">Kısa brief yaz, uygun satıcılar teklif versin.</p>
+                <p class="mt-2 text-lg font-bold tracking-tight text-slate-900">Özel üretim için teklif al</p>
+                <p class="mt-2 text-sm text-slate-600">İhtiyacınızı anlatın, uygun üreticilerin tekliflerini karşılaştırın.</p>
                 <p class="mt-4 text-sm font-semibold text-orange-600">Teklif al →</p>
             </a>
             <a href="{{ route('quote-requests.create', ['type' => 'freelancer']) }}" class="by-card by-card-hover p-6">

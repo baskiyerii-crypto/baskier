@@ -8,8 +8,10 @@
             <a href="{{ route('freelancer-jobs.index') }}" class="small text-decoration-none text-muted">← İş ilanları</a>
         </nav>
 
-        <div class="rounded-4 overflow-hidden shadow-sm mb-4" style="max-height:320px;">
-            <img src="https://picsum.photos/1200/500?random=job{{ $job->id }}" alt="{{ $job->title }}" class="w-100" style="object-fit:cover; height:320px;">
+        <div class="rounded-4 overflow-hidden shadow-sm mb-4 p-4 p-md-5 text-white" style="background: linear-gradient(135deg, #1e293b, #334155);">
+            <span class="badge bg-white/20 text-white border border-white/30 px-3 py-1.5 rounded-pill">{{ $job->category }}</span>
+            <h1 class="h3 fw-bold mt-2 mb-1 text-white">{{ $job->title }}</h1>
+            <p class="text-white/70 small mb-0">İlan No: #{{ $job->id }} · Yayınlanma: {{ $job->created_at->format('d.m.Y') }}</p>
         </div>
 
         <div class="row">

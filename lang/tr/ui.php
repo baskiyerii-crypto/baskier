@@ -36,6 +36,6 @@ return [
     'vendor_cta_body' => 'Satıcı hesabı oluşturup iş kolunu seçerek başvurunu tamamla.',
     'vendor_cta_primary' => 'Satıcı ol',
     'vendor_cta_secondary' => 'Satıcıları gör',
-    'tagline' => 'Matbaa, tabela, promosyon ve özel üretim işleriniz için modern pazaryeri + teklif (RFQ) platformu.',
+    'tagline' => 'Matbaa, tabela, promosyon ve özel üretim işleriniz için alışveriş ve teklif platformu.',
     'default_title' => 'BaskıYeri – Matbaa & Reklam Pazaryeri',
 ];

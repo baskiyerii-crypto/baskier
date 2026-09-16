@@ -51,7 +51,7 @@ class CartController extends Controller
             'variant_id' => $variant?->id,
         ]);
         $newQty = ($row->exists ? $row->quantity : 0) + $qty;
-        if ($availableStock < $newQty) {
+        if ($newQty > 999 || $availableStock < $newQty) {
             return back()->with('error', 'Sepetteki miktar stoku aşamaz.');
         }
         $row->quantity = $newQty;

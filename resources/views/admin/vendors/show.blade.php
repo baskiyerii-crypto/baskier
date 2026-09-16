@@ -71,7 +71,7 @@
                         <tr>
                             <td class="small">#{{ $o->order_number }}</td>
                             <td>₺{{ number_format($o->subtotal, 2, ',', '.') }}</td>
-                            <td>{{ $o->status }}</td>
+                            <td>{{ \App\Support\UiLabels::orderStatus($o->status) }}</td>
                             <td class="small">{{ optional($o->termin_due_at)->format('d.m.Y') ?? '—' }}</td>
                         </tr>
                     @endforeach

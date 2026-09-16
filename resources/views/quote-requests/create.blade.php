@@ -4,7 +4,7 @@
 <div class="by-container py-10">
     <div class="mx-auto max-w-[1200px]">
         <div class="by-card by-gradient-border p-6 md:p-8">
-            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Özel iş / RFQ</p>
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Özel üretim / Teklif talebi</p>
             <div class="mt-2 flex flex-wrap items-end justify-between gap-4">
                 <div>
                     <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">{{ ($type ?? '') === 'freelancer' ? 'Hizmet al' : 'Teklif al' }}</h1>
@@ -30,7 +30,7 @@
             <div class="mt-4 by-card border-emerald-200 bg-emerald-50/70 p-5 text-sm text-emerald-900">{{ session('success') }}</div>
         @endif
 
-        <div class="mt-6 grid gap-6 lg:grid-cols-[1fr,360px]">
+        <div class="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
             <div class="by-card p-6 md:p-8">
                 <form method="POST" action="{{ route('quote-requests.store') }}" class="space-y-6" enctype="multipart/form-data">
                 @csrf

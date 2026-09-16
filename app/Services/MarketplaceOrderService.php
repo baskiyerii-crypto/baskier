@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Domain\OrderStatus;
 use App\Models\Address;
 use App\Models\CartItem;
 use App\Models\Order;
@@ -51,7 +52,8 @@ class MarketplaceOrderService
                     'type' => 'product',
                     'quote_id' => null,
                     'freelancer_job_id' => null,
-                    'status' => 'paid',
+                    'status' => OrderStatus::CONFIRMED,
+                    'payment_status' => 'paid',
                     'payment_method' => $paymentData['payment_method'] ?? 'credit_card',
                     'subtotal' => $subtotal,
                     'commission_rate' => $rate,

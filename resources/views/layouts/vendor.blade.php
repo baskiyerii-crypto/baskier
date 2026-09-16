@@ -78,17 +78,17 @@
     </style>
 </head>
 <body class="min-h-screen">
-<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+<div class="panel-backdrop" data-panel-backdrop></div>
 <div class="vendor-shell">
-    <aside class="vendor-sidebar" id="vendorSidebar">
+    <aside class="vendor-sidebar" id="panel-sidebar" data-panel-sidebar tabindex="-1" aria-label="Satıcı menüsü">
         <div class="brand d-flex justify-content-between align-items-center">
             <a href="{{ route('vendor.dashboard') }}">Baskı<span class="accent">Yeri</span> <span class="accent">Satıcı</span></a>
-            <button type="button" class="btn-close d-lg-none" onclick="toggleSidebar()"></button>
+            <button type="button" class="panel-close-button" data-panel-close aria-label="Menüyü kapat">×</button>
         </div>
-        <nav class="nav">
+        <nav class="nav" aria-label="Panel menüsü">
             <a href="{{ route('vendor.dashboard') }}" class="nav-link {{ request()->routeIs('vendor.dashboard') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
-                <span>Özet & Dashboard</span>
+                <span>Genel bakış</span>
             </a>
             <a href="{{ route('vendor.orders.index') }}" class="nav-link {{ request()->routeIs('vendor.orders.*') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
@@ -103,13 +103,13 @@
                 <span>Belgeler</span>
             </a>
             @if(auth()->user()->vendor?->hasActiveQuotesModule())
-            <a href="{{ route('vendor.quote-requests.index') }}" class="nav-link {{ request()->routeIs('vendor.quote-requests.*') ? 'active' : '' }}">
+            <a href="{{ route('vendor.quote-requests.index') }}" class="nav-link {{ request()->routeIs('vendor.quote-requests.*') && request()->route('quoteRequest')?->request_type !== 'freelancer' ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                 <span>Toplu üretim / Teklifler</span>
             </a>
             @endif
             @if(auth()->user()->vendor?->hasActiveFreelancerModule())
-            <a href="{{ route('vendor.freelancer.index') }}" class="nav-link {{ request()->routeIs('vendor.freelancer.*') ? 'active' : '' }}">
+            <a href="{{ route('vendor.freelancer.index') }}" class="nav-link {{ request()->routeIs('vendor.freelancer.*') || request()->route('quoteRequest')?->request_type === 'freelancer' ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
                 <span>Freelancerım</span>
             </a>
@@ -167,13 +167,13 @@
     <main class="vendor-main">
         <header class="vendor-header">
             <div class="d-flex align-items-center gap-2">
-                <button type="button" class="btn btn-sm btn-outline-secondary d-lg-none" onclick="toggleSidebar()">
+                <button type="button" class="panel-menu-button" data-panel-open aria-controls="panel-sidebar" aria-expanded="false" aria-label="Menüyü aç">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
                 </button>
                 <h1 class="page-title mb-0">@yield('title', 'Panel')</h1>
             </div>
             <div class="user-menu">
-                <a href="{{ route('home') }}" target="_blank">Pazaryerine Git ↗</a>
+                <a href="{{ route('home') }}" target="_blank" rel="noopener">Pazaryerine Git ↗</a>
                 <span class="sep"></span>
                 <span class="text-muted small fw-medium">{{ auth()->user()->name ?? '' }}</span>
                 <form method="POST" action="{{ route('logout') }}" class="d-inline">@csrf
@@ -184,17 +184,13 @@
         <div class="vendor-content">
             @if(session('success'))<div class="alert alert-success alert-dismissible fade show small mb-3" role="alert">{{ session('success') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>@endif
             @if(session('error'))<div class="alert alert-danger alert-dismissible fade show small mb-3" role="alert">{{ session('error') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>@endif
+            @include('partials.validation-errors')
             @yield('content')
         </div>
     </main>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    function toggleSidebar() {
-        document.getElementById('vendorSidebar').classList.toggle('show');
-        document.getElementById('sidebarBackdrop').classList.toggle('show');
-    }
-</script>
+@stack('scripts')
 @include('partials.pwa-install')
 </body>
 </html>

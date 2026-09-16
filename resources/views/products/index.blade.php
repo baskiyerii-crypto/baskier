@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="by-container py-6">
-        <div class="grid gap-6 lg:grid-cols-[320px,1fr]">
+        <div class="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
             <aside class="by-card by-card-hover overflow-hidden">
                 <div class="relative">
                     <div class="h-28 bg-gradient-to-br from-orange-400/20 via-white to-indigo-500/10"></div>
@@ -24,13 +24,13 @@
                                 <span class="by-badge">→</span>
                             </a>
                             @foreach($categories as $category)
-                                <a href="{{ route('products.index', ['category_id' => $category->id]) }}"
+                                <a href="{{ route('products.index', array_merge(request()->only('q', 'type'), ['category_id' => $category->id])) }}"
                                    class="flex items-center justify-between rounded-xl px-3 py-2 text-sm {{ (int) request('category_id') === $category->id ? 'bg-orange-50 text-orange-900 border border-orange-200 font-semibold' : 'text-slate-700 hover:bg-slate-50' }}">
                                     <span class="truncate">{{ $category->name }}</span>
                                     <span class="text-slate-400">›</span>
                                 </a>
                                 @foreach($category->children as $child)
-                                    <a href="{{ route('products.index', ['category_id' => $child->id]) }}"
+                                    <a href="{{ route('products.index', array_merge(request()->only('q', 'type'), ['category_id' => $child->id])) }}"
                                        class="ml-3 flex items-center justify-between rounded-xl px-3 py-2 text-sm {{ (int) request('category_id') === $child->id ? 'bg-orange-50 text-orange-900 border border-orange-200 font-semibold' : 'text-slate-600 hover:bg-slate-50' }}">
                                         <span class="truncate">{{ $child->name }}</span>
                                     </a>
@@ -41,7 +41,7 @@
                 </div>
             </aside>
 
-            <section>
+            <section class="min-w-0">
                 <div class="by-card p-5 md:p-6">
                     <div class="flex flex-wrap items-end justify-between gap-4">
                         <div>
@@ -86,14 +86,14 @@
                                         @if($product->main_image)
                                             <img src="{{ asset('storage/'.$product->main_image) }}" alt="{{ $product->name }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
                                         @else
-                                            <img src="https://picsum.photos/800/600?random=liste{{ $product->id ?? $loop->index }}" alt="{{ $product->name }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
+                                            <div class="h-full flex items-center justify-center text-sm text-slate-500">Ürün görseli hazırlanıyor</div>
                                         @endif
                                     </div>
                                     <div class="p-4">
-                                        <div class="flex items-start justify-between gap-3">
+                                        <div class="flex flex-wrap items-start justify-between gap-3">
                                             <div class="min-w-0">
                                                 <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ $product->category?->name ?? 'Kategori' }}</p>
-                                                <p class="mt-1 truncate text-sm font-semibold text-slate-900">{{ $product->name }}</p>
+                                                <p class="mt-1 text-sm font-semibold text-slate-900">{{ $product->name }}</p>
                                                 <p class="mt-1 text-xs text-slate-500">{{ $product->vendor?->name ?? 'Satıcı' }}</p>
                                             </div>
                                             <span class="rounded-full bg-orange-50 px-3 py-1 text-sm font-bold text-orange-900">

@@ -12,12 +12,12 @@ use Illuminate\Support\Facades\DB;
 
 class VendorQuoteRequestController extends Controller
 {
-    private function ensureQuotesModuleEnabled($vendor)
+    private function ensureQuotesModuleEnabled($vendor, ?QuoteRequest $quoteRequest = null)
     {
-        if (! $vendor->hasActiveQuotesModule()) {
+        if (! app(\App\Services\VendorQuoteAccess::class)->moduleEnabled($vendor, $quoteRequest)) {
             return redirect()
                 ->route('vendor.subscriptions.index')
-                ->with('error', 'Teklif verme modülü pasif. Önce abonelikten aktif edin.');
+                ->with('error', 'Bu talep için gerekli abonelik aktif değil. Aboneliklerinizi kontrol edin.');
         }
 
         return null;
@@ -62,18 +62,10 @@ class VendorQuoteRequestController extends Controller
     public function show(Request $request, QuoteRequest $quoteRequest)
     {
         $vendor = $this->getVendor($request);
-        if ($response = $this->ensureQuotesModuleEnabled($vendor)) {
+        if ($response = $this->ensureQuotesModuleEnabled($vendor, $quoteRequest)) {
             return $response;
         }
-        $categoryIds = $vendor->quoteCategories()->pluck('categories.id');
-        if ($categoryIds->isEmpty()) {
-            $categoryIds = $vendor->products()->pluck('category_id')->unique();
-        }
-        $allowed = $categoryIds->contains($quoteRequest->category_id)
-            || $quoteRequest->items()->whereIn('category_id', $categoryIds)->exists();
-        if (! $allowed) {
-            abort(403, 'Bu kategoriye teklif veremezsiniz.');
-        }
+        abort_unless(app(\App\Services\VendorQuoteAccess::class)->categoryAllowed($vendor, $quoteRequest), 403, 'Bu kategoriye teklif veremezsiniz.');
         $quoteRequest->load([
             'category',
             'user',
@@ -90,8 +82,12 @@ class VendorQuoteRequestController extends Controller
     public function acceptMeeting(Request $request, QuoteRequest $quoteRequest)
     {
         $vendor = $this->getVendor($request);
-        if ($response = $this->ensureQuotesModuleEnabled($vendor)) {
+        if ($response = $this->ensureQuotesModuleEnabled($vendor, $quoteRequest)) {
             return $response;
+        }
+        abort_unless(app(\App\Services\VendorQuoteAccess::class)->categoryAllowed($vendor, $quoteRequest), 403, 'Bu kategoriye teklif veremezsiniz.');
+        if (! $quoteRequest->isOpen()) {
+            return back()->with('error', 'Bu talep kapanmış. Açık talepleri inceleyebilirsiniz.');
         }
         $fee = Setting::meetingFee();
         if ($vendor->balance < $fee) {
@@ -122,8 +118,12 @@ class VendorQuoteRequestController extends Controller
     public function submitQuote(Request $request, QuoteRequest $quoteRequest)
     {
         $vendor = $this->getVendor($request);
-        if ($response = $this->ensureQuotesModuleEnabled($vendor)) {
+        if ($response = $this->ensureQuotesModuleEnabled($vendor, $quoteRequest)) {
             return $response;
+        }
+        abort_unless(app(\App\Services\VendorQuoteAccess::class)->categoryAllowed($vendor, $quoteRequest), 403, 'Bu kategoriye teklif veremezsiniz.');
+        if (! $quoteRequest->isOpen()) {
+            return back()->with('error', 'Bu talep kapanmış. Açık talepleri inceleyebilirsiniz.');
         }
         if (! QuoteMeetingCharge::where('quote_request_id', $quoteRequest->id)->where('vendor_id', $vendor->id)->exists()) {
             return back()->with('error', 'Once bu talebe gorusme hakki almalisiniz.');

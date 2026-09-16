@@ -5,7 +5,7 @@
 @section('content')
 <div class="content-shell py-4">
     <h1 class="h5 mb-4">İlanlarım</h1>
-    <div class="bg-white rounded-4 shadow-sm overflow-hidden">
+    <div class="bg-white rounded-4 shadow-sm table-responsive">
         <table class="table table-hover mb-0 small">
             <thead><tr><th>Başlık</th><th>Durum</th><th>Teklif</th><th></th></tr></thead>
             <tbody>

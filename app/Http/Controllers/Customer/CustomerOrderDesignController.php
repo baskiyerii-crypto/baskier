@@ -17,7 +17,9 @@ class CustomerOrderDesignController extends Controller
         if ($order->user_id !== $request->user()->id) {
             abort(403);
         }
-        $this->authorize('designRespond', $order);
+        if (! $request->user()->can('designRespond', $order)) {
+            abort(403);
+        }
         if ((int) $designApproval->order_id !== (int) $order->id) {
             abort(404);
         }
@@ -41,7 +43,9 @@ class CustomerOrderDesignController extends Controller
         if ($order->user_id !== $request->user()->id) {
             abort(403);
         }
-        $this->authorize('designRespond', $order);
+        if (! $request->user()->can('designRespond', $order)) {
+            abort(403);
+        }
         if ((int) $designApproval->order_id !== (int) $order->id) {
             abort(404);
         }

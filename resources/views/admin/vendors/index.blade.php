@@ -7,7 +7,7 @@
     <span></span>
     <a href="{{ route('admin.vendors.create') }}" class="btn btn-primary btn-sm">Yeni Satıcı</a>
 </div>
-<div class="card overflow-hidden">
+<div class="card table-responsive">
         <table class="table table-hover mb-0">
             <thead><tr><th>Ad</th><th>İş kolu</th><th>E-posta</th><th>Ürün</th><th>Risk</th><th>Modüller</th><th>Durum</th><th></th></tr></thead>
             <tbody>

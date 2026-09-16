@@ -1,6 +1,6 @@
 @extends('layouts.vendor')
 
-@section('title', 'Özet & Dashboard')
+@section('title', 'Genel bakış')
 
 @section('content')
 @php

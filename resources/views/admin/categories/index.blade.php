@@ -11,7 +11,7 @@
     </div>
     <a href="{{ route('admin.categories.create', ['channel' => $channel ?? 'physical_quote']) }}" class="btn btn-primary btn-sm">Yeni Kategori</a>
 </div>
-<div class="card overflow-hidden">
+<div class="card table-responsive">
         <table class="table table-hover mb-0">
             <thead><tr><th>Ad</th><th>Kanal</th><th>Termin (gün)</th><th>Üst</th><th>Ürün</th><th>Durum</th><th></th></tr></thead>
             <tbody>

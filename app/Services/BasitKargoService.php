@@ -69,7 +69,6 @@ class BasitKargoService
             'tracking_number' => $tracking,
             'shipping_label_path' => $labelPath,
             'carrier_code' => $carrierCode,
-            'shipped_at' => $order->shipped_at ?: now(),
         ]);
 
         return $order->fresh();

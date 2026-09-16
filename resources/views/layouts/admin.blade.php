@@ -172,15 +172,17 @@
     </style>
 </head>
 <body class="min-h-screen">
+<div class="panel-backdrop" data-panel-backdrop></div>
 <div class="admin-shell">
-    <aside class="admin-sidebar">
-        <div class="brand">
+    <aside class="admin-sidebar" id="panel-sidebar" data-panel-sidebar tabindex="-1" aria-label="Yönetim menüsü">
+        <div class="brand d-flex align-items-center justify-content-between">
             <a href="{{ route('admin.dashboard') }}">Baskı<span class="accent">Yeri</span> <span class="accent">Admin</span></a>
+            <button type="button" class="panel-close-button" data-panel-close aria-label="Menüyü kapat">×</button>
         </div>
-        <nav class="nav">
+        <nav class="nav" aria-label="Panel menüsü">
             <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
-                <span>Dashboard</span>
+                <span>Genel bakış</span>
             </a>
             <a href="{{ route('admin.categories.index') }}" class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
@@ -222,6 +224,8 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
                 <span>Sözleşmeler</span>
             </a>
+            <a href="{{ route('admin.support-tickets.index') }}" class="nav-link {{ request()->routeIs('admin.support-tickets.*') ? 'active' : '' }}"><span>Destek talepleri</span></a>
+            <a href="{{ route('admin.vendor-payout-requests.index') }}" class="nav-link {{ request()->routeIs('admin.vendor-payout-requests.*') ? 'active' : '' }}"><span>Ödeme talepleri</span></a>
         </nav>
         <div class="user-footer">
             <form method="POST" action="{{ route('logout') }}" class="d-inline w-100">
@@ -235,9 +239,10 @@
     </aside>
     <main class="admin-main">
         <header class="admin-header">
+            <button type="button" class="panel-menu-button" data-panel-open aria-controls="panel-sidebar" aria-expanded="false">Menü</button>
             <h1 class="page-title mb-0">@yield('title', 'Yönetim')</h1>
             <div class="user-menu">
-                <a href="{{ route('home') }}" target="_blank">Siteyi görüntüle</a>
+                <a href="{{ route('home') }}" target="_blank" rel="noopener">Siteyi görüntüle</a>
                 <span class="sep"></span>
                 <span class="text-muted small">{{ auth()->user()->name ?? '' }}</span>
                 <form method="POST" action="{{ route('logout') }}" class="d-inline">
@@ -249,6 +254,7 @@
         <div class="admin-content">
             @if(session('success'))<div class="alert alert-success alert-dismissible fade show small" role="alert">{{ session('success') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>@endif
             @if(session('error'))<div class="alert alert-danger alert-dismissible fade show small" role="alert">{{ session('error') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>@endif
+            @include('partials.validation-errors')
             @yield('content')
         </div>
     </main>

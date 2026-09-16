@@ -2,7 +2,7 @@
     <div class="flex items-center justify-between gap-3">
         <div>
             <p class="text-sm font-semibold text-slate-900">Uygulamayı ana ekrana ekle</p>
-            <p class="text-xs text-slate-500">Daha hızlı erişim ve bildirimler için PWA olarak kurun.</p>
+            <p class="text-xs text-slate-500">BaskıYeri’ne ana ekranınızdan kolayca ulaşın.</p>
         </div>
         <div class="flex gap-2">
             <button type="button" id="pwa-dismiss" class="rounded-xl border px-3 py-2 text-xs">Sonra</button>
