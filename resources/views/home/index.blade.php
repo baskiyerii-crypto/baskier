@@ -80,7 +80,7 @@
     <section class="by-container -mt-2">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
             <a href="{{ route('products.index') }}" class="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-900 shadow-lg shadow-slate-900/10 transition hover:-translate-y-1 hover:shadow-xl">
-                <img src="https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=1200&q=80" alt="{{ __('home.path_ready_title') }}" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
+                <img src="{{ asset('images/home/path-ready-products.png') }}" alt="{{ __('home.path_ready_title') }}" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/55 to-indigo-900/25"></div>
                 <div class="relative flex min-h-[240px] flex-col justify-end p-6 sm:min-h-[280px]">
                     <span class="inline-flex w-fit rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white/90 backdrop-blur">{{ __('home.path_ready_eyebrow') }}</span>
@@ -90,7 +90,7 @@
                 </div>
             </a>
             <a href="{{ route('quote-requests.create', ['type' => 'physical_quote']) }}" class="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-900 shadow-lg shadow-slate-900/10 transition hover:-translate-y-1 hover:shadow-xl">
-                <img src="https://images.unsplash.com/photo-1562654501-a0ccc0d62da1?auto=format&fit=crop&w=1200&q=80" alt="{{ __('home.path_quote_title') }}" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
+                <img src="{{ asset('images/home/path-print-rfq.png') }}" alt="{{ __('home.path_quote_title') }}" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-orange-950/55 to-amber-700/20"></div>
                 <div class="relative flex min-h-[240px] flex-col justify-end p-6 sm:min-h-[280px]">
                     <span class="inline-flex w-fit rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white/90 backdrop-blur">{{ __('home.path_quote_eyebrow') }}</span>
@@ -100,7 +100,7 @@
                 </div>
             </a>
             <a href="{{ route('quote-requests.create', ['type' => 'tabela']) }}" class="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-900 shadow-lg shadow-slate-900/10 transition hover:-translate-y-1 hover:shadow-xl">
-                <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80" alt="{{ __('home.path_tabela_title') }}" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
+                <img src="{{ asset('images/home/path-tabela.png') }}" alt="{{ __('home.path_tabela_title') }}" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-rose-950/50 to-fuchsia-800/20"></div>
                 <div class="relative flex min-h-[240px] flex-col justify-end p-6 sm:min-h-[280px]">
                     <span class="inline-flex w-fit rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white/90 backdrop-blur">{{ __('home.path_tabela_eyebrow') }}</span>
@@ -110,7 +110,7 @@
                 </div>
             </a>
             <a href="{{ route('freelancer-jobs.create') }}" class="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-900 shadow-lg shadow-slate-900/10 transition hover:-translate-y-1 hover:shadow-xl">
-                <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80" alt="{{ __('home.path_freelancer_title') }}" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
+                <img src="{{ asset('images/home/path-freelancer.png') }}" alt="{{ __('home.path_freelancer_title') }}" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-emerald-950/50 to-teal-700/20"></div>
                 <div class="relative flex min-h-[240px] flex-col justify-end p-6 sm:min-h-[280px]">
                     <span class="inline-flex w-fit rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white/90 backdrop-blur">{{ __('home.path_freelancer_eyebrow') }}</span>
