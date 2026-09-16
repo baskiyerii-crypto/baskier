@@ -223,12 +223,9 @@
 
     <header class="sticky top-0 z-50 border-b border-slate-200/70 bg-white/70 backdrop-blur">
         <div class="by-container py-3 md:py-4">
-            {{-- Mobile: menu | brand | lang + cart --}}
-            <div class="grid grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-2 md:hidden">
-                <label for="site-menu-toggle" class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 cursor-pointer" aria-label="{{ __('ui.menu') }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-                </label>
-                <div class="flex min-w-0 items-center justify-center overflow-hidden px-1">
+            {{-- Mobile: brand (left) | lang + login — menu is in bottom dock --}}
+            <div class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 md:hidden">
+                <div class="flex min-w-0 items-center justify-start overflow-hidden">
                     @include('partials.platform-brand', ['compact' => true, 'forceName' => true, 'mobileHeader' => true, 'brandHref' => route('home')])
                 </div>
                 <div class="flex shrink-0 items-center justify-end gap-1.5">
