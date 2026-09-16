@@ -1,5 +1,5 @@
-/* Network-first shell: never block the live site behind a dead cache. */
-const CACHE = 'baskiyeri-shell-v2';
+/* v3: never cache error/503 pages; network-first for HTML */
+const CACHE = 'baskiyeri-shell-v3';
 const ASSETS = ['/manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {
@@ -11,20 +11,29 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
-    )
+    (async () => {
+      const keys = await caches.keys();
+      await Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)));
+      await self.clients.claim();
+    })()
   );
-  self.clients.claim();
 });
+
+function shouldCache(response) {
+  return response && response.ok && response.type === 'basic';
+}
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
-  const url = new URL(event.request.url);
+  let url;
+  try {
+    url = new URL(event.request.url);
+  } catch {
+    return;
+  }
   if (url.origin !== self.location.origin) return;
 
-  // HTML navigations: always try network first (avoids stale "offline" shells).
   const isNavigate = event.request.mode === 'navigate'
     || (event.request.headers.get('accept') || '').includes('text/html');
 
@@ -32,21 +41,29 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(event.request)
         .then((res) => {
-          const copy = res.clone();
-          caches.open(CACHE).then((cache) => cache.put(event.request, copy)).catch(() => {});
+          if (shouldCache(res)) {
+            const copy = res.clone();
+            caches.open(CACHE).then((cache) => cache.put(event.request, copy)).catch(() => {});
+          }
           return res;
         })
-        .catch(() => caches.match(event.request).then((cached) => cached || caches.match('/')))
+        .catch(async () => {
+          const cached = await caches.match(event.request);
+          if (cached && cached.ok) return cached;
+          return new Response(
+            '<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Bağlantı yok</title><body style="font-family:sans-serif;padding:2rem"><h1>Sunucuya ulaşılamıyor</h1><p>Wi‑Fi / mobil veriyi deneyin veya site verilerini temizleyip yenileyin.</p></body>',
+            { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+          );
+        })
     );
     return;
   }
 
-  // Static assets: cache, then network
   event.respondWith(
     caches.match(event.request).then((cached) => {
       const fetched = fetch(event.request)
         .then((res) => {
-          if (res && res.ok) {
+          if (shouldCache(res)) {
             const copy = res.clone();
             caches.open(CACHE).then((cache) => cache.put(event.request, copy)).catch(() => {});
           }
