@@ -59,4 +59,8 @@ return [
     'vendors_body' => 'Filter by business type and browse vendor profiles.',
     'business_type' => 'Business type',
     'clear' => 'Clear',
+    'contact' => 'Contact',
+    'contact_title' => 'Contact us',
+    'contact_body' => 'Platform contact details are listed below.',
+    'contact_empty' => 'Contact details are not set yet. Add them in admin settings.',
 ];

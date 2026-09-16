@@ -33,6 +33,7 @@ use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\QuoteRequestController;
+use App\Http\Controllers\VendorController;
 use App\Http\Controllers\Vendor\VendorBalanceController;
 use App\Http\Controllers\Vendor\VendorDashboardController;
 use App\Http\Controllers\Vendor\VendorDocumentController;
@@ -66,6 +67,7 @@ Route::get('/satici/{slug}', [VendorController::class, 'show'])->name('vendors.s
 Route::get('/gizlilik', [PageController::class, 'privacy'])->name('pages.privacy');
 Route::get('/kullanim-kosullari', [PageController::class, 'terms'])->name('pages.terms');
 Route::get('/hakkimizda', [PageController::class, 'about'])->name('pages.about');
+Route::get('/iletisim', [PageController::class, 'contact'])->name('pages.contact');
 Route::get('/sozlesme/{key}', [ContractController::class, 'show'])->name('contracts.show');
 
 Route::get('/is-ilanlari', [FreelancerJobController::class, 'index'])->name('freelancer-jobs.index');

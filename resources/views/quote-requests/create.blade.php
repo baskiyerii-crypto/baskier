@@ -1,9 +1,14 @@
 @extends('layouts.app')
-@section('title', match($type ?? 'physical_quote') {
-    'freelancer' => __('home.path_freelancer_title'),
-    'tabela' => __('home.path_tabela_title'),
-    default => __('home.path_quote_title'),
-})
+@section('title')
+    @php
+        $type = $type ?? 'physical_quote';
+        echo match ($type) {
+            'freelancer' => __('home.path_freelancer_title'),
+            'tabela' => __('home.path_tabela_title'),
+            default => __('home.path_quote_title'),
+        };
+    @endphp
+@endsection
 @section('content')
 @php
     $type = $type ?? 'physical_quote';
@@ -79,7 +84,7 @@
                             <p class="text-xs font-extrabold uppercase tracking-wider text-indigo-900">{{ __('home.quote_items') }}</p>
                             <p class="mt-1 text-sm text-slate-700">{{ __('home.quote_items_help') }}</p>
                         </div>
-                        <button type="button" class="by-btn-primary" id="add-item" @disabled($categories->isEmpty())>+ {{ __('home.quote_add_item') }}</button>
+                        <button type="button" class="by-btn-primary" id="add-item" @if($categories->isEmpty()) disabled @endif>+ {{ __('home.quote_add_item') }}</button>
                     </div>
 
                     <div class="mt-4 space-y-4" id="items"></div>
@@ -163,7 +168,7 @@
                 </div>
 
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <button type="submit" class="by-btn-cta" @disabled($categories->isEmpty())>
+                    <button type="submit" class="by-btn-cta" @if($categories->isEmpty()) disabled @endif>
                         {{ auth()->check() ? __('home.submit') : __('home.continue_auth') }}
                     </button>
                     <a href="{{ route('home') }}" class="by-btn-secondary">{{ __('panel.cancel') }}</a>

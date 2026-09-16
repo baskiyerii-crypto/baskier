@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Support\PlatformBranding;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class AdminSettingsController extends Controller
 {
@@ -53,16 +53,15 @@ class AdminSettingsController extends Controller
         ]);
 
         if ($request->hasFile('platform_logo')) {
-            $old = Setting::get('platform_logo');
-            if ($old) {
-                Storage::disk('public')->delete($old);
-            }
-            $validated['platform_logo'] = $request->file('platform_logo')->store('platform', 'public');
+            $validated['platform_logo'] = \App\Support\PlatformBranding::storeLogo($request->file('platform_logo'));
         } else {
             unset($validated['platform_logo']);
         }
 
         foreach ($validated as $key => $value) {
+            if ($key === 'platform_logo') {
+                continue; // already persisted by PlatformBranding::storeLogo
+            }
             Setting::set($key, $value);
         }
 

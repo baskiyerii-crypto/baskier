@@ -74,7 +74,10 @@ class CustomerDirectQuoteController extends Controller
             return back()->with('error', __('panel.direct_quote_not_ready'));
         }
         if (! $directQuote->vendor_consented) {
-            return back()->with('error', __('panel.waiting_vendor_consent'));
+            // Column may be missing before migrate; treat as not consented only when present.
+            if (\Illuminate\Support\Facades\Schema::hasColumn('direct_quote_requests', 'vendor_consented')) {
+                return back()->with('error', __('panel.waiting_vendor_consent'));
+            }
         }
 
         try {

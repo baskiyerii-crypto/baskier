@@ -59,4 +59,8 @@ return [
     'vendors_body' => 'İş koluna göre filtreleyip satıcı profillerini inceleyin.',
     'business_type' => 'İş kolu',
     'clear' => 'Temizle',
+    'contact' => 'İletişim',
+    'contact_title' => 'Bize ulaşın',
+    'contact_body' => 'Platform iletişim bilgileri aşağıdadır.',
+    'contact_empty' => 'İletişim bilgileri henüz girilmedi. Yönetici ayarlarından ekleyebilirsiniz.',
 ];

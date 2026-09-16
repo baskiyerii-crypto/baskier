@@ -14,15 +14,10 @@
         <header class="sticky top-0 z-50 border-b border-slate-200/70 bg-white/70 backdrop-blur">
             <div class="by-container py-4">
                 <div class="flex items-center justify-between gap-3">
-                    <a href="{{ route('home') }}" class="flex items-center gap-2 text-sm font-extrabold tracking-tight text-slate-900">
-                        @php $platformLogo = \App\Models\Setting::get('platform_logo'); @endphp
-                        @if($platformLogo)
-                            <img src="{{ asset('storage/'.$platformLogo) }}" alt="BaskıYeri" class="h-9 w-9 rounded-2xl object-contain bg-white border border-slate-200/80 shadow-sm">
-                        @else
-                            <span class="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-cyan-400 text-white shadow-sm">B</span>
-                        @endif
-                        <span>Hesabım</span>
-                    </a>
+                    <div class="flex items-center gap-2 text-sm font-extrabold tracking-tight text-slate-900">
+                        @include('partials.platform-brand', ['compact' => true, 'logoOnly' => true])
+                        <a href="{{ route('customer.dashboard') }}">Hesabım</a>
+                    </div>
                     <div class="flex items-center gap-2">
                         @include('partials.locale-switcher')
                         <span class="hidden sm:inline text-xs font-mono text-slate-500">{{ auth()->user()?->publicCode() }}</span>

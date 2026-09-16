@@ -22,6 +22,6 @@
         <label class="form-label">{{ __('panel.body') }}</label>
         <textarea name="body" class="form-control" rows="5"></textarea>
     </div>
-    <button class="by-btn-primary" @disabled($vendors->isEmpty())>{{ __('panel.send') }}</button>
+    <button class="by-btn-primary" @if($vendors->isEmpty()) disabled @endif>{{ __('panel.submit_for_approval') }}</button>
 </form>
 @endsection

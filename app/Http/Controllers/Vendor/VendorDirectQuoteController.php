@@ -42,12 +42,15 @@ class VendorDirectQuoteController extends Controller
             'share_my_contact' => ['accepted'],
         ]);
 
-        $directQuote->update([
+        $payload = [
             'offer_amount' => $validated['offer_amount'],
             'vendor_note' => $validated['vendor_note'] ?? null,
-            'vendor_consented' => true,
             'status' => 'offered',
-        ]);
+        ];
+        if (\Illuminate\Support\Facades\Schema::hasColumn('direct_quote_requests', 'vendor_consented')) {
+            $payload['vendor_consented'] = true;
+        }
+        $directQuote->update($payload);
 
         return back()->with('success', __('panel.direct_quote_offer_sent'));
     }

@@ -38,8 +38,8 @@
 
                 <hr class="my-4">
                 <h2 class="h6 fw-bold mb-3">{{ __('panel.settings_platform') }}</h2>
-                @if($platform_logo)
-                    <div class="mb-2"><img src="{{ asset('storage/'.$platform_logo) }}" alt="logo" style="max-height:48px"></div>
+                @if(\App\Support\PlatformBranding::logoUrl())
+                    <div class="mb-2"><img src="{{ \App\Support\PlatformBranding::logoUrl() }}" alt="logo" style="max-height:48px"></div>
                 @endif
                 <div class="mb-3">
                     <label class="form-label fw-semibold">{{ __('panel.platform_logo') }}</label>

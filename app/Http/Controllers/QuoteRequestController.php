@@ -22,7 +22,11 @@ class QuoteRequestController extends Controller
 
         $categories = Category::query()
             ->where('is_active', true)
-            ->where('channel', $type)
+            ->when(
+                \Illuminate\Support\Facades\Schema::hasColumn('categories', 'channel'),
+                fn ($q) => $q->where('channel', $type),
+                fn ($q) => $q->whereRaw('1 = 0')
+            )
             ->orderBy('name')
             ->get();
 
