@@ -1,21 +1,40 @@
-# Deploy: kalıcı `public/uploads` volume
+# Deploy: kalıcı dosya ve veritabanı
 
-Platform logosu ve benzeri marka dosyaları `public/uploads/branding/` altına yazılır (`PlatformBranding`).
+Coolify her deploy’da uygulama konteynerini sıfırdan kurar. Volume yoksa **logo, ürün görseli, belgeler silinir**. Kullanıcı/ürün/sipariş satırları veritabanındadır; DB ayrı servis değilse onlar da silinir.
 
-Coolify / Docker / PaaS redeploy sırasında `public/` imajdan geldiği için **volume bağlanmazsa logo silinir**.
+## Coolify Persistent Storage → Volume Mount
 
-## Zorunlu volume
+Nixpacks kökü genelde `/app`. Source Path = volume adı (sunucu klasörü değil).
 
-| Host / volume | Container path |
-|---------------|----------------|
-| Persistent volume (ör. `baskiyeri-uploads`) | `/app/public/uploads` |
+| Source Path (volume adı) | Destination Path | Ne durur |
+|---|---|---|
+| `baskiyeri-uploads` | `/app/public/uploads` | Platform logosu |
+| `baskiyeri-storage` | `/app/storage/app/public` | Ürün/kategori/satıcı görselleri, teklif dosyaları, tasarımlar, belgeler |
 
-Laravel root genelde `/app` veya `/var/www/html` olur; path’i imaja göre ayarlayın.
+Kaydet → **Redeploy**. Volume ilk sefer boştur; logoyu ve görselleri **bir kez** yeniden yükle. Sonraki deploy’larda durur.
 
-## Redeploy sonrası
+## Veritabanı
 
-1. Volume bağlı mı kontrol edin.
-2. Admin → Ayarlar → platform logosunu bir kez yeniden yükleyin (volume boşsa).
-3. Hard refresh ile vitrini doğrulayın.
+Environment Variables:
 
-`storage/app/public` symlink’i logo için yeterli değildir; branding bilerek `public/uploads` kullanır.
+- `DB_CONNECTION=mysql` (veya `pgsql`)
+- `DB_HOST` = Coolify **Database** servisinin internal hostname’i
+- SQLite (`database/database.sqlite`) kullanma; her deploy kullanıcıyı siler.
+
+Database servisinin kendisinde de persistent volume olsun (Coolify DB eklerken varsayılan gelir).
+
+## Post-deployment command
+
+Coolify → Configuration → **Pre/Post Deployment** (veya Custom command):
+
+```bash
+sh scripts/coolify-postdeploy.sh
+```
+
+Bu komut `storage:link` ve `migrate --force` çalıştırır.
+
+## Yapma
+
+- S3 Storages (şimdilik gerekmez)
+- File Mount / Directory Mount (logo için değil)
+- `storage/` veya `public/uploads` içeriğini Git’e commit etme
