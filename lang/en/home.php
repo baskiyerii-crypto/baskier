@@ -83,6 +83,14 @@ return [
     'get_quote' => 'Get a quote',
     'latest_jobs' => 'Latest listings',
 
+    'freelancer_cat' => [
+        'logo' => 'Logo & Corporate Identity',
+        'brochure' => 'Brochure & Catalog',
+        'digital' => 'Digital Content & Social Media',
+        'wordpress' => 'Website & WordPress',
+        'other' => 'Signage & Other Work',
+    ],
+
     'digital_eyebrow' => 'New',
     'digital_title' => 'Digital products',
     'digital_body' => 'Templates, graphic packs and files — download instantly.',
@@ -98,4 +106,8 @@ return [
     'no_products' => 'No products yet.',
     'vendor_fallback' => 'Vendor',
     'detail' => 'Details',
+    'budget' => 'Budget',
+    'job_title' => 'Title',
+    'publish' => 'Publish',
+    'no_jobs_open' => 'No open job listings right now.',
 ];

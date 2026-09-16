@@ -144,10 +144,10 @@
                     @foreach($categories as $category)
                         <a href="{{ route('products.index', ['category' => $category->slug]) }}" class="group by-card by-card-hover overflow-hidden">
                             <div class="aspect-4/3 bg-slate-100">
-                                <img src="https://picsum.photos/900/700?random=kategori{{ $category->id }}" alt="{{ $category->name }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
+                                <img src="https://picsum.photos/900/700?random=kategori{{ $category->id }}" alt="{{ $category->localizedName() }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
                             </div>
                             <div class="p-4">
-                                <p class="text-sm font-semibold text-slate-900">{{ $category->name }}</p>
+                                <p class="text-sm font-semibold text-slate-900">{{ $category->localizedName() }}</p>
                             </div>
                         </a>
                     @endforeach
@@ -191,7 +191,7 @@
                         @foreach($freelancerJobs->take(3) as $job)
                             <a href="{{ route('freelancer-jobs.show', $job) }}" class="rounded-2xl border border-slate-200 bg-white/70 p-4 hover:bg-white">
                                 <p class="text-sm font-semibold text-slate-900">{{ Str::limit($job->title, 54) }}</p>
-                                <p class="mt-1 text-xs text-slate-500">{{ $job->category }} · ₺{{ $job->budget_min ? number_format($job->budget_min, 0, ',', '.') : '?' }}+</p>
+                                <p class="mt-1 text-xs text-slate-500">{{ \App\Support\FreelancerCategories::label($job->category) }} · ₺{{ $job->budget_min ? number_format($job->budget_min, 0, ',', '.') : '?' }}+</p>
                             </a>
                         @endforeach
                     </div>
@@ -214,14 +214,14 @@
                         <a href="{{ route('products.show', $product->slug) }}" class="group by-card by-card-hover overflow-hidden">
                             <div class="aspect-4/3 bg-slate-100">
                                 @if($product->main_image)
-                                    <img src="{{ asset('storage/'.$product->main_image) }}" alt="{{ $product->name }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
+                                    <img src="{{ asset('storage/'.$product->main_image) }}" alt="{{ $product->localizedName() }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
                                 @else
-                                    <img src="https://picsum.photos/900/700?random=digital{{ $product->id }}" alt="{{ $product->name }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
+                                    <img src="https://picsum.photos/900/700?random=digital{{ $product->id }}" alt="{{ $product->localizedName() }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
                                 @endif
                             </div>
                             <div class="p-4">
                                 <span class="by-badge border-indigo-200 bg-indigo-50 text-indigo-800">{{ __('home.digital_badge') }}</span>
-                                <p class="mt-2 truncate text-sm font-semibold text-slate-900">{{ Str::limit($product->name, 40) }}</p>
+                                <p class="mt-2 truncate text-sm font-semibold text-slate-900">{{ Str::limit($product->localizedName(), 40) }}</p>
                                 <p class="mt-1 text-xs text-slate-500">{{ $product->vendor?->name }}</p>
                                 <p class="mt-3 text-sm font-extrabold text-slate-900">₺{{ number_format($product->price, 2, ',', '.') }}</p>
                             </div>
@@ -256,14 +256,14 @@
                     <a href="{{ route('products.show', $product->slug) }}" class="group by-card by-card-hover overflow-hidden">
                         <div class="aspect-4/3 bg-slate-100">
                             @if($product->main_image)
-                                <img src="{{ asset('storage/'.$product->main_image) }}" alt="{{ $product->name }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
+                                <img src="{{ asset('storage/'.$product->main_image) }}" alt="{{ $product->localizedName() }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
                             @else
-                                <img src="https://picsum.photos/900/700?random=urun{{ $product->id ?? $loop->index }}" alt="{{ $product->name }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
+                                <img src="https://picsum.photos/900/700?random=urun{{ $product->id ?? $loop->index }}" alt="{{ $product->localizedName() }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
                             @endif
                         </div>
                         <div class="p-4">
                             <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ $product->vendor?->name ?? __('home.vendor_fallback') }}</p>
-                            <p class="mt-1 truncate text-sm font-semibold text-slate-900">{{ $product->name }}</p>
+                            <p class="mt-1 truncate text-sm font-semibold text-slate-900">{{ $product->localizedName() }}</p>
                             <div class="mt-3 flex items-center justify-between">
                                 <p class="text-sm font-extrabold text-slate-900">₺{{ number_format($product->price, 2, ',', '.') }}</p>
                                 <span class="text-xs font-semibold text-indigo-600">{{ __('home.detail') }} →</span>

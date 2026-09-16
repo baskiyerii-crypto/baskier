@@ -74,7 +74,8 @@
             </label>
             <button type="button" class="btn btn-sm btn-outline-danger mi-remove">Sil</button>
         </div>
-        <input type="text" class="form-control mi-label" placeholder="Etiket" maxlength="80" required>
+        <input type="text" class="form-control mi-label" placeholder="Etiket (TR)" maxlength="80" required>
+        <input type="text" class="form-control mi-label-en" placeholder="Label (EN)" maxlength="80">
         <div class="menu-item-grid">
             <div>
                 <select class="form-select mi-type">
@@ -134,6 +135,7 @@
         var node = tpl.content.firstElementChild.cloneNode(true);
         data = data || {};
         node.querySelector('.mi-label').value = data.label || '';
+        node.querySelector('.mi-label-en').value = data.label_en || '';
         node.querySelector('.mi-type').value = data.type || 'route';
         node.querySelector('.mi-placement').value = data.placement || 'top';
         node.querySelector('.mi-active').checked = data.is_active !== false;
@@ -194,6 +196,7 @@
             list.querySelectorAll('.menu-item').forEach(function (li) {
                 var type = li.querySelector('.mi-type').value;
                 var label = li.querySelector('.mi-label').value.trim();
+                var labelEn = li.querySelector('.mi-label-en').value.trim();
                 var placement = list.getAttribute('data-placement');
                 var active = li.querySelector('.mi-active').checked;
                 var target = '';
@@ -210,6 +213,7 @@
                     e.target.appendChild(inp);
                 }
                 add('label', label);
+                add('label_en', labelEn);
                 add('type', type);
                 add('target', target);
                 add('placement', placement);

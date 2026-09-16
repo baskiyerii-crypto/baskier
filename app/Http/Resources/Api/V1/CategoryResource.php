@@ -12,9 +12,9 @@ class CategoryResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
+            'name' => $this->localizedName(),
             'slug' => $this->slug,
-            'description' => $this->description,
+            'description' => $this->localized('description') ?? $this->description,
             'image' => $this->image,
             'parent_id' => $this->parent_id,
             'requires_quote' => $this->requires_quote ?? false,

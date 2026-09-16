@@ -83,6 +83,14 @@ return [
     'get_quote' => 'Teklif al',
     'latest_jobs' => 'Son eklenen ilanlar',
 
+    'freelancer_cat' => [
+        'logo' => 'Logo & Kurumsal Kimlik',
+        'brochure' => 'Broşür & Katalog',
+        'digital' => 'Dijital İçerik & Sosyal Medya',
+        'wordpress' => 'Web Sitesi & WordPress',
+        'other' => 'Tabela & Diğer İşler',
+    ],
+
     'digital_eyebrow' => 'Yeni',
     'digital_title' => 'Dijital ürünler',
     'digital_body' => 'Şablonlar, grafik paketleri, dijital dosyalar – anında indir, hemen kullan.',
@@ -98,4 +106,8 @@ return [
     'no_products' => 'Henüz ürün yok.',
     'vendor_fallback' => 'Satıcı',
     'detail' => 'Detay',
+    'budget' => 'Bütçe',
+    'job_title' => 'Başlık',
+    'publish' => 'Yayınla',
+    'no_jobs_open' => 'Şu an açık iş ilanı bulunmuyor.',
 ];

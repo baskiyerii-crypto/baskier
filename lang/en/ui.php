@@ -62,6 +62,8 @@ return [
     'business_type' => 'Business type',
     'clear' => 'Clear',
     'contact' => 'Contact',
+    'blog' => 'Blog',
+    'quote' => 'Get a quote',
     'contact_title' => 'Contact us',
     'contact_body' => 'Platform contact details are listed below.',
     'contact_empty' => 'Contact details are not set yet. Add them in admin settings.',

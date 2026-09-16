@@ -191,7 +191,7 @@
 
 <script>
     (function () {
-        const categories = @json($categories->map(fn ($c) => ['id' => $c->id, 'name' => $c->name])->values());
+        const categories = @json($categories->map(fn ($c) => ['id' => $c->id, 'name' => $c->localizedName()])->values());
         const products = @json(($products ?? collect())->map(fn ($p) => ['id' => $p->id, 'name' => $p->name, 'category_id' => $p->category_id])->values());
         const productsByCategory = products.reduce((acc, p) => {
             (acc[p.category_id] ||= []).push(p);

@@ -24,6 +24,7 @@ final class SiteMenu
                     ->map(function (array $i) {
                         return [
                             'label' => (string) $i['label'],
+                            'label_en' => isset($i['label_en']) && $i['label_en'] !== '' ? (string) $i['label_en'] : null,
                             'type' => (string) ($i['type'] ?? 'route'),
                             'target' => isset($i['target']) && $i['target'] !== '' ? (string) $i['target'] : null,
                             'placement' => in_array(($i['placement'] ?? 'drawer'), ['top', 'drawer'], true) ? $i['placement'] : 'drawer',
@@ -104,5 +105,34 @@ final class SiteMenu
                 : ($target ? url('/'.$target) : null),
             default => null,
         };
+    }
+
+    public static function displayLabel(array $item): string
+    {
+        if (app()->getLocale() === 'en' && ! empty($item['label_en'])) {
+            return (string) $item['label_en'];
+        }
+
+        if (app()->getLocale() === 'en') {
+            $type = $item['type'] ?? 'route';
+            $target = $item['target'] ?? null;
+            $key = match (true) {
+                $type === 'route' && $target === 'home' => 'ui.home',
+                $type === 'route' && $target === 'products.index' => 'ui.products',
+                $type === 'route' && $target === 'vendors.index' => 'ui.vendors',
+                $type === 'route' && $target === 'pages.contact' => 'ui.contact',
+                $type === 'route' && $target === 'freelancer-jobs.index' => 'ui.jobs',
+                $type === 'route' && $target === 'blog.index' => 'ui.blog',
+                $type === 'route' && $target === 'quote-requests.create' => 'ui.quote',
+                $type === 'products' => 'ui.products',
+                $type === 'categories_accordion' => 'ui.categories',
+                default => null,
+            };
+            if ($key) {
+                return __($key);
+            }
+        }
+
+        return (string) ($item['label'] ?? '');
     }
 }

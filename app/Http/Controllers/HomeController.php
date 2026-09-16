@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\FreelancerJobListing;
 use App\Models\Product;
+use App\Support\FreelancerCategories;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -45,25 +46,17 @@ class HomeController extends Controller
             ->limit(6)
             ->get();
 
-        // Armut tarzı: hizmet türü kartları – kategori bazlı açık ilan sayıları
-        $freelancerCategoryKeys = [
-            'logo'       => ['label' => 'Logo & Kurumsal Kimlik', 'seed' => 'flogo'],
-            'brochure'   => ['label' => 'Broşür & Katalog', 'seed' => 'fbrochure'],
-            'digital'    => ['label' => 'Dijital İçerik & Sosyal Medya', 'seed' => 'fdigital'],
-            'wordpress'  => ['label' => 'Web Sitesi & WordPress', 'seed' => 'fwordpress'],
-            'other'      => ['label' => 'Tabela & Diğer İşler', 'seed' => 'fother'],
-        ];
         $openCounts = FreelancerJobListing::query()
             ->where('status', 'open')
             ->selectRaw('category, count(*) as total')
             ->groupBy('category')
             ->pluck('total', 'category');
         $freelancerCategories = [];
-        foreach ($freelancerCategoryKeys as $key => $config) {
+        foreach (FreelancerCategories::catalog() as $key => $config) {
             $freelancerCategories[] = [
-                'key'   => $key,
+                'key' => $key,
                 'label' => $config['label'],
-                'seed'  => $config['seed'],
+                'seed' => $config['seed'],
                 'count' => (int) ($openCounts[$key] ?? 0),
             ];
         }

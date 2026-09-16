@@ -31,6 +31,7 @@ class AdminMenuController extends Controller
         $validated = $request->validate([
             'items' => ['nullable', 'array'],
             'items.*.label' => ['required', 'string', 'max:80'],
+            'items.*.label_en' => ['nullable', 'string', 'max:80'],
             'items.*.type' => ['required', 'in:route,url,category,products,page,categories_accordion'],
             'items.*.target' => ['nullable', 'string', 'max:500'],
             'items.*.placement' => ['required', 'in:top,drawer'],
@@ -46,6 +47,7 @@ class AdminMenuController extends Controller
             }
             $items[] = [
                 'label' => trim($row['label']),
+                'label_en' => trim((string) ($row['label_en'] ?? '')) ?: null,
                 'type' => $type,
                 'target' => $target !== null && $target !== '' ? (string) $target : null,
                 'placement' => $row['placement'],

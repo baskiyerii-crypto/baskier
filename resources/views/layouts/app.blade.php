@@ -47,7 +47,7 @@
                         @foreach(\App\Support\SiteMenu::forPlacement('drawer') as $item)
                             @if(($item['type'] ?? '') === 'categories_accordion')
                                 <details class="by-card overflow-hidden">
-                                    <summary class="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-slate-900">{{ $item['label'] }}</summary>
+                                    <summary class="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-slate-900">{{ \App\Support\SiteMenu::displayLabel($item) }}</summary>
                                     <div class="border-t border-slate-100 px-2 py-2 max-h-[40vh] overflow-auto">
                                         @if(!empty($headerCategories) && $headerCategories->isNotEmpty())
                                             @foreach($headerCategories as $parentCategory)
@@ -64,7 +64,7 @@
                             @else
                                 @php $href = \App\Support\SiteMenu::href($item); @endphp
                                 @if($href)
-                                    <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ $href }}">{{ $item['label'] }}</a>
+                                    <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ $href }}">{{ \App\Support\SiteMenu::displayLabel($item) }}</a>
                                 @endif
                             @endif
                         @endforeach
@@ -113,22 +113,21 @@
 
     <header class="sticky top-0 z-50 border-b border-slate-200/70 bg-white/70 backdrop-blur">
         <div class="by-container py-3 md:py-4">
-            {{-- Mobile: menu | brand | actions (no overlap) --}}
+            {{-- Mobile: menu | brand | cart (lang in drawer) --}}
             <div class="grid grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-2 md:hidden">
-                <button type="button" data-left-drawer-open class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700" aria-label="{{ __('ui.menu') }}">
+                <button type="button" data-left-drawer-open class="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700" aria-label="{{ __('ui.menu') }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
                 </button>
-                <div class="flex min-w-0 items-center justify-center overflow-hidden">
+                <div class="flex min-w-0 items-center justify-center overflow-hidden px-1">
                     @include('partials.platform-brand', ['compact' => true, 'forceName' => true, 'mobileHeader' => true])
                 </div>
                 <div class="flex shrink-0 items-center justify-end gap-1.5">
-                    @include('partials.locale-switcher', ['compact' => true])
                     @auth
-                        <a href="{{ route('cart.index') }}" class="inline-flex h-10 items-center rounded-xl bg-orange-600 px-2.5 text-xs font-bold text-white">
+                        <a href="{{ route('cart.index') }}" class="inline-flex h-11 items-center rounded-xl bg-orange-600 px-3 text-xs font-bold text-white">
                             {{ __('ui.cart') }}
                         </a>
                     @else
-                        <a href="{{ route('login') }}" class="inline-flex h-10 items-center rounded-xl border border-slate-200 bg-white px-2.5 text-xs font-semibold text-slate-700">{{ __('ui.login') }}</a>
+                        <a href="{{ route('login') }}" class="inline-flex h-11 items-center rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700">{{ __('ui.login') }}</a>
                     @endauth
                 </div>
             </div>
@@ -141,7 +140,7 @@
                     @foreach(\App\Support\SiteMenu::forPlacement('top') as $item)
                         @php $href = \App\Support\SiteMenu::href($item); @endphp
                         @if($href)
-                            <a href="{{ $href }}" class="rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 {{ request()->url() === $href ? 'bg-orange-50 text-orange-900' : '' }}">{{ $item['label'] }}</a>
+                            <a href="{{ $href }}" class="rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 {{ request()->url() === $href ? 'bg-orange-50 text-orange-900' : '' }}">{{ \App\Support\SiteMenu::displayLabel($item) }}</a>
                         @endif
                     @endforeach
                 </nav>

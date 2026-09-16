@@ -7,6 +7,7 @@ use App\Http\Resources\Api\V1\ProductResource;
 use App\Models\Category;
 use App\Models\FreelancerJobListing;
 use App\Models\Product;
+use App\Support\FreelancerCategories;
 use Illuminate\Http\Request;
 
 /**
@@ -50,20 +51,13 @@ class HomeContentController extends ApiController
             ->limit(6)
             ->get();
 
-        $freelancerCategoryKeys = [
-            'logo' => ['label' => 'Logo & Kurumsal Kimlik', 'seed' => 'flogo'],
-            'brochure' => ['label' => 'Broşür & Katalog', 'seed' => 'fbrochure'],
-            'digital' => ['label' => 'Dijital İçerik & Sosyal Medya', 'seed' => 'fdigital'],
-            'wordpress' => ['label' => 'Web Sitesi & WordPress', 'seed' => 'fwordpress'],
-            'other' => ['label' => 'Tabela & Diğer İşler', 'seed' => 'fother'],
-        ];
         $openCounts = FreelancerJobListing::query()
             ->where('status', 'open')
             ->selectRaw('category, count(*) as total')
             ->groupBy('category')
             ->pluck('total', 'category');
         $freelancerCategories = [];
-        foreach ($freelancerCategoryKeys as $key => $config) {
+        foreach (FreelancerCategories::catalog() as $key => $config) {
             $freelancerCategories[] = [
                 'key' => $key,
                 'label' => $config['label'],
