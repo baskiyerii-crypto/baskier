@@ -37,13 +37,13 @@
                                 <div class="flex flex-col gap-3 md:flex-row">
                                     <input class="by-input md:flex-1 bg-white/90" name="q" value="{{ request('q') }}" placeholder="{{ __('home.search_placeholder') }}" />
                                     <button class="by-btn-primary">{{ __('home.search') }}</button>
-                                    <a class="by-btn-cta" href="{{ route('quote-requests.create') }}">{{ __('home.quote') }}</a>
+                                    <a class="by-btn-cta" href="{{ route('quote-requests.create', ['type' => 'physical_quote']) }}">{{ __('home.quote') }}</a>
                                 </div>
                             </form>
                             <div class="mt-3 flex flex-wrap gap-2">
                                 <a class="by-badge border-white/15 bg-white/10 text-white hover:bg-white/15" href="{{ route('products.index') }}">{{ __('home.products') }}</a>
                                 <a class="by-badge border-white/15 bg-white/10 text-white hover:bg-white/15" href="{{ route('vendors.index') }}">{{ __('home.vendors') }}</a>
-                                <a class="by-badge border-white/15 bg-white/10 text-white hover:bg-white/15" href="{{ route('quote-requests.create', ['type' => 'freelancer']) }}">{{ __('home.get_service') }}</a>
+                                <a class="by-badge border-white/15 bg-white/10 text-white hover:bg-white/15" href="{{ route('freelancer-jobs.create') }}">{{ __('home.get_service') }}</a>
                             </div>
                         </div>
                     </div>
@@ -55,7 +55,7 @@
                                 <p class="mt-2 text-lg font-bold">{{ __('home.ready_title') }}</p>
                                 <p class="mt-2 text-sm text-white/75">{{ __('home.ready_body') }}</p>
                             </a>
-                            <a href="{{ route('quote-requests.create') }}" class="by-card border-white/15 bg-white/10 p-5 text-white backdrop-blur hover:bg-white/15">
+                            <a href="{{ route('quote-requests.create', ['type' => 'physical_quote']) }}" class="by-card border-white/15 bg-white/10 p-5 text-white backdrop-blur hover:bg-white/15">
                                 <p class="text-xs font-bold uppercase tracking-wider text-white/70">{{ __('home.custom_eyebrow') }}</p>
                                 <p class="mt-2 text-lg font-bold">{{ __('home.custom_title') }}</p>
                                 <p class="mt-2 text-sm text-white/75">{{ __('home.custom_body') }}</p>
@@ -78,35 +78,45 @@
     </section>
 
     <section class="by-container -mt-2">
-        <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
             <a href="{{ route('products.index') }}" class="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-900 shadow-lg shadow-slate-900/10 transition hover:-translate-y-1 hover:shadow-xl">
-                <img src="https://picsum.photos/1200/800?random=path-ready" alt="" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/55 to-indigo-900/20"></div>
-                <div class="relative flex min-h-[220px] flex-col justify-end p-6 sm:min-h-[260px] sm:p-7">
+                <img src="https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=1200&q=80" alt="{{ __('home.path_ready_title') }}" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/55 to-indigo-900/25"></div>
+                <div class="relative flex min-h-[240px] flex-col justify-end p-6 sm:min-h-[280px]">
                     <span class="inline-flex w-fit rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white/90 backdrop-blur">{{ __('home.path_ready_eyebrow') }}</span>
                     <h3 class="mt-3 text-2xl font-extrabold tracking-tight text-white">{{ __('home.path_ready_title') }}</h3>
                     <p class="mt-2 max-w-sm text-sm leading-relaxed text-white/80">{{ __('home.path_ready_body') }}</p>
-                    <span class="mt-5 inline-flex items-center gap-2 text-sm font-bold text-cyan-200">{{ __('home.path_ready_cta') }} <span aria-hidden="true">→</span></span>
+                    <span class="mt-5 inline-flex items-center gap-2 text-sm font-bold text-cyan-200">{{ __('home.path_ready_cta') }} →</span>
                 </div>
             </a>
-            <a href="{{ route('quote-requests.create') }}" class="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-900 shadow-lg shadow-slate-900/10 transition hover:-translate-y-1 hover:shadow-xl">
-                <img src="https://picsum.photos/1200/800?random=path-quote" alt="" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-orange-950/50 to-amber-700/15"></div>
-                <div class="relative flex min-h-[220px] flex-col justify-end p-6 sm:min-h-[260px] sm:p-7">
+            <a href="{{ route('quote-requests.create', ['type' => 'physical_quote']) }}" class="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-900 shadow-lg shadow-slate-900/10 transition hover:-translate-y-1 hover:shadow-xl">
+                <img src="https://images.unsplash.com/photo-1562654501-a0ccc0d62da1?auto=format&fit=crop&w=1200&q=80" alt="{{ __('home.path_quote_title') }}" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-orange-950/55 to-amber-700/20"></div>
+                <div class="relative flex min-h-[240px] flex-col justify-end p-6 sm:min-h-[280px]">
                     <span class="inline-flex w-fit rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white/90 backdrop-blur">{{ __('home.path_quote_eyebrow') }}</span>
                     <h3 class="mt-3 text-2xl font-extrabold tracking-tight text-white">{{ __('home.path_quote_title') }}</h3>
                     <p class="mt-2 max-w-sm text-sm leading-relaxed text-white/80">{{ __('home.path_quote_body') }}</p>
-                    <span class="mt-5 inline-flex items-center gap-2 text-sm font-bold text-orange-200">{{ __('home.path_quote_cta') }} <span aria-hidden="true">→</span></span>
+                    <span class="mt-5 inline-flex items-center gap-2 text-sm font-bold text-orange-200">{{ __('home.path_quote_cta') }} →</span>
                 </div>
             </a>
-            <a href="{{ route('quote-requests.create', ['type' => 'freelancer']) }}" class="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-900 shadow-lg shadow-slate-900/10 transition hover:-translate-y-1 hover:shadow-xl">
-                <img src="https://picsum.photos/1200/800?random=path-freelancer" alt="" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-emerald-950/45 to-teal-700/15"></div>
-                <div class="relative flex min-h-[220px] flex-col justify-end p-6 sm:min-h-[260px] sm:p-7">
+            <a href="{{ route('quote-requests.create', ['type' => 'tabela']) }}" class="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-900 shadow-lg shadow-slate-900/10 transition hover:-translate-y-1 hover:shadow-xl">
+                <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80" alt="{{ __('home.path_tabela_title') }}" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-rose-950/50 to-fuchsia-800/20"></div>
+                <div class="relative flex min-h-[240px] flex-col justify-end p-6 sm:min-h-[280px]">
+                    <span class="inline-flex w-fit rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white/90 backdrop-blur">{{ __('home.path_tabela_eyebrow') }}</span>
+                    <h3 class="mt-3 text-2xl font-extrabold tracking-tight text-white">{{ __('home.path_tabela_title') }}</h3>
+                    <p class="mt-2 max-w-sm text-sm leading-relaxed text-white/80">{{ __('home.path_tabela_body') }}</p>
+                    <span class="mt-5 inline-flex items-center gap-2 text-sm font-bold text-rose-200">{{ __('home.path_tabela_cta') }} →</span>
+                </div>
+            </a>
+            <a href="{{ route('freelancer-jobs.create') }}" class="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-900 shadow-lg shadow-slate-900/10 transition hover:-translate-y-1 hover:shadow-xl">
+                <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80" alt="{{ __('home.path_freelancer_title') }}" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-emerald-950/50 to-teal-700/20"></div>
+                <div class="relative flex min-h-[240px] flex-col justify-end p-6 sm:min-h-[280px]">
                     <span class="inline-flex w-fit rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white/90 backdrop-blur">{{ __('home.path_freelancer_eyebrow') }}</span>
                     <h3 class="mt-3 text-2xl font-extrabold tracking-tight text-white">{{ __('home.path_freelancer_title') }}</h3>
                     <p class="mt-2 max-w-sm text-sm leading-relaxed text-white/80">{{ __('home.path_freelancer_body') }}</p>
-                    <span class="mt-5 inline-flex items-center gap-2 text-sm font-bold text-emerald-200">{{ __('home.path_freelancer_cta') }} <span aria-hidden="true">→</span></span>
+                    <span class="mt-5 inline-flex items-center gap-2 text-sm font-bold text-emerald-200">{{ __('home.path_freelancer_cta') }} →</span>
                 </div>
             </a>
         </div>
@@ -164,7 +174,7 @@
                             </div>
                         </a>
                         <div class="p-4 pt-0">
-                            <a href="{{ route('quote-requests.create', ['category' => $cat['key']]) }}" class="w-full by-btn-primary">{{ __('home.get_quote') }}</a>
+                            <a href="{{ route('freelancer-jobs.create', ['category' => $cat['key']]) }}" class="w-full by-btn-primary">{{ __('home.path_freelancer_cta') }}</a>
                         </div>
                     </div>
                 @endforeach

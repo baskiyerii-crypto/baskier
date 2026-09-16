@@ -13,9 +13,15 @@ use Illuminate\Support\Facades\DB;
 
 class FreelancerJobWebController extends Controller
 {
-    public function create()
+    public function create(Request $request)
     {
-        return view('freelancer-jobs.create');
+        $selectedCategory = $request->get('category');
+        $allowed = ['logo', 'wordpress', 'brochure', 'digital', 'other'];
+        if (! in_array($selectedCategory, $allowed, true)) {
+            $selectedCategory = null;
+        }
+
+        return view('freelancer-jobs.create', compact('selectedCategory'));
     }
 
     public function store(Request $request)

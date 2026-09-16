@@ -16,24 +16,27 @@ class QuoteRequestController extends Controller
     public function create(Request $request)
     {
         $type = $request->get('type', 'physical_quote');
-        $channel = $type === 'freelancer' ? 'freelancer' : 'physical_quote';
-
-        $categories = Category::where('is_active', true)
-            ->where(function ($q) use ($channel) {
-                $q->where('channel', $channel)->orWhereNull('channel');
-            })
-            ->when($type !== 'freelancer', fn ($q) => $q->where(function ($q2) {
-                $q2->where('requires_quote', true)->orWhere('channel', 'physical_quote');
-            }))
-            ->orderBy('name')->get();
-
-        if ($categories->isEmpty()) {
-            $categories = Category::where('is_active', true)->orderBy('name')->get();
+        if (! in_array($type, ['physical_quote', 'freelancer', 'tabela'], true)) {
+            $type = 'physical_quote';
         }
-        $products = Product::select(['id', 'name', 'category_id'])
+
+        $categories = Category::query()
             ->where('is_active', true)
+            ->where('channel', $type)
             ->orderBy('name')
             ->get();
+
+        // Products only for print RFQ (physical) — not for freelancer/tabela mix-ups.
+        $products = collect();
+        if ($type === 'physical_quote') {
+            $categoryIds = $categories->pluck('id');
+            $products = Product::query()
+                ->select(['id', 'name', 'category_id'])
+                ->where('is_active', true)
+                ->when($categoryIds->isNotEmpty(), fn ($q) => $q->whereIn('category_id', $categoryIds))
+                ->orderBy('name')
+                ->get();
+        }
 
         return view('quote-requests.create', compact('categories', 'products', 'type'));
     }
