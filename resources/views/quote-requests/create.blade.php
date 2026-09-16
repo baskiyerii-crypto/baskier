@@ -29,7 +29,7 @@
     };
 @endphp
 <div class="by-container py-10">
-    <div class="mx-auto max-w-[1200px]">
+    <div class="mx-auto max-w-300">
         <div class="by-card by-gradient-border p-6 md:p-8">
             <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ $eyebrow }}</p>
             <div class="mt-2 flex flex-wrap items-end justify-between gap-4">
@@ -129,7 +129,7 @@
                                 </div>
                                 <div class="md:col-span-2">
                                     <label class="text-xs font-semibold text-slate-600">{{ __('home.spec') }}</label>
-                                    <textarea class="by-input mt-1 min-h-[90px]" data-spec></textarea>
+                                    <textarea class="by-input mt-1 min-h-22.5" data-spec></textarea>
                                 </div>
                                 <div class="md:col-span-2">
                                     <label class="text-xs font-semibold text-slate-600">{{ __('home.files') }}</label>
@@ -142,7 +142,7 @@
 
                 <div class="by-surface-amber by-accent-bar">
                     <p class="text-xs font-extrabold uppercase tracking-wider text-amber-900">{{ __('home.description') }}</p>
-                    <textarea name="description" class="by-input mt-1 min-h-[120px]" rows="4">{{ old('description') }}</textarea>
+                    <textarea name="description" class="by-input mt-1 min-h-30" rows="4">{{ old('description') }}</textarea>
                 </div>
 
                 <div class="by-surface-cyan by-accent-bar">

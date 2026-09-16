@@ -3,7 +3,7 @@
 @section('title', __('home.title'))
 
 @section('content')
-    <section class="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
+    <section class="w-screen relative left-1/2 right-1/2 ml-[-50vw] mr-[-50vw]">
         <div class="by-container py-10">
             <div class="by-hero" data-hero-slider>
                 <div class="absolute inset-0">
@@ -22,14 +22,14 @@
                     <div class="absolute inset-0 by-hero-scrim"></div>
                 </div>
 
-                <div class="relative grid items-center gap-10 p-7 md:p-10 lg:grid-cols-12 lg:min-h-[560px]">
+                <div class="relative grid items-center gap-10 p-7 md:p-10 lg:grid-cols-12 lg:min-h-140">
                     <div class="lg:col-span-7">
                         <p class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white/90 backdrop-blur">
                             {{ __('home.badge') }}
                         </p>
                         <h1 class="mt-4 text-4xl font-extrabold tracking-tight text-white md:text-6xl">
                             {{ __('home.hero_line_1') }}
-                            <span class="bg-gradient-to-r from-cyan-200 to-white bg-clip-text text-transparent">{{ __('home.hero_line_2') }}</span>{{ __('home.hero_line_3') }}
+                            <span class="bg-linear-to-r from-cyan-200 to-white bg-clip-text text-transparent">{{ __('home.hero_line_2') }}</span>{{ __('home.hero_line_3') }}
                         </h1>
                         <p class="mt-4 max-w-xl text-base leading-relaxed text-white/80">
                             {{ __('home.hero_body') }}
@@ -85,8 +85,8 @@
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
             <a href="{{ route('products.index') }}" class="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-900 shadow-lg shadow-slate-900/10 transition hover:-translate-y-1 hover:shadow-xl">
                 <img src="{{ asset('images/home/path-ready-products.png') }}" alt="{{ __('home.path_ready_title') }}" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/55 to-indigo-900/25"></div>
-                <div class="relative flex min-h-[240px] flex-col justify-end p-6 sm:min-h-[280px]">
+                <div class="absolute inset-0 bg-linear-to-t from-slate-950 via-slate-950/55 to-indigo-900/25"></div>
+                <div class="relative flex min-h-60 flex-col justify-end p-6 sm:min-h-70">
                     <span class="inline-flex w-fit rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white/90 backdrop-blur">{{ __('home.path_ready_eyebrow') }}</span>
                     <h3 class="mt-3 text-2xl font-extrabold tracking-tight text-white">{{ __('home.path_ready_title') }}</h3>
                     <p class="mt-2 max-w-sm text-sm leading-relaxed text-white/80">{{ __('home.path_ready_body') }}</p>
@@ -95,8 +95,8 @@
             </a>
             <a href="{{ route('quote-requests.create', ['type' => 'physical_quote']) }}" class="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-900 shadow-lg shadow-slate-900/10 transition hover:-translate-y-1 hover:shadow-xl">
                 <img src="{{ asset('images/home/path-print-rfq.png') }}" alt="{{ __('home.path_quote_title') }}" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-orange-950/55 to-amber-700/20"></div>
-                <div class="relative flex min-h-[240px] flex-col justify-end p-6 sm:min-h-[280px]">
+                <div class="absolute inset-0 bg-linear-to-t from-slate-950 via-orange-950/55 to-amber-700/20"></div>
+                <div class="relative flex min-h-60 flex-col justify-end p-6 sm:min-h-70">
                     <span class="inline-flex w-fit rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white/90 backdrop-blur">{{ __('home.path_quote_eyebrow') }}</span>
                     <h3 class="mt-3 text-2xl font-extrabold tracking-tight text-white">{{ __('home.path_quote_title') }}</h3>
                     <p class="mt-2 max-w-sm text-sm leading-relaxed text-white/80">{{ __('home.path_quote_body') }}</p>
@@ -105,8 +105,8 @@
             </a>
             <a href="{{ route('quote-requests.create', ['type' => 'tabela']) }}" class="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-900 shadow-lg shadow-slate-900/10 transition hover:-translate-y-1 hover:shadow-xl">
                 <img src="{{ asset('images/home/path-tabela.png') }}" alt="{{ __('home.path_tabela_title') }}" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-rose-950/50 to-fuchsia-800/20"></div>
-                <div class="relative flex min-h-[240px] flex-col justify-end p-6 sm:min-h-[280px]">
+                <div class="absolute inset-0 bg-linear-to-t from-slate-950 via-rose-950/50 to-fuchsia-800/20"></div>
+                <div class="relative flex min-h-60 flex-col justify-end p-6 sm:min-h-70">
                     <span class="inline-flex w-fit rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white/90 backdrop-blur">{{ __('home.path_tabela_eyebrow') }}</span>
                     <h3 class="mt-3 text-2xl font-extrabold tracking-tight text-white">{{ __('home.path_tabela_title') }}</h3>
                     <p class="mt-2 max-w-sm text-sm leading-relaxed text-white/80">{{ __('home.path_tabela_body') }}</p>
@@ -115,8 +115,8 @@
             </a>
             <a href="{{ route('freelancer-jobs.create') }}" class="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-900 shadow-lg shadow-slate-900/10 transition hover:-translate-y-1 hover:shadow-xl">
                 <img src="{{ asset('images/home/path-freelancer.png') }}" alt="{{ __('home.path_freelancer_title') }}" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-emerald-950/50 to-teal-700/20"></div>
-                <div class="relative flex min-h-[240px] flex-col justify-end p-6 sm:min-h-[280px]">
+                <div class="absolute inset-0 bg-linear-to-t from-slate-950 via-emerald-950/50 to-teal-700/20"></div>
+                <div class="relative flex min-h-60 flex-col justify-end p-6 sm:min-h-70">
                     <span class="inline-flex w-fit rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white/90 backdrop-blur">{{ __('home.path_freelancer_eyebrow') }}</span>
                     <h3 class="mt-3 text-2xl font-extrabold tracking-tight text-white">{{ __('home.path_freelancer_title') }}</h3>
                     <p class="mt-2 max-w-sm text-sm leading-relaxed text-white/80">{{ __('home.path_freelancer_body') }}</p>
@@ -143,7 +143,7 @@
                 <div class="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
                     @foreach($categories as $category)
                         <a href="{{ route('products.index', ['category' => $category->slug]) }}" class="group by-card by-card-hover overflow-hidden">
-                            <div class="aspect-[4/3] bg-slate-100">
+                            <div class="aspect-4/3 bg-slate-100">
                                 <img src="https://picsum.photos/900/700?random=kategori{{ $category->id }}" alt="{{ $category->name }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
                             </div>
                             <div class="p-4">
@@ -169,7 +169,7 @@
                 @foreach($freelancerCategories ?? [] as $cat)
                     <div class="by-card by-card-hover overflow-hidden">
                         <a href="{{ route('freelancer-jobs.index', ['category' => $cat['key']]) }}" class="block">
-                            <div class="aspect-[4/3] bg-slate-100">
+                            <div class="aspect-4/3 bg-slate-100">
                                 <img src="https://picsum.photos/900/700?random={{ $cat['seed'] }}" alt="{{ $cat['label'] }}" class="h-full w-full object-cover">
                             </div>
                             <div class="p-4">
@@ -212,7 +212,7 @@
                 <div class="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
                     @foreach($digitalProducts as $product)
                         <a href="{{ route('products.show', $product->slug) }}" class="group by-card by-card-hover overflow-hidden">
-                            <div class="aspect-[4/3] bg-slate-100">
+                            <div class="aspect-4/3 bg-slate-100">
                                 @if($product->main_image)
                                     <img src="{{ asset('storage/'.$product->main_image) }}" alt="{{ $product->name }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
                                 @else
@@ -254,7 +254,7 @@
             <div class="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
                 @foreach($featuredProducts as $product)
                     <a href="{{ route('products.show', $product->slug) }}" class="group by-card by-card-hover overflow-hidden">
-                        <div class="aspect-[4/3] bg-slate-100">
+                        <div class="aspect-4/3 bg-slate-100">
                             @if($product->main_image)
                                 <img src="{{ asset('storage/'.$product->main_image) }}" alt="{{ $product->name }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
                             @else

@@ -7,7 +7,7 @@
         <div class="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
             <aside class="by-card by-card-hover overflow-hidden">
                 <div class="relative">
-                    <div class="h-28 bg-gradient-to-br from-orange-400/20 via-white to-indigo-500/10"></div>
+                    <div class="h-28 bg-linear-to-br from-orange-400/20 via-white to-indigo-500/10"></div>
                     <div class="absolute inset-x-0 top-0 p-5">
                         <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('ui.filter') }}</p>
                         <h2 class="mt-1 text-lg font-bold tracking-tight text-slate-900">{{ __('ui.categories') }}</h2>
@@ -65,7 +65,7 @@
                                 name="q"
                                 value="{{ request('q') }}"
                                 placeholder="{{ __('ui.search_placeholder') }}"
-                                class="w-full rounded-full border border-slate-200 bg-white/80 px-4 py-2.5 text-sm outline-none ring-orange-400 focus:ring-2 sm:w-[340px]"
+                                class="w-full rounded-full border border-slate-200 bg-white/80 px-4 py-2.5 text-sm outline-none ring-orange-400 focus:ring-2 sm:w-85"
                             />
                             <button class="by-btn-primary" type="submit">{{ __('ui.search') }}</button>
                         </form>
@@ -82,7 +82,7 @@
                         <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
                             @foreach($products as $product)
                                 <a href="{{ route('products.show', $product->slug) }}" class="group by-card by-card-hover overflow-hidden">
-                                    <div class="aspect-[4/3] bg-slate-100">
+                                    <div class="aspect-4/3 bg-slate-100">
                                         @if($product->main_image)
                                             <img src="{{ asset('storage/'.$product->main_image) }}" alt="{{ $product->name }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
                                         @else

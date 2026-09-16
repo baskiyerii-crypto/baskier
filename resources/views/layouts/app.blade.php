@@ -19,9 +19,9 @@
 </head>
 <body class="storefront min-h-screen font-sans">
 <div class="min-h-screen flex flex-col">
-    <div data-left-drawer id="site-menu" inert aria-hidden="true" class="fixed inset-0 z-[60] pointer-events-none">
+    <div data-left-drawer id="site-menu" inert aria-hidden="true" class="fixed inset-0 z-60 pointer-events-none">
         <div data-left-drawer-overlay class="absolute inset-0 bg-slate-900/40 opacity-0 transition-opacity duration-200"></div>
-        <div data-left-drawer-panel role="dialog" aria-modal="true" aria-label="Menü" tabindex="-1" class="absolute left-0 top-0 h-full w-[340px] max-w-[88vw] -translate-x-full transition-transform duration-200">
+        <div data-left-drawer-panel role="dialog" aria-modal="true" aria-label="Menü" tabindex="-1" class="absolute left-0 top-0 h-full w-85 max-w-[88vw] -translate-x-full transition-transform duration-200">
             <div class="h-full bg-white/95 backdrop-blur border-r border-slate-200 shadow-xl">
                 <div class="p-4 border-b border-slate-200/70 flex items-center justify-between gap-2">
                     @include('partials.platform-brand', ['compact' => true])
