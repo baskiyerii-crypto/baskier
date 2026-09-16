@@ -37,20 +37,178 @@
         .site-menu-overlay {
             position: absolute !important;
             inset: 0 !important;
-            background: rgba(15,23,42,.45) !important;
+            background: rgba(15, 23, 42, .42) !important;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
         .site-menu-panel {
             position: absolute !important;
             left: 0 !important;
             top: 0 !important;
             height: 100% !important;
-            width: min(22rem, 88vw) !important;
-            background: #fff !important;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,.25) !important;
+            width: min(20.5rem, 86vw) !important;
+            background: rgba(255,255,255,.92) !important;
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-right: 1px solid rgba(226,232,240,.9);
+            border-radius: 0 1.75rem 1.75rem 0;
+            box-shadow: 16px 0 48px -20px rgba(15,23,42,.35) !important;
             overflow-y: auto !important;
             -webkit-overflow-scrolling: touch;
+            padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+        }
+        .site-menu-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .75rem;
+            padding: 1rem 1rem .9rem;
+            border-bottom: 1px solid rgba(226,232,240,.8);
+            position: sticky;
+            top: 0;
+            background: rgba(255,255,255,.88);
+            backdrop-filter: blur(12px);
+            z-index: 1;
+        }
+        .site-menu-close {
+            display: inline-flex;
+            height: 2.5rem;
+            width: 2.5rem;
+            align-items: center;
+            justify-content: center;
+            border-radius: 1rem;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            color: #334155;
+            cursor: pointer;
+        }
+        .site-menu-nav { padding: 1rem 1rem 0; }
+        .site-menu-kicker {
+            margin: 0 0 .5rem;
+            font-size: .68rem;
+            font-weight: 800;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: #64748b;
+        }
+        .site-menu-list { display: grid; gap: .35rem; }
+        .site-menu-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .75rem;
+            padding: .85rem 1rem;
+            border-radius: 1rem;
+            font-size: .9rem;
+            font-weight: 600;
+            color: #0f172a;
+            text-decoration: none;
+            background: rgba(248,250,252,.8);
+            border: 1px solid transparent;
+        }
+        .site-menu-link:hover { background: #fff7ed; color: #9a3412; }
+        .site-menu-link.is-active {
+            background: #fff7ed;
+            border-color: #fed7aa;
+            color: #9a3412;
+        }
+        .site-menu-acc {
+            border-radius: 1rem;
+            background: rgba(248,250,252,.8);
+            overflow: hidden;
+        }
+        .site-menu-acc summary {
+            list-style: none;
+            cursor: pointer;
+            padding: .85rem 1rem;
+            font-size: .9rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        .site-menu-acc summary::-webkit-details-marker { display: none; }
+        .site-menu-acc-body { border-top: 1px solid #f1f5f9; padding: .35rem; }
+        .site-menu-acc-body a {
+            display: block;
+            padding: .65rem .85rem;
+            border-radius: .85rem;
+            font-size: .85rem;
+            font-weight: 600;
+            color: #0f172a;
+            text-decoration: none;
+        }
+        .site-menu-acc-body a.is-child { color: #64748b; padding-left: 1.25rem; }
+        .site-menu-empty { margin: 0; padding: .65rem .85rem; font-size: .8rem; color: #64748b; }
+        .site-menu-cta {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: .85rem 1rem;
+            border-radius: 999px;
+            font-size: .9rem;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+            background: linear-gradient(90deg, #6366f1, #22d3ee);
+        }
+        .site-menu-logout {
+            width: 100%;
+            margin-top: .15rem;
+            padding: .75rem 1rem;
+            border-radius: 999px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            font-size: .85rem;
+            font-weight: 600;
+            color: #334155;
+            cursor: pointer;
+        }
+        .site-menu-foot { padding: 1rem 1rem 0; }
+        .by-dock {
+            position: fixed;
+            left: .75rem;
+            right: .75rem;
+            bottom: max(.7rem, env(safe-area-inset-bottom));
+            z-index: 50;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: .2rem;
+            padding: .4rem;
+            border-radius: 1.6rem;
+            border: 1px solid rgba(226,232,240,.9);
+            background: rgba(255,255,255,.88);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            box-shadow: 0 18px 40px -24px rgba(15,23,42,.45);
+        }
+        .by-dock-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: .2rem;
+            padding: .55rem .2rem .45rem;
+            border-radius: 1.15rem;
+            font-size: .65rem;
+            font-weight: 700;
+            color: #64748b;
+            text-decoration: none;
+            cursor: pointer;
+            background: transparent;
+            border: 0;
+        }
+        .by-dock-item svg { display: block; }
+        .by-dock-item.is-active,
+        .by-dock-item:active,
+        body:has(.site-menu-toggle:checked) .by-dock-menu {
+            color: #9a3412;
+            background: #fff7ed;
+        }
+        #mobile-search-sheet {
+            left: .75rem;
+            right: .75rem;
+            bottom: calc(4.75rem + env(safe-area-inset-bottom));
         }
         body:has(.site-menu-toggle:checked) { overflow: hidden; }
+        @media (min-width: 768px) { .by-dock { display: none !important; } }
     </style>
 </head>
 <body class="storefront min-h-screen font-sans">
@@ -142,8 +300,8 @@
     </header>
 
     {{-- Mobile search sheet (opened from bottom nav) --}}
-    <div id="mobile-search-sheet" class="fixed inset-x-0 bottom-16 z-[90] px-3 pb-2 md:hidden" hidden>
-        <form action="{{ route('products.index') }}" class="by-card border-slate-200 bg-white p-3 shadow-lg">
+    <div id="mobile-search-sheet" class="fixed z-[90] md:hidden" hidden>
+        <form action="{{ route('products.index') }}" class="rounded-2xl border border-slate-200/80 bg-white/95 p-3 shadow-xl backdrop-blur">
             <label class="sr-only" for="mobile-search-q">{{ __('ui.search') }}</label>
             <div class="flex gap-2">
                 <input id="mobile-search-q" class="by-input flex-1" name="q" value="{{ request('q') }}" placeholder="{{ __('ui.search_placeholder_short') }}" autocomplete="off" />
@@ -152,7 +310,7 @@
         </form>
     </div>
 
-    <main class="flex-1 pb-20 md:pb-0">
+    <main class="flex-1 pb-24 md:pb-0">
         @if(session('success'))
             <div class="by-container pt-4">
                 <div class="by-card border-emerald-200 bg-emerald-50/70 p-4 text-sm text-emerald-900">{{ session('success') }}</div>
@@ -172,28 +330,26 @@
         @yield('content')
     </main>
 
-    <nav class="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/95 backdrop-blur md:hidden" aria-label="{{ __('ui.menu') }}">
-        <div class="grid grid-cols-4 gap-1 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2">
-            <label for="site-menu-toggle" class="flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-[11px] font-semibold text-slate-600 cursor-pointer" aria-label="{{ __('ui.menu') }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-                {{ __('ui.menu') }}
-            </label>
-            <a href="{{ auth()->check() ? route('cart.index') : route('login') }}" class="flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-[11px] font-semibold {{ request()->routeIs('cart.*') ? 'bg-orange-50 text-orange-800' : 'text-slate-600' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-                {{ __('ui.cart') }}
-            </a>
-            <a href="{{ auth()->check() ? (auth()->user()->isVendor() ? route('vendor.dashboard') : (auth()->user()->isAdmin() ? route('admin.dashboard') : route('customer.dashboard'))) : route('login') }}" class="flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-[11px] font-semibold {{ request()->routeIs('customer.*','account.*','vendor.*','admin.*') ? 'bg-orange-50 text-orange-800' : 'text-slate-600' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                {{ __('ui.account') }}
-            </a>
-            <button type="button" id="mobile-search-toggle" class="flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-[11px] font-semibold text-slate-600" aria-expanded="false" aria-controls="mobile-search-sheet">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                {{ __('ui.search') }}
-            </button>
-        </div>
+    <nav class="by-dock md:hidden" aria-label="{{ __('ui.menu') }}">
+        <label for="site-menu-toggle" class="by-dock-item by-dock-menu" aria-label="{{ __('ui.menu') }}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            {{ __('ui.menu') }}
+        </label>
+        <a href="{{ auth()->check() ? route('cart.index') : route('login') }}" class="by-dock-item {{ request()->routeIs('cart.*') ? 'is-active' : '' }}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            {{ __('ui.cart') }}
+        </a>
+        <a href="{{ auth()->check() ? (auth()->user()->isVendor() ? route('vendor.dashboard') : (auth()->user()->isAdmin() ? route('admin.dashboard') : route('customer.dashboard'))) : route('login') }}" class="by-dock-item {{ request()->routeIs('customer.*','account.*','vendor.*','admin.*') ? 'is-active' : '' }}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            {{ __('ui.account') }}
+        </a>
+        <button type="button" id="mobile-search-toggle" class="by-dock-item" aria-expanded="false" aria-controls="mobile-search-sheet">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            {{ __('ui.search') }}
+        </button>
     </nav>
 
-    <footer class="mt-16 border-t border-slate-200/70 bg-white/60 backdrop-blur mb-16 md:mb-0">
+    <footer class="mt-16 border-t border-slate-200/70 bg-white/60 backdrop-blur mb-24 md:mb-0">
         <div class="by-container py-12">
             @unless(request()->routeIs('cart.*', 'checkout.*', 'login', 'register') || auth()->user()?->isVendor() || auth()->user()?->isAdmin())
             <div class="by-card by-gradient-border p-6 md:p-8 mb-10">
@@ -267,12 +423,12 @@
     if (open) {
       sheet.removeAttribute('hidden');
       toggle.setAttribute('aria-expanded', 'true');
-      toggle.classList.add('bg-orange-50', 'text-orange-800');
+      toggle.classList.add('is-active');
       setTimeout(function () { input && input.focus(); }, 50);
     } else {
       sheet.setAttribute('hidden', '');
       toggle.setAttribute('aria-expanded', 'false');
-      toggle.classList.remove('bg-orange-50', 'text-orange-800');
+      toggle.classList.remove('is-active');
     }
   });
 })();

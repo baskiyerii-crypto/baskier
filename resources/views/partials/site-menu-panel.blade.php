@@ -1,69 +1,70 @@
-<div class="p-4 border-b border-slate-200/70 flex items-center justify-between gap-2">
+<div class="site-menu-head">
     @include('partials.platform-brand', ['compact' => true, 'brandHref' => route('home')])
-    <label for="site-menu-toggle" class="by-btn-secondary px-3 py-2 cursor-pointer" aria-label="{{ __('ui.close_menu') }}">
+    <label for="site-menu-toggle" class="site-menu-close" aria-label="{{ __('ui.close_menu') }}">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
     </label>
 </div>
 
-<div class="px-4 pb-4 pt-2">
-    <p class="text-xs font-extrabold uppercase tracking-wider text-slate-500">{{ __('ui.menu') }}</p>
-    <div class="mt-2 grid gap-2">
+<nav class="site-menu-nav">
+    <p class="site-menu-kicker">{{ __('ui.menu') }}</p>
+    <div class="site-menu-list">
         @foreach(\App\Support\SiteMenu::forPlacement('drawer') as $item)
             @if(($item['type'] ?? '') === 'categories_accordion')
-                <details class="by-card overflow-hidden">
-                    <summary class="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-slate-900">{{ \App\Support\SiteMenu::displayLabel($item) }}</summary>
-                    <div class="border-t border-slate-100 px-2 py-2 max-h-[40vh] overflow-auto">
+                <details class="site-menu-acc">
+                    <summary>{{ \App\Support\SiteMenu::displayLabel($item) }}</summary>
+                    <div class="site-menu-acc-body">
                         @if(!empty($headerCategories) && $headerCategories->isNotEmpty())
                             @foreach($headerCategories as $parentCategory)
-                                <a class="block rounded-xl px-3 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50" href="{{ route('products.index', ['category_id' => $parentCategory->id]) }}">{{ $parentCategory->localizedName() }}</a>
+                                <a href="{{ route('products.index', ['category_id' => $parentCategory->id]) }}">{{ $parentCategory->localizedName() }}</a>
                                 @foreach($parentCategory->children as $childCategory)
-                                    <a class="ml-3 block rounded-xl px-3 py-2 text-sm text-slate-600 hover:bg-slate-50" href="{{ route('products.index', ['category_id' => $childCategory->id]) }}">{{ $childCategory->localizedName() }}</a>
+                                    <a class="is-child" href="{{ route('products.index', ['category_id' => $childCategory->id]) }}">{{ $childCategory->localizedName() }}</a>
                                 @endforeach
                             @endforeach
                         @else
-                            <p class="px-2 py-2 text-sm text-slate-500">{{ __('ui.no_categories') }}</p>
+                            <p class="site-menu-empty">{{ __('ui.no_categories') }}</p>
                         @endif
                     </div>
                 </details>
             @else
                 @php $menuHref = \App\Support\SiteMenu::href($item); @endphp
                 @if($menuHref)
-                    <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ $menuHref }}">{{ \App\Support\SiteMenu::displayLabel($item) }}</a>
+                    <a class="site-menu-link {{ request()->url() === $menuHref ? 'is-active' : '' }}" href="{{ $menuHref }}">
+                        <span>{{ \App\Support\SiteMenu::displayLabel($item) }}</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+                    </a>
                 @endif
             @endif
         @endforeach
     </div>
-</div>
+</nav>
 
-<div class="px-4 pb-4">
-    <p class="text-xs font-extrabold uppercase tracking-wider text-slate-500">{{ __('ui.account') }}</p>
-    <div class="mt-2 grid gap-2">
+<nav class="site-menu-nav">
+    <p class="site-menu-kicker">{{ __('ui.account') }}</p>
+    <div class="site-menu-list">
         @auth
-            <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('cart.index') }}">{{ __('ui.cart') }}</a>
-            <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('account.orders.index') }}">{{ __('ui.orders') }}</a>
+            <a class="site-menu-link" href="{{ route('cart.index') }}"><span>{{ __('ui.cart') }}</span></a>
+            <a class="site-menu-link" href="{{ route('account.orders.index') }}"><span>{{ __('ui.orders') }}</span></a>
             @if(auth()->user()->isAdmin())
-                <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('admin.dashboard') }}">{{ __('ui.admin') }}</a>
+                <a class="site-menu-link" href="{{ route('admin.dashboard') }}"><span>{{ __('ui.admin') }}</span></a>
             @endif
             @if(auth()->user()->isVendor())
-                <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('vendor.dashboard') }}">{{ __('ui.vendor_panel') }}</a>
+                <a class="site-menu-link" href="{{ route('vendor.dashboard') }}"><span>{{ __('ui.vendor_panel') }}</span></a>
             @endif
             @if(auth()->user()->isCustomer())
-                <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('customer.dashboard') }}">{{ __('ui.account') }}</a>
+                <a class="site-menu-link" href="{{ route('customer.dashboard') }}"><span>{{ __('ui.account') }}</span></a>
             @endif
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="w-full by-btn-secondary">{{ __('ui.logout') }}</button>
+                <button type="submit" class="site-menu-logout">{{ __('ui.logout') }}</button>
             </form>
         @else
-            <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('login') }}">{{ __('ui.login_full') }}</a>
-            <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('register') }}">{{ __('ui.register') }}</a>
+            <a class="site-menu-link" href="{{ route('login') }}"><span>{{ __('ui.login_full') }}</span></a>
+            <a class="site-menu-cta" href="{{ route('register') }}">{{ __('ui.register') }}</a>
         @endauth
     </div>
-</div>
+</nav>
 
-<div class="px-4 pb-6">
-    <p class="text-xs font-extrabold uppercase tracking-wider text-slate-500">{{ __('ui.language') }}</p>
-    <div class="mt-2">
-        @include('partials.locale-switcher')
-    </div>
+<div class="site-menu-foot">
+    <p class="site-menu-kicker">{{ __('ui.language') }}</p>
+    @include('partials.locale-switcher')
 </div>
