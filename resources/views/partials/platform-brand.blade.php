@@ -4,18 +4,18 @@
     $siteName = \App\Support\SiteMenu::platformName();
     $isMobileHeader = (bool) ($mobileHeader ?? false);
     $brandClass = $isMobileHeader
-        ? 'inline-flex min-w-0 max-w-full items-center gap-2.5 text-base font-extrabold tracking-tight text-slate-900'
+        ? 'inline-flex min-w-0 max-w-full items-center gap-2 text-lg leading-tight font-extrabold tracking-tight text-slate-900'
         : (($compact ?? false)
             ? 'inline-flex min-w-0 max-w-full items-center gap-2 text-sm font-extrabold tracking-tight text-slate-900'
             : 'inline-flex items-center gap-2 text-base font-extrabold tracking-tight text-slate-900');
-    $logoBox = $isMobileHeader ? 'h-11 w-11 shrink-0' : 'h-9 w-9 shrink-0';
+    $logoBox = $isMobileHeader ? 'h-9 w-9 shrink-0' : 'h-9 w-9 shrink-0';
     $showName = ! ($logoOnly ?? false);
     if (($forceName ?? false) === true) {
         $showName = true;
     }
     $version = ($logoRel && is_file(public_path($logoRel))) ? filemtime(public_path($logoRel)) : null;
     $nameClass = $isMobileHeader
-        ? 'truncate max-w-[9rem]'
+        ? 'truncate max-w-[8.5rem]'
         : 'truncate max-w-[9rem] sm:max-w-none';
 @endphp
 <a href="{{ $href ?? route('home') }}" class="{{ $brandClass }}" aria-label="{{ $siteName }}">
