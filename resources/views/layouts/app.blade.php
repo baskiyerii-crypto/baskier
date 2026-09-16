@@ -233,13 +233,9 @@
                 </div>
                 <div class="flex shrink-0 items-center justify-end gap-1.5">
                     @include('partials.locale-switcher', ['compact' => true])
-                    @auth
-                        <a href="{{ route('cart.index') }}" class="inline-flex h-10 items-center rounded-xl bg-orange-600 px-3 text-xs font-bold text-white">
-                            {{ __('ui.cart') }}
-                        </a>
-                    @else
+                    @guest
                         <a href="{{ route('login') }}" class="inline-flex h-10 items-center rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700">{{ __('ui.login') }}</a>
-                    @endauth
+                    @endguest
                 </div>
             </div>
 
