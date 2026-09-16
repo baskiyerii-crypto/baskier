@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminFinanceController;
 use App\Http\Controllers\Admin\AdminPayoutController;
 use App\Http\Controllers\Admin\AdminProductController;
+use App\Http\Controllers\Admin\AdminProductModerationController;
 use App\Http\Controllers\Admin\AdminSettingsController;
 use App\Http\Controllers\Admin\AdminSupportTicketWebController;
 use App\Http\Controllers\Admin\AdminVendorController;
@@ -33,6 +34,7 @@ use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\QuoteRequestController;
+use App\Http\Controllers\VendorController;
 use App\Http\Controllers\Vendor\VendorBalanceController;
 use App\Http\Controllers\Vendor\VendorDashboardController;
 use App\Http\Controllers\Vendor\VendorDocumentController;
@@ -44,9 +46,13 @@ use App\Http\Controllers\Vendor\VendorPayoutRequestWebController;
 use App\Http\Controllers\Vendor\VendorProductController;
 use App\Http\Controllers\Vendor\VendorQuoteRequestController;
 use App\Http\Controllers\Vendor\VendorSubscriptionController;
-use App\Http\Controllers\Vendor\VendorTabelaController;
-use App\Http\Controllers\VendorController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Vendor\VendorContractController;
+use App\Http\Controllers\Vendor\VendorCategoryRequestController;
+use App\Http\Controllers\Admin\AdminCustomerController;
+use App\Http\Controllers\Admin\AdminVendorUpdateController;
+use App\Http\Controllers\Customer\CustomerDirectQuoteController;
+use App\Http\Controllers\Vendor\VendorDirectQuoteController;
+use App\Http\Controllers\Vendor\VendorProfileController;
 
 // Genel
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -62,6 +68,7 @@ Route::get('/satici/{slug}', [VendorController::class, 'show'])->name('vendors.s
 Route::get('/gizlilik', [PageController::class, 'privacy'])->name('pages.privacy');
 Route::get('/kullanim-kosullari', [PageController::class, 'terms'])->name('pages.terms');
 Route::get('/hakkimizda', [PageController::class, 'about'])->name('pages.about');
+Route::get('/iletisim', [PageController::class, 'contact'])->name('pages.contact');
 Route::get('/sozlesme/{key}', [ContractController::class, 'show'])->name('contracts.show');
 
 Route::get('/is-ilanlari', [FreelancerJobController::class, 'index'])->name('freelancer-jobs.index');
@@ -129,6 +136,11 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:customer'])->prefix('hesabim')->name('customer.')->group(function () {
     Route::get('/', [CustomerDashboardController::class, 'index'])->name('dashboard');
     Route::get('/fiyat-tahmini', [CustomerPriceEstimateController::class, 'index'])->name('price-estimate');
+    Route::get('/bireysel-teklifler', [CustomerDirectQuoteController::class, 'index'])->name('direct-quotes.index');
+    Route::get('/bireysel-teklifler/yeni', [CustomerDirectQuoteController::class, 'create'])->name('direct-quotes.create');
+    Route::post('/bireysel-teklifler', [CustomerDirectQuoteController::class, 'store'])->name('direct-quotes.store');
+    Route::get('/bireysel-teklifler/{directQuote}', [CustomerDirectQuoteController::class, 'show'])->name('direct-quotes.show');
+    Route::post('/bireysel-teklifler/{directQuote}/kabul', [CustomerDirectQuoteController::class, 'accept'])->name('direct-quotes.accept');
 });
 
 // Satıcı paneli
@@ -164,6 +176,16 @@ Route::middleware(['auth', 'role:vendor'])->prefix('satici-panel')->name('vendor
     Route::post('tabela/gorusme', [VendorTabelaController::class, 'startMeeting'])->name('tabela.meeting');
     Route::get('abonelikler', [VendorSubscriptionController::class, 'index'])->name('subscriptions.index');
     Route::post('abonelikler/aktiflestir', [VendorSubscriptionController::class, 'activate'])->name('subscriptions.activate');
+    Route::get('sozlesmeler', [VendorContractController::class, 'index'])->name('contracts.index');
+    Route::post('sozlesmeler/{acceptance}/onayla', [VendorContractController::class, 'accept'])->name('contracts.accept');
+    Route::get('kategorilerim', [VendorCategoryRequestController::class, 'index'])->name('categories.index');
+    Route::post('kategorilerim', [VendorCategoryRequestController::class, 'store'])->name('categories.store');
+    Route::get('profil', [VendorProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('profil', [VendorProfileController::class, 'update'])->name('profile.update');
+    Route::get('bireysel-teklifler', [VendorDirectQuoteController::class, 'index'])->name('direct-quotes.index');
+    Route::get('bireysel-teklifler/{directQuote}', [VendorDirectQuoteController::class, 'show'])->name('direct-quotes.show');
+    Route::post('bireysel-teklifler/{directQuote}/teklif', [VendorDirectQuoteController::class, 'offer'])->name('direct-quotes.offer');
+    Route::post('bireysel-teklifler/{directQuote}/iletisim', [VendorDirectQuoteController::class, 'consent'])->name('direct-quotes.consent');
 });
 
 // Yönetici paneli
@@ -180,14 +202,22 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('products/{product}/edit', [AdminProductController::class, 'edit'])->name('products.edit');
     Route::put('products/{product}', [AdminProductController::class, 'update'])->name('products.update');
     Route::delete('products/{product}', [AdminProductController::class, 'destroy'])->name('products.destroy');
+    Route::get('urun-onaylari', [AdminProductModerationController::class, 'index'])->name('product-approvals.index');
+    Route::post('urun-onaylari/{product}/onayla', [AdminProductModerationController::class, 'approve'])->name('product-approvals.approve');
+    Route::post('urun-onaylari/{product}/reddet', [AdminProductModerationController::class, 'reject'])->name('product-approvals.reject');
     Route::get('settings', [AdminSettingsController::class, 'index'])->name('settings.index');
     Route::post('settings', [AdminSettingsController::class, 'update'])->name('settings.update');
     Route::get('finans', [AdminFinanceController::class, 'index'])->name('finance.index');
     Route::post('finans/giderler', [AdminFinanceController::class, 'updateExpenses'])->name('finance.expenses');
     Route::get('finans/export', [AdminFinanceController::class, 'export'])->name('finance.export');
     Route::get('blog', [AdminBlogController::class, 'index'])->name('blog.index');
+    Route::get('blog/yeni', [AdminBlogController::class, 'create'])->name('blog.create');
+    Route::post('blog', [AdminBlogController::class, 'store'])->name('blog.store');
     Route::get('blog/ice-aktar', [AdminBlogController::class, 'importForm'])->name('blog.import');
     Route::post('blog/ice-aktar', [AdminBlogController::class, 'import'])->name('blog.import.store');
+    Route::get('blog/{post}/duzenle', [AdminBlogController::class, 'edit'])->name('blog.edit');
+    Route::put('blog/{post}', [AdminBlogController::class, 'update'])->name('blog.update');
+    Route::delete('blog/{post}', [AdminBlogController::class, 'destroy'])->name('blog.destroy');
     Route::get('api-yonetimi', [AdminApiManagementController::class, 'index'])->name('api-management.index');
     Route::post('api-yonetimi', [AdminApiManagementController::class, 'update'])->name('api-management.update');
     Route::get('payouts', [AdminPayoutController::class, 'index'])->name('payouts.index');
@@ -200,5 +230,22 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('satici-odeme-talepleri', [AdminVendorPayoutRequestController::class, 'index'])->name('vendor-payout-requests.index');
     Route::post('satici-odeme-talepleri/{payoutRequest}/onayla', [AdminVendorPayoutRequestController::class, 'approve'])->name('vendor-payout-requests.approve');
     Route::post('satici-odeme-talepleri/{payoutRequest}/reddet', [AdminVendorPayoutRequestController::class, 'reject'])->name('vendor-payout-requests.reject');
+    Route::get('musteriler', [AdminCustomerController::class, 'index'])->name('customers.index');
+    Route::get('musteriler/{customer}', [AdminCustomerController::class, 'show'])->name('customers.show');
+    Route::post('musteriler/{customer}/aktiflik', [AdminCustomerController::class, 'toggleActive'])->name('customers.toggle');
+    Route::get('satici-guncellemeleri', [AdminVendorUpdateController::class, 'index'])->name('vendor-updates.index');
+    Route::post('satici-guncellemeleri/belgeler/{document}/onayla', [AdminVendorUpdateController::class, 'approveDocument'])->name('vendor-updates.documents.approve');
+    Route::post('satici-guncellemeleri/belgeler/{document}/reddet', [AdminVendorUpdateController::class, 'rejectDocument'])->name('vendor-updates.documents.reject');
+    Route::post('satici-guncellemeleri/profil/{vendorProfileChangeRequest}/onayla', [AdminVendorUpdateController::class, 'approveProfile'])->name('vendor-updates.profiles.approve');
+    Route::post('satici-guncellemeleri/profil/{vendorProfileChangeRequest}/reddet', [AdminVendorUpdateController::class, 'rejectProfile'])->name('vendor-updates.profiles.reject');
+    Route::get('satici-kategori-talepleri', [AdminVendorCategoryRequestController::class, 'index'])->name('vendor-category-requests.index');
+    Route::post('satici-kategori-talepleri/{vendorCategoryRequest}/onayla', [AdminVendorCategoryRequestController::class, 'approve'])->name('vendor-category-requests.approve');
+    Route::post('satici-kategori-talepleri/{vendorCategoryRequest}/reddet', [AdminVendorCategoryRequestController::class, 'reject'])->name('vendor-category-requests.reject');
     Route::resource('contracts', AdminContractController::class)->only(['index', 'create', 'store', 'edit', 'update']);
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/dogrulama', [OtpVerificationController::class, 'show'])->name('otp.show');
+    Route::post('/dogrulama/gonder', [OtpVerificationController::class, 'send'])->name('otp.send');
+    Route::post('/dogrulama/onayla', [OtpVerificationController::class, 'verify'])->name('otp.verify');
 });

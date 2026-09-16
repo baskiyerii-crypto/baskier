@@ -30,7 +30,7 @@ class VendorController extends Controller
             ->firstOrFail();
 
         $products = Product::where('vendor_id', $vendor->id)
-            ->where('is_active', true)
+            ->published()
             ->with('category')
             ->paginate(12);
 

@@ -27,7 +27,12 @@ class User extends Authenticatable
         'password',
         'role',
         'vendor_id',
-        'is_freelancer',
+            'is_freelancer',
+        'public_id',
+        'phone',
+        'email_verified_at',
+        'phone_verified_at',
+        'is_active',
     ];
 
     /**
@@ -49,8 +54,35 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'phone_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (User $user): void {
+            if (empty($user->public_id)) {
+                $user->public_id = static::generateUniquePublicId();
+            }
+        });
+    }
+
+    public static function generateUniquePublicId(): string
+    {
+        do {
+            $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        } while (static::query()->where('public_id', $code)->exists());
+
+        return $code;
+    }
+
+    public function publicCode(): string
+    {
+        $id = $this->public_id ?: '000000';
+
+        return 'BY-'.$id;
     }
 
     public function vendor(): \Illuminate\Database\Eloquent\Relations\BelongsTo

@@ -1,36 +1,91 @@
 @extends('layouts.admin')
-@section('title', 'Ayarlar')
+@section('title', __('panel.nav_settings'))
 @section('content')
-<div class="card p-4" style="max-width:520px;">
-    <form method="POST" action="{{ route('admin.settings.update') }}">
-        @csrf
-        <div class="mb-3">
-            <label class="form-label fw-semibold">Komisyon oranı (%)</label>
-            <input type="number" name="commission_rate" class="form-control" value="{{ old('commission_rate', $commission_rate) }}" min="0" max="100" step="0.01" required>
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card p-4">
+            <h2 class="h6 fw-bold mb-3">{{ __('panel.settings_finance') }}</h2>
+            <form method="POST" action="{{ route('admin.settings.update') }}" enctype="multipart/form-data">
+                @csrf
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Komisyon oranı (%)</label>
+                    <input type="number" name="commission_rate" class="form-control" value="{{ old('commission_rate', $commission_rate) }}" min="0" max="100" step="0.01" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Hakediş dağılım günü (ayın kaçı)</label>
+                    <input type="number" name="payout_day_of_month" class="form-control" value="{{ old('payout_day_of_month', $payout_day_of_month) }}" min="1" max="28" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Komisyon bekleme süresi (gün)</label>
+                    <input type="number" name="commission_wait_days" class="form-control" value="{{ old('commission_wait_days', $commission_wait_days) }}" min="0" max="90" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">{{ __('panel.contract_acceptance_days') }}</label>
+                    <input type="number" name="contract_acceptance_days" class="form-control" value="{{ old('contract_acceptance_days', $contract_acceptance_days) }}" min="1" max="90" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Tabela görüşme ücreti (₺)</label>
+                    <input type="number" name="meeting_fee" class="form-control" value="{{ old('meeting_fee', $meeting_fee) }}" min="0" max="1000" step="0.01" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Freelancer modülü aylık ücreti (₺)</label>
+                    <input type="number" name="freelancer_monthly_fee" class="form-control" value="{{ old('freelancer_monthly_fee', $freelancer_monthly_fee) }}" min="0" max="100000" step="0.01" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Teklif verme modülü aylık ücreti (₺)</label>
+                    <input type="number" name="quotes_monthly_fee" class="form-control" value="{{ old('quotes_monthly_fee', $quotes_monthly_fee) }}" min="0" max="100000" step="0.01" required>
+                </div>
+
+                <hr class="my-4">
+                <h2 class="h6 fw-bold mb-3">{{ __('panel.settings_platform') }}</h2>
+                @if(\App\Support\PlatformBranding::logoUrl())
+                    <div class="mb-2"><img src="{{ \App\Support\PlatformBranding::logoUrl() }}" alt="logo" style="max-height:48px"></div>
+                @endif
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">{{ __('panel.platform_logo') }}</label>
+                    <input type="file" name="platform_logo" class="form-control" accept="image/*">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">{{ __('panel.address') }}</label>
+                    <input type="text" name="platform_address" class="form-control" value="{{ old('platform_address', $platform_address) }}">
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">{{ __('panel.phone') }}</label>
+                        <input type="text" name="platform_phone" class="form-control" value="{{ old('platform_phone', $platform_phone) }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">{{ __('panel.email') }}</label>
+                        <input type="email" name="platform_email" class="form-control" value="{{ old('platform_email', $platform_email) }}">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">{{ __('panel.map_embed') }}</label>
+                    <input type="text" name="platform_map_embed_url" class="form-control" value="{{ old('platform_map_embed_url', $platform_map_embed_url) }}">
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Lat</label>
+                        <input type="text" name="platform_map_lat" class="form-control" value="{{ old('platform_map_lat', $platform_map_lat) }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Lng</label>
+                        <input type="text" name="platform_map_lng" class="form-control" value="{{ old('platform_map_lng', $platform_map_lng) }}">
+                    </div>
+                </div>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Instagram</label>
+                        <input type="text" name="platform_social_instagram" class="form-control" value="{{ old('platform_social_instagram', $platform_social_instagram) }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Website</label>
+                        <input type="url" name="platform_social_website" class="form-control" value="{{ old('platform_social_website', $platform_social_website) }}">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">{{ __('panel.save') }}</button>
+            </form>
         </div>
-        <div class="mb-3">
-            <label class="form-label fw-semibold">Hakediş dağılım günü (ayın kaçı)</label>
-            <input type="number" name="payout_day_of_month" class="form-control" value="{{ old('payout_day_of_month', $payout_day_of_month) }}" min="1" max="28" required>
-            <div class="form-text">Örn: 5 = her ayın 5'inde listelenir.</div>
-        </div>
-        <div class="mb-3">
-            <label class="form-label fw-semibold">Komisyon bekleme süresi (gün)</label>
-            <input type="number" name="commission_wait_days" class="form-control" value="{{ old('commission_wait_days', $commission_wait_days) }}" min="0" max="90" required>
-            <div class="form-text">Teslimden sonra kaç gün beklenir (örn: 15).</div>
-        </div>
-        <div class="mb-4">
-            <label class="form-label fw-semibold">Tabela görüşme ücreti (₺)</label>
-            <input type="number" name="meeting_fee" class="form-control" value="{{ old('meeting_fee', $meeting_fee) }}" min="0" max="1000" step="0.01" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label fw-semibold">Freelancer modülü aylık ücreti (₺)</label>
-            <input type="number" name="freelancer_monthly_fee" class="form-control" value="{{ old('freelancer_monthly_fee', $freelancer_monthly_fee) }}" min="0" max="100000" step="0.01" required>
-        </div>
-        <div class="mb-4">
-            <label class="form-label fw-semibold">Teklif verme modülü aylık ücreti (₺)</label>
-            <input type="number" name="quotes_monthly_fee" class="form-control" value="{{ old('quotes_monthly_fee', $quotes_monthly_fee) }}" min="0" max="100000" step="0.01" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Kaydet</button>
-    </form>
+    </div>
 </div>
 @endsection

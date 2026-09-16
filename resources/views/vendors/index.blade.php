@@ -1,30 +1,30 @@
 @extends('layouts.app')
 
-@section('title', 'Satıcılar - BaskıYeri Pazaryeri')
+@section('title', __('ui.vendors_title'))
 
 @section('content')
     <div class="by-container py-6">
         <div class="by-card p-6">
             <div class="flex flex-wrap items-end justify-between gap-4">
                 <div>
-                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Keşfet</p>
-                    <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-900">Satıcılar</h1>
-                    <p class="mt-1 text-sm text-slate-600">İş koluna göre filtreleyip satıcı profillerini inceleyin.</p>
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('ui.discover') }}</p>
+                    <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-900">{{ __('ui.vendors') }}</h1>
+                    <p class="mt-1 text-sm text-slate-600">{{ __('ui.vendors_body') }}</p>
                 </div>
 
                 @if(isset($businessTypes) && $businessTypes->isNotEmpty())
                     <form method="get" action="{{ route('vendors.index') }}" class="flex items-end gap-2">
                         <div>
-                            <label class="text-xs font-semibold text-slate-600">İş kolu</label>
+                            <label class="text-xs font-semibold text-slate-600">{{ __('ui.business_type') }}</label>
                             <select name="business_type" class="mt-1 w-64 rounded-full border border-slate-200 bg-white/80 px-4 py-2.5 text-sm outline-none ring-orange-400 focus:ring-2" onchange="this.form.submit()">
-                                <option value="">Tümü</option>
+                                <option value="">{{ __('ui.all') }}</option>
                                 @foreach($businessTypes as $bt)
                                     <option value="{{ $bt->slug }}" @selected(request('business_type') === $bt->slug)>{{ $bt->name }}</option>
                                 @endforeach
                             </select>
                         </div>
                         @if(request('business_type'))
-                            <a class="by-btn-secondary" href="{{ route('vendors.index') }}">Temizle</a>
+                            <a class="by-btn-secondary" href="{{ route('vendors.index') }}">{{ __('ui.clear') }}</a>
                         @endif
                     </form>
                 @endif
@@ -34,10 +34,10 @@
         <div class="mt-6">
             @if($vendors->isEmpty())
                 <div class="by-card p-8 text-center">
-                    <p class="text-sm text-slate-600">Satıcı bulunamadı.</p>
+                    <p class="text-sm text-slate-600">{{ __('ui.no_vendors') }}</p>
                 </div>
             @else
-                <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
                     @foreach($vendors as $vendor)
                         <a href="{{ route('vendors.show', $vendor->slug) }}" class="group by-card by-card-hover p-5">
                             <div class="flex items-start gap-3">

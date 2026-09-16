@@ -9,7 +9,9 @@
     <meta name="theme-color" content="#059669">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @endif
     <style>
         :root {
             --side-bg: #f8fafc;
@@ -31,10 +33,45 @@
             position: fixed; top: 0; left: 0; height: 100vh; z-index: 1040;
             display: flex; flex-direction: column; transition: transform 0.2s ease-in-out;
         }
+        .vendor-sidebar.is-collapsed { transform: translateX(-100%); }
+        .vendor-shell.nav-collapsed .vendor-main { margin-left: 0; }
+        .vendor-sidebar details.nav-acc > summary {
+            list-style: none; cursor: pointer; padding: 9px 12px; color: var(--side-text); font-weight: 600; font-size: 0.8125rem;
+            border-radius: 8px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .vendor-sidebar details.nav-acc > summary::-webkit-details-marker { display: none; }
+        .vendor-sidebar details.nav-acc[open] > summary { background: rgba(5,150,105,.08); color: var(--side-active-text); }
+        .vendor-sidebar details.nav-acc .nav-acc-body { display: flex; flex-direction: column; flex-wrap: nowrap; gap: 2px; padding: 4px 0 8px 6px; width: 100%; }
+        .vendor-content .card { transition: transform .15s ease, box-shadow .15s ease; background: linear-gradient(180deg,#fff,#f8fafc); }
+        .vendor-content .card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(15,23,42,.08) !important; }
         .vendor-sidebar .brand { padding: 1.25rem 1.25rem; border-bottom: 1px solid var(--side-border); }
         .vendor-sidebar .brand a { font-weight: 700; font-size: 1.15rem; color: var(--side-text-hover); text-decoration: none; }
         .vendor-sidebar .brand .accent { color: var(--side-accent); }
-        .vendor-sidebar .nav { flex: 1; padding: 0.75rem 0.65rem; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; }
+        .vendor-sidebar .nav {
+            flex: 1;
+            min-height: 0;
+            padding: 0.75rem 0.65rem;
+            overflow-x: hidden;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            gap: 3px;
+            width: 100%;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 transparent;
+        }
+        .vendor-sidebar .nav::-webkit-scrollbar { width: 6px; }
+        .vendor-sidebar .nav::-webkit-scrollbar-track { background: transparent; }
+        .vendor-sidebar .nav::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 999px;
+        }
+        .vendor-sidebar .nav::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .vendor-sidebar details.nav-acc {
+            width: 100%;
+            flex: 0 0 auto;
+        }
         .vendor-sidebar .nav-link {
             display: flex; align-items: center; gap: 10px; padding: 9px 12px;
             color: var(--side-text); text-decoration: none; font-size: 0.875rem; font-weight: 500;
@@ -78,69 +115,61 @@
     </style>
 </head>
 <body class="min-h-screen">
-<div class="panel-backdrop" data-panel-backdrop></div>
-<div class="vendor-shell">
-    <aside class="vendor-sidebar" id="panel-sidebar" data-panel-sidebar tabindex="-1" aria-label="Satıcı menüsü">
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+<div class="vendor-shell" id="vendorShell">
+    <aside class="vendor-sidebar" id="vendorSidebar">
         <div class="brand d-flex justify-content-between align-items-center">
             <a href="{{ route('vendor.dashboard') }}">Baskı<span class="accent">Yeri</span> <span class="accent">Satıcı</span></a>
-            <button type="button" class="panel-close-button" data-panel-close aria-label="Menüyü kapat">×</button>
+            <button type="button" class="btn-close d-lg-none" onclick="toggleSidebar()" aria-label="Kapat"></button>
         </div>
-        <nav class="nav" aria-label="Panel menüsü">
+        @php $v = auth()->user()->vendor; @endphp
+        <nav class="nav">
             <a href="{{ route('vendor.dashboard') }}" class="nav-link {{ request()->routeIs('vendor.dashboard') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
-                <span>Genel bakış</span>
+                <span>Özet</span>
             </a>
-            <a href="{{ route('vendor.orders.index') }}" class="nav-link {{ request()->routeIs('vendor.orders.*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-                <span>Siparişler</span>
-            </a>
-            <a href="{{ route('vendor.products.index') }}" class="nav-link {{ request()->routeIs('vendor.products.*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                <span>Ürünlerim</span>
-            </a>
-            <a href="{{ route('vendor.documents.index') }}" class="nav-link {{ request()->routeIs('vendor.documents.*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                <span>Belgeler</span>
-            </a>
-            @if(auth()->user()->vendor?->hasActiveQuotesModule())
-            <a href="{{ route('vendor.quote-requests.index') }}" class="nav-link {{ request()->routeIs('vendor.quote-requests.*') && request()->route('quoteRequest')?->request_type !== 'freelancer' ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                <span>Toplu üretim / Teklifler</span>
-            </a>
-            @endif
-            @if(auth()->user()->vendor?->hasActiveFreelancerModule())
-            <a href="{{ route('vendor.freelancer.index') }}" class="nav-link {{ request()->routeIs('vendor.freelancer.*') || request()->route('quoteRequest')?->request_type === 'freelancer' ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
-                <span>Freelancerım</span>
-            </a>
-            @endif
-            @if(auth()->user()->vendor?->hasActiveTabelaModule())
-            <a href="{{ route('vendor.tabela.index') }}" class="nav-link {{ request()->routeIs('vendor.tabela.*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 20h10"/></svg>
-                <span>Tabela</span>
-            </a>
-            @endif
-            <a href="{{ route('vendor.payout-requests.index') }}" class="nav-link {{ request()->routeIs('vendor.payout-requests.*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                <span>Hakediş & Para Çekme</span>
-            </a>
-            <a href="{{ route('vendor.balance.index') }}" class="nav-link {{ request()->routeIs('vendor.balance.*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/></svg>
-                <span>Görüşme Bakiyesi</span>
-            </a>
-            <a href="{{ route('vendor.messages.index') }}" class="nav-link {{ request()->routeIs('vendor.messages.*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                <span>Müşteri Mesajları</span>
-            </a>
-            <a href="{{ route('vendor.subscriptions.index') }}" class="nav-link {{ request()->routeIs('vendor.subscriptions.*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                <span>Modüller & Abonelik</span>
-            </a>
-            @if(auth()->user()->vendor)
-            <a href="{{ route('vendors.show', auth()->user()->vendor->slug) }}" target="_blank" rel="noopener" class="nav-link text-muted">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/></svg>
-                <span>Vitrin Mağazam ↗</span>
-            </a>
+            <details class="nav-acc" @if(request()->routeIs('vendor.orders.*','vendor.products.*','vendor.quote-requests.*','vendor.direct-quotes.*','vendor.freelancer.*','vendor.tabela.*')) open @endif>
+                <summary>{{ __('panel.nav_work') }} <span>▾</span></summary>
+                <div class="nav-acc-body">
+                    <a href="{{ route('vendor.orders.index') }}" class="nav-link {{ request()->routeIs('vendor.orders.*') ? 'active' : '' }}"><span>Siparişler</span></a>
+                    @if(!$v || $v->hasTrack('physical_products') || empty($v->registration_tracks))
+                    <a href="{{ route('vendor.products.index') }}" class="nav-link {{ request()->routeIs('vendor.products.*') ? 'active' : '' }}"><span>Ürünlerim</span></a>
+                    @endif
+                    @if($v?->hasActiveQuotesModule() && ($v->hasTrack('physical_quote') || empty($v->registration_tracks)))
+                    <a href="{{ route('vendor.quote-requests.index') }}" class="nav-link {{ request()->routeIs('vendor.quote-requests.*') ? 'active' : '' }}"><span>{{ __('panel.nav_bulk_production') }}</span></a>
+                    @endif
+                    <a href="{{ route('vendor.direct-quotes.index') }}" class="nav-link {{ request()->routeIs('vendor.direct-quotes.*') ? 'active' : '' }}"><span>{{ __('panel.nav_direct_quotes') }}</span></a>
+                    @if($v?->hasActiveFreelancerModule() && $v->hasFreelancerTrack() && Route::has('vendor.freelancer.index'))
+                    <a href="{{ route('vendor.freelancer.index') }}" class="nav-link {{ request()->routeIs('vendor.freelancer.*') ? 'active' : '' }}"><span>{{ __('panel.nav_freelancerim') }}</span></a>
+                    @endif
+                    @if($v?->hasActiveTabelaModule() && Route::has('vendor.tabela.index'))
+                    <a href="{{ route('vendor.tabela.index') }}" class="nav-link {{ request()->routeIs('vendor.tabela.*') ? 'active' : '' }}"><span>{{ __('panel.nav_tabela') }}</span></a>
+                    @endif
+                </div>
+            </details>
+            <details class="nav-acc" @if(request()->routeIs('vendor.documents.*','vendor.profile.*','vendor.categories.*','vendor.contracts.*','vendor.subscriptions.*')) open @endif>
+                <summary>{{ __('panel.nav_account_vendor') }} <span>▾</span></summary>
+                <div class="nav-acc-body">
+                    <a href="{{ route('vendor.profile.edit') }}" class="nav-link {{ request()->routeIs('vendor.profile.*') ? 'active' : '' }}"><span>{{ __('panel.profile') }}</span></a>
+                    <a href="{{ route('vendor.documents.index') }}" class="nav-link {{ request()->routeIs('vendor.documents.*') ? 'active' : '' }}"><span>Belgeler</span></a>
+                    @if(Route::has('vendor.categories.index'))
+                    <a href="{{ route('vendor.categories.index') }}" class="nav-link {{ request()->routeIs('vendor.categories.*') ? 'active' : '' }}"><span>{{ __('panel.nav_my_categories') }}</span></a>
+                    @endif
+                    @if(Route::has('vendor.contracts.index'))
+                    <a href="{{ route('vendor.contracts.index') }}" class="nav-link {{ request()->routeIs('vendor.contracts.*') ? 'active' : '' }}"><span>{{ __('panel.nav_contracts_vendor') }}</span></a>
+                    @endif
+                    <a href="{{ route('vendor.subscriptions.index') }}" class="nav-link {{ request()->routeIs('vendor.subscriptions.*') ? 'active' : '' }}"><span>Modüller</span></a>
+                </div>
+            </details>
+            <details class="nav-acc" @if(request()->routeIs('vendor.payout-requests.*','vendor.balance.*','vendor.messages.*')) open @endif>
+                <summary>{{ __('panel.nav_finance_vendor') }} <span>▾</span></summary>
+                <div class="nav-acc-body">
+                    <a href="{{ route('vendor.payout-requests.index') }}" class="nav-link {{ request()->routeIs('vendor.payout-requests.*') ? 'active' : '' }}"><span>Hakediş</span></a>
+                    <a href="{{ route('vendor.balance.index') }}" class="nav-link {{ request()->routeIs('vendor.balance.*') ? 'active' : '' }}"><span>Bakiye</span></a>
+                    <a href="{{ route('vendor.messages.index') }}" class="nav-link {{ request()->routeIs('vendor.messages.*') ? 'active' : '' }}"><span>Mesajlar</span></a>
+                </div>
+            </details>
+            @if($v)
+            <a href="{{ route('vendors.show', $v->slug) }}" target="_blank" rel="noopener" class="nav-link text-muted"><span>Vitrin ↗</span></a>
             @endif
         </nav>
         @if($vendor = auth()->user()->vendor)
@@ -167,17 +196,20 @@
     <main class="vendor-main">
         <header class="vendor-header">
             <div class="d-flex align-items-center gap-2">
-                <button type="button" class="panel-menu-button" data-panel-open aria-controls="panel-sidebar" aria-expanded="false" aria-label="Menüyü aç">
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleSidebar()" aria-label="{{ __('panel.toggle_nav') }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
                 </button>
                 <h1 class="page-title mb-0">@yield('title', 'Panel')</h1>
             </div>
             <div class="user-menu">
-                <a href="{{ route('home') }}" target="_blank" rel="noopener">Pazaryerine Git ↗</a>
+                @include('partials.locale-switcher')
+                <span class="sep"></span>
+                <span class="text-muted small">{{ auth()->user()?->publicCode() }}</span>
+                <a href="{{ route('home') }}" target="_blank">{{ __('panel.view_site') }} ↗</a>
                 <span class="sep"></span>
                 <span class="text-muted small fw-medium">{{ auth()->user()->name ?? '' }}</span>
                 <form method="POST" action="{{ route('logout') }}" class="d-inline">@csrf
-                    <button type="submit" class="btn-out-vendor">Çıkış</button>
+                    <button type="submit" class="btn-out-vendor">{{ __('panel.logout') }}</button>
                 </form>
             </div>
         </header>
@@ -190,6 +222,21 @@
     </main>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('vendorSidebar');
+        const shell = document.getElementById('vendorShell');
+        const backdrop = document.getElementById('sidebarBackdrop');
+        const isMobile = window.matchMedia('(max-width: 991.98px)').matches;
+        if (isMobile) {
+            sidebar.classList.toggle('show');
+            backdrop.classList.toggle('show');
+        } else {
+            sidebar.classList.toggle('is-collapsed');
+            shell.classList.toggle('nav-collapsed');
+        }
+    }
+</script>
 @stack('scripts')
 @include('partials.pwa-install')
 </body>

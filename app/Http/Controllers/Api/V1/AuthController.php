@@ -79,11 +79,16 @@ class AuthController extends ApiController
     {
         return [
             'id' => $user->id,
+            'public_id' => $user->public_id,
+            'public_code' => $user->publicCode(),
             'name' => $user->name,
             'email' => $user->email,
+            'phone' => $user->phone,
             'role' => $user->role,
             'vendor_id' => $user->vendor_id,
             'is_freelancer' => (bool) $user->is_freelancer,
+            'email_verified' => (bool) $user->email_verified_at,
+            'phone_verified' => (bool) $user->phone_verified_at,
         ];
     }
 }

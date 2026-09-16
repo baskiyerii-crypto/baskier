@@ -76,6 +76,21 @@ class VendorDashboardController extends Controller
             'tabela' => $vendor->tabela_expires_at,
         ])->filter(fn ($d) => $d && $d->isFuture() && $d->lte(now()->addDays(14)));
 
+        $revenueTrend = ['labels' => [], 'values' => []];
+        for ($i = 29; $i >= 0; $i--) {
+            $day = now()->subDays($i)->toDateString();
+            $revenueTrend['labels'][] = $day;
+            $revenueTrend['values'][] = (float) Order::where('vendor_id', $vendor->id)
+                ->whereDate('created_at', $day)
+                ->whereNotIn('status', [OrderStatus::CANCELLED])
+                ->sum('vendor_amount');
+        }
+
+        $statusBreakdown = Order::where('vendor_id', $vendor->id)
+            ->selectRaw('status, COUNT(*) as c')
+            ->groupBy('status')
+            ->pluck('c', 'status');
+
         return view('vendor.dashboard', compact(
             'vendor',
             'productsCount',
@@ -88,7 +103,9 @@ class VendorDashboardController extends Controller
             'recentOrders',
             'openQuoteRequestsCount',
             'upcomingPayouts',
-            'moduleEnds'
+            'moduleEnds',
+            'revenueTrend',
+            'statusBreakdown'
         ));
     }
 }

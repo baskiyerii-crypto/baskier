@@ -14,9 +14,15 @@ use Illuminate\Support\Facades\DB;
 
 class FreelancerJobWebController extends Controller
 {
-    public function create()
+    public function create(Request $request)
     {
-        return view('freelancer-jobs.create');
+        $selectedCategory = $request->get('category');
+        $allowed = ['logo', 'wordpress', 'brochure', 'digital', 'other'];
+        if (! in_array($selectedCategory, $allowed, true)) {
+            $selectedCategory = null;
+        }
+
+        return view('freelancer-jobs.create', compact('selectedCategory'));
     }
 
     public function store(Request $request)
@@ -89,10 +95,8 @@ class FreelancerJobWebController extends Controller
             $job->bids()->where('id', '!=', $bid->id)->update(['status' => 'rejected']);
             $job->update(['status' => 'closed', 'closed_at' => now()]);
 
-            $rate = Setting::commissionRate();
-            $subtotal = $bid->amount;
-            $commissionAmount = round($subtotal * $rate / 100, 2);
-            $vendorAmount = $subtotal - $commissionAmount;
+            $commissions = app(\App\Services\CommissionService::class);
+            [$rate, $commissionAmount, $vendorAmount] = $commissions->calculate((float) $bid->amount, 'freelancer');
             $waitDays = Setting::commissionWaitDays();
 
             $newOrder = Order::create([
@@ -104,7 +108,7 @@ class FreelancerJobWebController extends Controller
                 'freelancer_job_id' => $job->id,
                 'status' => OrderStatus::CONFIRMED,
                 'payment_status' => 'paid',
-                'subtotal' => $subtotal,
+                'subtotal' => $bid->amount,
                 'commission_rate' => $rate,
                 'commission_amount' => $commissionAmount,
                 'vendor_amount' => $vendorAmount,
@@ -115,7 +119,7 @@ class FreelancerJobWebController extends Controller
 
             $newOrder->items()->create([
                 'name' => $job->title . ' (freelancer)',
-                'price' => $subtotal,
+                'price' => $bid->amount,
                 'quantity' => 1,
             ]);
 

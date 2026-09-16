@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Ödeme - BaskıYeri')
+@section('title', __('ui.checkout_title') . ' - BaskıYeri')
 
 @section('content')
 <div class="content-shell py-4">
-    <h1 class="h5 mb-4">Ödeme</h1>
+    <h1 class="h5 mb-4">{{ __('ui.checkout_title') }}</h1>
     <p class="small text-muted mb-4">Teslimat ve fatura bilgilerinizi kontrol edin, ardından ödeme yönteminizi seçin.</p>
     @if(!app(\App\Services\PaymentService::class)->isConfigured() || app(\App\Services\PaymentService::class)->mode() !== 'live')
         <div class="alert alert-warning mb-4" role="status">Kart ödemesi test modunda. Gerçek kart bilgilerinizi kullanmayın; bu modda gerçek tahsilat yapılmaz.</div>

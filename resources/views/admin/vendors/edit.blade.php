@@ -53,7 +53,7 @@
                 </div>
                 <div class="col-12 small text-muted">
                     Doğrulama durumu:
-                    <span class="badge bg-light text-dark border">{{ $vendor->verification_status ?? 'pending' }}</span>
+                    <span class="badge bg-light text-dark border">{{ \App\Support\UiLabels::verificationStatus($vendor->verification_status ?? 'pending') }}</span>
                 </div>
                 @php
                     $taxDoc = $vendor->documents()->where('document_type', 'tax_plate')->latest()->first();
@@ -64,7 +64,7 @@
                         @if($taxDoc)
                             <a class="btn btn-outline-secondary btn-sm" href="{{ asset('storage/'.$taxDoc->path) }}" target="_blank" rel="noopener">Görüntüle</a>
                             <span class="badge {{ $taxDoc->status === 'approved' ? 'bg-success-subtle text-success' : ($taxDoc->status === 'rejected' ? 'bg-danger-subtle text-danger' : 'bg-light text-muted border') }}">
-                                {{ $taxDoc->status }}
+                                {{ \App\Support\UiLabels::status($taxDoc->status) }}
                             </span>
                         @else
                             <span class="text-muted small">Yüklenmemiş</span>

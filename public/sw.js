@@ -4,7 +4,9 @@ const CACHE = 'baskiyeri-shell-v2';
 const ASSETS = ['/manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS)));
+  event.waitUntil(
+    caches.open(CACHE).then((cache) => cache.addAll(ASSETS).catch(() => undefined))
+  );
   self.skipWaiting();
 });
 

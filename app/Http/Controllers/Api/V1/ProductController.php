@@ -13,7 +13,7 @@ class ProductController extends ApiController
     public function index(Request $request)
     {
         $query = Product::query()
-            ->where('is_active', true)
+            ->published()
             ->with(['vendor', 'category']);
 
         if ($search = $request->string('q')->toString()) {
@@ -52,7 +52,7 @@ class ProductController extends ApiController
     public function show(string $slug)
     {
         $product = Product::where('slug', $slug)
-            ->where('is_active', true)
+            ->published()
             ->with(['vendor', 'category'])
             ->firstOrFail();
 
@@ -64,7 +64,7 @@ class ProductController extends ApiController
     public function priceEstimate(string $slug, PricingEstimateService $pricing)
     {
         $product = Product::where('slug', $slug)
-            ->where('is_active', true)
+            ->published()
             ->with(['vendor', 'category'])
             ->firstOrFail();
 

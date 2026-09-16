@@ -27,7 +27,7 @@
                                     {{ $r->category?->name }}
                                 @endif
                             </td>
-                            <td>{{ $r->status === 'open' ? 'Acik' : 'Kapali' }}</td>
+                            <td>{{ $r->status === 'open' ? __('panel.status_open') : __('panel.status_closed') }}</td>
                             <td>{{ $r->created_at->format('d.m.Y') }}</td>
                             <td><a href="{{ route('quote-requests.show', $r) }}" class="btn btn-outline-secondary btn-sm">Goruntule</a></td>
                         </tr>

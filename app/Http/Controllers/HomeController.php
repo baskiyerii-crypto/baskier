@@ -24,14 +24,14 @@ class HomeController extends Controller
             ->get();
 
         $featuredProducts = Product::query()
-            ->where('is_active', true)
+            ->published()
             ->where('is_featured', true)
             ->with(['vendor', 'category'])
             ->limit(50)
             ->get();
 
         $digitalProducts = Product::query()
-            ->where('is_active', true)
+            ->published()
             ->where('product_type', 'digital')
             ->with(['vendor', 'category'])
             ->latest()

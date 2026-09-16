@@ -18,4 +18,16 @@ class PageController extends Controller
     {
         return view('pages.about');
     }
+
+    public function contact()
+    {
+        return view('pages.contact', [
+            'address' => \App\Models\Setting::get('platform_address'),
+            'phone' => \App\Models\Setting::get('platform_phone'),
+            'email' => \App\Models\Setting::get('platform_email'),
+            'map' => \App\Models\Setting::get('platform_map_embed_url'),
+            'instagram' => \App\Models\Setting::get('platform_social_instagram'),
+            'website' => \App\Models\Setting::get('platform_social_website'),
+        ]);
+    }
 }

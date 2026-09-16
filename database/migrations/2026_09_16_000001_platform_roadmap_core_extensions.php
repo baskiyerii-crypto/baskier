@@ -12,13 +12,11 @@ return new class extends Migration
         if (Schema::hasTable('categories')) {
             Schema::table('categories', function (Blueprint $table) {
                 if (! Schema::hasColumn('categories', 'channel')) {
-                    $table->string('channel', 32)->default('physical_quote')->after('is_active');
+                    $table->string('channel', 32)->default('physical_quote');
                     $table->index('channel');
                 }
-                if (Schema::hasColumn('categories', 'delivery_days') && ! Schema::hasColumn('categories', 'termin_days')) {
-                    $table->unsignedSmallInteger('termin_days')->nullable()->after('channel');
-                } elseif (! Schema::hasColumn('categories', 'termin_days')) {
-                    $table->unsignedSmallInteger('termin_days')->nullable()->after('channel');
+                if (! Schema::hasColumn('categories', 'termin_days')) {
+                    $table->unsignedSmallInteger('termin_days')->nullable();
                 }
             });
         }
@@ -26,16 +24,16 @@ return new class extends Migration
         if (Schema::hasTable('orders')) {
             Schema::table('orders', function (Blueprint $table) {
                 if (! Schema::hasColumn('orders', 'termin_due_at')) {
-                    $table->timestamp('termin_due_at')->nullable()->after('shipped_at');
+                    $table->timestamp('termin_due_at')->nullable();
                 }
                 if (! Schema::hasColumn('orders', 'tracking_number')) {
-                    $table->string('tracking_number', 120)->nullable()->after('termin_due_at');
+                    $table->string('tracking_number', 120)->nullable();
                 }
                 if (! Schema::hasColumn('orders', 'shipping_label_path')) {
-                    $table->string('shipping_label_path')->nullable()->after('tracking_number');
+                    $table->string('shipping_label_path')->nullable();
                 }
                 if (! Schema::hasColumn('orders', 'carrier_code')) {
-                    $table->string('carrier_code', 64)->nullable()->after('shipping_label_path');
+                    $table->string('carrier_code', 64)->nullable();
                 }
             });
         }
@@ -43,16 +41,16 @@ return new class extends Migration
         if (Schema::hasTable('vendors')) {
             Schema::table('vendors', function (Blueprint $table) {
                 if (! Schema::hasColumn('vendors', 'tabela_enabled')) {
-                    $table->boolean('tabela_enabled')->default(false)->after('quotes_expires_at');
+                    $table->boolean('tabela_enabled')->default(false);
                 }
                 if (! Schema::hasColumn('vendors', 'tabela_expires_at')) {
-                    $table->timestamp('tabela_expires_at')->nullable()->after('tabela_enabled');
+                    $table->timestamp('tabela_expires_at')->nullable();
                 }
                 if (! Schema::hasColumn('vendors', 'risk_band')) {
-                    $table->string('risk_band', 16)->nullable()->after('tabela_expires_at');
+                    $table->string('risk_band', 16)->nullable();
                 }
                 if (! Schema::hasColumn('vendors', 'risk_score')) {
-                    $table->decimal('risk_score', 5, 2)->nullable()->after('risk_band');
+                    $table->decimal('risk_score', 5, 2)->nullable();
                 }
             });
         }
@@ -60,11 +58,11 @@ return new class extends Migration
         if (Schema::hasTable('quote_requests')) {
             Schema::table('quote_requests', function (Blueprint $table) {
                 if (! Schema::hasColumn('quote_requests', 'request_type')) {
-                    $table->string('request_type', 32)->default('physical_quote')->after('status');
+                    $table->string('request_type', 32)->default('physical_quote');
                     $table->index('request_type');
                 }
                 if (! Schema::hasColumn('quote_requests', 'show_customer_profile')) {
-                    $table->boolean('show_customer_profile')->default(false)->after('request_type');
+                    $table->boolean('show_customer_profile')->default(false);
                 }
             });
         }
@@ -124,22 +122,27 @@ return new class extends Migration
             DB::statement('UPDATE categories SET termin_days = delivery_days WHERE termin_days IS NULL');
         }
 
-        $settings = [
-            ['key' => 'tabela_monthly_fee', 'value' => '149'],
-            ['key' => 'tabela_meeting_fee', 'value' => '50'],
-            ['key' => 'platform_expenses', 'value' => '0'],
-            ['key' => 'iyzico_mode', 'value' => 'sandbox'],
-            ['key' => 'iyzico_api_key', 'value' => ''],
-            ['key' => 'iyzico_secret_key', 'value' => ''],
-            ['key' => 'iyzico_base_url', 'value' => 'https://sandbox-api.iyzipay.com'],
-            ['key' => 'basitkargo_api_key', 'value' => ''],
-            ['key' => 'basitkargo_base_url', 'value' => ''],
-            ['key' => 'openai_api_key', 'value' => ''],
-            ['key' => 'openai_model', 'value' => 'gpt-4o-mini'],
-        ];
+        if (Schema::hasTable('settings')) {
+            $settings = [
+                ['key' => 'tabela_monthly_fee', 'value' => '149'],
+                ['key' => 'tabela_meeting_fee', 'value' => '50'],
+                ['key' => 'platform_expenses', 'value' => '0'],
+                ['key' => 'iyzico_mode', 'value' => 'sandbox'],
+                ['key' => 'iyzico_api_key', 'value' => ''],
+                ['key' => 'iyzico_secret_key', 'value' => ''],
+                ['key' => 'iyzico_base_url', 'value' => 'https://sandbox-api.iyzipay.com'],
+                ['key' => 'basitkargo_api_key', 'value' => ''],
+                ['key' => 'basitkargo_base_url', 'value' => ''],
+                ['key' => 'openai_api_key', 'value' => ''],
+                ['key' => 'openai_model', 'value' => 'gpt-4o-mini'],
+            ];
 
-        foreach ($settings as $row) {
-            DB::table('settings')->updateOrInsert(['key' => $row['key']], ['value' => $row['value'], 'updated_at' => now(), 'created_at' => now()]);
+            foreach ($settings as $row) {
+                DB::table('settings')->updateOrInsert(
+                    ['key' => $row['key']],
+                    ['value' => $row['value'], 'updated_at' => now(), 'created_at' => now()]
+                );
+            }
         }
     }
 
@@ -185,14 +188,15 @@ return new class extends Migration
                 if (Schema::hasColumn('categories', 'channel')) {
                     $table->dropColumn('channel');
                 }
-                // termin_days leave in place for safety; delivery_days retained if present
             });
         }
 
-        DB::table('settings')->whereIn('key', [
-            'tabela_monthly_fee', 'tabela_meeting_fee', 'platform_expenses',
-            'iyzico_mode', 'iyzico_api_key', 'iyzico_secret_key', 'iyzico_base_url',
-            'basitkargo_api_key', 'basitkargo_base_url', 'openai_api_key', 'openai_model',
-        ])->delete();
+        if (Schema::hasTable('settings')) {
+            DB::table('settings')->whereIn('key', [
+                'tabela_monthly_fee', 'tabela_meeting_fee', 'platform_expenses',
+                'iyzico_mode', 'iyzico_api_key', 'iyzico_secret_key', 'iyzico_base_url',
+                'basitkargo_api_key', 'basitkargo_base_url', 'openai_api_key', 'openai_model',
+            ])->delete();
+        }
     }
 };

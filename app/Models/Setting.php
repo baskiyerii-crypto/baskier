@@ -67,4 +67,9 @@ class Setting extends Model
     {
         return (float) self::get('platform_expenses', 0);
     }
+
+    public static function contractAcceptanceDays(): int
+    {
+        return (int) self::get('contract_acceptance_days', 15);
+    }
 }

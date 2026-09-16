@@ -12,21 +12,21 @@
     <div class="col-6 col-md-3">
         <div class="card p-3 h-100 shadow-sm border-0" style="background: linear-gradient(135deg, #ecfdf5, #ffffff);">
             <div class="small text-muted mb-1">Toplam Hakediş (Ciro)</div>
-            <div class="h4 mb-0 fw-bold text-success">₺{{ number_format($totalRevenue, 2, ',', '.') }}</div>
+            <div class="h4 mb-0 fw-bold text-success metric-count" data-count="{{ (int) $totalRevenue }}">₺{{ number_format($totalRevenue, 2, ',', '.') }}</div>
             <a href="{{ route('vendor.payout-requests.index') }}" class="small text-success text-decoration-none mt-2 d-inline-block fw-medium">Para Çekme →</a>
         </div>
     </div>
     <div class="col-6 col-md-3">
         <div class="card p-3 h-100 shadow-sm border-0" style="background: linear-gradient(135deg, #eff6ff, #ffffff);">
             <div class="small text-muted mb-1">Aktif Siparişler</div>
-            <div class="h4 mb-0 fw-bold text-primary">{{ $ordersPending }}</div>
+            <div class="h4 mb-0 fw-bold text-primary metric-count" data-count="{{ $ordersPending }}">{{ $ordersPending }}</div>
             <a href="{{ route('vendor.orders.index') }}" class="small text-primary text-decoration-none mt-2 d-inline-block fw-medium">Tümünü Yönet →</a>
         </div>
     </div>
     <div class="col-6 col-md-3">
         <div class="card p-3 h-100 shadow-sm border-0" style="background: linear-gradient(135deg, #fffbeb, #ffffff);">
             <div class="small text-muted mb-1">Baskı Provası Bekleyen</div>
-            <div class="h4 mb-0 fw-bold text-warning">{{ $proofPendingCount }}</div>
+            <div class="h4 mb-0 fw-bold text-warning metric-count" data-count="{{ $proofPendingCount }}">{{ $proofPendingCount }}</div>
             <a href="{{ route('vendor.orders.index', ['status' => OrderStatus::DESIGN_REVIEW]) }}" class="small text-warning text-decoration-none mt-2 d-inline-block fw-medium">Provaları Yükle →</a>
         </div>
     </div>
@@ -85,9 +85,22 @@
     </div>
 </div>
 
+<div class="row g-3 mb-4">
+    <div class="col-md-7">
+        <div class="card p-3 shadow-sm border-0 h-100">
+            <div class="small text-muted mb-2">{{ __('panel.revenue_30d') }}</div>
+            <canvas id="vendorRevenueChart" height="120"></canvas>
+        </div>
+    </div>
+    <div class="col-md-5">
+        <div class="card p-3 shadow-sm border-0 h-100">
+            <div class="small text-muted mb-2">{{ __('panel.order_status_chart') }}</div>
+            <canvas id="vendorStatusChart" height="120"></canvas>
+        </div>
+    </div>
+</div>
+
 <div class="card p-4 mb-4 shadow-sm">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="h6 fw-bold mb-0">Son Siparişler</h2>
         <a href="{{ route('vendor.orders.index') }}" class="small fw-semibold text-decoration-none">Tümü →</a>
     </div>
     @if($recentOrders->isEmpty())
@@ -153,3 +166,25 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+document.querySelectorAll('.metric-count[data-count]').forEach((el) => {
+  const target = Number(el.getAttribute('data-count') || 0);
+  if (!target || String(el.textContent).includes('₺')) return;
+  let n = 0; const step = Math.max(1, Math.ceil(target / 30));
+  const t = setInterval(() => { n = Math.min(target, n + step); el.textContent = n; if (n >= target) clearInterval(t); }, 20);
+});
+new Chart(document.getElementById('vendorRevenueChart'), {
+  type: 'line',
+  data: { labels: @json($revenueTrend['labels'] ?? []), datasets: [{ data: @json($revenueTrend['values'] ?? []), borderColor: '#059669', backgroundColor: 'rgba(5,150,105,.15)', fill: true, tension: .35 }] },
+  options: { plugins: { legend: { display: false } }, scales: { x: { display: false } } }
+});
+new Chart(document.getElementById('vendorStatusChart'), {
+  type: 'doughnut',
+  data: { labels: @json(($statusBreakdown ?? collect())->keys()), datasets: [{ data: @json(($statusBreakdown ?? collect())->values()), backgroundColor: ['#6366f1','#06b6d4','#84cc16','#f97316','#a855f7','#64748b'] }] },
+  options: { plugins: { legend: { position: 'bottom' } } }
+});
+</script>
+@endpush

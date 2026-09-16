@@ -33,7 +33,16 @@ class Product extends Model
         'listing_status',
         'price_min',
         'price_max',
+        'moderation_status',
+        'moderation_note',
+        'submitted_for_moderation_at',
     ];
+
+    public const MODERATION_PENDING = 'pending';
+
+    public const MODERATION_APPROVED = 'approved';
+
+    public const MODERATION_REJECTED = 'rejected';
 
     protected $casts = [
         'attributes' => 'array',
@@ -42,7 +51,22 @@ class Product extends Model
         'price' => 'decimal:2',
         'price_min' => 'decimal:2',
         'price_max' => 'decimal:2',
+        'submitted_for_moderation_at' => 'datetime',
     ];
+
+    public function scopePublished($query)
+    {
+        $query->where('is_active', true);
+
+        if (\Illuminate\Support\Facades\Schema::hasColumn('products', 'moderation_status')) {
+            $query->where(function ($q) {
+                $q->where('moderation_status', self::MODERATION_APPROVED)
+                    ->orWhereNull('moderation_status');
+            });
+        }
+
+        return $query;
+    }
 
     public function category(): BelongsTo
     {

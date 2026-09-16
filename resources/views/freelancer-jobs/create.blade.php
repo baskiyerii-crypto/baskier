@@ -10,11 +10,11 @@
         <div class="mb-3">
             <label class="form-label">Kategori</label>
             <select name="category" class="form-select" required>
-                <option value="logo">Logo & kurumsal</option>
-                <option value="wordpress">Web & WordPress</option>
-                <option value="brochure">Broşür & katalog</option>
-                <option value="digital">Dijital içerik</option>
-                <option value="other">Diğer</option>
+                <option value="logo" @selected(old('category', $selectedCategory ?? '') === 'logo')>Logo & kurumsal</option>
+                <option value="wordpress" @selected(old('category', $selectedCategory ?? '') === 'wordpress')>Web & WordPress</option>
+                <option value="brochure" @selected(old('category', $selectedCategory ?? '') === 'brochure')>Broşür & katalog</option>
+                <option value="digital" @selected(old('category', $selectedCategory ?? '') === 'digital')>Dijital içerik</option>
+                <option value="other" @selected(old('category', $selectedCategory ?? '') === 'other')>Diğer</option>
             </select>
         </div>
         <div class="mb-3">

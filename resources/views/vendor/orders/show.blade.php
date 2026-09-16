@@ -196,14 +196,34 @@
                         <input type="hidden" name="status" value="{{ OrderStatus::SHIPPED }}">
                         <div class="mb-2">
                             <label class="form-label small">Kargo Firması</label>
-                            <select name="carrier" class="form-select form-select-sm" required>
-                                <option value="Yurtiçi Kargo">Yurtiçi Kargo</option>
-                                <option value="Aras Kargo">Aras Kargo</option>
-                                <option value="MNG Kargo">MNG Kargo</option>
-                                <option value="Sürat Kargo">Sürat Kargo</option>
-                                <option value="PTT Kargo">PTT Kargo</option>
-                                <option value="Özel Kurye / Dağıtım">Özel Kurye / Dağıtım</option>
+                            <select name="carrier" class="form-select form-select-sm" id="bk-carrier" required>
+                                @forelse(($carriers ?? []) as $carrier)
+                                    @php
+                                        $code = is_array($carrier) ? (string) ($carrier['code'] ?? $carrier['name'] ?? '') : (string) $carrier;
+                                        $name = is_array($carrier) ? (string) ($carrier['name'] ?? $code) : (string) $carrier;
+                                    @endphp
+                                    @if($code !== '')
+                                        <option value="{{ $name }}" data-code="{{ $code }}">{{ $name }}</option>
+                                    @endif
+                                @empty
+                                    <option value="Basit Kargo" data-code="basitkargo">Basit Kargo</option>
+                                @endforelse
                             </select>
+                            <input type="hidden" name="carrier_code" id="bk-carrier-code" value="">
+                            <div class="form-text">Taşıyıcı listesi Basit Kargo entegrasyonundan gelir.</div>
+                            <script>
+                            (function () {
+                                var sel = document.getElementById('bk-carrier');
+                                var code = document.getElementById('bk-carrier-code');
+                                function sync() {
+                                    if (!sel || !code) return;
+                                    var opt = sel.options[sel.selectedIndex];
+                                    code.value = opt ? (opt.getAttribute('data-code') || '') : '';
+                                }
+                                sel?.addEventListener('change', sync);
+                                sync();
+                            })();
+                            </script>
                         </div>
                         <div class="mb-2">
                             <label class="form-label small">Takip Numarası</label>

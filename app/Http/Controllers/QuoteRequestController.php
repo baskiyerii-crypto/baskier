@@ -17,24 +17,31 @@ class QuoteRequestController extends Controller
     public function create(Request $request)
     {
         $type = $request->get('type', 'physical_quote');
-        $channel = $type === 'freelancer' ? 'freelancer' : 'physical_quote';
-
-        $categories = Category::where('is_active', true)
-            ->where(function ($q) use ($channel) {
-                $q->where('channel', $channel)->orWhereNull('channel');
-            })
-            ->when($type !== 'freelancer', fn ($q) => $q->where(function ($q2) {
-                $q2->where('requires_quote', true)->orWhere('channel', 'physical_quote');
-            }))
-            ->orderBy('name')->get();
-
-        if ($categories->isEmpty()) {
-            $categories = Category::where('is_active', true)->orderBy('name')->get();
+        if (! in_array($type, ['physical_quote', 'freelancer', 'tabela'], true)) {
+            $type = 'physical_quote';
         }
-        $products = Product::select(['id', 'name', 'category_id'])
+
+        $categories = Category::query()
             ->where('is_active', true)
+            ->when(
+                \Illuminate\Support\Facades\Schema::hasColumn('categories', 'channel'),
+                fn ($q) => $q->where('channel', $type),
+                fn ($q) => $q->whereRaw('1 = 0')
+            )
             ->orderBy('name')
             ->get();
+
+        // Products only for print RFQ (physical) — not for freelancer/tabela mix-ups.
+        $products = collect();
+        if ($type === 'physical_quote') {
+            $categoryIds = $categories->pluck('id');
+            $products = Product::query()
+                ->select(['id', 'name', 'category_id'])
+                ->published()
+                ->when($categoryIds->isNotEmpty(), fn ($q) => $q->whereIn('category_id', $categoryIds))
+                ->orderBy('name')
+                ->get();
+        }
 
         return view('quote-requests.create', compact('categories', 'products', 'type'));
     }
@@ -158,7 +165,18 @@ class QuoteRequestController extends Controller
         $quoteRequest->load(['category', 'quotes' => fn ($q) => $q->whereIn('status', ['pending', 'selected', 'rejected'])->with('vendor'), 'items.category', 'items.product', 'items.files']);
         // Müşteri yalnızca teklif vermiş satıcıları görür
         $quoteRequest->setRelation('quotes', $quoteRequest->quotes);
-        return view('quote-requests.show', compact('quoteRequest'));
+        $consentContract = \App\Models\Contract::query()
+            ->whereIn('key', ['open_consent', 'kvkk', 'privacy'])
+            ->where('is_active', true)
+            ->get()
+            ->sortBy(fn ($c) => match ($c->key) {
+                'open_consent' => 0,
+                'kvkk' => 1,
+                default => 2,
+            })
+            ->first();
+
+        return view('quote-requests.show', compact('quoteRequest', 'consentContract'));
     }
 
     public function selectQuote(Request $request, QuoteRequest $quoteRequest, Quote $quote)
@@ -167,16 +185,37 @@ class QuoteRequestController extends Controller
             abort(403);
         }
         if ($quote->quote_request_id !== $quoteRequest->id || $quote->status !== 'pending') {
-            abort(400, 'Bu teklif seçilemez.');
+            abort(400, __('panel.quote_not_selectable'));
         }
+
+        $validated = $request->validate([
+            'share_my_contact' => ['accepted'],
+            'accept_vendor_contact' => ['accepted'],
+            'accept_consent' => ['accepted'],
+            'accept_consent_scrolled_at' => ['required', 'date'],
+        ]);
+
         $quote->update(['status' => 'selected']);
         $quote->quoteRequest->quotes()->where('id', '!=', $quote->id)->update(['status' => 'rejected']);
         $quoteRequest->update(['status' => 'closed', 'closed_at' => now()]);
 
-        $rate = Setting::commissionRate();
-        $subtotal = $quote->amount;
-        $commissionAmount = round($subtotal * $rate / 100, 2);
-        $vendorAmount = $subtotal - $commissionAmount;
+        $isTabela = ($quoteRequest->request_type ?? '') === 'tabela';
+        try {
+            app(\App\Services\ContactShareService::class)->shareAfterAccept(
+                $request->user(),
+                $quote->vendor,
+                'quote_request',
+                $quoteRequest->id,
+                true,
+                true,
+                $isTabela
+            );
+        } catch (\Throwable $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        $commissions = app(\App\Services\CommissionService::class);
+        [$rate, $commissionAmount, $vendorAmount] = $commissions->calculate((float) $quote->amount, 'quote');
         $waitDays = Setting::commissionWaitDays();
 
         $order = Order::create([
@@ -187,7 +226,7 @@ class QuoteRequestController extends Controller
             'quote_id' => $quote->id,
             'status' => OrderStatus::CONFIRMED,
             'payment_status' => 'paid',
-            'subtotal' => $subtotal,
+            'subtotal' => $quote->amount,
             'commission_rate' => $rate,
             'commission_amount' => $commissionAmount,
             'vendor_amount' => $vendorAmount,
@@ -198,10 +237,11 @@ class QuoteRequestController extends Controller
 
         $order->items()->create([
             'name' => $quoteRequest->title,
-            'price' => $subtotal,
+            'price' => $quote->amount,
             'quantity' => 1,
         ]);
 
-        return redirect()->route('quote-requests.show', $quoteRequest)->with('success', 'Teklif seçildi. Sipariş #' . $order->order_number . ' oluşturuldu.');
+        return redirect()->route('quote-requests.show', $quoteRequest)
+            ->with('success', __('panel.quote_selected', ['number' => $order->order_number]));
     }
 }

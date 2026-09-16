@@ -21,6 +21,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\EnsureRole::class,
         ]);
     })
+    ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule): void {
+        $schedule->command('contracts:suspend-overdue')->hourly();
+    })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();

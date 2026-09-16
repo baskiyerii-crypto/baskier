@@ -12,9 +12,27 @@
 </div>
 <script>
 (() => {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
-  }
+  if (!('serviceWorker' in navigator)) return;
+
+  // Force update + drop legacy caches that may hold Traefik 503 HTML.
+  navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' })
+    .then((reg) => {
+      reg.update().catch(() => {});
+      if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+    })
+    .catch(() => {});
+
+  // One-time mobile recovery: purge old shell caches after SW v3 deploy.
+  try {
+    if (!localStorage.getItem('sw_v3_purged')) {
+      caches.keys().then((keys) => Promise.all(keys.map((k) => {
+        if (k.startsWith('baskiyeri-shell-') && k !== 'baskiyeri-shell-v3') {
+          return caches.delete(k);
+        }
+      }))).finally(() => localStorage.setItem('sw_v3_purged', '1'));
+    }
+  } catch (_) {}
+
   let deferredPrompt = null;
   const banner = document.getElementById('pwa-install-banner');
   window.addEventListener('beforeinstallprompt', (e) => {

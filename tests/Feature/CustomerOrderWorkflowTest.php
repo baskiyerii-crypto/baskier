@@ -186,7 +186,12 @@ class CustomerOrderWorkflowTest extends TestCase
             'status' => 'pending',
         ]);
 
-        $this->actingAs($customer)->post(route('quote-requests.select-quote', [$quoteRequest, $quote]))
+        $this->actingAs($customer)->post(route('quote-requests.select-quote', [$quoteRequest, $quote]), [
+            'share_my_contact' => '1',
+            'accept_vendor_contact' => '1',
+            'accept_consent' => '1',
+            'accept_consent_scrolled_at' => now()->toIso8601String(),
+        ])
             ->assertRedirect(route('quote-requests.show', $quoteRequest));
 
         $order = Order::where('quote_id', $quote->id)->first();

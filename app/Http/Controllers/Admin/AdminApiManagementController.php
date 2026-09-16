@@ -19,6 +19,9 @@ class AdminApiManagementController extends Controller
             'basitkargo_base_url' => Setting::get('basitkargo_base_url', ''),
             'openai_api_key' => Setting::get('openai_api_key', ''),
             'openai_model' => Setting::get('openai_model', 'gpt-4o-mini'),
+            'evolution_base_url' => Setting::get('evolution_base_url', config('evolution.base_url')),
+            'evolution_api_key' => Setting::get('evolution_api_key', config('evolution.api_key')),
+            'evolution_instance' => Setting::get('evolution_instance', config('evolution.instance')),
         ]);
     }
 
@@ -33,12 +36,15 @@ class AdminApiManagementController extends Controller
             'basitkargo_base_url' => ['nullable', 'url', 'max:255'],
             'openai_api_key' => ['nullable', 'string', 'max:255'],
             'openai_model' => ['nullable', 'string', 'max:120'],
+            'evolution_base_url' => ['nullable', 'string', 'max:255'],
+            'evolution_api_key' => ['nullable', 'string', 'max:255'],
+            'evolution_instance' => ['nullable', 'string', 'max:120'],
         ]);
 
         foreach ($validated as $key => $value) {
             Setting::set($key, (string) ($value ?? ''));
         }
 
-        return back()->with('success', 'API ayarları kaydedildi.');
+        return back()->with('success', __('panel.settings_saved'));
     }
 }

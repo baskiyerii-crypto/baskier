@@ -56,7 +56,7 @@
                                             <button type="submit" class="btn btn-sm btn-success w-100">Bu teklifi seç</button>
                                         </form>
                                     @else
-                                        <span class="badge bg-secondary mt-1">{{ $bid->status }}</span>
+                                        <span class="badge bg-secondary mt-1">{{ \App\Support\UiLabels::status($bid->status) }}</span>
                                     @endif
                                 </div>
                             @empty

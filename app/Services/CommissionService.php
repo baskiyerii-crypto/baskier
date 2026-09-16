@@ -9,13 +9,38 @@ use App\Models\Vendor;
 
 class CommissionService
 {
-    public function rateForVendor(?Vendor $vendor): float
+    public const PRODUCT_TYPES = ['product'];
+
+    public const ZERO_COMMISSION_TYPES = ['quote', 'freelancer', 'tabela', 'tabela_meeting'];
+
+    public function rateForVendor(?Vendor $vendor = null): float
     {
-        if ($vendor && $vendor->commission_rate_override !== null) {
-            return (float) $vendor->commission_rate_override;
+        return Setting::commissionRate();
+    }
+
+    public function rateForOrderType(?string $type): float
+    {
+        if (in_array($type, self::PRODUCT_TYPES, true)) {
+            return Setting::commissionRate();
         }
 
-        return Setting::commissionRate();
+        return 0.0;
+    }
+
+    public function rateForOrder(Order $order): float
+    {
+        return $this->rateForOrderType($order->type);
+    }
+
+    /**
+     * @return array{0: float, 1: float, 2: float} [rate, commission, vendorNet]
+     */
+    public function calculate(float $subtotal, ?string $orderType = 'product'): array
+    {
+        $rate = $this->rateForOrderType($orderType);
+        [$commission, $vendorNet] = $this->amountsForSubtotal($subtotal, $rate);
+
+        return [$rate, $commission, $vendorNet];
     }
 
     public function amountsForSubtotal(float $subtotal, float $ratePercent): array
