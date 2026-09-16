@@ -14,10 +14,26 @@ return new class extends Migration
             }
         });
 
-        Schema::table('cart_items', function (Blueprint $table) {
-            $table->dropUnique('cart_items_user_id_product_id_unique');
-            $table->unique(['user_id', 'product_id', 'variant_id'], 'cart_items_user_product_variant_unique');
-        });
+        // MySQL, unique(user_id, product_id) index'ini user_id FK için kullanır.
+        // Önce ayrı index yoksa unique düşmez (error 1553).
+        if (! $this->hasIndex('cart_items', 'cart_items_user_id_index')
+            && ! $this->hasIndex('cart_items', 'cart_items_user_id_foreign')) {
+            Schema::table('cart_items', function (Blueprint $table) {
+                $table->index('user_id', 'cart_items_user_id_index');
+            });
+        }
+
+        if ($this->hasIndex('cart_items', 'cart_items_user_id_product_id_unique')) {
+            Schema::table('cart_items', function (Blueprint $table) {
+                $table->dropUnique('cart_items_user_id_product_id_unique');
+            });
+        }
+
+        if (! $this->hasIndex('cart_items', 'cart_items_user_product_variant_unique')) {
+            Schema::table('cart_items', function (Blueprint $table) {
+                $table->unique(['user_id', 'product_id', 'variant_id'], 'cart_items_user_product_variant_unique');
+            });
+        }
 
         Schema::table('order_items', function (Blueprint $table) {
             if (! Schema::hasColumn('order_items', 'variant_id')) {
@@ -48,12 +64,27 @@ return new class extends Migration
         });
 
         Schema::table('cart_items', function (Blueprint $table) {
-            $table->dropUnique('cart_items_user_product_variant_unique');
-            $table->unique(['user_id', 'product_id']);
+            if ($this->hasIndex('cart_items', 'cart_items_user_product_variant_unique')) {
+                $table->dropUnique('cart_items_user_product_variant_unique');
+            }
+            if (! $this->hasIndex('cart_items', 'cart_items_user_id_product_id_unique')) {
+                $table->unique(['user_id', 'product_id']);
+            }
             if (Schema::hasColumn('cart_items', 'variant_id')) {
                 $table->dropForeign(['variant_id']);
                 $table->dropColumn('variant_id');
             }
         });
+    }
+
+    private function hasIndex(string $table, string $name): bool
+    {
+        foreach (Schema::getIndexes($table) as $index) {
+            if (($index['name'] ?? '') === $name) {
+                return true;
+            }
+        }
+
+        return false;
     }
 };
