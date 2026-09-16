@@ -36,7 +36,7 @@ class QuoteRequestController extends Controller
             $categoryIds = $categories->pluck('id');
             $products = Product::query()
                 ->select(['id', 'name', 'category_id'])
-                ->where('is_active', true)
+                ->published()
                 ->when($categoryIds->isNotEmpty(), fn ($q) => $q->whereIn('category_id', $categoryIds))
                 ->orderBy('name')
                 ->get();
@@ -164,7 +164,18 @@ class QuoteRequestController extends Controller
         $quoteRequest->load(['category', 'quotes' => fn ($q) => $q->whereIn('status', ['pending', 'selected', 'rejected'])->with('vendor'), 'items.category', 'items.product', 'items.files']);
         // Müşteri yalnızca teklif vermiş satıcıları görür
         $quoteRequest->setRelation('quotes', $quoteRequest->quotes);
-        return view('quote-requests.show', compact('quoteRequest'));
+        $consentContract = \App\Models\Contract::query()
+            ->whereIn('key', ['open_consent', 'kvkk', 'privacy'])
+            ->where('is_active', true)
+            ->get()
+            ->sortBy(fn ($c) => match ($c->key) {
+                'open_consent' => 0,
+                'kvkk' => 1,
+                default => 2,
+            })
+            ->first();
+
+        return view('quote-requests.show', compact('quoteRequest', 'consentContract'));
     }
 
     public function selectQuote(Request $request, QuoteRequest $quoteRequest, Quote $quote)
@@ -179,6 +190,8 @@ class QuoteRequestController extends Controller
         $validated = $request->validate([
             'share_my_contact' => ['accepted'],
             'accept_vendor_contact' => ['accepted'],
+            'accept_consent' => ['accepted'],
+            'accept_consent_scrolled_at' => ['required', 'date'],
         ]);
 
         $quote->update(['status' => 'selected']);

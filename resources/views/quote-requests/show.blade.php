@@ -70,7 +70,14 @@
                                 @csrf
                                 <label class="d-flex gap-2 small mb-1"><input type="checkbox" name="share_my_contact" value="1" required> {{ __('panel.consent_share_my_contact') }}</label>
                                 <label class="d-flex gap-2 small mb-2"><input type="checkbox" name="accept_vendor_contact" value="1" required> {{ __('panel.consent_accept_vendor_contact') }}</label>
-                                <p class="small text-muted">{{ __('panel.consent_legal') }}</p>
+                                <div class="mb-2">
+                                    @include('partials.legal-scroll-gate', [
+                                        'slug' => 'consent-'.$q->id,
+                                        'label' => __('panel.consent_legal'),
+                                        'field' => 'accept_consent',
+                                        'contractHtml' => $consentContract->content_html ?? null,
+                                    ])
+                                </div>
                                 <button type="submit" class="btn btn-warning btn-sm">{{ __('panel.select_this_quote') }}</button>
                             </form>
                         @elseif($q->status === 'selected')

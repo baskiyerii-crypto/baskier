@@ -117,6 +117,33 @@ class Vendor extends Model
             ->exists();
     }
 
+    public function logoUrl(): ?string
+    {
+        if (! $this->logo) {
+            return null;
+        }
+
+        $path = ltrim((string) $this->logo, '/');
+
+        if (str_starts_with($path, 'uploads/') && is_file(public_path($path))) {
+            return asset($path);
+        }
+
+        if (str_starts_with($path, 'storage/')) {
+            return asset($path);
+        }
+
+        if (is_file(public_path('storage/'.$path))) {
+            return asset('storage/'.$path);
+        }
+
+        if (is_file(storage_path('app/public/'.$path))) {
+            return asset('storage/'.$path);
+        }
+
+        return asset('storage/'.$path);
+    }
+
     public function recalculateRating(): void
     {
         $avg = $this->reviews()->avg('rating');

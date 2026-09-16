@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Ödeme - BaskıYeri')
+@section('title', __('ui.checkout_title') . ' - BaskıYeri')
 
 @section('content')
 <div class="content-shell py-4">
-    <h1 class="h5 mb-4">Ödeme</h1>
+    <h1 class="h5 mb-4">{{ __('ui.checkout_title') }}</h1>
     <p class="small text-muted">Kart ödemesi iyzico üzerinden işlenir. API anahtarları tanımlı değilse sandbox/demo kaydı oluşur.</p>
 
     @if($items->isEmpty())

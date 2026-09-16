@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminFinanceController;
 use App\Http\Controllers\Admin\AdminPayoutController;
 use App\Http\Controllers\Admin\AdminProductController;
+use App\Http\Controllers\Admin\AdminProductModerationController;
 use App\Http\Controllers\Admin\AdminSettingsController;
 use App\Http\Controllers\Admin\AdminSupportTicketWebController;
 use App\Http\Controllers\Admin\AdminVendorController;
@@ -201,6 +202,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('products/{product}/edit', [AdminProductController::class, 'edit'])->name('products.edit');
     Route::put('products/{product}', [AdminProductController::class, 'update'])->name('products.update');
     Route::delete('products/{product}', [AdminProductController::class, 'destroy'])->name('products.destroy');
+    Route::get('urun-onaylari', [AdminProductModerationController::class, 'index'])->name('product-approvals.index');
+    Route::post('urun-onaylari/{product}/onayla', [AdminProductModerationController::class, 'approve'])->name('product-approvals.approve');
+    Route::post('urun-onaylari/{product}/reddet', [AdminProductModerationController::class, 'reject'])->name('product-approvals.reject');
     Route::get('settings', [AdminSettingsController::class, 'index'])->name('settings.index');
     Route::post('settings', [AdminSettingsController::class, 'update'])->name('settings.update');
     Route::get('finans', [AdminFinanceController::class, 'index'])->name('finance.index');

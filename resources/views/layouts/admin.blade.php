@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex,nofollow">
+    <meta name="theme-color" content="#1d4ed8">
+    <link rel="manifest" href="/manifest.webmanifest">
     <title>@yield('title', 'Yönetim') – BaskıYeri Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
@@ -233,6 +235,7 @@
                     <a href="{{ route('admin.categories.index') }}" class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}"><span>{{ __('panel.nav_categories') }}</span></a>
                     <a href="{{ route('admin.business-types.index') }}" class="nav-link {{ request()->routeIs('admin.business-types.*') ? 'active' : '' }}"><span>{{ __('panel.nav_business_types') }}</span></a>
                     <a href="{{ route('admin.products.index') }}" class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}"><span>{{ __('panel.nav_products') }}</span></a>
+                    <a href="{{ route('admin.product-approvals.index') }}" class="nav-link {{ request()->routeIs('admin.product-approvals.*') ? 'active' : '' }}"><span>{{ __('panel.nav_product_approvals') }}</span></a>
                     @if(Route::has('admin.blog.index'))
                     <a href="{{ route('admin.blog.index') }}" class="nav-link {{ request()->routeIs('admin.blog.*') ? 'active' : '' }}"><span>{{ __('panel.nav_blog') }}</span></a>
                     @endif

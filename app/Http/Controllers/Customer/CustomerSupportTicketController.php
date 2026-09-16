@@ -25,7 +25,15 @@ class CustomerSupportTicketController extends Controller
         $validated = $request->validate([
             'subject' => ['required', 'string', 'max:255'],
             'body' => ['required', 'string', 'max:5000'],
+            'page_url' => ['nullable', 'string', 'max:500'],
+            'page_path' => ['nullable', 'string', 'max:255'],
         ]);
+
+        $body = $validated['body'];
+        if (! empty($validated['page_path']) || ! empty($validated['page_url'])) {
+            $ctx = trim(($validated['page_path'] ?? '').' '.($validated['page_url'] ?? ''));
+            $body = "[Sayfa: {$ctx}]\n\n".$body;
+        }
 
         $ticket = SupportTicket::create([
             'user_id' => $request->user()->id,
@@ -34,7 +42,7 @@ class CustomerSupportTicketController extends Controller
         ]);
         $ticket->messages()->create([
             'user_id' => $request->user()->id,
-            'body' => $validated['body'],
+            'body' => $body,
         ]);
 
         return redirect()->route('account.support.show', $ticket)->with('success', 'Destek talebiniz oluşturuldu.');

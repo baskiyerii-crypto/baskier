@@ -82,8 +82,11 @@ class AuthController extends Controller
     public function showRegisterForm()
     {
         $businessTypes = BusinessType::orderBy('sort_order')->orderBy('name')->get();
+        $termsContract = \App\Models\Contract::query()->where('key', 'terms')->where('is_active', true)->first();
+        $privacyContract = \App\Models\Contract::query()->where('key', 'privacy')->where('is_active', true)->first();
+        $vendorAgreement = \App\Models\Contract::query()->where('key', 'vendor_agreement')->where('is_active', true)->first();
 
-        return view('auth.register', compact('businessTypes'));
+        return view('auth.register', compact('businessTypes', 'termsContract', 'privacyContract', 'vendorAgreement'));
     }
 
     public function register(Request $request)
@@ -95,6 +98,8 @@ class AuthController extends Controller
             'role' => ['required', 'in:customer,vendor'],
             'accept_terms' => ['accepted'],
             'accept_privacy' => ['accepted'],
+            'accept_terms_scrolled_at' => ['required', 'date'],
+            'accept_privacy_scrolled_at' => ['required', 'date'],
             'business_type_ids' => ['nullable', 'array'],
             'business_type_ids.*' => ['exists:business_types,id'],
             'registration_tracks' => ['nullable', 'array'],
@@ -109,6 +114,7 @@ class AuthController extends Controller
             $tracks = array_values(array_unique($request->input('registration_tracks', [])));
             $rules['registration_tracks'] = ['required', 'array', 'min:1'];
             $rules['accept_vendor_agreement'] = ['accepted'];
+            $rules['accept_vendor_agreement_scrolled_at'] = ['required', 'date'];
 
             $needsPhysical = in_array('physical_products', $tracks, true) || in_array('physical_quote', $tracks, true);
             $freelancerOnly = in_array('freelancer', $tracks, true) && ! $needsPhysical;

@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ea580c">
+    <link rel="manifest" href="/manifest.webmanifest">
     <title>@yield('title', 'Hesabım') – BaskıYeri</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
@@ -98,5 +100,8 @@
             document.querySelector('[data-account-nav]')?.classList.toggle('is-open');
         });
     </script>
+    @include('partials.review-prompt')
+    @include('partials.pwa-install')
+    @include('partials.floating-support')
 </body>
 </html>

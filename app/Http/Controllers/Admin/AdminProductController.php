@@ -57,6 +57,9 @@ class AdminProductController extends Controller
         $validated['is_active'] = $request->boolean('is_active');
         $validated['is_featured'] = $request->boolean('is_featured');
         $validated['product_type'] = $validated['product_type'] ?? 'physical';
+        if (\Illuminate\Support\Facades\Schema::hasColumn('products', 'moderation_status')) {
+            $validated['moderation_status'] = Product::MODERATION_APPROVED;
+        }
         if ($request->hasFile('main_image')) {
             $validated['main_image'] = $request->file('main_image')->store('products', 'public');
         }

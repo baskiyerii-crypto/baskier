@@ -73,21 +73,32 @@
         </div>
     </div>
 </div>
+@if(session('success'))
+    <div class="alert alert-success mt-3">{{ session('success') }}</div>
+@endif
+@if(session('error'))
+    <div class="alert alert-danger mt-3">{{ session('error') }}</div>
+@endif
+<p class="small text-muted mt-3 mb-0">Her form yalnızca seçtiğiniz tek modülü ücretlendirir. Çift tıklamayın.</p>
 <script>
 document.querySelectorAll('.js-subscription-form').forEach(function (form) {
     form.addEventListener('submit', function (e) {
         var btn = form.querySelector('.js-subscription-btn');
+        var module = form.getAttribute('data-module') || 'modül';
         if (btn.dataset.submitted === '1') {
             e.preventDefault();
             return;
         }
-        if (!confirm('Bu modül için aylık ücret bakiyenizden düşülecek. Onaylıyor musunuz?')) {
+        if (!confirm('Sadece «' + module + '» modülü için aylık ücret bakiyenizden düşülecek. Onaylıyor musunuz?')) {
             e.preventDefault();
             return;
         }
         btn.dataset.submitted = '1';
         btn.disabled = true;
         btn.textContent = 'İşleniyor...';
+        document.querySelectorAll('.js-subscription-btn').forEach(function (other) {
+            if (other !== btn) other.disabled = true;
+        });
     });
 });
 </script>

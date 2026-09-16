@@ -283,5 +283,6 @@
 </div>
 @include('partials.review-prompt')
 @include('partials.pwa-install')
+@include('partials.floating-support')
 </body>
 </html>

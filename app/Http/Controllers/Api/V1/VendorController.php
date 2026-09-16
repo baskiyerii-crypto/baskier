@@ -30,7 +30,7 @@ class VendorController extends ApiController
     {
         $vendor = Vendor::where('slug', $slug)
             ->where('is_active', true)
-            ->with(['businessTypes', 'products' => fn ($q) => $q->where('is_active', true)->limit(50)])
+            ->with(['businessTypes', 'products' => fn ($q) => $q->published()->limit(50)])
             ->firstOrFail();
 
         return $this->ok(new VendorResource($vendor));

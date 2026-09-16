@@ -83,9 +83,21 @@
                             </span>
                         </td>
                         <td>
-                            <span class="badge rounded-pill {{ $p->is_active ? 'bg-success' : 'bg-secondary' }}">
-                                {{ $p->is_active ? 'Aktif' : 'Pasif' }}
-                            </span>
+                            @php
+                                $mod = $p->moderation_status ?? 'approved';
+                            @endphp
+                            @if($mod === 'pending')
+                                <span class="badge rounded-pill bg-warning text-dark">Onay bekliyor</span>
+                            @elseif($mod === 'rejected')
+                                <span class="badge rounded-pill bg-danger">Reddedildi</span>
+                                @if($p->moderation_note)
+                                    <div class="small text-muted">{{ $p->moderation_note }}</div>
+                                @endif
+                            @else
+                                <span class="badge rounded-pill {{ $p->is_active ? 'bg-success' : 'bg-secondary' }}">
+                                    {{ $p->is_active ? 'Aktif' : 'Pasif' }}
+                                </span>
+                            @endif
                         </td>
                         <td class="text-end">
                             <a href="{{ route('products.show', $p->slug) }}" class="btn btn-outline-secondary btn-sm" target="_blank">Vitrin ↗</a>

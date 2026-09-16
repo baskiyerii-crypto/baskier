@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use RuntimeException;
 
 class VendorSubscriptionController extends Controller
 {
@@ -45,59 +46,56 @@ class VendorSubscriptionController extends Controller
             'tabela' => Setting::tabelaMonthlyFee(),
         };
 
-        if ($vendor->balance < $fee) {
-            return back()->with('error', 'Bakiye yetersiz. Önce bakiye yükleyin.');
+        $labels = [
+            'freelancer' => 'Freelancer',
+            'quotes' => 'Teklif Verme',
+            'tabela' => 'Tabela',
+        ];
+
+        try {
+            DB::transaction(function () use ($vendor, $module, $fee, $labels) {
+                $locked = $vendor->newQuery()->whereKey($vendor->id)->lockForUpdate()->first();
+
+                $duplicate = $locked->balanceTransactions()
+                    ->where('type', 'subscription_fee')
+                    ->where('reference_type', 'subscription_'.$module)
+                    ->where('created_at', '>=', now()->subSeconds(90))
+                    ->exists();
+
+                if ($duplicate) {
+                    throw new RuntimeException('Bu modül için abonelik az önce işlendi. Lütfen bekleyin.');
+                }
+
+                if ((float) $locked->balance < (float) $fee) {
+                    throw new RuntimeException('Bakiye yetersiz. Önce bakiye yükleyin.');
+                }
+
+                $locked->decrement('balance', $fee);
+
+                $fieldEnabled = $module.'_enabled';
+                $fieldExpires = $module.'_expires_at';
+                $currentEnd = $locked->{$fieldExpires};
+                $start = $currentEnd && $currentEnd->isFuture() ? $currentEnd : now();
+
+                // Only touch the selected module columns.
+                $locked->update([
+                    $fieldEnabled => true,
+                    $fieldExpires => $start->copy()->addMonth(),
+                ]);
+
+                $locked->balanceTransactions()->create([
+                    'amount' => -$fee,
+                    'type' => 'subscription_fee',
+                    'reference_type' => 'subscription_'.$module,
+                    'reference_id' => $locked->id,
+                    'description' => ($labels[$module] ?? $module).' modülü aylık abonelik ücreti',
+                    'balance_after' => $locked->fresh()->balance,
+                ]);
+            });
+        } catch (RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
         }
 
-        $recent = $vendor->balanceTransactions()
-            ->where('type', 'subscription_fee')
-            ->where('description', $module.' modülü aylık abonelik ücreti')
-            ->where('created_at', '>=', now()->subSeconds(60))
-            ->exists();
-
-        if ($recent) {
-            return back()->with('error', 'Bu modül için abonelik az önce işlendi. Lütfen birkaç saniye bekleyin.');
-        }
-
-        DB::transaction(function () use ($vendor, $module, $fee) {
-            $locked = $vendor->newQuery()->whereKey($vendor->id)->lockForUpdate()->first();
-
-            $duplicate = $locked->balanceTransactions()
-                ->where('type', 'subscription_fee')
-                ->where('description', $module.' modülü aylık abonelik ücreti')
-                ->where('created_at', '>=', now()->subSeconds(60))
-                ->exists();
-
-            if ($duplicate) {
-                return;
-            }
-
-            if ($locked->balance < $fee) {
-                return;
-            }
-
-            $locked->decrement('balance', $fee);
-
-            $fieldEnabled = $module.'_enabled';
-            $fieldExpires = $module.'_expires_at';
-            $currentEnd = $locked->{$fieldExpires};
-            $start = $currentEnd && $currentEnd->isFuture() ? $currentEnd : now();
-
-            $locked->update([
-                $fieldEnabled => true,
-                $fieldExpires => $start->copy()->addMonth(),
-            ]);
-
-            $locked->balanceTransactions()->create([
-                'amount' => -$fee,
-                'type' => 'subscription_fee',
-                'reference_type' => 'subscription',
-                'reference_id' => $locked->id,
-                'description' => $module.' modülü aylık abonelik ücreti',
-                'balance_after' => $locked->fresh()->balance,
-            ]);
-        });
-
-        return back()->with('success', 'Abonelik başarıyla yenilendi/aktif edildi.');
+        return back()->with('success', ($labels[$module] ?? $module).' aboneliği aktif edildi. Sadece bu modül ücretlendirildi.');
     }
 }

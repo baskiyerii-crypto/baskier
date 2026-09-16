@@ -2,12 +2,19 @@
 @section('title', 'Blog içe aktar')
 @section('content')
 <div class="card p-4" style="max-width:640px;">
-    <p class="small text-muted">CSV sütunları: title/baslik, body/icerik, category/kategori, meta_title (opsiyonel)</p>
-    <form method="post" action="{{ route('admin.blog.import.store') }}" enctype="multipart/form-data">
+    @if(session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
+    <p class="small text-muted mb-2">CSV veya gerçek <strong>XLSX</strong> desteklenir.</p>
+    <ul class="small text-muted">
+        <li>İlk satır başlık olmalı: <code>title</code> / <code>baslik</code>, <code>body</code> / <code>icerik</code>, <code>category</code> (opsiyonel)</li>
+        <li>A sütunu yalnızca “A” olursa hata verilir — başlık adı yazın.</li>
+    </ul>
+    <form method="post" action="{{ route('admin.blog.import.store') }}" enctype="multipart/form-data" class="mt-3">
         @csrf
         <div class="mb-3">
             <label class="form-label">Dosya</label>
-            <input type="file" name="file" class="form-control" accept=".csv,.txt,.xlsx" required>
+            <input type="file" name="file" class="form-control" accept=".csv,.txt,.xlsx,.xls" required>
         </div>
         <div class="mb-3">
             <label class="form-label">Durum</label>

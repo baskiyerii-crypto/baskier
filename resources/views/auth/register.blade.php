@@ -138,33 +138,30 @@
                     </div>
 
                     <div class="mt-6 by-divider"></div>
-                    <label class="mt-4 flex items-start gap-3 text-sm text-slate-700">
-                        <input class="mt-1 h-4 w-4 rounded border-slate-300" type="checkbox" name="accept_vendor_agreement" value="1" @checked(old('accept_vendor_agreement'))>
-                        <span>
-                            <span class="font-semibold">{{ __('panel.vendor_agreement') }}</span>
-                            <a class="by-link" target="_blank" href="{{ route('contracts.show', 'vendor_agreement') }}">{{ __('panel.view') }}</a>
-                        </span>
-                    </label>
+                    <div class="mt-4" id="vendor-agreement-gate">
+                        @include('partials.legal-scroll-gate', [
+                            'slug' => 'vendor_agreement',
+                            'label' => __('panel.vendor_agreement'),
+                            'field' => 'accept_vendor_agreement',
+                            'contractHtml' => $vendorAgreement->content_html ?? null,
+                        ])
+                    </div>
                 </div>
 
-                <div class="by-surface-indigo p-4">
+                <div class="by-surface-indigo p-4 space-y-3">
                     <div class="by-accent-bar mb-3"></div>
-                    <div class="space-y-2 text-sm text-slate-700">
-                        <label class="flex items-start gap-3">
-                            <input class="mt-1 h-4 w-4 rounded border-slate-300" type="checkbox" name="accept_terms" value="1" @checked(old('accept_terms')) required>
-                            <span>
-                                <span class="font-semibold">Kullanım Koşulları</span>'nı okudum ve kabul ediyorum.
-                                <a class="by-link" target="_blank" href="{{ route('contracts.show', 'terms') }}">Görüntüle</a>
-                            </span>
-                        </label>
-                        <label class="flex items-start gap-3">
-                            <input class="mt-1 h-4 w-4 rounded border-slate-300" type="checkbox" name="accept_privacy" value="1" @checked(old('accept_privacy')) required>
-                            <span>
-                                <span class="font-semibold">Gizlilik Politikası</span>'nı okudum ve kabul ediyorum.
-                                <a class="by-link" target="_blank" href="{{ route('contracts.show', 'privacy') }}">Görüntüle</a>
-                            </span>
-                        </label>
-                    </div>
+                    @include('partials.legal-scroll-gate', [
+                        'slug' => 'terms',
+                        'label' => __('ui.terms'),
+                        'field' => 'accept_terms',
+                        'contractHtml' => $termsContract->content_html ?? null,
+                    ])
+                    @include('partials.legal-scroll-gate', [
+                        'slug' => 'privacy',
+                        'label' => __('ui.privacy'),
+                        'field' => 'accept_privacy',
+                        'contractHtml' => $privacyContract->content_html ?? null,
+                    ])
                 </div>
 
                 <button type="submit" class="w-full by-btn-cta">Kayıt Ol</button>

@@ -135,14 +135,14 @@
                     <a href="{{ route('vendor.products.index') }}" class="nav-link {{ request()->routeIs('vendor.products.*') ? 'active' : '' }}"><span>Ürünlerim</span></a>
                     @endif
                     @if($v?->hasActiveQuotesModule() && ($v->hasTrack('physical_quote') || empty($v->registration_tracks)))
-                    <a href="{{ route('vendor.quote-requests.index') }}" class="nav-link {{ request()->routeIs('vendor.quote-requests.*') ? 'active' : '' }}"><span>Teklifler</span></a>
+                    <a href="{{ route('vendor.quote-requests.index') }}" class="nav-link {{ request()->routeIs('vendor.quote-requests.*') ? 'active' : '' }}"><span>{{ __('panel.nav_bulk_production') }}</span></a>
                     @endif
                     <a href="{{ route('vendor.direct-quotes.index') }}" class="nav-link {{ request()->routeIs('vendor.direct-quotes.*') ? 'active' : '' }}"><span>{{ __('panel.nav_direct_quotes') }}</span></a>
                     @if($v?->hasActiveFreelancerModule() && $v->hasFreelancerTrack() && Route::has('vendor.freelancer.index'))
-                    <a href="{{ route('vendor.freelancer.index') }}" class="nav-link {{ request()->routeIs('vendor.freelancer.*') ? 'active' : '' }}"><span>Freelancer</span></a>
+                    <a href="{{ route('vendor.freelancer.index') }}" class="nav-link {{ request()->routeIs('vendor.freelancer.*') ? 'active' : '' }}"><span>{{ __('panel.nav_freelancerim') }}</span></a>
                     @endif
                     @if($v?->hasActiveTabelaModule() && Route::has('vendor.tabela.index'))
-                    <a href="{{ route('vendor.tabela.index') }}" class="nav-link {{ request()->routeIs('vendor.tabela.*') ? 'active' : '' }}"><span>Tabela</span></a>
+                    <a href="{{ route('vendor.tabela.index') }}" class="nav-link {{ request()->routeIs('vendor.tabela.*') ? 'active' : '' }}"><span>{{ __('panel.nav_tabela') }}</span></a>
                     @endif
                 </div>
             </details>

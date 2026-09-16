@@ -8,6 +8,7 @@ use App\Services\AiContentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class AdminBlogController extends Controller
 {
@@ -82,56 +83,110 @@ class AdminBlogController extends Controller
     public function import(Request $request, AiContentService $ai)
     {
         $validated = $request->validate([
-            'file' => ['required', 'file', 'mimes:csv,txt,xlsx'],
+            'file' => ['required', 'file', 'mimes:csv,txt,xlsx,xls', 'max:10240'],
             'humanize' => ['boolean'],
             'status' => ['required', 'in:draft,published'],
             'category_filter' => ['nullable', 'string', 'max:120'],
         ]);
 
-        $path = $request->file('file')->getRealPath();
-        $handle = fopen($path, 'r');
-        $header = fgetcsv($handle) ?: [];
-        $header = array_map(fn ($h) => Str::lower(trim((string) $h)), $header);
-        $count = 0;
+        $file = $request->file('file');
+        $ext = strtolower($file->getClientOriginalExtension() ?: '');
+        $rows = [];
 
-        while (($row = fgetcsv($handle)) !== false) {
-            $data = [];
-            foreach ($header as $i => $key) {
-                $data[$key] = $row[$i] ?? '';
+        try {
+            if (in_array($ext, ['xlsx', 'xls'], true)) {
+                $sheet = IOFactory::load($file->getRealPath())->getActiveSheet();
+                $matrix = $sheet->toArray(null, true, true, false);
+                if ($matrix === []) {
+                    return back()->with('error', 'Excel dosyası boş.');
+                }
+                $headerRow = array_shift($matrix);
+                $header = $this->normalizeHeader($headerRow);
+                $this->assertTitleColumn($header);
+                foreach ($matrix as $row) {
+                    $rows[] = $this->rowAssoc($header, $row);
+                }
+            } else {
+                $handle = fopen($file->getRealPath(), 'r');
+                $headerRaw = fgetcsv($handle) ?: [];
+                $header = $this->normalizeHeader($headerRaw);
+                $this->assertTitleColumn($header);
+                while (($row = fgetcsv($handle)) !== false) {
+                    $rows[] = $this->rowAssoc($header, $row);
+                }
+                fclose($handle);
             }
-            $title = $data['title'] ?? $data['baslik'] ?? $data['a'] ?? null;
-            $body = $data['body'] ?? $data['icerik'] ?? $data['content'] ?? $data['b'] ?? '';
+        } catch (\InvalidArgumentException $e) {
+            return back()->with('error', $e->getMessage());
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Dosya okunamadı: '.$e->getMessage());
+        }
+
+        $count = 0;
+        foreach ($rows as $data) {
+            $title = $data['title'] ?? $data['baslik'] ?? null;
+            $body = $data['body'] ?? $data['icerik'] ?? $data['content'] ?? '';
             $category = $data['category'] ?? $data['kategori'] ?? null;
 
-            if (! $title || trim($title) === '') {
+            if (! is_string($title) || trim($title) === '') {
                 continue;
             }
-            if ($validated['category_filter'] && $category && Str::lower($category) !== Str::lower($validated['category_filter'])) {
+            if ($validated['category_filter'] && $category && Str::lower((string) $category) !== Str::lower($validated['category_filter'])) {
                 continue;
             }
 
             if ($request->boolean('humanize') && $body) {
-                $body = $ai->humanize($body);
+                $body = $ai->humanize((string) $body);
             }
 
-            Post::updateOrCreate(
-                ['slug' => Str::slug($title).'-'.Str::random(4)],
-                [
-                    'title' => $title,
-                    'body' => $body,
-                    'category' => $category,
-                    'meta_title' => $data['meta_title'] ?? $title,
-                    'meta_description' => Str::limit(strip_tags($body), 160),
-                    'status' => $validated['status'],
-                    'ai_humanized' => $request->boolean('humanize'),
-                    'published_at' => $validated['status'] === 'published' ? now() : null,
-                ]
-            );
+            Post::create([
+                'slug' => $this->uniqueSlug($title),
+                'title' => trim($title),
+                'body' => (string) $body,
+                'category' => $category,
+                'meta_title' => $data['meta_title'] ?? trim($title),
+                'meta_description' => Str::limit(strip_tags((string) $body), 160),
+                'status' => $validated['status'],
+                'ai_humanized' => $request->boolean('humanize'),
+                'published_at' => $validated['status'] === 'published' ? now() : null,
+            ]);
             $count++;
         }
-        fclose($handle);
 
         return redirect()->route('admin.blog.index')->with('success', "{$count} yazı içe aktarıldı.");
+    }
+
+    private function normalizeHeader(array $headerRow): array
+    {
+        return array_map(function ($h) {
+            $h = Str::lower(trim((string) $h));
+            // Excel sometimes exports first column as "A" when header is missing — reject later.
+            return $h;
+        }, $headerRow);
+    }
+
+    private function assertTitleColumn(array $header): void
+    {
+        $keys = array_values(array_filter($header, fn ($h) => $h !== ''));
+        $hasTitle = in_array('title', $keys, true) || in_array('baslik', $keys, true);
+        if (! $hasTitle) {
+            throw new \InvalidArgumentException(
+                'Başlık sütunu bulunamadı. İlk satırda title veya baslik başlığı olmalı (A sütunu başlık adı olmalı; ham “A” kabul edilmez).'
+            );
+        }
+    }
+
+    private function rowAssoc(array $header, array $row): array
+    {
+        $data = [];
+        foreach ($header as $i => $key) {
+            if ($key === '') {
+                continue;
+            }
+            $data[$key] = isset($row[$i]) ? trim((string) $row[$i]) : '';
+        }
+
+        return $data;
     }
 
     private function validated(Request $request, ?Post $post = null): array

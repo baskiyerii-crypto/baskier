@@ -89,15 +89,20 @@ class VendorProductController extends Controller
         ]);
         $validated['vendor_id'] = $vendor->id;
         $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']) . '-' . time();
-        $validated['is_active'] = true;
+        $validated['is_active'] = false;
         $validated['product_type'] = 'physical';
         $validated['digital_link'] = null;
+        if (\Illuminate\Support\Facades\Schema::hasColumn('products', 'moderation_status')) {
+            $validated['moderation_status'] = Product::MODERATION_PENDING;
+            $validated['submitted_for_moderation_at'] = now();
+            $validated['moderation_note'] = null;
+        }
         if ($request->hasFile('main_image')) {
             $validated['main_image'] = $request->file('main_image')->store('products', 'public');
         }
         $product = Product::create($validated);
         $this->syncVariants($product, (string) $request->input('variant_lines', ''));
-        return redirect()->route('vendor.products.index')->with('success', 'Ürün eklendi.');
+        return redirect()->route('vendor.products.index')->with('success', 'Ürün eklendi; admin onayından sonra yayınlanır.');
     }
 
     public function edit(Request $request, Product $product)
@@ -134,9 +139,14 @@ class VendorProductController extends Controller
             'variant_lines' => ['nullable', 'string'],
         ]);
         $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']) . '-' . $product->id;
-        $validated['is_active'] = $request->boolean('is_active');
+        $validated['is_active'] = false;
         $validated['product_type'] = 'physical';
         $validated['digital_link'] = null;
+        if (\Illuminate\Support\Facades\Schema::hasColumn('products', 'moderation_status')) {
+            $validated['moderation_status'] = Product::MODERATION_PENDING;
+            $validated['submitted_for_moderation_at'] = now();
+            $validated['moderation_note'] = null;
+        }
         if ($request->hasFile('main_image')) {
             if ($product->main_image) {
                 Storage::disk('public')->delete($product->main_image);
@@ -145,7 +155,7 @@ class VendorProductController extends Controller
         }
         $product->update($validated);
         $this->syncVariants($product, (string) $request->input('variant_lines', ''));
-        return redirect()->route('vendor.products.index')->with('success', 'Ürün güncellendi.');
+        return redirect()->route('vendor.products.index')->with('success', 'Ürün güncellendi; yeniden onay bekliyor.');
     }
 
     public function destroy(Request $request, Product $product)

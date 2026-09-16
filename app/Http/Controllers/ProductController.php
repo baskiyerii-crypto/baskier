@@ -15,7 +15,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $query = Product::query()
-            ->where('is_active', true)
+            ->published()
             ->with(['vendor', 'category'])
             ->latest();
 
@@ -64,17 +64,17 @@ class ProductController extends Controller
     public function show(string $slug)
     {
         $product = Product::where('slug', $slug)
-            ->where('is_active', true)
+            ->published()
             ->with(['vendor', 'category.parent', 'variants'])
             ->firstOrFail();
 
-        $related = Product::where('is_active', true)
+        $related = Product::published()
             ->where('category_id', $product->category_id)
             ->whereKeyNot($product->getKey())
             ->limit(4)
             ->get();
         if ($related->isEmpty()) {
-            $related = Product::where('is_active', true)
+            $related = Product::published()
                 ->whereKeyNot($product->getKey())
                 ->latest()
                 ->limit(4)
