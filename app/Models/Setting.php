@@ -72,4 +72,14 @@ class Setting extends Model
     {
         return (int) self::get('contract_acceptance_days', 15);
     }
+
+    public static function apiEnabled(string $key, bool $default = true): bool
+    {
+        $v = self::get('api_'.$key.'_enabled');
+        if ($v === null || $v === '') {
+            return $default;
+        }
+
+        return $v === '1' || $v === 'true' || $v === 'on';
+    }
 }

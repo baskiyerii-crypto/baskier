@@ -23,8 +23,20 @@ class EvolutionWhatsAppService
         return (string) (Setting::get('evolution_instance') ?: config('evolution.instance'));
     }
 
+    public function isConfigured(): bool
+    {
+        return Setting::apiEnabled('evolution')
+            && $this->baseUrl() !== ''
+            && $this->apiKey() !== ''
+            && $this->instance() !== '';
+    }
+
     public function sendText(string $phone, string $message): bool
     {
+        if (! $this->isConfigured()) {
+            return false;
+        }
+
         $number = preg_replace('/\D+/', '', $phone) ?? '';
         if ($number === '') {
             return false;

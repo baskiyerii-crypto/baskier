@@ -121,6 +121,7 @@ return [
     'nav_finance' => 'Finans',
     'nav_blog' => 'Blog',
     'nav_api' => 'API yönetimi',
+    'nav_menu' => 'Menü',
     'nav_products' => 'Ürünler',
     'nav_product_approvals' => 'Ürün onayları',
     'nav_settings' => 'Ayarlar',

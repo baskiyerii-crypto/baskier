@@ -121,6 +121,7 @@ return [
     'nav_finance' => 'Finance',
     'nav_blog' => 'Blog',
     'nav_api' => 'API management',
+    'nav_menu' => 'Menu',
     'nav_products' => 'Products',
     'nav_product_approvals' => 'Product approvals',
     'nav_settings' => 'Settings',

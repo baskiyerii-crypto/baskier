@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminContractController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminFinanceController;
+use App\Http\Controllers\Admin\AdminMenuController;
 use App\Http\Controllers\Admin\AdminPayoutController;
 use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\AdminProductModerationController;
@@ -209,6 +210,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('urun-onaylari/{product}/reddet', [AdminProductModerationController::class, 'reject'])->name('product-approvals.reject');
     Route::get('settings', [AdminSettingsController::class, 'index'])->name('settings.index');
     Route::post('settings', [AdminSettingsController::class, 'update'])->name('settings.update');
+    Route::get('menu', [AdminMenuController::class, 'index'])->name('menu.index');
+    Route::post('menu', [AdminMenuController::class, 'update'])->name('menu.update');
+    Route::post('menu/reset', [AdminMenuController::class, 'reset'])->name('menu.reset');
     Route::get('finans', [AdminFinanceController::class, 'index'])->name('finance.index');
     Route::post('finans/giderler', [AdminFinanceController::class, 'updateExpenses'])->name('finance.expenses');
     Route::get('finans/export', [AdminFinanceController::class, 'export'])->name('finance.export');

@@ -110,11 +110,8 @@
                     <label class="form-check-label" for="fc">Ara yüzen buton</label>
                 </div>
 
-                <hr class="my-4">
-                <h2 class="h6 fw-bold mb-2">Menü (JSON)</h2>
-                <p class="small text-muted">placement: <code>top</code> | <code>drawer</code>. type: <code>route</code>, <code>url</code>, <code>category</code>, <code>products</code>, <code>page</code>, <code>categories_accordion</code>.</p>
-                <textarea name="menu_items_json" class="form-control font-monospace small" rows="14">{{ old('menu_items_json', $menu_items_json) }}</textarea>
-                <button type="submit" class="btn btn-primary mt-3">{{ __('panel.save') }}</button>
+                <p class="small text-muted mb-3">Menü düzenleme: <a href="{{ route('admin.menu.index') }}">Menü yönetimi</a> (sürükle-bırak).</p>
+                <button type="submit" class="btn btn-primary mt-2">{{ __('panel.save') }}</button>
             </form>
         </div>
     </div>

@@ -13,7 +13,9 @@ class BasitKargoService
 {
     public function isConfigured(): bool
     {
-        return filled(Setting::get('basitkargo_api_key')) && filled(Setting::get('basitkargo_base_url'));
+        return Setting::apiEnabled('basitkargo')
+            && filled(Setting::get('basitkargo_api_key'))
+            && filled(Setting::get('basitkargo_base_url'));
     }
 
     public function carriers(): array

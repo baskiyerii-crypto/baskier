@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use App\Support\PlatformBranding;
-use App\Support\SiteMenu;
 use Illuminate\Http\Request;
 
 class AdminSettingsController extends Controller
@@ -34,7 +33,6 @@ class AdminSettingsController extends Controller
             'call_number' => Setting::get('call_number'),
             'float_whatsapp_enabled' => Setting::get('float_whatsapp_enabled', '1'),
             'float_call_enabled' => Setting::get('float_call_enabled', '1'),
-            'menu_items_json' => Setting::get('menu_items_json', json_encode(SiteMenu::defaults(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)),
         ]);
     }
 
@@ -62,26 +60,17 @@ class AdminSettingsController extends Controller
             'call_number' => ['nullable', 'string', 'max:32'],
             'float_whatsapp_enabled' => ['nullable', 'boolean'],
             'float_call_enabled' => ['nullable', 'boolean'],
-            'menu_items_json' => ['nullable', 'string', 'max:20000'],
         ]);
 
         if ($request->hasFile('platform_logo')) {
             PlatformBranding::storeLogo($request->file('platform_logo'));
         }
 
-        if (! empty($validated['menu_items_json'])) {
-            $decoded = json_decode($validated['menu_items_json'], true);
-            if (! is_array($decoded)) {
-                return back()->withInput()->with('error', 'Menü JSON geçersiz.');
-            }
-            Setting::set('menu_items_json', json_encode(array_values($decoded), JSON_UNESCAPED_UNICODE));
-        }
-
         Setting::set('float_whatsapp_enabled', $request->boolean('float_whatsapp_enabled') ? '1' : '0');
         Setting::set('float_call_enabled', $request->boolean('float_call_enabled') ? '1' : '0');
 
         foreach ($validated as $key => $value) {
-            if (in_array($key, ['platform_logo', 'menu_items_json', 'float_whatsapp_enabled', 'float_call_enabled'], true)) {
+            if (in_array($key, ['platform_logo', 'float_whatsapp_enabled', 'float_call_enabled'], true)) {
                 continue;
             }
             Setting::set($key, $value ?? '');

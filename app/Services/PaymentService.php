@@ -11,21 +11,35 @@ use Illuminate\Support\Str;
 
 class PaymentService
 {
-    public function provider(): string
-    {
-        $p = Setting::get('payment_provider', 'shopify');
-
-        return in_array($p, ['shopify', 'iyzico'], true) ? $p : 'shopify';
-    }
-
     public function isShopifyConfigured(): bool
     {
-        return filled(Setting::get('shopify_shop_domain')) && filled(Setting::get('shopify_admin_token'));
+        return Setting::apiEnabled('shopify')
+            && filled(Setting::get('shopify_shop_domain'))
+            && filled(Setting::get('shopify_admin_token'));
     }
 
     public function isIyzicoConfigured(): bool
     {
-        return filled(Setting::get('iyzico_api_key')) && filled(Setting::get('iyzico_secret_key'));
+        return Setting::apiEnabled('iyzico')
+            && filled(Setting::get('iyzico_api_key'))
+            && filled(Setting::get('iyzico_secret_key'));
+    }
+
+    public function provider(): string
+    {
+        $p = Setting::get('payment_provider', 'shopify');
+        if (! in_array($p, ['shopify', 'iyzico'], true)) {
+            $p = 'shopify';
+        }
+        // If preferred provider disabled, fall back to the other if enabled.
+        if ($p === 'shopify' && ! Setting::apiEnabled('shopify')) {
+            $p = Setting::apiEnabled('iyzico') ? 'iyzico' : 'shopify';
+        }
+        if ($p === 'iyzico' && ! Setting::apiEnabled('iyzico')) {
+            $p = Setting::apiEnabled('shopify') ? 'shopify' : 'iyzico';
+        }
+
+        return $p;
     }
 
     public function isConfigured(): bool

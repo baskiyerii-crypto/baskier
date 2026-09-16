@@ -250,7 +250,7 @@
                     @endif
                 </div>
             </details>
-            <details class="nav-acc" @if(request()->routeIs('admin.finance.*','admin.payouts.*','admin.contracts.*','admin.settings.*','admin.api-management.*','admin.support-tickets.*','admin.vendor-payout-requests.*')) open @endif>
+            <details class="nav-acc" @if(request()->routeIs('admin.finance.*','admin.payouts.*','admin.contracts.*','admin.settings.*','admin.menu.*','admin.api-management.*','admin.support-tickets.*','admin.vendor-payout-requests.*')) open @endif>
                 <summary>{{ __('panel.nav_ops') }} <span>▾</span></summary>
                 <div class="nav-acc-body">
                     @if(Route::has('admin.finance.index'))
@@ -259,6 +259,9 @@
                     <a href="{{ route('admin.payouts.index') }}" class="nav-link {{ request()->routeIs('admin.payouts.*') ? 'active' : '' }}"><span>{{ __('panel.nav_payouts') }}</span></a>
                     <a href="{{ route('admin.contracts.index') }}" class="nav-link {{ request()->routeIs('admin.contracts.*') ? 'active' : '' }}"><span>{{ __('panel.nav_contracts') }}</span></a>
                     <a href="{{ route('admin.settings.index') }}" class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}"><span>{{ __('panel.nav_settings') }}</span></a>
+                    @if(Route::has('admin.menu.index'))
+                    <a href="{{ route('admin.menu.index') }}" class="nav-link {{ request()->routeIs('admin.menu.*') ? 'active' : '' }}"><span>{{ __('panel.nav_menu') }}</span></a>
+                    @endif
                     @if(Route::has('admin.api-management.index'))
                     <a href="{{ route('admin.api-management.index') }}" class="nav-link {{ request()->routeIs('admin.api-management.*') ? 'active' : '' }}"><span>{{ __('panel.nav_api') }}</span></a>
                     @endif

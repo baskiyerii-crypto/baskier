@@ -11,7 +11,7 @@ class AiContentService
     public function humanize(string $text): string
     {
         $apiKey = Setting::get('openai_api_key');
-        if (! $apiKey) {
+        if (! Setting::apiEnabled('openai') || ! $apiKey) {
             return $this->localHumanize($text);
         }
 
