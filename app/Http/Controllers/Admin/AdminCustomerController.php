@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\QuoteRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class AdminCustomerController extends Controller
 {
@@ -18,8 +19,10 @@ class AdminCustomerController extends Controller
                 $term = '%'.$request->string('q').'%';
                 $q->where(function ($inner) use ($term, $request) {
                     $inner->where('name', 'like', $term)
-                        ->orWhere('email', 'like', $term)
-                        ->orWhere('public_id', 'like', '%'.preg_replace('/\D/', '', (string) $request->q).'%');
+                        ->orWhere('email', 'like', $term);
+                    if (Schema::hasColumn('users', 'public_id')) {
+                        $inner->orWhere('public_id', 'like', '%'.preg_replace('/\D/', '', (string) $request->q).'%');
+                    }
                 });
             })
             ->latest()
@@ -41,6 +44,9 @@ class AdminCustomerController extends Controller
     public function toggleActive(User $customer)
     {
         abort_unless($customer->role === 'customer', 404);
+        if (! Schema::hasColumn('users', 'is_active')) {
+            return back()->with('error', 'is_active kolonu henüz migrate edilmedi.');
+        }
         $customer->update(['is_active' => ! $customer->is_active]);
 
         return back()->with('success', __('panel.customer_updated'));

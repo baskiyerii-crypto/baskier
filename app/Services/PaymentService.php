@@ -11,9 +11,28 @@ use Illuminate\Support\Str;
 
 class PaymentService
 {
-    public function isConfigured(): bool
+    public function provider(): string
+    {
+        $p = Setting::get('payment_provider', 'shopify');
+
+        return in_array($p, ['shopify', 'iyzico'], true) ? $p : 'shopify';
+    }
+
+    public function isShopifyConfigured(): bool
+    {
+        return filled(Setting::get('shopify_shop_domain')) && filled(Setting::get('shopify_admin_token'));
+    }
+
+    public function isIyzicoConfigured(): bool
     {
         return filled(Setting::get('iyzico_api_key')) && filled(Setting::get('iyzico_secret_key'));
+    }
+
+    public function isConfigured(): bool
+    {
+        return $this->provider() === 'shopify'
+            ? $this->isShopifyConfigured()
+            : $this->isIyzicoConfigured();
     }
 
     public function mode(): string
@@ -33,9 +52,6 @@ class PaymentService
             : 'https://sandbox-api.iyzipay.com';
     }
 
-    /**
-     * Demo / placeholder: marks order as financially cleared and records a payment row.
-     */
     public function recordDemoPayment(Order $order): Payment
     {
         return Payment::create([
@@ -48,9 +64,109 @@ class PaymentService
         ]);
     }
 
+    /**
+     * Create Shopify draft order and return invoice/checkout URL.
+     * Falls back to demo paid + null URL when Shopify is not configured.
+     */
+    public function createShopifyCheckout(Order $order): array
+    {
+        if (! $this->isShopifyConfigured()) {
+            $payment = $this->recordDemoPayment($order);
+            $order->update(['payment_status' => 'paid']);
+
+            return ['url' => null, 'payment' => $payment, 'demo' => true];
+        }
+
+        $shop = preg_replace('#^https?://#', '', rtrim((string) Setting::get('shopify_shop_domain'), '/'));
+        $token = Setting::get('shopify_admin_token');
+        $apiVersion = Setting::get('shopify_api_version', '2024-01');
+
+        $payload = [
+            'draft_order' => [
+                'line_items' => [[
+                    'title' => 'Siparis '.$order->order_number,
+                    'quantity' => 1,
+                    'price' => number_format((float) $order->subtotal, 2, '.', ''),
+                ]],
+                'note' => 'BaskiYeri order #'.$order->order_number,
+                'email' => $order->invoice_email,
+                'tags' => 'baskiyeri,order-'.$order->id,
+                'use_customer_default_address' => true,
+            ],
+        ];
+
+        try {
+            $res = Http::withHeaders([
+                'X-Shopify-Access-Token' => $token,
+                'Content-Type' => 'application/json',
+            ])
+                ->timeout(30)
+                ->post("https://{$shop}/admin/api/{$apiVersion}/draft_orders.json", $payload);
+
+            $body = $res->json() ?? [];
+            $draft = $body['draft_order'] ?? [];
+            $invoiceUrl = $draft['invoice_url'] ?? null;
+
+            $payment = Payment::create([
+                'order_id' => $order->id,
+                'provider' => 'shopify',
+                'reference' => (string) ($draft['id'] ?? ('SH-'.$order->order_number)),
+                'amount' => $order->subtotal,
+                'status' => $invoiceUrl ? 'pending' : 'failed',
+                'meta' => $body,
+            ]);
+
+            $order->update([
+                'payment_status' => $invoiceUrl ? 'pending' : 'failed',
+            ]);
+
+            if (! $invoiceUrl) {
+                throw new \RuntimeException($body['errors'] ?? 'Shopify ödeme bağlantısı oluşturulamadı.');
+            }
+
+            return ['url' => $invoiceUrl, 'payment' => $payment, 'demo' => false];
+        } catch (\Throwable $e) {
+            Log::warning('shopify_checkout_failed', ['order' => $order->id, 'error' => $e->getMessage()]);
+            throw $e;
+        }
+    }
+
+    public function markShopifyPaid(Order $order, ?string $reference = null): Payment
+    {
+        $payment = Payment::query()
+            ->where('order_id', $order->id)
+            ->where('provider', 'shopify')
+            ->latest()
+            ->first();
+
+        if ($payment) {
+            $payment->update([
+                'status' => 'completed',
+                'reference' => $reference ?: $payment->reference,
+            ]);
+        } else {
+            $payment = Payment::create([
+                'order_id' => $order->id,
+                'provider' => 'shopify',
+                'reference' => $reference ?: ('SH-DONE-'.$order->order_number),
+                'amount' => $order->subtotal,
+                'status' => 'completed',
+                'meta' => [],
+            ]);
+        }
+
+        $order->update(['payment_status' => 'paid']);
+
+        return $payment;
+    }
+
     public function chargeCard(Order $order, array $card): Payment
     {
-        if (! $this->isConfigured()) {
+        if ($this->provider() === 'shopify') {
+            throw new \RuntimeException('Aktif ödeme sağlayıcısı Shopify. Kart ile iyzico için API yönetiminden geçiş yapın.');
+        }
+
+        if (! $this->isIyzicoConfigured()) {
             $payment = $this->recordDemoPayment($order);
             $order->update(['payment_status' => 'paid']);
 

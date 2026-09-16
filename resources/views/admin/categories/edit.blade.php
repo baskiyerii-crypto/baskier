@@ -12,6 +12,10 @@
             <input type="text" name="name" class="form-control" value="{{ old('name', $category->name) }}" required>
         </div>
         <div class="mb-3">
+            <label class="form-label fw-semibold">Ad (EN)</label>
+            <input type="text" name="name_en" class="form-control" value="{{ old('name_en', $category->name_en) }}">
+        </div>
+        <div class="mb-3">
             <label class="form-label fw-semibold">Kanal</label>
             <select name="channel" class="form-select" required>
                 <option value="physical_quote" @selected(old('channel', $category->channel ?? 'physical_quote') === 'physical_quote')>Fiziksel + Teklif</option>

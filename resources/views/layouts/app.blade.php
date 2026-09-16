@@ -44,11 +44,30 @@
                 <div class="px-4 pb-4">
                     <p class="text-xs font-extrabold uppercase tracking-wider text-slate-500">{{ __('ui.menu') }}</p>
                     <div class="mt-2 grid gap-2">
-                        <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('home') }}">{{ __('ui.home') }}</a>
-                        <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('products.index') }}">{{ __('ui.products') }}</a>
-                        <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('vendors.index') }}">{{ __('ui.vendors') }}</a>
-                        <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('pages.contact') }}">{{ __('ui.contact') }}</a>
-                    <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('freelancer-jobs.index') }}">{{ __('ui.jobs') }}</a>
+                        @foreach(\App\Support\SiteMenu::forPlacement('drawer') as $item)
+                            @if(($item['type'] ?? '') === 'categories_accordion')
+                                <details class="by-card overflow-hidden">
+                                    <summary class="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-slate-900">{{ $item['label'] }}</summary>
+                                    <div class="border-t border-slate-100 px-2 py-2 max-h-[40vh] overflow-auto">
+                                        @if(!empty($headerCategories) && $headerCategories->isNotEmpty())
+                                            @foreach($headerCategories as $parentCategory)
+                                                <a class="block rounded-xl px-3 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50" href="{{ route('products.index', ['category_id' => $parentCategory->id]) }}">{{ $parentCategory->localizedName() }}</a>
+                                                @foreach($parentCategory->children as $childCategory)
+                                                    <a class="ml-3 block rounded-xl px-3 py-2 text-sm text-slate-600 hover:bg-slate-50" href="{{ route('products.index', ['category_id' => $childCategory->id]) }}">{{ $childCategory->localizedName() }}</a>
+                                                @endforeach
+                                            @endforeach
+                                        @else
+                                            <p class="px-2 py-2 text-sm text-slate-500">{{ __('ui.no_categories') }}</p>
+                                        @endif
+                                    </div>
+                                </details>
+                            @else
+                                @php $href = \App\Support\SiteMenu::href($item); @endphp
+                                @if($href)
+                                    <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ $href }}">{{ $item['label'] }}</a>
+                                @endif
+                            @endif
+                        @endforeach
                     </div>
                 </div>
 
@@ -86,27 +105,7 @@
                 </div>
 
                 <div class="px-4 pb-6">
-                    <p class="text-xs font-extrabold uppercase tracking-wider text-slate-500">{{ __('ui.categories') }}</p>
-                    <div class="mt-2 max-h-[38vh] overflow-auto pr-1">
-                        @if(!empty($headerCategories) && $headerCategories->isNotEmpty())
-                            <div class="grid gap-1.5">
-                                @foreach($headerCategories as $parentCategory)
-                                    <a class="rounded-2xl px-4 py-2.5 text-sm font-semibold text-slate-900 hover:bg-slate-50"
-                                       href="{{ route('products.index', ['category_id' => $parentCategory->id]) }}">
-                                        {{ $parentCategory->name }}
-                                    </a>
-                                    @foreach($parentCategory->children as $childCategory)
-                                        <a class="ml-3 rounded-2xl px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50"
-                                           href="{{ route('products.index', ['category_id' => $childCategory->id]) }}">
-                                            {{ $childCategory->name }}
-                                        </a>
-                                    @endforeach
-                                @endforeach
-                            </div>
-                        @else
-                            <p class="px-2 py-2 text-sm text-slate-500">{{ __('ui.no_categories') }}</p>
-                        @endif
-                    </div>
+                    {{-- categories also via menu accordion; keep nothing duplicate if accordion used --}}
                 </div>
             </div>
         </div>
@@ -121,7 +120,7 @@
                 </button>
                 <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
                     <div class="pointer-events-auto">
-                        @include('partials.platform-brand', ['compact' => true, 'logoOnly' => true])
+                        @include('partials.platform-brand', ['compact' => true, 'forceName' => true])
                     </div>
                 </div>
                 <div class="flex items-center gap-1.5">
@@ -140,7 +139,16 @@
             <div class="hidden items-center justify-between gap-4 md:flex">
                 @include('partials.platform-brand', ['compact' => true])
 
-                <form action="{{ route('products.index') }}" class="hidden flex-1 lg:block">
+                <nav class="hidden flex-1 items-center justify-center gap-1 lg:flex">
+                    @foreach(\App\Support\SiteMenu::forPlacement('top') as $item)
+                        @php $href = \App\Support\SiteMenu::href($item); @endphp
+                        @if($href)
+                            <a href="{{ $href }}" class="rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 {{ request()->url() === $href ? 'bg-orange-50 text-orange-900' : '' }}">{{ $item['label'] }}</a>
+                        @endif
+                    @endforeach
+                </nav>
+
+                <form action="{{ route('products.index') }}" class="hidden max-w-xs flex-1 xl:block">
                     <div class="relative">
                         <input class="by-input pl-11" name="q" value="{{ request('q') }}" placeholder="{{ __('ui.search_placeholder') }}" />
                         <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
@@ -286,7 +294,38 @@
 </div>
 @include('partials.review-prompt')
 @include('partials.pwa-install')
+@include('partials.floating-actions')
 @include('partials.floating-support')
+<style>
+/* Vite build yoksa da drawer çalışsın */
+[data-left-drawer] { pointer-events: none; }
+[data-left-drawer].is-open { pointer-events: auto; }
+[data-left-drawer].is-open [data-left-drawer-overlay] { opacity: 1; }
+[data-left-drawer].is-open [data-left-drawer-panel] { transform: translateX(0); }
+</style>
+<script>
+(() => {
+  const drawer = document.querySelector('[data-left-drawer]');
+  if (!drawer || drawer.dataset.drawerBound === '1') return;
+  drawer.dataset.drawerBound = '1';
+  const panel = drawer.querySelector('[data-left-drawer-panel]');
+  const overlay = drawer.querySelector('[data-left-drawer-overlay]');
+  const setOpen = (open) => {
+    drawer.classList.toggle('is-open', open);
+    document.documentElement.classList.toggle('overflow-hidden', open);
+    document.body.classList.toggle('overflow-hidden', open);
+  };
+  document.querySelectorAll('[data-left-drawer-open]').forEach((btn) => {
+    btn.addEventListener('click', (e) => { e.preventDefault(); setOpen(true); });
+  });
+  drawer.querySelectorAll('[data-left-drawer-close]').forEach((btn) => {
+    btn.addEventListener('click', (e) => { e.preventDefault(); setOpen(false); });
+  });
+  overlay?.addEventListener('click', () => setOpen(false));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
+  panel?.addEventListener('click', (e) => { if (e.target && e.target.tagName === 'A') setOpen(false); });
+})();
+</script>
 @stack('scripts')
 </body>
 </html>

@@ -50,6 +50,7 @@ use App\Http\Controllers\Vendor\VendorContractController;
 use App\Http\Controllers\Vendor\VendorCategoryRequestController;
 use App\Http\Controllers\Admin\AdminCustomerController;
 use App\Http\Controllers\Admin\AdminVendorUpdateController;
+use App\Http\Controllers\Admin\AdminVendorCategoryRequestController;
 use App\Http\Controllers\Customer\CustomerDirectQuoteController;
 use App\Http\Controllers\Vendor\VendorDirectQuoteController;
 use App\Http\Controllers\Vendor\VendorProfileController;
@@ -108,6 +109,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/sepet/kalem/{cartItem}', [CartController::class, 'remove'])->name('cart.remove');
     Route::get('/odeme', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/odeme', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/odeme/shopify/{order}', [CheckoutController::class, 'shopifyReturn'])->name('checkout.shopify.return');
     Route::get('/favorilerim', [FavoriteController::class, 'index'])->name('favorites.index');
     Route::post('/favoriler/{product}', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
 

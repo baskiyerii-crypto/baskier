@@ -9,6 +9,10 @@
             <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
             @error('name')<div class="text-danger small">{{ $message }}</div>@enderror
         </div>
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Urun adi (EN)</label>
+            <input type="text" name="name_en" class="form-control" value="{{ old('name_en') }}">
+        </div>
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label fw-semibold">Kategori</label>

@@ -34,17 +34,20 @@ class CheckoutController extends Controller
         $billingProfile = $user->billingProfiles()->latest('updated_at')->first();
         $distanceSalesContract = Contract::query()->where('key', 'distance_sales')->where('is_active', true)->first();
         $carriers = app(\App\Services\BasitKargoService::class)->carriers();
+        $paymentProvider = $this->paymentService->provider();
 
-        return view('checkout.index', compact('items', 'total', 'addresses', 'billingProfile', 'defaultBillingAddress', 'distanceSalesContract', 'carriers'));
+        return view('checkout.index', compact('items', 'total', 'addresses', 'billingProfile', 'defaultBillingAddress', 'distanceSalesContract', 'carriers', 'paymentProvider'));
     }
 
     public function store(Request $request)
     {
+        $provider = $this->paymentService->provider();
+        $methods = ['credit_card', 'bank_transfer', 'cash_on_delivery', 'shopify'];
         $validated = $request->validate([
             'shipping_address_id' => ['required', 'exists:addresses,id'],
             'use_shipping_for_billing' => ['nullable', 'boolean'],
             'billing_address_id' => ['nullable', 'exists:addresses,id'],
-            'payment_method' => ['required', Rule::in(['credit_card', 'bank_transfer', 'cash_on_delivery'])],
+            'payment_method' => ['required', Rule::in($methods)],
             'accept_distance_sales' => ['accepted'],
             'card_holder_name' => ['nullable', 'string', 'max:120'],
             'card_number' => ['nullable', 'string', 'max:32'],
@@ -60,6 +63,10 @@ class CheckoutController extends Controller
             'invoice_tax_number' => ['nullable', 'string', 'max:16'],
             'invoice_tax_office' => ['nullable', 'string', 'max:120'],
         ]);
+
+        if ($provider === 'shopify' && ($validated['payment_method'] ?? '') === 'credit_card') {
+            $validated['payment_method'] = 'shopify';
+        }
 
         if ($validated['invoice_type'] === 'corporate') {
             $request->validate([
@@ -143,6 +150,7 @@ class CheckoutController extends Controller
             );
 
             $contract = Contract::query()->where('key', 'distance_sales')->where('is_active', true)->first();
+            $shopifyRedirect = null;
             foreach ($orders as $order) {
                 if ($contract) {
                     OrderContractAcceptance::create([
@@ -154,7 +162,18 @@ class CheckoutController extends Controller
                         'accepted_at' => now(),
                     ]);
                 }
-                if (($paymentData['payment_method'] ?? '') === 'credit_card') {
+                $method = $paymentData['payment_method'] ?? '';
+                if ($method === 'shopify' || ($provider === 'shopify' && $method === 'credit_card')) {
+                    try {
+                        $result = $this->paymentService->createShopifyCheckout($order);
+                        if (! empty($result['url']) && ! $shopifyRedirect) {
+                            $shopifyRedirect = $result['url'];
+                        }
+                    } catch (\Throwable $e) {
+                        return redirect()->route('account.orders.index')
+                            ->with('error', 'Sipariş oluşturuldu ancak Shopify ödemesi başarısız: '.$e->getMessage());
+                    }
+                } elseif ($method === 'credit_card') {
                     try {
                         $this->paymentService->chargeCard($order, [
                             'card_holder_name' => $validated['card_holder_name'] ?? '',
@@ -174,11 +193,25 @@ class CheckoutController extends Controller
             return redirect()->route('cart.index')->with('error', $e->getMessage());
         }
 
+        if ($shopifyRedirect) {
+            return redirect()->away($shopifyRedirect);
+        }
+
         $first = $orders[0]->order_number;
         $msg = count($orders) > 1
             ? count($orders) . ' sipariş oluşturuldu. İlk sipariş no: #' . $first
             : 'Siparişiniz alındı. Sipariş no: #' . $first;
 
         return redirect()->route('account.orders.index')->with('success', $msg);
+    }
+
+    public function shopifyReturn(Request $request, \App\Models\Order $order)
+    {
+        if ($order->user_id !== $request->user()->id) {
+            abort(403);
+        }
+        $this->paymentService->markShopifyPaid($order, $request->string('ref')->toString() ?: null);
+
+        return redirect()->route('account.orders.index')->with('success', 'Shopify ödemesi kaydedildi. Sipariş #'.$order->order_number);
     }
 }

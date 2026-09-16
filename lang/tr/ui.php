@@ -31,6 +31,8 @@ return [
     'privacy' => 'Gizlilik',
     'rights' => '© :year BaskıYeri. Tüm hakları saklıdır.',
     'country' => 'Türkiye',
+    'call' => 'Ara',
+    'description' => 'Açıklama',
     'vendor_cta_eyebrow' => 'Satıcı mısın?',
     'vendor_cta_title' => 'BaskıYeri’nde mağazanı aç, tekliflere cevap ver, sipariş al.',
     'vendor_cta_body' => 'Satıcı hesabı oluşturup iş kolunu seçerek başvurunu tamamla.',

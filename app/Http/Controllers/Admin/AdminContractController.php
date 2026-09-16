@@ -6,12 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Models\Contract;
 use App\Services\ContractPublishService;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Schema;
 
 class AdminContractController extends Controller
 {
     public function index()
     {
-        $contracts = Contract::orderBy('key')->paginate(20);
+        $contracts = Schema::hasTable('contracts')
+            ? Contract::orderBy('key')->paginate(20)
+            : new LengthAwarePaginator([], 0, 20);
 
         return view('admin.contracts.index', compact('contracts'));
     }

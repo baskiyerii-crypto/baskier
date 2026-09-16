@@ -14,6 +14,10 @@
                 @error('name')<div class="text-danger small">{{ $message }}</div>@enderror
             </div>
             <div class="mb-3">
+                <label class="form-label small fw-semibold">Ürün adı (EN)</label>
+                <input type="text" name="name_en" class="form-control rounded-3" value="{{ old('name_en') }}">
+            </div>
+            <div class="mb-3">
                 <label class="form-label small fw-semibold">Kategori</label>
                 <select name="category_id" class="form-select rounded-3" required>
                     @foreach($categories as $c)<option value="{{ $c->id }}" @selected(old('category_id') == $c->id)>{{ $c->name }}</option>@endforeach
@@ -41,8 +45,16 @@
                 <textarea name="short_description" class="form-control" rows="2">{{ old('short_description') }}</textarea>
             </div>
             <div class="mb-3">
+                <label class="form-label fw-semibold">Kısa açıklama (EN)</label>
+                <textarea name="short_description_en" class="form-control" rows="2">{{ old('short_description_en') }}</textarea>
+            </div>
+            <div class="mb-3">
                 <label class="form-label fw-semibold">Detaylı açıklama</label>
                 <textarea name="description" class="form-control" rows="4">{{ old('description') }}</textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Detaylı açıklama (EN)</label>
+                <textarea name="description_en" class="form-control" rows="4">{{ old('description_en') }}</textarea>
             </div>
             <div class="mb-3">
                 <label class="form-label fw-semibold">Varyantlar (isteğe bağlı)</label>

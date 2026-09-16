@@ -84,6 +84,15 @@
             .admin-sidebar { transform: translateX(-100%); }
             .admin-sidebar.is-open { transform: translateX(0); }
             .admin-main { margin-left: 0; }
+            .admin-content { padding: 0.75rem !important; min-width: 0; overflow-x: hidden; }
+            .admin-header { padding: 0 0.75rem; height: 56px; }
+            .admin-header .page-title { font-size: 0.95rem; max-width: 45vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+            .admin-header .user-menu a:not(.btn-out-admin) { display: none; }
+            .admin-header .user-menu .sep { display: none; }
+            .admin-content .table-responsive { display: block; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .admin-content .row > [class*="col-"] { margin-bottom: 0.75rem; }
+            .admin-content .btn-group { flex-wrap: wrap; }
+            .admin-content .d-flex.gap-2 { flex-wrap: wrap; }
         }
         .metric-card, .card { transition: transform .15s ease, box-shadow .15s ease; }
         .metric-card:hover, .card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(15,23,42,.08) !important; }

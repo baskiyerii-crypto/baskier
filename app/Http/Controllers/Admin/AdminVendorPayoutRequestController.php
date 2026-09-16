@@ -6,12 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Models\PayoutRequest;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class AdminVendorPayoutRequestController extends Controller
 {
     public function index(Request $request)
     {
+        if (! Schema::hasTable('payout_requests')) {
+            $requests = new LengthAwarePaginator([], 0, 25);
+
+            return view('admin.vendor-payout-requests.index', compact('requests'));
+        }
+
         $q = PayoutRequest::with('vendor')->latest();
         if ($request->filled('status')) {
             $q->where('status', $request->string('status'));

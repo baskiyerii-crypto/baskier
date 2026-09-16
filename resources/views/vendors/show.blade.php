@@ -76,14 +76,14 @@
                     <a href="{{ route('products.show', $product->slug) }}" class="group overflow-hidden rounded-2xl border border-slate-200/80 bg-white transition hover:border-orange-200 hover:shadow-md">
                         <div class="aspect-[4/3] bg-slate-100">
                             @if($product->main_image)
-                                <img src="{{ asset('storage/'.$product->main_image) }}" alt="{{ $product->name }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]" loading="lazy">
+                                <img src="{{ asset('storage/'.$product->main_image) }}" alt="{{ $product->localizedName() }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]" loading="lazy">
                             @else
                                 <div class="flex h-full w-full items-center justify-center text-sm text-slate-400">{{ __('ui.no_image') }}</div>
                             @endif
                         </div>
                         <div class="p-3 sm:p-4">
-                            <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">{{ $product->category?->name ?? __('ui.category') }}</p>
-                            <p class="mt-1 line-clamp-2 text-sm font-semibold text-slate-900">{{ $product->name }}</p>
+                            <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">{{ $product->category?->localizedName() ?? __('ui.category') }}</p>
+                            <p class="mt-1 line-clamp-2 text-sm font-semibold text-slate-900">{{ $product->localizedName() }}</p>
                             <p class="mt-2 text-sm font-bold text-orange-900">₺{{ number_format($product->price, 2, ',', '.') }}</p>
                         </div>
                     </a>

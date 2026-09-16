@@ -94,6 +94,11 @@
         @media (max-width: 767.98px) {
             .account-nav { display: none; }
             .account-nav.is-open { display: block; }
+            .account-layout__main { padding: 1rem !important; min-width: 0; overflow-x: hidden; }
+            .account-layout__main .table-responsive,
+            .account-layout__main table { display: block; width: 100%; overflow-x: auto; }
+            header .by-btn-secondary { display: none; }
+            header form[action*="logout"] { display: none; }
         }
     </style>
     <script>

@@ -59,9 +59,17 @@
                     <hr>
                     <h2 class="h6 mb-3">Ödeme yöntemi</h2>
                     <div class="border rounded-3 p-3 mb-3">
+                        @php $provider = $paymentProvider ?? 'shopify'; @endphp
+                        @if($provider === 'shopify')
+                            <div class="form-check mb-2">
+                                <input class="form-check-input payment-method-radio" type="radio" name="payment_method" id="payShopify" value="shopify" checked>
+                                <label class="form-check-label" for="payShopify">Shopify ile güvenli ödeme</label>
+                            </div>
+                            <p class="small text-muted mb-0">Sipariş sonrası Shopify ödeme sayfasına yönlendirilirsiniz. Kart bilgileri sitemizde tutulmaz.</p>
+                        @else
                         <div class="form-check mb-2">
                             <input class="form-check-input payment-method-radio" type="radio" name="payment_method" id="payCreditCard" value="credit_card" @checked(old('payment_method', 'credit_card') === 'credit_card')>
-                            <label class="form-check-label" for="payCreditCard">Kredi / Banka Kartı</label>
+                            <label class="form-check-label" for="payCreditCard">Kredi / Banka Kartı (iyzico)</label>
                         </div>
                         <div class="payment-method-box payment-credit-card {{ old('payment_method', 'credit_card') === 'credit_card' ? '' : 'd-none' }}">
                             <div class="row g-2 mb-2">
@@ -85,6 +93,7 @@
                                 </div>
                             </div>
                         </div>
+                        @endif
 
                         <div class="form-check mb-2 mt-3">
                             <input class="form-check-input payment-method-radio" type="radio" name="payment_method" id="payBankTransfer" value="bank_transfer" @checked(old('payment_method') === 'bank_transfer')>

@@ -40,13 +40,16 @@ class AdminProductController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'name_en' => ['nullable', 'string', 'max:255'],
             'category_id' => ['required', 'exists:categories,id'],
             'vendor_id' => ['required', 'exists:vendors,id'],
             'sku' => ['nullable', 'string', 'max:100'],
             'price' => ['required', 'numeric', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
             'short_description' => ['nullable', 'string'],
+            'short_description_en' => ['nullable', 'string'],
             'description' => ['nullable', 'string'],
+            'description_en' => ['nullable', 'string'],
             'main_image' => ['nullable', 'image', 'max:2048'],
             'product_type' => ['nullable', 'in:physical,digital'],
             'digital_link' => ['nullable', 'url', 'max:500'],
@@ -78,13 +81,16 @@ class AdminProductController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'name_en' => ['nullable', 'string', 'max:255'],
             'category_id' => ['required', 'exists:categories,id'],
             'vendor_id' => ['required', 'exists:vendors,id'],
             'sku' => ['nullable', 'string', 'max:100'],
             'price' => ['required', 'numeric', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
             'short_description' => ['nullable', 'string'],
+            'short_description_en' => ['nullable', 'string'],
             'description' => ['nullable', 'string'],
+            'description_en' => ['nullable', 'string'],
             'main_image' => ['nullable', 'image', 'max:2048'],
             'is_active' => ['boolean'],
             'is_featured' => ['boolean'],

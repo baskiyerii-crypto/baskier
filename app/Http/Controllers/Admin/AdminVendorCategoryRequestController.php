@@ -5,11 +5,19 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\VendorCategoryRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class AdminVendorCategoryRequestController extends Controller
 {
     public function index(Request $request)
     {
+        if (! Schema::hasTable('vendor_category_requests')) {
+            $requests = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
+
+            return view('admin.vendor-category-requests.index', compact('requests'))
+                ->with('error', 'Kategori talepleri tablosu henüz migrate edilmedi.');
+        }
+
         $requests = VendorCategoryRequest::query()
             ->with(['vendor.user'])
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))

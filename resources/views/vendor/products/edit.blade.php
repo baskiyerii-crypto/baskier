@@ -11,6 +11,10 @@
             <div class="mb-3">
                 <label class="form-label small fw-semibold">Ürün adı</label>
                 <input type="text" name="name" class="form-control rounded-3" value="{{ old('name', $product->name) }}" required>
+                <div class="mt-2">
+                    <label class="form-label small fw-semibold">Ürün adı (EN)</label>
+                    <input type="text" name="name_en" class="form-control rounded-3" value="{{ old('name_en', $product->name_en) }}">
+                </div>
                 @error('name')<div class="text-danger small">{{ $message }}</div>@enderror
             </div>
             <div class="mb-3">
@@ -38,10 +42,14 @@
             <div class="mb-3">
                 <label class="form-label fw-semibold">Kısa açıklama</label>
                 <textarea name="short_description" class="form-control" rows="2">{{ old('short_description', $product->short_description) }}</textarea>
+                <label class="form-label fw-semibold mt-2">Kısa açıklama (EN)</label>
+                <textarea name="short_description_en" class="form-control" rows="2">{{ old('short_description_en', $product->short_description_en) }}</textarea>
             </div>
             <div class="mb-3">
                 <label class="form-label fw-semibold">Detaylı açıklama</label>
                 <textarea name="description" class="form-control" rows="4">{{ old('description', $product->description) }}</textarea>
+                <label class="form-label fw-semibold mt-2">Detaylı açıklama (EN)</label>
+                <textarea name="description_en" class="form-control" rows="4">{{ old('description_en', $product->description_en) }}</textarea>
             </div>
             <div class="mb-3">
                 <label class="form-label fw-semibold">Varyantlar (isteğe bağlı)</label>

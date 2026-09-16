@@ -1,8 +1,9 @@
 @extends('layouts.admin')
 @section('title', __('panel.nav_settings'))
 @section('content')
+@if(session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
 <div class="row g-4">
-    <div class="col-lg-6">
+    <div class="col-lg-7">
         <div class="card p-4">
             <h2 class="h6 fw-bold mb-3">{{ __('panel.settings_finance') }}</h2>
             <form method="POST" action="{{ route('admin.settings.update') }}" enctype="multipart/form-data">
@@ -38,6 +39,10 @@
 
                 <hr class="my-4">
                 <h2 class="h6 fw-bold mb-3">{{ __('panel.settings_platform') }}</h2>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Site adı</label>
+                    <input type="text" name="platform_name" class="form-control" value="{{ old('platform_name', $platform_name) }}" required maxlength="80">
+                </div>
                 @if(\App\Support\PlatformBranding::logoUrl())
                     <div class="mb-2"><img src="{{ \App\Support\PlatformBranding::logoUrl() }}" alt="logo" style="max-height:48px"></div>
                 @endif
@@ -83,7 +88,33 @@
                         <input type="url" name="platform_social_website" class="form-control" value="{{ old('platform_social_website', $platform_social_website) }}">
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary">{{ __('panel.save') }}</button>
+
+                <hr class="my-4">
+                <h2 class="h6 fw-bold mb-3">Yüzen iletişim butonları</h2>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">WhatsApp numarası</label>
+                        <input type="text" name="whatsapp_number" class="form-control" placeholder="905xxxxxxxxx" value="{{ old('whatsapp_number', $whatsapp_number) }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Arama numarası</label>
+                        <input type="text" name="call_number" class="form-control" value="{{ old('call_number', $call_number) }}">
+                    </div>
+                </div>
+                <div class="form-check mb-2">
+                    <input type="checkbox" class="form-check-input" name="float_whatsapp_enabled" value="1" id="fw" @checked(old('float_whatsapp_enabled', $float_whatsapp_enabled) == '1')>
+                    <label class="form-check-label" for="fw">WhatsApp yüzen buton</label>
+                </div>
+                <div class="form-check mb-4">
+                    <input type="checkbox" class="form-check-input" name="float_call_enabled" value="1" id="fc" @checked(old('float_call_enabled', $float_call_enabled) == '1')>
+                    <label class="form-check-label" for="fc">Ara yüzen buton</label>
+                </div>
+
+                <hr class="my-4">
+                <h2 class="h6 fw-bold mb-2">Menü (JSON)</h2>
+                <p class="small text-muted">placement: <code>top</code> | <code>drawer</code>. type: <code>route</code>, <code>url</code>, <code>category</code>, <code>products</code>, <code>page</code>, <code>categories_accordion</code>.</p>
+                <textarea name="menu_items_json" class="form-control font-monospace small" rows="14">{{ old('menu_items_json', $menu_items_json) }}</textarea>
+                <button type="submit" class="btn btn-primary mt-3">{{ __('panel.save') }}</button>
             </form>
         </div>
     </div>

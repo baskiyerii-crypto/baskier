@@ -93,7 +93,7 @@
                                         <div class="flex flex-wrap items-start justify-between gap-3">
                                             <div class="min-w-0">
                                                 <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ $product->category?->name ?? __('ui.category') }}</p>
-                                                <p class="mt-1 text-sm font-semibold text-slate-900">{{ $product->name }}</p>
+                                                <p class="mt-1 text-sm font-semibold text-slate-900">{{ $product->localizedName() }}</p>
                                                 <p class="mt-1 text-xs text-slate-500">{{ $product->vendor?->name ?? __('ui.vendor') }}</p>
                                             </div>
                                             <span class="rounded-full bg-orange-50 px-3 py-1 text-sm font-bold text-orange-900">

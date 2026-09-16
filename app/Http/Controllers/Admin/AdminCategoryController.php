@@ -33,6 +33,7 @@ class AdminCategoryController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'name_en' => ['nullable', 'string', 'max:255'],
             'parent_id' => ['nullable', 'exists:categories,id'],
             'description' => ['nullable', 'string'],
             'image' => ['nullable', 'image', 'max:2048'],
@@ -52,6 +53,9 @@ class AdminCategoryController extends Controller
         }
         if (! Schema::hasColumn('categories', 'termin_days')) {
             unset($validated['termin_days']);
+        }
+        if (! Schema::hasColumn('categories', 'name_en')) {
+            unset($validated['name_en']);
         }
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('categories', 'public');
@@ -74,6 +78,7 @@ class AdminCategoryController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'name_en' => ['nullable', 'string', 'max:255'],
             'parent_id' => ['nullable', 'exists:categories,id'],
             'description' => ['nullable', 'string'],
             'image' => ['nullable', 'image', 'max:2048'],
@@ -93,6 +98,9 @@ class AdminCategoryController extends Controller
         }
         if (! Schema::hasColumn('categories', 'termin_days')) {
             unset($validated['termin_days']);
+        }
+        if (! Schema::hasColumn('categories', 'name_en')) {
+            unset($validated['name_en']);
         }
         if ($request->hasFile('image')) {
             if ($category->image) {

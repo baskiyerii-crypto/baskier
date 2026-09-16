@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $product->name . ' - BaskıYeri Pazaryeri')
+@section('title', $product->localizedName() . ' - BaskıYeri Pazaryeri')
 
 @section('content')
     <div class="by-container py-6">
@@ -13,7 +13,7 @@
                 <a href="{{ route('products.index', ['category_id' => $trail->id]) }}" class="hover:text-slate-900">{{ $trail->name }}</a>
             @endforeach
             <span class="mx-2">/</span>
-            <span class="text-slate-700">{{ $product->name }}</span>
+            <span class="text-slate-700">{{ $product->localizedName() }}</span>
         </nav>
 
         <div class="grid gap-6 lg:grid-cols-2">
@@ -33,7 +33,7 @@
             <div class="space-y-6">
                 <div class="by-card p-6">
                     <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ $product->category?->name ?? 'Kategori' }}</p>
-                    <h1 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">{{ $product->name }}</h1>
+                    <h1 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">{{ $product->localizedName() }}</h1>
                     <div class="mt-4 flex flex-wrap items-center gap-3">
                         <span class="rounded-full bg-orange-50 px-4 py-2 text-xl font-extrabold text-orange-900" id="product-display-price" data-base-price="{{ (float) $product->price }}">
                             ₺{{ number_format($product->price, 2, ',', '.') }}
@@ -55,13 +55,13 @@
                         </div>
                     @endif
 
-                    @if($product->short_description)
-                        <p class="mt-5 text-sm leading-relaxed text-slate-700">{{ $product->short_description }}</p>
+                    @if($product->localized('short_description'))
+                        <p class="mt-5 text-sm leading-relaxed text-slate-700">{{ $product->localized('short_description') }}</p>
                     @endif
-                    @if($product->description)
+                    @if($product->localized('description'))
                         <div class="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Açıklama</p>
-                            <p class="mt-2 whitespace-pre-wrap text-sm text-slate-700">{{ $product->description }}</p>
+                            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('ui.description') }}</p>
+                            <p class="mt-2 whitespace-pre-wrap text-sm text-slate-700">{{ $product->localized('description') }}</p>
                         </div>
                     @endif
                 </div>

@@ -4,6 +4,29 @@
 <div class="card p-4" style="max-width:720px;">
     <form method="post" action="{{ route('admin.api-management.update') }}">
         @csrf
+        <h2 class="h6">Ödeme sağlayıcısı</h2>
+        <div class="mb-3">
+            <select name="payment_provider" class="form-select">
+                <option value="shopify" @selected(($payment_provider ?? 'shopify')==='shopify')>Shopify (varsayılan)</option>
+                <option value="iyzico" @selected(($payment_provider ?? '')==='iyzico')>iyzico</option>
+            </select>
+            <div class="form-text">İlk etap Shopify; istediğiniz zaman iyzico’ya geçebilirsiniz.</div>
+        </div>
+        <h2 class="h6 mt-3">Shopify</h2>
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Shop domain</label>
+                <input type="text" name="shopify_shop_domain" class="form-control" placeholder="magaza.myshopify.com" value="{{ $shopify_shop_domain ?? '' }}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Admin API token</label>
+                <input type="password" name="shopify_admin_token" class="form-control" value="{{ $shopify_admin_token ?? '' }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">API version</label>
+                <input type="text" name="shopify_api_version" class="form-control" value="{{ $shopify_api_version ?? '2024-01' }}">
+            </div>
+        </div>
         <h2 class="h6">iyzico</h2>
         <div class="row g-3 mb-3">
             <div class="col-md-4">

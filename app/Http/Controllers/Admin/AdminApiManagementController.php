@@ -11,6 +11,10 @@ class AdminApiManagementController extends Controller
     public function index()
     {
         return view('admin.api-management.index', [
+            'payment_provider' => Setting::get('payment_provider', 'shopify'),
+            'shopify_shop_domain' => Setting::get('shopify_shop_domain', ''),
+            'shopify_admin_token' => Setting::get('shopify_admin_token', ''),
+            'shopify_api_version' => Setting::get('shopify_api_version', '2024-01'),
             'iyzico_mode' => Setting::get('iyzico_mode', 'sandbox'),
             'iyzico_api_key' => Setting::get('iyzico_api_key', ''),
             'iyzico_secret_key' => Setting::get('iyzico_secret_key', ''),
@@ -28,6 +32,10 @@ class AdminApiManagementController extends Controller
     public function update(Request $request)
     {
         $validated = $request->validate([
+            'payment_provider' => ['required', 'in:shopify,iyzico'],
+            'shopify_shop_domain' => ['nullable', 'string', 'max:255'],
+            'shopify_admin_token' => ['nullable', 'string', 'max:512'],
+            'shopify_api_version' => ['nullable', 'string', 'max:32'],
             'iyzico_mode' => ['required', 'in:sandbox,live'],
             'iyzico_api_key' => ['nullable', 'string', 'max:255'],
             'iyzico_secret_key' => ['nullable', 'string', 'max:255'],

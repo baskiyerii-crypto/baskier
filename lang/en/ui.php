@@ -31,6 +31,8 @@ return [
     'privacy' => 'Privacy',
     'rights' => '© :year BaskiYeri. All rights reserved.',
     'country' => 'Türkiye',
+    'call' => 'Call',
+    'description' => 'Description',
     'vendor_cta_eyebrow' => 'Are you a vendor?',
     'vendor_cta_title' => 'Open your shop on BaskiYeri, answer quotes and receive orders.',
     'vendor_cta_body' => 'Create a vendor account, pick your line of business and complete your application.',

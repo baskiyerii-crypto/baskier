@@ -13,6 +13,10 @@
             @error('name')<div class="text-danger small">{{ $message }}</div>@enderror
         </div>
         <div class="mb-3">
+            <label class="form-label fw-semibold">Ad (EN)</label>
+            <input type="text" name="name_en" class="form-control" value="{{ old('name_en') }}">
+        </div>
+        <div class="mb-3">
             <label class="form-label fw-semibold">Kanal</label>
             <select name="channel" class="form-select" required>
                 <option value="physical_quote" @selected(old('channel', $channel ?? '') === 'physical_quote')>Fiziksel + Teklif</option>

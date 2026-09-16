@@ -111,6 +111,14 @@
             .vendor-sidebar.show { transform: translateX(0); }
             .sidebar-backdrop.show { display: block; }
             .vendor-main { margin-left: 0; }
+            .vendor-content { padding: 0.75rem !important; min-width: 0; overflow-x: hidden; }
+            .vendor-header { padding: 0 0.75rem; height: 56px; }
+            .vendor-header .page-title { font-size: 0.95rem; max-width: 42vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+            .vendor-header .user-menu a:not(.btn-out-vendor) { display: none; }
+            .vendor-header .user-menu .sep { display: none; }
+            .vendor-content .table-responsive { display: block; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .vendor-content .d-flex.gap-2 { flex-wrap: wrap; }
+            .vendor-content .btn { white-space: normal; }
         }
     </style>
 </head>

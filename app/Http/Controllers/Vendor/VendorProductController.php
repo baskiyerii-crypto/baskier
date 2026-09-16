@@ -79,12 +79,15 @@ class VendorProductController extends Controller
         }
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'name_en' => ['nullable', 'string', 'max:255'],
             'category_id' => ['required', 'exists:categories,id'],
             'price' => ['required', 'numeric', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
             'short_description' => ['nullable', 'string'],
+            'short_description_en' => ['nullable', 'string'],
             'main_image' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
             'description' => ['nullable', 'string'],
+            'description_en' => ['nullable', 'string'],
             'variant_lines' => ['nullable', 'string'],
         ]);
         $validated['vendor_id'] = $vendor->id;
@@ -129,13 +132,16 @@ class VendorProductController extends Controller
         }
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'name_en' => ['nullable', 'string', 'max:255'],
             'category_id' => ['required', 'exists:categories,id'],
             'price' => ['required', 'numeric', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
             'short_description' => ['nullable', 'string'],
+            'short_description_en' => ['nullable', 'string'],
             'is_active' => ['boolean'],
             'main_image' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
             'description' => ['nullable', 'string'],
+            'description_en' => ['nullable', 'string'],
             'variant_lines' => ['nullable', 'string'],
         ]);
         $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']) . '-' . $product->id;

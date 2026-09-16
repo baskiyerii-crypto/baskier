@@ -7,22 +7,28 @@ use App\Models\VendorDocument;
 use App\Models\VendorProfileChangeRequest;
 use App\Services\FreelancerTierService;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Schema;
 
 class AdminVendorUpdateController extends Controller
 {
     public function index(Request $request)
     {
-        $documents = VendorDocument::query()
-            ->with(['vendor.user'])
-            ->when($request->get('status', 'pending') !== 'all', fn ($q) => $q->where('status', $request->get('status', 'pending')))
-            ->latest()
-            ->paginate(20, ['*'], 'docs_page');
+        $documents = Schema::hasTable('vendor_documents')
+            ? VendorDocument::query()
+                ->with(['vendor.user'])
+                ->when($request->get('status', 'pending') !== 'all', fn ($q) => $q->where('status', $request->get('status', 'pending')))
+                ->latest()
+                ->paginate(20, ['*'], 'docs_page')
+            : new LengthAwarePaginator([], 0, 20, 1, ['pageName' => 'docs_page']);
 
-        $profileRequests = VendorProfileChangeRequest::query()
-            ->with(['vendor.user'])
-            ->when($request->get('profile_status', 'pending') !== 'all', fn ($q) => $q->where('status', $request->get('profile_status', 'pending')))
-            ->latest()
-            ->paginate(20, ['*'], 'profile_page');
+        $profileRequests = Schema::hasTable('vendor_profile_change_requests')
+            ? VendorProfileChangeRequest::query()
+                ->with(['vendor.user'])
+                ->when($request->get('profile_status', 'pending') !== 'all', fn ($q) => $q->where('status', $request->get('profile_status', 'pending')))
+                ->latest()
+                ->paginate(20, ['*'], 'profile_page')
+            : new LengthAwarePaginator([], 0, 20, 1, ['pageName' => 'profile_page']);
 
         return view('admin.vendor-updates.index', compact('documents', 'profileRequests'));
     }
