@@ -52,7 +52,14 @@ final class SiteMenu
 
     public static function forPlacement(string $placement): Collection
     {
-        return collect(self::items())->filter(fn ($i) => ($i['placement'] ?? 'drawer') === $placement)->values();
+        $items = collect(self::items())->filter(fn ($i) => ($i['placement'] ?? 'drawer') === $placement)->values();
+        if ($items->isEmpty()) {
+            $items = collect(self::defaults())
+                ->filter(fn ($i) => ($i['placement'] ?? 'drawer') === $placement && ($i['is_active'] ?? true))
+                ->values();
+        }
+
+        return $items;
     }
 
     public static function defaults(): array

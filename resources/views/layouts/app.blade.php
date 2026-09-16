@@ -16,93 +16,60 @@
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
+    <style>
+        .site-menu-toggle {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 24px !important;
+            height: 24px !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            margin: 0 !important;
+        }
+        .site-menu {
+            display: none !important;
+            position: fixed !important;
+            inset: 0 !important;
+            z-index: 2147483646 !important;
+        }
+        .site-menu-toggle:checked + .site-menu { display: block !important; }
+        .site-menu-overlay {
+            position: absolute !important;
+            inset: 0 !important;
+            background: rgba(15,23,42,.45) !important;
+        }
+        .site-menu-panel {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            height: 100% !important;
+            width: min(22rem, 88vw) !important;
+            background: #fff !important;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,.25) !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch;
+        }
+        body:has(.site-menu-toggle:checked) { overflow: hidden; }
+    </style>
 </head>
 <body class="storefront min-h-screen font-sans">
-<div class="min-h-screen flex flex-col">
-    <div data-left-drawer id="site-menu" aria-hidden="true" class="fixed inset-0 z-[100] pointer-events-none">
-        <div data-left-drawer-overlay class="absolute inset-0 bg-slate-900/40 opacity-0 transition-opacity duration-200"></div>
-        <div data-left-drawer-panel role="dialog" aria-modal="true" aria-label="{{ __('ui.menu') }}" tabindex="-1" class="absolute left-0 top-0 h-full w-[min(22rem,88vw)] max-w-[88vw] -translate-x-full transition-transform duration-200">
-            <div class="h-full bg-white/95 backdrop-blur border-r border-slate-200 shadow-xl">
-                <div class="p-4 border-b border-slate-200/70 flex items-center justify-between gap-2">
-                    @include('partials.platform-brand', ['compact' => true, 'brandHref' => route('home')])
-                    <button data-left-drawer-close class="by-btn-secondary px-3 py-2" type="button" aria-label="{{ __('ui.close_menu') }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                    </button>
-                </div>
-
-                <div class="px-4 pb-4 pt-2">
-                    <p class="text-xs font-extrabold uppercase tracking-wider text-slate-500">{{ __('ui.menu') }}</p>
-                    <div class="mt-2 grid gap-2">
-                        @foreach(\App\Support\SiteMenu::forPlacement('drawer') as $item)
-                            @if(($item['type'] ?? '') === 'categories_accordion')
-                                <details class="by-card overflow-hidden">
-                                    <summary class="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-slate-900">{{ \App\Support\SiteMenu::displayLabel($item) }}</summary>
-                                    <div class="border-t border-slate-100 px-2 py-2 max-h-[40vh] overflow-auto">
-                                        @if(!empty($headerCategories) && $headerCategories->isNotEmpty())
-                                            @foreach($headerCategories as $parentCategory)
-                                                <a class="block rounded-xl px-3 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50" href="{{ route('products.index', ['category_id' => $parentCategory->id]) }}">{{ $parentCategory->localizedName() }}</a>
-                                                @foreach($parentCategory->children as $childCategory)
-                                                    <a class="ml-3 block rounded-xl px-3 py-2 text-sm text-slate-600 hover:bg-slate-50" href="{{ route('products.index', ['category_id' => $childCategory->id]) }}">{{ $childCategory->localizedName() }}</a>
-                                                @endforeach
-                                            @endforeach
-                                        @else
-                                            <p class="px-2 py-2 text-sm text-slate-500">{{ __('ui.no_categories') }}</p>
-                                        @endif
-                                    </div>
-                                </details>
-                            @else
-                                @php $menuHref = \App\Support\SiteMenu::href($item); @endphp
-                                @if($menuHref)
-                                    <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ $menuHref }}">{{ \App\Support\SiteMenu::displayLabel($item) }}</a>
-                                @endif
-                            @endif
-                        @endforeach
-                    </div>
-                </div>
-
-                <div class="px-4 pb-4">
-                    <p class="text-xs font-extrabold uppercase tracking-wider text-slate-500">{{ __('ui.account') }}</p>
-                    <div class="mt-2 grid gap-2">
-                        @auth
-                            <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('cart.index') }}">{{ __('ui.cart') }}</a>
-                            <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('account.orders.index') }}">{{ __('ui.orders') }}</a>
-                            @if(auth()->user()->isAdmin())
-                                <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('admin.dashboard') }}">{{ __('ui.admin') }}</a>
-                            @endif
-                            @if(auth()->user()->isVendor())
-                                <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('vendor.dashboard') }}">{{ __('ui.vendor_panel') }}</a>
-                            @endif
-                            @if(auth()->user()->isCustomer())
-                                <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('customer.dashboard') }}">{{ __('ui.account') }}</a>
-                            @endif
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="w-full by-btn-secondary">{{ __('ui.logout') }}</button>
-                            </form>
-                        @else
-                            <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('login') }}">{{ __('ui.login_full') }}</a>
-                            <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ route('register') }}">{{ __('ui.register') }}</a>
-                        @endauth
-                    </div>
-                </div>
-
-                <div class="px-4 pb-6">
-                    <p class="text-xs font-extrabold uppercase tracking-wider text-slate-500">{{ __('ui.language') }}</p>
-                    <div class="mt-2">
-                        @include('partials.locale-switcher')
-                    </div>
-                </div>
-            </div>
-        </div>
+<input type="checkbox" id="site-menu-toggle" class="site-menu-toggle" autocomplete="off">
+<div id="site-menu" class="site-menu" role="dialog" aria-label="{{ __('ui.menu') }}">
+    <label for="site-menu-toggle" class="site-menu-overlay" aria-label="{{ __('ui.close_menu') }}"></label>
+    <div class="site-menu-panel">
+        @include('partials.site-menu-panel')
     </div>
+</div>
+<div class="min-h-screen flex flex-col">
 
     <header class="sticky top-0 z-50 border-b border-slate-200/70 bg-white/70 backdrop-blur">
         <div class="by-container py-3 md:py-4">
             {{-- Mobile: menu | brand | lang + cart --}}
             <div class="grid grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-2 md:hidden">
-                <button type="button" data-left-drawer-open class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700" aria-label="{{ __('ui.menu') }}">
+                <label for="site-menu-toggle" class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 cursor-pointer" aria-label="{{ __('ui.menu') }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-                </button>
+                </label>
                 <div class="flex min-w-0 items-center justify-center overflow-hidden px-1">
                     @include('partials.platform-brand', ['compact' => true, 'forceName' => true, 'mobileHeader' => true, 'brandHref' => route('home')])
                 </div>
@@ -143,9 +110,9 @@
                 <div class="flex items-center gap-2">
                     <div class="hidden sm:block">@include('partials.locale-switcher')</div>
 
-                    <button type="button" data-left-drawer-open aria-controls="site-menu" aria-expanded="false" class="by-btn-secondary px-4 py-2.5" aria-label="{{ __('ui.menu') }}">
+                    <label for="site-menu-toggle" class="by-btn-secondary px-4 py-2.5 cursor-pointer" aria-label="{{ __('ui.menu') }}">
                         {{ __('ui.menu') }}
-                    </button>
+                    </label>
 
                     @auth
                         @if(auth()->user()->isAdmin())
@@ -207,10 +174,10 @@
 
     <nav class="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/95 backdrop-blur md:hidden" aria-label="{{ __('ui.menu') }}">
         <div class="grid grid-cols-4 gap-1 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2">
-            <button type="button" data-left-drawer-open class="flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-[11px] font-semibold text-slate-600">
+            <label for="site-menu-toggle" class="flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-[11px] font-semibold text-slate-600 cursor-pointer" aria-label="{{ __('ui.menu') }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
                 {{ __('ui.menu') }}
-            </button>
+            </label>
             <a href="{{ auth()->check() ? route('cart.index') : route('login') }}" class="flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-[11px] font-semibold {{ request()->routeIs('cart.*') ? 'bg-orange-50 text-orange-800' : 'text-slate-600' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
                 {{ __('ui.cart') }}
@@ -287,66 +254,27 @@
 @include('partials.floating-actions')
 @include('partials.floating-support')
 <style>
-/* Vite build yoksa da drawer çalışsın */
-[data-left-drawer] { pointer-events: none; z-index: 100; }
-[data-left-drawer].is-open { pointer-events: auto; }
-[data-left-drawer].is-open [data-left-drawer-overlay] { opacity: 1; }
-[data-left-drawer].is-open [data-left-drawer-panel] { transform: translateX(0); }
 #mobile-search-sheet:not([hidden]) { display: block; }
 </style>
 <script>
-(() => {
-  const drawer = document.querySelector('[data-left-drawer]');
-  if (drawer && drawer.dataset.drawerBound !== '1') {
-    drawer.dataset.drawerBound = '1';
-    const panel = drawer.querySelector('[data-left-drawer-panel]');
-    const overlay = drawer.querySelector('[data-left-drawer-overlay]');
-    const setOpen = (open) => {
-      drawer.classList.toggle('is-open', open);
-      drawer.setAttribute('aria-hidden', open ? 'false' : 'true');
-      if ('inert' in drawer) drawer.inert = !open;
-      document.documentElement.classList.toggle('overflow-hidden', open);
-      document.body.classList.toggle('overflow-hidden', open);
-      document.querySelectorAll('[data-left-drawer-open]').forEach((btn) => {
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      });
-    };
-    setOpen(false);
-    document.querySelectorAll('[data-left-drawer-open]').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setOpen(true);
-      });
-    });
-    drawer.querySelectorAll('[data-left-drawer-close]').forEach((btn) => {
-      btn.addEventListener('click', (e) => { e.preventDefault(); setOpen(false); });
-    });
-    overlay?.addEventListener('click', () => setOpen(false));
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
-    panel?.addEventListener('click', (e) => {
-      if (e.target && e.target.closest('a[href]')) setOpen(false);
-    });
-  }
-
-  const sheet = document.getElementById('mobile-search-sheet');
-  const toggle = document.getElementById('mobile-search-toggle');
-  const input = document.getElementById('mobile-search-q');
-  if (sheet && toggle) {
-    toggle.addEventListener('click', () => {
-      const open = sheet.hasAttribute('hidden');
-      if (open) {
-        sheet.removeAttribute('hidden');
-        toggle.setAttribute('aria-expanded', 'true');
-        toggle.classList.add('bg-orange-50', 'text-orange-800');
-        setTimeout(() => input?.focus(), 50);
-      } else {
-        sheet.setAttribute('hidden', '');
-        toggle.setAttribute('aria-expanded', 'false');
-        toggle.classList.remove('bg-orange-50', 'text-orange-800');
-      }
-    });
-  }
+(function () {
+  var sheet = document.getElementById('mobile-search-sheet');
+  var toggle = document.getElementById('mobile-search-toggle');
+  var input = document.getElementById('mobile-search-q');
+  if (!sheet || !toggle) return;
+  toggle.addEventListener('click', function () {
+    var open = sheet.hasAttribute('hidden');
+    if (open) {
+      sheet.removeAttribute('hidden');
+      toggle.setAttribute('aria-expanded', 'true');
+      toggle.classList.add('bg-orange-50', 'text-orange-800');
+      setTimeout(function () { input && input.focus(); }, 50);
+    } else {
+      sheet.setAttribute('hidden', '');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.classList.remove('bg-orange-50', 'text-orange-800');
+    }
+  });
 })();
 </script>
 @stack('scripts')
