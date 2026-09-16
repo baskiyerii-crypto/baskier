@@ -43,7 +43,7 @@
                             <div class="mt-3 flex flex-wrap gap-2">
                                 <a class="by-badge border-white/15 bg-white/10 text-white hover:bg-white/15" href="{{ route('products.index') }}">{{ __('home.products') }}</a>
                                 <a class="by-badge border-white/15 bg-white/10 text-white hover:bg-white/15" href="{{ route('vendors.index') }}">{{ __('home.vendors') }}</a>
-                                <a class="by-badge border-white/15 bg-white/10 text-white hover:bg-white/15" href="{{ route('quote-requests.create', ['type' => 'freelancer']) }}">Hizmet al</a>
+                                <a class="by-badge border-white/15 bg-white/10 text-white hover:bg-white/15" href="{{ route('quote-requests.create', ['type' => 'freelancer']) }}">{{ __('home.get_service') }}</a>
                             </div>
                         </div>
                     </div>
@@ -78,24 +78,36 @@
     </section>
 
     <section class="by-container -mt-2">
-        <div class="grid gap-4 lg:grid-cols-3">
-            <a href="{{ route('products.index') }}" class="by-card by-card-hover p-6">
-                <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Hazır ürün</p>
-                <p class="mt-2 text-lg font-bold tracking-tight text-slate-900">Katalogtan satın al</p>
-                <p class="mt-2 text-sm text-slate-600">Ürünleri gez, sepete ekle, ödeme ile siparişi tamamla.</p>
-                <p class="mt-4 text-sm font-semibold text-indigo-600">Ürünlere git →</p>
+        <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+            <a href="{{ route('products.index') }}" class="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-900 shadow-lg shadow-slate-900/10 transition hover:-translate-y-1 hover:shadow-xl">
+                <img src="https://picsum.photos/1200/800?random=path-ready" alt="" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/55 to-indigo-900/20"></div>
+                <div class="relative flex min-h-[220px] flex-col justify-end p-6 sm:min-h-[260px] sm:p-7">
+                    <span class="inline-flex w-fit rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white/90 backdrop-blur">{{ __('home.path_ready_eyebrow') }}</span>
+                    <h3 class="mt-3 text-2xl font-extrabold tracking-tight text-white">{{ __('home.path_ready_title') }}</h3>
+                    <p class="mt-2 max-w-sm text-sm leading-relaxed text-white/80">{{ __('home.path_ready_body') }}</p>
+                    <span class="mt-5 inline-flex items-center gap-2 text-sm font-bold text-cyan-200">{{ __('home.path_ready_cta') }} <span aria-hidden="true">→</span></span>
+                </div>
             </a>
-            <a href="{{ route('quote-requests.create') }}" class="by-card by-card-hover p-6">
-                <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Teklif</p>
-                <p class="mt-2 text-lg font-bold tracking-tight text-slate-900">Özel iş için RFQ aç</p>
-                <p class="mt-2 text-sm text-slate-600">Kısa brief yaz, uygun satıcılar teklif versin.</p>
-                <p class="mt-4 text-sm font-semibold text-orange-600">Teklif al →</p>
+            <a href="{{ route('quote-requests.create') }}" class="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-900 shadow-lg shadow-slate-900/10 transition hover:-translate-y-1 hover:shadow-xl">
+                <img src="https://picsum.photos/1200/800?random=path-quote" alt="" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-orange-950/50 to-amber-700/15"></div>
+                <div class="relative flex min-h-[220px] flex-col justify-end p-6 sm:min-h-[260px] sm:p-7">
+                    <span class="inline-flex w-fit rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white/90 backdrop-blur">{{ __('home.path_quote_eyebrow') }}</span>
+                    <h3 class="mt-3 text-2xl font-extrabold tracking-tight text-white">{{ __('home.path_quote_title') }}</h3>
+                    <p class="mt-2 max-w-sm text-sm leading-relaxed text-white/80">{{ __('home.path_quote_body') }}</p>
+                    <span class="mt-5 inline-flex items-center gap-2 text-sm font-bold text-orange-200">{{ __('home.path_quote_cta') }} <span aria-hidden="true">→</span></span>
+                </div>
             </a>
-            <a href="{{ route('quote-requests.create', ['type' => 'freelancer']) }}" class="by-card by-card-hover p-6">
-                <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Freelancer</p>
-                <p class="mt-2 text-lg font-bold tracking-tight text-slate-900">Hizmet al</p>
-                <p class="mt-2 text-sm text-slate-600">İhtiyacınızı yazın, ilgili freelancerlar fiyat teklifi versin.</p>
-                <p class="mt-4 text-sm font-semibold text-indigo-600">Hizmet talebi oluştur →</p>
+            <a href="{{ route('quote-requests.create', ['type' => 'freelancer']) }}" class="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-900 shadow-lg shadow-slate-900/10 transition hover:-translate-y-1 hover:shadow-xl">
+                <img src="https://picsum.photos/1200/800?random=path-freelancer" alt="" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-emerald-950/45 to-teal-700/15"></div>
+                <div class="relative flex min-h-[220px] flex-col justify-end p-6 sm:min-h-[260px] sm:p-7">
+                    <span class="inline-flex w-fit rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white/90 backdrop-blur">{{ __('home.path_freelancer_eyebrow') }}</span>
+                    <h3 class="mt-3 text-2xl font-extrabold tracking-tight text-white">{{ __('home.path_freelancer_title') }}</h3>
+                    <p class="mt-2 max-w-sm text-sm leading-relaxed text-white/80">{{ __('home.path_freelancer_body') }}</p>
+                    <span class="mt-5 inline-flex items-center gap-2 text-sm font-bold text-emerald-200">{{ __('home.path_freelancer_cta') }} <span aria-hidden="true">→</span></span>
+                </div>
             </a>
         </div>
     </section>
@@ -103,15 +115,15 @@
     <section class="by-container py-12">
         <div class="flex flex-wrap items-end justify-between gap-4">
             <div>
-                <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Koleksiyon</p>
-                <h2 class="mt-1 text-2xl font-bold tracking-tight text-slate-900">Kategoriler</h2>
-                <p class="mt-2 text-sm text-slate-600">Baskı ve reklam ürünlerinde aradığınız kategoriye göz atın.</p>
+                <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('home.collection_eyebrow') }}</p>
+                <h2 class="mt-1 text-2xl font-bold tracking-tight text-slate-900">{{ __('home.collection_title') }}</h2>
+                <p class="mt-2 text-sm text-slate-600">{{ __('home.collection_body') }}</p>
             </div>
-            <a href="{{ route('products.index') }}" class="by-btn-secondary">Tüm ürünler</a>
+            <a href="{{ route('products.index') }}" class="by-btn-secondary">{{ __('home.all_products') }}</a>
         </div>
             @if($categories->isEmpty())
                 <div class="mt-6 by-card p-8 text-center">
-                    <p class="text-sm text-slate-600">Kategori bulunamadı.</p>
+                    <p class="text-sm text-slate-600">{{ __('home.no_categories') }}</p>
                 </div>
             @else
                 <div class="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
@@ -132,11 +144,11 @@
     <section class="by-container py-12">
         <div class="flex flex-wrap items-end justify-between gap-4">
             <div>
-                <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Hizmet</p>
-                <h2 class="mt-1 text-2xl font-bold tracking-tight text-slate-900">İş yapanlar & Freelancer</h2>
-                <p class="mt-2 text-sm text-slate-600">Tasarım, baskı, web, tabela – ihtiyacınız olan işi seçin, teklif alın.</p>
+                <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('home.service_eyebrow') }}</p>
+                <h2 class="mt-1 text-2xl font-bold tracking-tight text-slate-900">{{ __('home.service_title') }}</h2>
+                <p class="mt-2 text-sm text-slate-600">{{ __('home.service_body') }}</p>
             </div>
-            <a href="{{ route('freelancer-jobs.index') }}" class="by-btn-secondary">Tüm ilanlar</a>
+            <a href="{{ route('freelancer-jobs.index') }}" class="by-btn-secondary">{{ __('home.all_jobs') }}</a>
         </div>
 
             <div class="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
@@ -148,11 +160,11 @@
                             </div>
                             <div class="p-4">
                                 <p class="text-sm font-semibold text-slate-900">{{ $cat['label'] }}</p>
-                                <p class="mt-1 text-xs text-slate-500">{{ $cat['count'] }} açık ilan</p>
+                                <p class="mt-1 text-xs text-slate-500">{{ __('home.open_jobs', ['count' => $cat['count']]) }}</p>
                             </div>
                         </a>
                         <div class="p-4 pt-0">
-                            <a href="{{ route('quote-requests.create', ['category' => $cat['key']]) }}" class="w-full by-btn-primary">Teklif al</a>
+                            <a href="{{ route('quote-requests.create', ['category' => $cat['key']]) }}" class="w-full by-btn-primary">{{ __('home.get_quote') }}</a>
                         </div>
                     </div>
                 @endforeach
@@ -160,7 +172,7 @@
 
             @if(isset($freelancerJobs) && $freelancerJobs->isNotEmpty())
                 <div class="mt-10 by-card p-6">
-                    <p class="text-sm font-bold text-slate-900">Son eklenen ilanlar</p>
+                    <p class="text-sm font-bold text-slate-900">{{ __('home.latest_jobs') }}</p>
                     <div class="mt-4 grid gap-3 md:grid-cols-3">
                         @foreach($freelancerJobs->take(3) as $job)
                             <a href="{{ route('freelancer-jobs.show', $job) }}" class="rounded-2xl border border-slate-200 bg-white/70 p-4 hover:bg-white">
@@ -176,11 +188,11 @@
     <section class="by-container py-12">
         <div class="flex flex-wrap items-end justify-between gap-4">
             <div>
-                <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Yeni</p>
-                <h2 class="mt-1 text-2xl font-bold tracking-tight text-slate-900">Dijital ürünler</h2>
-                <p class="mt-2 text-sm text-slate-600">Şablonlar, grafik paketleri, dijital dosyalar – anında indir, hemen kullan.</p>
+                <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('home.digital_eyebrow') }}</p>
+                <h2 class="mt-1 text-2xl font-bold tracking-tight text-slate-900">{{ __('home.digital_title') }}</h2>
+                <p class="mt-2 text-sm text-slate-600">{{ __('home.digital_body') }}</p>
             </div>
-            <a href="{{ route('products.index', ['type' => 'digital']) }}" class="by-btn-secondary">Tümünü gör</a>
+            <a href="{{ route('products.index', ['type' => 'digital']) }}" class="by-btn-secondary">{{ __('home.see_all') }}</a>
         </div>
             @if(isset($digitalProducts) && $digitalProducts->isNotEmpty())
                 <div class="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
@@ -194,7 +206,7 @@
                                 @endif
                             </div>
                             <div class="p-4">
-                                <span class="by-badge border-indigo-200 bg-indigo-50 text-indigo-800">Dijital</span>
+                                <span class="by-badge border-indigo-200 bg-indigo-50 text-indigo-800">{{ __('home.digital_badge') }}</span>
                                 <p class="mt-2 truncate text-sm font-semibold text-slate-900">{{ Str::limit($product->name, 40) }}</p>
                                 <p class="mt-1 text-xs text-slate-500">{{ $product->vendor?->name }}</p>
                                 <p class="mt-3 text-sm font-extrabold text-slate-900">₺{{ number_format($product->price, 2, ',', '.') }}</p>
@@ -204,8 +216,8 @@
                 </div>
             @else
                 <div class="mt-6 by-card p-8 text-center">
-                    <p class="text-sm text-slate-600">Dijital ürünler yakında eklenecek.</p>
-                    <a href="{{ route('products.index', ['type' => 'digital']) }}" class="mt-4 inline-flex by-btn-secondary">Dijital ürünlere göz at</a>
+                    <p class="text-sm text-slate-600">{{ __('home.digital_empty') }}</p>
+                    <a href="{{ route('products.index', ['type' => 'digital']) }}" class="mt-4 inline-flex by-btn-secondary">{{ __('home.digital_browse') }}</a>
                 </div>
             @endif
     </section>
@@ -213,16 +225,16 @@
     <section class="by-container py-12">
         <div class="flex flex-wrap items-end justify-between gap-4">
             <div>
-                <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Yeni koleksiyon</p>
-                <h2 class="mt-1 text-2xl font-bold tracking-tight text-slate-900">Öne çıkan ürünler</h2>
-                <p class="mt-2 text-sm text-slate-600">En güncel baskı ve reklam ürünleri.</p>
+                <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('home.featured_eyebrow') }}</p>
+                <h2 class="mt-1 text-2xl font-bold tracking-tight text-slate-900">{{ __('home.featured_title') }}</h2>
+                <p class="mt-2 text-sm text-slate-600">{{ __('home.featured_body') }}</p>
             </div>
-            <a href="{{ route('products.index') }}" class="by-btn-secondary">Tüm ürünleri gör</a>
+            <a href="{{ route('products.index') }}" class="by-btn-secondary">{{ __('home.see_all_products') }}</a>
         </div>
 
         @if($featuredProducts->isEmpty())
             <div class="mt-6 by-card p-8 text-center">
-                <p class="text-sm text-slate-600">Henüz ürün yok.</p>
+                <p class="text-sm text-slate-600">{{ __('home.no_products') }}</p>
             </div>
         @else
             <div class="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
@@ -236,11 +248,11 @@
                             @endif
                         </div>
                         <div class="p-4">
-                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ $product->vendor?->name ?? 'Satıcı' }}</p>
+                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ $product->vendor?->name ?? __('home.vendor_fallback') }}</p>
                             <p class="mt-1 truncate text-sm font-semibold text-slate-900">{{ $product->name }}</p>
                             <div class="mt-3 flex items-center justify-between">
                                 <p class="text-sm font-extrabold text-slate-900">₺{{ number_format($product->price, 2, ',', '.') }}</p>
-                                <span class="text-xs font-semibold text-indigo-600">Detay →</span>
+                                <span class="text-xs font-semibold text-indigo-600">{{ __('home.detail') }} →</span>
                             </div>
                         </div>
                     </a>
