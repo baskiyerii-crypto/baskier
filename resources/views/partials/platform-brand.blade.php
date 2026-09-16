@@ -2,6 +2,8 @@
     $logoUrl = \App\Support\PlatformBranding::logoUrl();
     $logoRel = \App\Support\PlatformBranding::logoRelativePath();
     $siteName = \App\Support\SiteMenu::platformName();
+    // Do NOT use $href — parent views leak menu loop $href (e.g. freelancer-jobs).
+    $homeUrl = $brandHref ?? route('home');
     $isMobileHeader = (bool) ($mobileHeader ?? false);
     $brandClass = $isMobileHeader
         ? 'inline-flex min-w-0 max-w-full items-center gap-2 text-lg leading-tight font-extrabold tracking-tight text-slate-900'
@@ -18,7 +20,7 @@
         ? 'truncate max-w-[8.5rem]'
         : 'truncate max-w-[9rem] sm:max-w-none';
 @endphp
-<a href="{{ $href ?? route('home') }}" class="{{ $brandClass }}" aria-label="{{ $siteName }}">
+<a href="{{ $homeUrl }}" class="{{ $brandClass }}" aria-label="{{ $siteName }}">
     @if($logoUrl)
         <img src="{{ $logoUrl }}{{ $version ? '?v='.$version : '' }}" alt="{{ $siteName }}" class="{{ $logoBox }} rounded-2xl object-contain bg-white border border-slate-200/80 shadow-sm">
     @else

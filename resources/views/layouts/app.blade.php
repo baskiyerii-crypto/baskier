@@ -19,29 +19,18 @@
 </head>
 <body class="storefront min-h-screen font-sans">
 <div class="min-h-screen flex flex-col">
-    <div data-left-drawer id="site-menu" inert aria-hidden="true" class="fixed inset-0 z-60 pointer-events-none">
+    <div data-left-drawer id="site-menu" aria-hidden="true" class="fixed inset-0 z-[100] pointer-events-none">
         <div data-left-drawer-overlay class="absolute inset-0 bg-slate-900/40 opacity-0 transition-opacity duration-200"></div>
-        <div data-left-drawer-panel role="dialog" aria-modal="true" aria-label="Menü" tabindex="-1" class="absolute left-0 top-0 h-full w-85 max-w-[88vw] -translate-x-full transition-transform duration-200">
+        <div data-left-drawer-panel role="dialog" aria-modal="true" aria-label="{{ __('ui.menu') }}" tabindex="-1" class="absolute left-0 top-0 h-full w-[min(22rem,88vw)] max-w-[88vw] -translate-x-full transition-transform duration-200">
             <div class="h-full bg-white/95 backdrop-blur border-r border-slate-200 shadow-xl">
                 <div class="p-4 border-b border-slate-200/70 flex items-center justify-between gap-2">
-                    @include('partials.platform-brand', ['compact' => true])
+                    @include('partials.platform-brand', ['compact' => true, 'brandHref' => route('home')])
                     <button data-left-drawer-close class="by-btn-secondary px-3 py-2" type="button" aria-label="{{ __('ui.close_menu') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                     </button>
                 </div>
 
-                <div class="p-4">
-                    <form action="{{ route('products.index') }}">
-                        <div class="relative">
-                            <input class="by-input pl-11" name="q" value="{{ request('q') }}" placeholder="{{ __('ui.search_drawer') }}" />
-                            <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                            </span>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="px-4 pb-4">
+                <div class="px-4 pb-4 pt-2">
                     <p class="text-xs font-extrabold uppercase tracking-wider text-slate-500">{{ __('ui.menu') }}</p>
                     <div class="mt-2 grid gap-2">
                         @foreach(\App\Support\SiteMenu::forPlacement('drawer') as $item)
@@ -62,9 +51,9 @@
                                     </div>
                                 </details>
                             @else
-                                @php $href = \App\Support\SiteMenu::href($item); @endphp
-                                @if($href)
-                                    <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ $href }}">{{ \App\Support\SiteMenu::displayLabel($item) }}</a>
+                                @php $menuHref = \App\Support\SiteMenu::href($item); @endphp
+                                @if($menuHref)
+                                    <a class="by-card by-card-hover px-4 py-3 text-sm font-semibold text-slate-900" href="{{ $menuHref }}">{{ \App\Support\SiteMenu::displayLabel($item) }}</a>
                                 @endif
                             @endif
                         @endforeach
@@ -97,15 +86,11 @@
                     </div>
                 </div>
 
-                <div class="px-4 pb-4">
+                <div class="px-4 pb-6">
                     <p class="text-xs font-extrabold uppercase tracking-wider text-slate-500">{{ __('ui.language') }}</p>
                     <div class="mt-2">
                         @include('partials.locale-switcher')
                     </div>
-                </div>
-
-                <div class="px-4 pb-6">
-                    {{-- categories also via menu accordion; keep nothing duplicate if accordion used --}}
                 </div>
             </div>
         </div>
@@ -119,7 +104,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
                 </button>
                 <div class="flex min-w-0 items-center justify-center overflow-hidden px-1">
-                    @include('partials.platform-brand', ['compact' => true, 'forceName' => true, 'mobileHeader' => true])
+                    @include('partials.platform-brand', ['compact' => true, 'forceName' => true, 'mobileHeader' => true, 'brandHref' => route('home')])
                 </div>
                 <div class="flex shrink-0 items-center justify-end gap-1.5">
                     @include('partials.locale-switcher', ['compact' => true])
@@ -135,13 +120,13 @@
 
             {{-- Desktop --}}
             <div class="hidden items-center justify-between gap-4 md:flex">
-                @include('partials.platform-brand', ['compact' => true])
+                @include('partials.platform-brand', ['compact' => true, 'brandHref' => route('home')])
 
                 <nav class="hidden flex-1 items-center justify-center gap-1 lg:flex">
                     @foreach(\App\Support\SiteMenu::forPlacement('top') as $item)
-                        @php $href = \App\Support\SiteMenu::href($item); @endphp
-                        @if($href)
-                            <a href="{{ $href }}" class="rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 {{ request()->url() === $href ? 'bg-orange-50 text-orange-900' : '' }}">{{ \App\Support\SiteMenu::displayLabel($item) }}</a>
+                        @php $menuHref = \App\Support\SiteMenu::href($item); @endphp
+                        @if($menuHref)
+                            <a href="{{ $menuHref }}" class="rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 {{ request()->url() === $menuHref ? 'bg-orange-50 text-orange-900' : '' }}">{{ \App\Support\SiteMenu::displayLabel($item) }}</a>
                         @endif
                     @endforeach
                 </nav>
@@ -186,12 +171,19 @@
                     @endauth
                 </div>
             </div>
-
-            <form action="{{ route('products.index') }}" class="mt-3 md:hidden">
-                <input class="by-input" name="q" value="{{ request('q') }}" placeholder="{{ __('ui.search_placeholder_short') }}" />
-            </form>
         </div>
     </header>
+
+    {{-- Mobile search sheet (opened from bottom nav) --}}
+    <div id="mobile-search-sheet" class="fixed inset-x-0 bottom-16 z-[90] px-3 pb-2 md:hidden" hidden>
+        <form action="{{ route('products.index') }}" class="by-card border-slate-200 bg-white p-3 shadow-lg">
+            <label class="sr-only" for="mobile-search-q">{{ __('ui.search') }}</label>
+            <div class="flex gap-2">
+                <input id="mobile-search-q" class="by-input flex-1" name="q" value="{{ request('q') }}" placeholder="{{ __('ui.search_placeholder_short') }}" autocomplete="off" />
+                <button type="submit" class="by-btn-primary shrink-0 px-4">{{ __('ui.search') }}</button>
+            </div>
+        </form>
+    </div>
 
     <main class="flex-1 pb-20 md:pb-0">
         @if(session('success'))
@@ -227,10 +219,10 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 {{ __('ui.account') }}
             </a>
-            <a href="{{ route('pages.contact') }}" class="flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-[11px] font-semibold {{ request()->routeIs('pages.contact') ? 'bg-orange-50 text-orange-800' : 'text-slate-600' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                {{ __('ui.contact') }}
-            </a>
+            <button type="button" id="mobile-search-toggle" class="flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-[11px] font-semibold text-slate-600" aria-expanded="false" aria-controls="mobile-search-sheet">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                {{ __('ui.search') }}
+            </button>
         </div>
     </nav>
 
@@ -258,7 +250,7 @@
             @endunless
             <div class="grid gap-8 md:grid-cols-4">
                 <div class="md:col-span-2">
-                    @include('partials.platform-brand')
+                    @include('partials.platform-brand', ['brandHref' => route('home')])
                     <p class="mt-3 max-w-md text-sm leading-relaxed text-slate-600">
                         {{ __('ui.tagline') }}
                     </p>
@@ -296,32 +288,65 @@
 @include('partials.floating-support')
 <style>
 /* Vite build yoksa da drawer çalışsın */
-[data-left-drawer] { pointer-events: none; }
+[data-left-drawer] { pointer-events: none; z-index: 100; }
 [data-left-drawer].is-open { pointer-events: auto; }
 [data-left-drawer].is-open [data-left-drawer-overlay] { opacity: 1; }
 [data-left-drawer].is-open [data-left-drawer-panel] { transform: translateX(0); }
+#mobile-search-sheet:not([hidden]) { display: block; }
 </style>
 <script>
 (() => {
   const drawer = document.querySelector('[data-left-drawer]');
-  if (!drawer || drawer.dataset.drawerBound === '1') return;
-  drawer.dataset.drawerBound = '1';
-  const panel = drawer.querySelector('[data-left-drawer-panel]');
-  const overlay = drawer.querySelector('[data-left-drawer-overlay]');
-  const setOpen = (open) => {
-    drawer.classList.toggle('is-open', open);
-    document.documentElement.classList.toggle('overflow-hidden', open);
-    document.body.classList.toggle('overflow-hidden', open);
-  };
-  document.querySelectorAll('[data-left-drawer-open]').forEach((btn) => {
-    btn.addEventListener('click', (e) => { e.preventDefault(); setOpen(true); });
-  });
-  drawer.querySelectorAll('[data-left-drawer-close]').forEach((btn) => {
-    btn.addEventListener('click', (e) => { e.preventDefault(); setOpen(false); });
-  });
-  overlay?.addEventListener('click', () => setOpen(false));
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
-  panel?.addEventListener('click', (e) => { if (e.target && e.target.tagName === 'A') setOpen(false); });
+  if (drawer && drawer.dataset.drawerBound !== '1') {
+    drawer.dataset.drawerBound = '1';
+    const panel = drawer.querySelector('[data-left-drawer-panel]');
+    const overlay = drawer.querySelector('[data-left-drawer-overlay]');
+    const setOpen = (open) => {
+      drawer.classList.toggle('is-open', open);
+      drawer.setAttribute('aria-hidden', open ? 'false' : 'true');
+      if ('inert' in drawer) drawer.inert = !open;
+      document.documentElement.classList.toggle('overflow-hidden', open);
+      document.body.classList.toggle('overflow-hidden', open);
+      document.querySelectorAll('[data-left-drawer-open]').forEach((btn) => {
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    };
+    setOpen(false);
+    document.querySelectorAll('[data-left-drawer-open]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setOpen(true);
+      });
+    });
+    drawer.querySelectorAll('[data-left-drawer-close]').forEach((btn) => {
+      btn.addEventListener('click', (e) => { e.preventDefault(); setOpen(false); });
+    });
+    overlay?.addEventListener('click', () => setOpen(false));
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
+    panel?.addEventListener('click', (e) => {
+      if (e.target && e.target.closest('a[href]')) setOpen(false);
+    });
+  }
+
+  const sheet = document.getElementById('mobile-search-sheet');
+  const toggle = document.getElementById('mobile-search-toggle');
+  const input = document.getElementById('mobile-search-q');
+  if (sheet && toggle) {
+    toggle.addEventListener('click', () => {
+      const open = sheet.hasAttribute('hidden');
+      if (open) {
+        sheet.removeAttribute('hidden');
+        toggle.setAttribute('aria-expanded', 'true');
+        toggle.classList.add('bg-orange-50', 'text-orange-800');
+        setTimeout(() => input?.focus(), 50);
+      } else {
+        sheet.setAttribute('hidden', '');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.classList.remove('bg-orange-50', 'text-orange-800');
+      }
+    });
+  }
 })();
 </script>
 @stack('scripts')

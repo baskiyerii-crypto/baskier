@@ -87,13 +87,17 @@ function initNavigationDrawer({ panel, overlay, openButtons, closeButtons, root,
 
 function initLeftDrawer() {
     const root = document.querySelector('[data-left-drawer]');
-    initNavigationDrawer({
-        root,
-        panel: root?.querySelector('[data-left-drawer-panel]'),
-        overlay: root?.querySelector('[data-left-drawer-overlay]'),
-        openButtons: [...document.querySelectorAll('[data-left-drawer-open]')],
-        closeButtons: [...document.querySelectorAll('[data-left-drawer-close]')],
-    });
+    // Inline layout script already bound the storefront drawer (Vite-free fallback).
+    if (root && root.dataset.drawerBound !== '1') {
+        initNavigationDrawer({
+            root,
+            panel: root.querySelector('[data-left-drawer-panel]'),
+            overlay: root.querySelector('[data-left-drawer-overlay]'),
+            openButtons: [...document.querySelectorAll('[data-left-drawer-open]')],
+            closeButtons: [...document.querySelectorAll('[data-left-drawer-close]')],
+        });
+        root.dataset.drawerBound = '1';
+    }
     initNavigationDrawer({
         panel: document.querySelector('[data-panel-sidebar]'),
         overlay: document.querySelector('[data-panel-backdrop]'),
