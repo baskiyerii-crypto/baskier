@@ -18,7 +18,7 @@
 
         <div class="grid gap-6 lg:grid-cols-2">
             <div class="by-card overflow-hidden">
-                <div class="aspect-[4/3] bg-slate-100 flex items-center justify-center">
+                <div class="aspect-4/3 bg-slate-100 flex items-center justify-center">
                     @if($product->main_image)
                         <img src="{{ asset('storage/'.$product->main_image) }}" alt="{{ $product->name }}" class="h-full w-full object-cover">
                     @else
@@ -102,10 +102,10 @@
                                     <div class="w-full sm:w-28 shrink-0">
                                         <label class="text-xs font-semibold text-slate-600" for="product-qty">Adet</label>
                                         <input id="product-qty" type="number" name="quantity" value="1" min="1" max="{{ $product->variants->first()?->stock ?? $product->stock }}"
-                                               class="by-input mt-1 w-full min-h-[48px]">
+                                               class="by-input mt-1 w-full min-h-12">
                                     </div>
                                     <div class="flex-1">
-                                        <button type="submit" class="w-full by-btn-primary min-h-[48px]" onclick="document.getElementById('buy_now_flag').value='0'">Sepete ekle</button>
+                                        <button type="submit" class="w-full by-btn-primary min-h-12" onclick="document.getElementById('buy_now_flag').value='0'">Sepete ekle</button>
                                     </div>
                                 </div>
                             </form>
@@ -192,7 +192,7 @@
             <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 @foreach($alsoBought->take(4) as $item)
                     <a href="{{ route('products.show', $item->slug) }}" class="group by-card by-card-hover overflow-hidden">
-                        <div class="aspect-[4/3] bg-slate-100 flex items-center justify-center">
+                        <div class="aspect-4/3 bg-slate-100 flex items-center justify-center">
                             @if($item->main_image)
                                 <img src="{{ asset('storage/'.$item->main_image) }}" alt="{{ $item->name }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
                             @else
@@ -218,7 +218,7 @@
             <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 @foreach($related as $item)
                     <a href="{{ route('products.show', $item->slug) }}" class="group by-card by-card-hover overflow-hidden">
-                        <div class="aspect-[4/3] bg-slate-100 flex items-center justify-center">
+                        <div class="aspect-4/3 bg-slate-100 flex items-center justify-center">
                             @if($item->main_image)
                                 <img src="{{ asset('storage/'.$item->main_image) }}" alt="{{ $item->name }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
                             @else
