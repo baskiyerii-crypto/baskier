@@ -80,6 +80,16 @@
                     </div>
                 @endif
             </div>
+            @php
+                $trackingUrl = UiLabels::carrierTrackingUrl($carrierName, $trackingNo);
+            @endphp
+            @if($trackingUrl)
+                <div class="mt-3 pt-2 border-top">
+                    <a href="{{ $trackingUrl }}" target="_blank" rel="noopener" class="btn btn-sm btn-primary">
+                        🔗 Kargo Firmasının Sitesinde Canlı Takip Et ↗
+                    </a>
+                </div>
+            @endif
         </div>
     @endif
 

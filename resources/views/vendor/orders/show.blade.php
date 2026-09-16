@@ -26,6 +26,22 @@
         <span class="text-muted small">Sipariş Tarihi: {{ $order->created_at->format('d.m.Y H:i') }}</span>
     </div>
     <div class="d-flex align-items-center gap-2">
+        @if($order->termin_due_at)
+            @php
+                $isLate = now()->gt($order->termin_due_at) && !in_array($order->status, [OrderStatus::SHIPPED, OrderStatus::DELIVERED, OrderStatus::COMPLETED, OrderStatus::CANCELLED]);
+                $daysLeft = (int) ceil(now()->diffInDays($order->termin_due_at, false));
+            @endphp
+            <span class="badge px-2.5 py-2 fs-6 rounded-pill {{ $isLate ? 'bg-danger text-white' : ($daysLeft <= 1 ? 'bg-warning text-dark' : 'bg-info-subtle text-info-emphasis border border-info-subtle') }}" title="Üretim / Kargoya Verme Son Tarihi">
+                ⏱️ Termin: {{ $order->termin_due_at->format('d.m.Y') }}
+                @if($isLate)
+                    (Gecikmede!)
+                @elseif($daysLeft === 0)
+                    (Bugün son gün!)
+                @elseif($daysLeft > 0)
+                    ({{ $daysLeft }} gün kaldı)
+                @endif
+            </span>
+        @endif
         <span class="badge px-3 py-2 fs-6 rounded-pill {{ $statusBadgeClass }}">
             {{ UiLabels::orderStatus($order->status) }}
         </span>
@@ -155,12 +171,22 @@
 
             <!-- Mevcut Kargo Bilgisi (Varsa) -->
             @if($order->latestShipment)
+                @php
+                    $trackingUrl = UiLabels::carrierTrackingUrl($order->latestShipment->carrier, $order->latestShipment->tracking_number);
+                @endphp
                 <div class="alert alert-info small mb-3">
                     <div class="fw-bold mb-1">🚚 Kargo Bilgisi:</div>
                     <div><strong>Firma:</strong> {{ $order->latestShipment->carrier }}</div>
                     <div><strong>Takip No:</strong> <span class="font-monospace fw-bold">{{ $order->latestShipment->tracking_number }}</span></div>
                     @if($order->latestShipment->shipped_at)
                         <div class="text-muted mt-1">Çıkış: {{ $order->latestShipment->shipped_at->format('d.m.Y H:i') }}</div>
+                    @endif
+                    @if($trackingUrl)
+                        <div class="mt-2">
+                            <a href="{{ $trackingUrl }}" target="_blank" rel="noopener" class="btn btn-sm btn-primary py-1 px-2">
+                                🔗 Kargoyu Canlı Sorgula ↗
+                            </a>
+                        </div>
                     @endif
                 </div>
             @endif

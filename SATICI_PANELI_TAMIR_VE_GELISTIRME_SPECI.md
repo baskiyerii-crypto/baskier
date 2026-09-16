@@ -61,12 +61,14 @@ f:\dev\baskiyeripazar\baskier\
 ## 🛠️ GÖREV 1: Sipariş Durum Makinesi ve Controller Onarımı
 
 ### 1.1. Problem Tespiti
+
 - `VendorDashboardController.php` içinde satıcının aktif siparişleri aranırken `whereIn('status', ['paid', 'in_progress'])` yazılmıştır. Ancak veritabanı migrasyonu bu statüleri `confirmed` ve `in_production` olarak değiştirmiştir. Sonuç: Sayaç daima 0 döner.
 - `VendorOrderController.php` içinde durum güncellemesi yapılırken `$request->validate(['status' => ['required', 'in:in_progress,delivered']])` doğrudan çalıştırılmakta; `OrderWorkflowService` baypas edilmekte ve `shipped`, `ready_to_ship`, `design_review` adımları işletilememektedir.
 
 ### 1.2. Yapılacak Değişiklikler
 
 #### [MODIFY] `app/Http/Controllers/Vendor/VendorDashboardController.php`
+
 ```php
 // AKTİF SİPARİŞ SAYACI DÜZELTMESİ:
 use App\Domain\OrderStatus;
@@ -101,6 +103,7 @@ $recentOrders = Order::where('vendor_id', $vendor->id)
 ```
 
 #### [MODIFY] `app/Http/Controllers/Vendor/VendorOrderController.php`
+
 `updateStatus` metodu `OrderWorkflowService` ve kargo takip bilgilerini destekleyecek şekilde güncellenmelidir:
 
 ```php
@@ -176,9 +179,11 @@ public function updateStatus(Request $request, Order $order, OrderWorkflowServic
 ## 🎨 GÖREV 2: Sipariş Detay Ekranının (`orders/show.blade.php`) Baştan Yazılması
 
 ### 2.1. Problem Tespiti
+
 Mevcut şablon 26 satırdan ibarettir; sipariş içindeki kalemleri, müşterinin adresini, tasarım dosyalarını ve satıcının prova yükleme formunu barındırmamaktadır.
 
 ### 2.2. Uygulama Talimatı
+
 `resources/views/vendor/orders/show.blade.php` dosyasını aşağıdaki tam teşekküllü arayüz ile değiştirin:
 
 ```blade
@@ -434,9 +439,11 @@ Mevcut şablon 26 satırdan ibarettir; sipariş içindeki kalemleri, müşterini
 ## 📑 GÖREV 3: Sipariş Listesi Ekranının (`orders/index.blade.php`) Yenilenmesi
 
 ### 3.1. Problem Tespiti
+
 Mevcut ekran statü sekmelerine, arama çubuğuna ve renkli Türkçe rozetlere sahip değildir.
 
 ### 3.2. Uygulama Talimatı
+
 `VendorOrderController@index` metodunu statü ve arama filtresini destekleyecek şekilde düzenleyin:
 
 ```php
@@ -564,12 +571,14 @@ public function index(Request $request)
 ## 🖥️ GÖREV 4: Layout (`layouts/vendor.blade.php`) ve Menü Restorasyonu
 
 ### 4.1. Problem Tespiti
+
 - Sol kenar çubuğunda **Ödeme Talepleri** bağlantısı yoktur.
 - Mağaza profili / IBAN ayarları bağlantısı yoktur.
 - "Tabela bakiyesi" üreticiyi yanıltmaktadır.
 - Bootstrap ve Tailwind sınıfları aynı anda yüklendiği için layout bozulmaları yaşanmaktadır.
 
 ### 4.2. Yapılacak Değişiklikler
+
 `resources/views/layouts/vendor.blade.php` dosyasında sol menü `nav` bloğunu şu şekilde güncelleyin:
 
 ```blade
@@ -620,17 +629,25 @@ public function index(Request $request)
 ## 📦 GÖREV 5: Ürün Yönetimi JS ve Alan Düzeltmeleri
 
 ### 5.1. Problem Tespiti
+
 `resources/views/vendor/products/create.blade.php` dosyasındaki javascript satırında:
+
 ```js
-document.querySelector('[name=product_type]').addEventListener('change', function(){
-    var isDigital = this.value==='digital';
-    document.querySelector('.product-digital-field').style.display = isDigital ? 'none' : 'block';
-    document.querySelector('.product-digital-link-field').style.display = isDigital ? 'block' : 'none';
-});
+document
+    .querySelector("[name=product_type]")
+    .addEventListener("change", function () {
+        var isDigital = this.value === "digital";
+        document.querySelector(".product-digital-field").style.display =
+            isDigital ? "none" : "block";
+        document.querySelector(".product-digital-link-field").style.display =
+            isDigital ? "block" : "none";
+    });
 ```
+
 `.product-digital-field` sınıfı görsel alanına verilmiştir! Bu nedenle satıcı dijital ürün seçtiğinde **ürün görseli yükleme alanı kaybolmaktadır**. Dijital pazarda da kapak görseli zorunludur.
 
 ### 5.2. Yapılacak Değişiklik
+
 `create.blade.php` ve `edit.blade.php` dosyalarında görsel alanındaki `.product-digital-field` sınıfını kaldırın. Görsel her iki ürün tipi için de görünür kalmalıdır; yalnızca `.product-digital-link-field` dijital seçildiğinde açılmalıdır.
 
 ---
@@ -638,9 +655,11 @@ document.querySelector('[name=product_type]').addEventListener('change', functio
 ## 💰 GÖREV 6: Hakediş ve Ödeme Güvenliği (`VendorPayoutRequestWebController.php`)
 
 ### 6.1. Problem Tespiti
+
 Satıcı talep oluşturduğunda bakiye rezerv edilmemektedir.
 
 ### 6.2. Yapılacak Değişiklik
+
 `app/Http/Controllers/Vendor/VendorPayoutRequestWebController.php` içinde `store` metodunda açıkta bekleyen taleplerin toplamını kontrol edin:
 
 ```php
@@ -684,12 +703,12 @@ public function store(Request $request)
 Ajan bu adımları sırasıyla doğrulamalıdır:
 
 1. **Syntax ve Derleme Kontrolü:**
-   - Değiştirilen tüm Blade dosyalarında tag kapatma, `@csrf`, `@method` ve PHP syntax hatası olmadığını teyit et.
+    - Değiştirilen tüm Blade dosyalarında tag kapatma, `@csrf`, `@method` ve PHP syntax hatası olmadığını teyit et.
 2. **Dashboard Sayacı Doğrulaması:**
-   - Veritabanında `status = 'confirmed'` veya `'in_production'` olan bir sipariş olduğunda dashboard sayacının sıfır değil, doğru sayıyı verdiğini kontrol et.
+    - Veritabanında `status = 'confirmed'` veya `'in_production'` olan bir sipariş olduğunda dashboard sayacının sıfır değil, doğru sayıyı verdiğini kontrol et.
 3. **Sipariş Akışı Doğrulaması:**
-   - `vendor.orders.show` rotasına gidildiğinde ürün adı, adet, fiyat ve net hakedişin doğru basıldığını gör.
-   - Prova yükleme formunun `VendorOrderDesignController@store` metoduna başarıyla POST attığını doğrula.
-   - Duruma göre (Örn. `ready_to_ship` iken) kargo takip formu doldurulup gönderildiğinde sipariş durumunun `shipped` olduğunu ve `shipments` tablosuna kayıt düştüğünü test et.
+    - `vendor.orders.show` rotasına gidildiğinde ürün adı, adet, fiyat ve net hakedişin doğru basıldığını gör.
+    - Prova yükleme formunun `VendorOrderDesignController@store` metoduna başarıyla POST attığını doğrula.
+    - Duruma göre (Örn. `ready_to_ship` iken) kargo takip formu doldurulup gönderildiğinde sipariş durumunun `shipped` olduğunu ve `shipments` tablosuna kayıt düştüğünü test et.
 4. **Menü Doğrulaması:**
-   - Kenar çubuğunda "Hakediş & Para Çekme" bağlantısının doğrudan `/satici-panel/odeme-talepleri` rotasına yönlendirdiğini teyit et.
+    - Kenar çubuğunda "Hakediş & Para Çekme" bağlantısının doğrudan `/satici-panel/odeme-talepleri` rotasına yönlendirdiğini teyit et.

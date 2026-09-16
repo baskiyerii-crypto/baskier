@@ -156,8 +156,29 @@ final class UiLabels
         ];
     }
 
-    public static function track(?string $track): string
+    public static function carrierTrackingUrl(?string $carrier, ?string $trackingNumber): ?string
     {
-        return self::tracks()[$track] ?? ($track ?: '—');
+        if (! $carrier || ! $trackingNumber) {
+            return null;
+        }
+        $c = mb_strtolower($carrier);
+        $t = urlencode(trim($trackingNumber));
+        if (str_contains($c, 'yurtiçi') || str_contains($c, 'yurtici')) {
+            return "https://www.yurticikargo.com/tr/online-servisler/gonderi-sorgula?code={$t}";
+        }
+        if (str_contains($c, 'aras')) {
+            return "https://www.araskargo.com.tr/kargo-takip/{$t}";
+        }
+        if (str_contains($c, 'mng')) {
+            return "https://www.mngkargo.com.tr/gonderitakip/{$t}";
+        }
+        if (str_contains($c, 'sürat') || str_contains($c, 'surat')) {
+            return "https://www.suratkargo.com.tr/KargoTakip/?kargotakipno={$t}";
+        }
+        if (str_contains($c, 'ptt')) {
+            return "https://gonderitakip.ptt.gov.tr/Track/Verify?q={$t}";
+        }
+
+        return null;
     }
 }
