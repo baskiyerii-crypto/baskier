@@ -3,140 +3,137 @@
 @section('title', 'Kayıt Ol - BaskıYeri')
 
 @section('content')
-<div class="by-container py-12 md:py-16">
+<div class="by-container py-10">
     <div class="mx-auto max-w-xl">
         <div class="mb-6 text-center">
-            <p class="text-xs font-bold uppercase tracking-wider text-muted">Aramıza Katılın</p>
-            <h1 class="font-heading text-2xl md:text-3xl font-bold tracking-tight text-ink mt-1">Hesap Oluşturun</h1>
-            <p class="mt-1.5 text-xs text-muted">Müşteri olarak alışveriş yapın veya üretici/uzman olarak mağazanızı açın.</p>
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Başlayalım</p>
+            <h1 class="mt-1 text-3xl font-extrabold tracking-tight text-slate-900">Kayıt ol</h1>
+            <p class="mt-2 text-sm text-slate-600">Müşteri ya da satıcı hesabı oluştur.</p>
         </div>
 
         @if (session('info'))
-            <x-alert type="info" class="mb-6">{{ session('info') }}</x-alert>
+            <div class="alert alert-info">{{ session('info') }}</div>
         @endif
 
-        <div class="by-card p-6 md:p-8 bg-surface border border-border">
-            <form method="POST" action="{{ route('register') }}" class="space-y-4" enctype="multipart/form-data">
+        <div class="by-card p-6 md:p-8">
+
+            <form method="POST" action="{{ route('register') }}" class="mt-4 space-y-4" enctype="multipart/form-data">
                 @csrf
-                <div class="grid gap-4 sm:grid-cols-2">
-                    <div class="sm:col-span-2">
-                        <label for="name" class="block text-xs font-semibold text-muted mb-1">Ad Soyad <span class="text-red-500">*</span></label>
-                        <input type="text" class="form-control text-xs" id="name" name="name" value="{{ old('name') }}" required placeholder="Adınız ve Soyadınız">
+                <div class="grid gap-4 md:grid-cols-2">
+                    <div class="md:col-span-2">
+                        <label for="name" class="form-label">Ad Soyad</label>
+                        <input type="text" class="form-control mt-1" id="name" name="name" value="{{ old('name') }}" required>
                     </div>
-                    <div class="sm:col-span-2">
-                        <label for="email" class="block text-xs font-semibold text-muted mb-1">E-posta Adresi <span class="text-red-500">*</span></label>
-                        <input type="email" class="form-control text-xs" id="email" name="email" value="{{ old('email') }}" required placeholder="ornek@baskiyeri.com">
-                    </div>
-                    <div>
-                        <label for="password" class="block text-xs font-semibold text-muted mb-1">Şifre <span class="text-red-500">*</span></label>
-                        <input type="password" class="form-control text-xs" id="password" name="password" required placeholder="En az 8 karakter">
+                    <div class="md:col-span-2">
+                        <label for="email" class="form-label">E-posta</label>
+                        <input type="email" class="form-control mt-1" id="email" name="email" value="{{ old('email') }}" required>
                     </div>
                     <div>
-                        <label for="password_confirmation" class="block text-xs font-semibold text-muted mb-1">Şifre Tekrar <span class="text-red-500">*</span></label>
-                        <input type="password" class="form-control text-xs" id="password_confirmation" name="password_confirmation" required placeholder="Şifrenizi doğrulayın">
+                        <label for="password" class="form-label">Şifre</label>
+                        <input type="password" class="form-control mt-1" id="password" name="password" required>
+                    </div>
+                    <div>
+                        <label for="password_confirmation" class="form-label">Şifre (tekrar)</label>
+                        <input type="password" class="form-control mt-1" id="password_confirmation" name="password_confirmation" required>
                     </div>
                 </div>
 
-                <div class="pt-2">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-muted mb-2">Hesap Türü</label>
-                    <div class="grid grid-cols-2 gap-3">
-                        <label class="flex items-center gap-2.5 p-3 rounded-xl border border-border bg-canvas/50 cursor-pointer hover:border-cta/50 transition-colors text-xs font-semibold text-ink">
-                            <input type="radio" class="h-4 w-4 text-cta focus:ring-cta" id="role_customer" name="role" value="customer"
+                <div>
+                    <label class="form-label">Hesap türü</label>
+                    <div class="mt-2 flex flex-wrap gap-2">
+                        <label class="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-slate-200 bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800">
+                            <input type="radio" class="h-4 w-4" id="role_customer" name="role" value="customer"
                                    {{ old('role', 'customer') === 'customer' ? 'checked' : '' }}
                                    onchange="window.toggleVendorBiz && window.toggleVendorBiz()">
-                            <span>Müşteri</span>
+                            Müşteri
                         </label>
-                        <label class="flex items-center gap-2.5 p-3 rounded-xl border border-border bg-canvas/50 cursor-pointer hover:border-cta/50 transition-colors text-xs font-semibold text-ink">
-                            <input type="radio" class="h-4 w-4 text-cta focus:ring-cta" id="role_vendor" name="role" value="vendor"
+                        <label class="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-slate-200 bg-white/70 px-4 py-3 text-sm font-semibold text-slate-800">
+                            <input type="radio" class="h-4 w-4" id="role_vendor" name="role" value="vendor"
                                    {{ old('role') === 'vendor' ? 'checked' : '' }}
                                    onchange="window.toggleVendorBiz && window.toggleVendorBiz()">
-                            <span>Satıcı / Üretici</span>
+                            Satıcı
                         </label>
                     </div>
                 </div>
 
-                <div id="vendor-extra-fields" class="p-5 rounded-xl border border-border bg-canvas/40 space-y-4" style="display:none;">
-                    <div>
-                        <p class="text-xs font-bold uppercase tracking-wider text-ink">{{ __('panel.vendor_tracks') }}</p>
-                        <p class="text-[11px] text-muted mt-0.5">{{ __('panel.vendor_tracks_help') }}</p>
-                        <div class="mt-3 space-y-2">
-                            @foreach([
-                                'physical_products' => __('panel.track_physical_products'),
-                                'physical_quote' => __('panel.track_physical_quote'),
-                                'freelancer' => __('panel.track_freelancer'),
-                            ] as $track => $label)
-                                <label class="flex items-center gap-2.5 p-3 rounded-lg border border-border bg-surface text-xs text-ink cursor-pointer">
-                                    <input class="h-4 w-4 track-cb rounded text-cta focus:ring-cta" type="checkbox" name="registration_tracks[]" value="{{ $track }}"
-                                           @checked(in_array($track, old('registration_tracks', [])))
-                                           onchange="window.toggleVendorTracks && window.toggleVendorTracks()">
-                                    <span class="font-medium">{{ $label }}</span>
+                <div id="vendor-extra-fields" class="by-card border-slate-200 bg-white/60 p-5" style="display:none;">
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('panel.vendor_tracks') }}</p>
+                    <p class="mt-1 text-sm text-slate-600">{{ __('panel.vendor_tracks_help') }}</p>
+                    <div class="mt-4 grid gap-2 md:grid-cols-1">
+                        @foreach([
+                            'physical_products' => __('panel.track_physical_products'),
+                            'physical_quote' => __('panel.track_physical_quote'),
+                            'freelancer' => __('panel.track_freelancer'),
+                        ] as $track => $label)
+                            <label class="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white/70 px-4 py-3 text-sm text-slate-800">
+                                <input class="h-4 w-4 track-cb" type="checkbox" name="registration_tracks[]" value="{{ $track }}"
+                                       @checked(in_array($track, old('registration_tracks', [])))
+                                       onchange="window.toggleVendorTracks && window.toggleVendorTracks()">
+                                <span class="font-semibold">{{ $label }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                    @error('registration_tracks')<div class="mt-2 text-sm font-semibold text-rose-600">{{ $message }}</div>@enderror
+
+                    @if(isset($businessTypes) && $businessTypes->isNotEmpty())
+                        <div class="mt-6 by-divider"></div>
+                        <p class="mt-6 text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('panel.business_types') }}</p>
+                        <div class="mt-4 grid gap-2 md:grid-cols-2">
+                            @foreach($businessTypes as $bt)
+                                <label class="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white/70 px-4 py-3 text-sm text-slate-800">
+                                    <input class="h-4 w-4" type="checkbox" name="business_type_ids[]" value="{{ $bt->id }}"
+                                           @checked(in_array($bt->id, old('business_type_ids', [])))>
+                                    <span class="font-semibold">{{ $bt->name }}</span>
                                 </label>
                             @endforeach
                         </div>
-                        @error('registration_tracks')<div class="mt-1 text-xs text-red-600">{{ $message }}</div>@enderror
-                    </div>
-
-                    @if(isset($businessTypes) && $businessTypes->isNotEmpty())
-                        <div class="pt-3 border-t border-border">
-                            <p class="text-xs font-bold uppercase tracking-wider text-ink">{{ __('panel.business_types') }}</p>
-                            <div class="mt-2 grid grid-cols-2 gap-2">
-                                @foreach($businessTypes as $bt)
-                                    <label class="flex items-center gap-2 p-2.5 rounded-lg border border-border bg-surface text-xs text-ink cursor-pointer">
-                                        <input class="h-4 w-4 rounded text-cta focus:ring-cta" type="checkbox" name="business_type_ids[]" value="{{ $bt->id }}"
-                                               @checked(in_array($bt->id, old('business_type_ids', [])))>
-                                        <span>{{ $bt->name }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
-                        </div>
                     @endif
 
-                    <div id="physical-tax-fields" class="pt-3 border-t border-border space-y-3" style="display:none;">
-                        <div>
-                            <p class="text-xs font-bold uppercase tracking-wider text-ink">{{ __('panel.tax_info') }}</p>
-                            <p class="text-[11px] text-muted mt-0.5">{{ __('panel.tax_plate_required_help') }}</p>
-                        </div>
-                        <div class="grid gap-3 sm:grid-cols-2">
-                            <div class="sm:col-span-2">
-                                <label class="block text-xs font-semibold text-muted mb-1">{{ __('panel.company_name') }}</label>
-                                <input type="text" class="form-control text-xs" name="company_name" value="{{ old('company_name') }}">
+                    <div id="physical-tax-fields" class="mt-6" style="display:none;">
+                        <div class="by-divider mb-4"></div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('panel.tax_info') }}</p>
+                        <p class="mt-1 text-sm text-slate-600">{{ __('panel.tax_plate_required_help') }}</p>
+                        <div class="mt-4 grid gap-4 md:grid-cols-2">
+                            <div class="md:col-span-2">
+                                <label class="form-label">{{ __('panel.company_name') }}</label>
+                                <input type="text" class="form-control mt-1" name="company_name" value="{{ old('company_name') }}">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-muted mb-1">{{ __('panel.tax_office') }}</label>
-                                <input type="text" class="form-control text-xs" name="tax_office" value="{{ old('tax_office') }}">
+                                <label class="form-label">{{ __('panel.tax_office') }}</label>
+                                <input type="text" class="form-control mt-1" name="tax_office" value="{{ old('tax_office') }}">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-muted mb-1">{{ __('panel.tax_number') }}</label>
-                                <input type="text" class="form-control text-xs" name="tax_number" value="{{ old('tax_number') }}">
+                                <label class="form-label">{{ __('panel.tax_number') }}</label>
+                                <input type="text" class="form-control mt-1" name="tax_number" value="{{ old('tax_number') }}">
                             </div>
-                            <div class="sm:col-span-2">
-                                <label class="block text-xs font-semibold text-muted mb-1">{{ __('panel.tax_plate') }}</label>
-                                <input type="file" class="form-control text-xs" name="tax_plate" accept=".pdf,image/*">
-                                @error('tax_plate')<div class="mt-1 text-xs text-red-600">{{ $message }}</div>@enderror
+                            <div class="md:col-span-2">
+                                <label class="form-label">{{ __('panel.tax_plate') }}</label>
+                                <input type="file" class="form-control mt-1" name="tax_plate" accept=".pdf,image/*">
+                                @error('tax_plate')<div class="mt-2 text-sm font-semibold text-rose-600">{{ $message }}</div>@enderror
                             </div>
                         </div>
                     </div>
 
-                    <div id="freelancer-doc-fields" class="pt-3 border-t border-border space-y-3" style="display:none;">
-                        <div>
-                            <p class="text-xs font-bold uppercase tracking-wider text-ink">{{ __('panel.freelancer_docs') }}</p>
-                            <p class="text-[11px] text-muted mt-0.5">{{ __('panel.freelancer_docs_help') }}</p>
-                        </div>
-                        <div class="space-y-2" id="freelancer-doc-list">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                <select name="freelancer_doc_types[]" class="form-control text-xs">
+                    <div id="freelancer-doc-fields" class="mt-6" style="display:none;">
+                        <div class="by-divider mb-4"></div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('panel.freelancer_docs') }}</p>
+                        <p class="mt-1 text-sm text-slate-600">{{ __('panel.freelancer_docs_help') }}</p>
+                        <div class="mt-3 space-y-3" id="freelancer-doc-list">
+                            <div class="grid gap-2 md:grid-cols-2">
+                                <select name="freelancer_doc_types[]" class="form-select">
                                     <option value="diploma">{{ __('panel.doc_diploma') }}</option>
                                     <option value="certificate">{{ __('panel.doc_certificate') }}</option>
                                     <option value="course">{{ __('panel.doc_course') }}</option>
                                     <option value="other">{{ __('panel.doc_other') }}</option>
                                 </select>
-                                <input type="file" name="freelancer_docs[]" class="form-control text-xs" accept=".pdf,image/*">
+                                <input type="file" name="freelancer_docs[]" class="form-control" accept=".pdf,image/*">
                             </div>
                         </div>
-                        @error('freelancer_docs')<div class="mt-1 text-xs text-red-600">{{ $message }}</div>@enderror
+                        @error('freelancer_docs')<div class="mt-2 text-sm font-semibold text-rose-600">{{ $message }}</div>@enderror
                     </div>
 
-                    <div class="pt-3 border-t border-border" id="vendor-agreement-gate">
+                    <div class="mt-6 by-divider"></div>
+                    <div class="mt-4" id="vendor-agreement-gate">
                         @include('partials.legal-scroll-gate', [
                             'slug' => 'vendor_agreement',
                             'label' => __('panel.vendor_agreement'),
@@ -146,7 +143,8 @@
                     </div>
                 </div>
 
-                <div class="p-4 rounded-xl border border-border bg-canvas/30 space-y-3">
+                <div class="by-surface-indigo p-4 space-y-3">
+                    <div class="by-accent-bar mb-3"></div>
                     @include('partials.legal-scroll-gate', [
                         'slug' => 'terms',
                         'label' => __('ui.terms'),
@@ -161,16 +159,15 @@
                     ])
                 </div>
 
-                <button type="submit" class="btn btn-cta w-full text-xs py-2.5 font-bold">Kayıt Ol ve Başla</button>
+                <button type="submit" class="w-full by-btn-cta">Kayıt Ol</button>
             </form>
 
-            <div class="mt-6 pt-6 border-t border-border text-center text-xs text-muted">
-                Zaten hesabınız var mı? <a href="{{ route('login') }}" class="font-bold text-cta hover:underline">Giriş Yapın</a>
-            </div>
+            <p class="mt-6 text-center text-sm text-slate-600">
+                Zaten hesabınız var mı? <a href="{{ route('login') }}" class="by-link">Giriş yapın</a>
+            </p>
         </div>
     </div>
 </div>
-
 <script>
 window.toggleVendorBiz = function () {
     var v = document.getElementById('role_vendor');

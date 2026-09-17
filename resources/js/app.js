@@ -1,156 +1,34 @@
 import './bootstrap';
 
-function initModals() {
-    let activeModal = null;
-    let returnFocus = null;
+function initHeroSlider() {
+    const root = document.querySelector('[data-hero-slider]');
+    if (!root) return;
 
-    const getFocusable = (el) => [...el.querySelectorAll('a[href], button, input, select, textarea, [tabindex="0"]')]
-        .filter((node) => !node.disabled && node.getClientRects().length);
+    const slides = Array.from(root.querySelectorAll('[data-slide]'));
+    const dots = Array.from(root.querySelectorAll('[data-dot]'));
+    if (slides.length <= 1) return;
 
-    window.openModal = function(id) {
-        const modal = document.getElementById(id);
-        if (!modal) return;
-        activeModal = modal;
-        returnFocus = document.activeElement;
+    let idx = 0;
 
-        modal.classList.remove('opacity-0', 'pointer-events-none');
-        modal.classList.add('opacity-100');
-        const box = modal.querySelector('.modal-box');
-        if (box) {
-            box.classList.remove('scale-95');
-            box.classList.add('scale-100');
-        }
-        document.documentElement.classList.add('overflow-hidden');
-        document.body.classList.add('overflow-hidden');
-
-        setTimeout(() => {
-            const focusable = getFocusable(modal);
-            if (focusable.length) focusable[0].focus();
-        }, 50);
+    const apply = (nextIdx) => {
+        idx = ((nextIdx % slides.length) + slides.length) % slides.length;
+        slides.forEach((el, i) => el.classList.toggle('is-active', i === idx));
+        dots.forEach((el, i) => {
+            el.classList.toggle('w-10', i === idx);
+            el.classList.toggle('w-2.5', i !== idx);
+            el.classList.toggle('bg-white/90', i === idx);
+            el.classList.toggle('bg-white/40', i !== idx);
+        });
     };
 
-    window.closeModal = function(id) {
-        const modal = id ? document.getElementById(id) : activeModal;
-        if (!modal) return;
+    dots.forEach((dot, i) => dot.addEventListener('click', () => apply(i)));
 
-        modal.classList.add('opacity-0', 'pointer-events-none');
-        modal.classList.remove('opacity-100');
-        const box = modal.querySelector('.modal-box');
-        if (box) {
-            box.classList.add('scale-95');
-            box.classList.remove('scale-100');
-        }
-        document.documentElement.classList.remove('overflow-hidden');
-        document.body.classList.remove('overflow-hidden');
-
-        if (returnFocus) {
-            returnFocus.focus();
-            returnFocus = null;
-        }
-        if (activeModal === modal) activeModal = null;
-    };
-
-    document.addEventListener('click', (e) => {
-        const openBtn = e.target.closest('[data-modal-open]');
-        if (openBtn) {
-            const targetId = openBtn.getAttribute('data-modal-open');
-            window.openModal(targetId);
-            return;
-        }
-
-        const closeBtn = e.target.closest('[data-modal-close]');
-        if (closeBtn) {
-            const modal = closeBtn.closest('[data-modal]');
-            if (modal) window.closeModal(modal.id);
-        }
-    });
-
-    document.addEventListener('keydown', (e) => {
-        if (!activeModal) return;
-        if (e.key === 'Escape') {
-            window.closeModal(activeModal.id);
-            return;
-        }
-        if (e.key === 'Tab') {
-            const nodes = getFocusable(activeModal);
-            if (nodes.length === 0) return;
-            const first = nodes[0];
-            const last = nodes[nodes.length - 1];
-            if (e.shiftKey && document.activeElement === first) {
-                e.preventDefault();
-                last.focus();
-            } else if (!e.shiftKey && document.activeElement === last) {
-                e.preventDefault();
-                first.focus();
-            }
-        }
-    });
-}
-
-function initDrawers() {
-    let activeDrawer = null;
-    let returnFocus = null;
-
-    window.openDrawer = function(id) {
-        const drawer = document.getElementById(id);
-        if (!drawer) return;
-        activeDrawer = drawer;
-        returnFocus = document.activeElement;
-
-        drawer.classList.remove('opacity-0', 'pointer-events-none');
-        drawer.classList.add('opacity-100');
-        const panel = drawer.querySelector('.drawer-panel');
-        if (panel) {
-            panel.classList.remove('-translate-x-full', 'translate-x-full');
-            panel.classList.add('translate-x-0');
-        }
-        document.documentElement.classList.add('overflow-hidden');
-        document.body.classList.add('overflow-hidden');
-    };
-
-    window.closeDrawer = function(id) {
-        const drawer = id ? document.getElementById(id) : activeDrawer;
-        if (!drawer) return;
-
-        drawer.classList.add('opacity-0', 'pointer-events-none');
-        drawer.classList.remove('opacity-100');
-        const panel = drawer.querySelector('.drawer-panel');
-        if (panel) {
-            const side = drawer.getAttribute('data-side') || 'left';
-            panel.classList.remove('translate-x-0');
-            panel.classList.add(side === 'left' ? '-translate-x-full' : 'translate-x-full');
-        }
-        document.documentElement.classList.remove('overflow-hidden');
-        document.body.classList.remove('overflow-hidden');
-
-        if (returnFocus) {
-            returnFocus.focus();
-            returnFocus = null;
-        }
-        if (activeDrawer === drawer) activeDrawer = null;
-    };
-
-    document.addEventListener('click', (e) => {
-        const openBtn = e.target.closest('[data-drawer-open]');
-        if (openBtn) {
-            const targetId = openBtn.getAttribute('data-drawer-open');
-            window.openDrawer(targetId);
-            return;
-        }
-
-        const closeBtn = e.target.closest('[data-drawer-close]');
-        if (closeBtn) {
-            const drawer = closeBtn.closest('[data-drawer]');
-            if (drawer) window.closeDrawer(drawer.id);
-        }
-    });
-
-    document.addEventListener('keydown', (e) => {
-        if (!activeDrawer) return;
-        if (e.key === 'Escape') {
-            window.closeDrawer(activeDrawer.id);
-        }
-    });
+    apply(0);
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        window.setInterval(() => {
+            if (!document.hidden && !root.matches(':hover, :focus-within')) apply(idx + 1);
+        }, 6500);
+    }
 }
 
 function initNavigationDrawer({ panel, overlay, openButtons, closeButtons, root, mobileOnly = false }) {
@@ -218,6 +96,13 @@ function initLeftDrawer() {
     document.querySelectorAll('nav a.active').forEach((link) => link.setAttribute('aria-current', 'page'));
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    initHeroSlider();
+    initLeftDrawer();
+    initPhoneInputs();
+    document.querySelector('[data-validation-summary]')?.focus();
+});
+
 function initPhoneInputs() {
     const nodes = document.querySelectorAll('input[name="phone"], input[name="invoice_phone"], input[name="contact_phone"], input[data-phone]');
     nodes.forEach((input) => {
@@ -233,11 +118,3 @@ function initPhoneInputs() {
         sanitize();
     });
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    initModals();
-    initDrawers();
-    initLeftDrawer();
-    initPhoneInputs();
-    document.querySelector('[data-validation-summary]')?.focus();
-});

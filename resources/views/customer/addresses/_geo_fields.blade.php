@@ -12,63 +12,58 @@
     }
 @endphp
 
-<div class="rounded-xl border border-border p-4 bg-canvas/40 space-y-4">
-    <div class="text-xs font-bold uppercase tracking-wider text-muted">Konum (Yalnızca Listeden)</div>
-    
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div>
-            <label class="block text-xs font-semibold text-muted mb-1">İl <span class="text-red-500">*</span></label>
-            <select id="geo-il" class="form-control text-xs">
+<div class="border rounded-3 p-3 mb-3 bg-light">
+    <div class="small fw-semibold text-muted mb-2">Konum (yalnızca listeden)</div>
+    <div class="row g-2">
+        <div class="col-md-6 mb-2">
+            <label class="form-label">İl</label>
+            <select id="geo-il" class="form-select">
                 <option value="">Seçiniz…</option>
             </select>
         </div>
-        <div>
-            <label class="block text-xs font-semibold text-muted mb-1">İlçe <span class="text-red-500">*</span></label>
-            <select id="geo-ilce" class="form-control text-xs" disabled>
+        <div class="col-md-6 mb-2">
+            <label class="form-label">İlçe</label>
+            <select id="geo-ilce" class="form-select" disabled>
                 <option value="">Önce il seçin</option>
             </select>
         </div>
     </div>
-
-    <div>
-        <label class="block text-xs font-semibold text-muted mb-1">Mahalle <span class="text-red-500">*</span></label>
-        <select id="geo-mahalle" class="form-control text-xs" disabled>
+    <div class="mb-2">
+        <label class="form-label">Mahalle</label>
+        <select id="geo-mahalle" class="form-select" disabled>
             <option value="">Önce ilçe seçin</option>
         </select>
     </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div>
-            <label class="block text-xs font-semibold text-muted mb-1">Cadde</label>
-            <input type="text" name="cadde" class="form-control text-xs" maxlength="120" value="{{ old('cadde', $addr?->cadde) }}" placeholder="İsteğe bağlı" autocomplete="address-line1">
+    <div class="row g-2 mb-2">
+        <div class="col-md-6">
+            <label class="form-label">Cadde</label>
+            <input type="text" name="cadde" class="form-control" maxlength="120" value="{{ old('cadde', $addr?->cadde) }}" placeholder="İsteğe bağlı" autocomplete="address-line1">
         </div>
-        <div>
-            <label class="block text-xs font-semibold text-muted mb-1">Sokak</label>
-            <input type="text" name="sokak" class="form-control text-xs" maxlength="120" value="{{ old('sokak', $addr?->sokak) }}" placeholder="İsteğe bağlı" autocomplete="address-line2">
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div>
-            <label class="block text-xs font-semibold text-muted mb-1">Bina No</label>
-            <input type="text" name="bina_no" class="form-control text-xs" maxlength="60" value="{{ old('bina_no', $addr?->bina_no) }}" placeholder="Örn. 12/A">
-        </div>
-        <div>
-            <label class="block text-xs font-semibold text-muted mb-1">İç Kapı No</label>
-            <input type="text" name="ic_kapi_no" class="form-control text-xs" maxlength="60" value="{{ old('ic_kapi_no', $addr?->ic_kapi_no) }}" placeholder="Örn. 5">
+        <div class="col-md-6">
+            <label class="form-label">Sokak</label>
+            <input type="text" name="sokak" class="form-control" maxlength="120" value="{{ old('sokak', $addr?->sokak) }}" placeholder="İsteğe bağlı" autocomplete="address-line2">
         </div>
     </div>
-
-    <div>
-        <label class="block text-xs font-semibold text-muted mb-1">Posta Kodu</label>
-        <div class="flex gap-2">
-            <input type="text" id="geo-postal" class="form-control text-xs max-w-[140px]" maxlength="5" inputmode="numeric" pattern="[0-9]{5}" placeholder="5 hane" autocomplete="postal-code">
-            <button type="button" class="btn btn-secondary text-xs px-3" id="geo-postal-btn" tabindex="-1">İl / İlçe Bul</button>
+    <div class="row g-2 mb-2">
+        <div class="col-md-6">
+            <label class="form-label">Bina No</label>
+            <input type="text" name="bina_no" class="form-control" maxlength="60" value="{{ old('bina_no', $addr?->bina_no) }}" placeholder="Örn. 12/A">
         </div>
-        <p class="text-[11px] text-muted mt-1">İlçe seçildiğinde posta kodu otomatik dolar veya posta kodunu yazınca il/ilçe eşleşir.</p>
+        <div class="col-md-6">
+            <label class="form-label">İç Kapı No</label>
+            <input type="text" name="ic_kapi_no" class="form-control" maxlength="60" value="{{ old('ic_kapi_no', $addr?->ic_kapi_no) }}" placeholder="Örn. 5">
+        </div>
     </div>
-
-    <div id="geo-ambiguous" class="p-3 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-950 d-none"></div>
+    <p class="small text-muted mb-2">Cadde ve sokak ayrı kolonlarda saklanır (BI / dışa aktarım). Ülke çapında hazır cadde/sokak listesi API’de olmadığı için burada metin girişi kullanılır.</p>
+    <div class="mb-2">
+        <label class="form-label">Posta kodu</label>
+        <div class="input-group">
+            <input type="text" id="geo-postal" class="form-control" maxlength="5" inputmode="numeric" pattern="[0-9]{5}" placeholder="5 hane" autocomplete="postal-code">
+            <button type="button" class="btn btn-outline-secondary" id="geo-postal-btn" tabindex="-1">İl / ilçe bul</button>
+        </div>
+        <p class="small text-muted mb-0 mt-1">İlçe seçildiğinde posta kodu otomatik dolar. Posta kodunu yazınca il/ilçe otomatik seçilir.</p>
+    </div>
+    <div id="geo-ambiguous" class="alert alert-warning py-2 small d-none"></div>
     <input type="hidden" name="turkiye_district_id" id="geo-district-id" value="{{ $initDistrict }}">
     <input type="hidden" name="turkiye_neighborhood_id" id="geo-neighborhood-id" value="{{ $initNeighborhood }}">
 </div>
@@ -105,7 +100,7 @@
             return;
         }
         elAmb.classList.remove('d-none');
-        elAmb.innerHTML = '<div class="font-semibold mb-1">' + msg + '</div>' + (html || '');
+        elAmb.innerHTML = '<div class="fw-semibold mb-1">' + msg + '</div>' + (html || '');
     }
 
     async function loadProvinces() {
@@ -237,9 +232,9 @@
                 await loadDistricts(m[0].province_id, m[0].district_id, null);
                 return;
             }
-            let html = '<div class="space-y-1 mt-2">';
+            let html = '<div class="d-grid gap-1">';
             m.forEach(function (row) {
-                html += '<button type="button" class="btn btn-secondary w-full text-xs text-left justify-start geo-pick" data-pid="' + row.province_id + '" data-did="' + row.district_id + '">' +
+                html += '<button type="button" class="btn btn-sm btn-outline-dark text-start geo-pick" data-pid="' + row.province_id + '" data-did="' + row.district_id + '">' +
                     row.province_name + ' — ' + row.district_name + '</button>';
             });
             html += '</div>';

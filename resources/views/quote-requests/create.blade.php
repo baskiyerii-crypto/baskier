@@ -28,14 +28,14 @@
         default => __('home.path_quote_eyebrow'),
     };
 @endphp
-<div class="by-container py-8 md:py-12">
-    <div class="mx-auto max-w-4xl">
-        <div class="by-card p-6 md:p-8 bg-surface">
-            <p class="text-xs font-bold uppercase tracking-wider text-muted">{{ $eyebrow }}</p>
+<div class="by-container py-10">
+    <div class="mx-auto max-w-300">
+        <div class="by-card by-gradient-border p-6 md:p-8">
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ $eyebrow }}</p>
             <div class="mt-2 flex flex-wrap items-end justify-between gap-4">
                 <div>
-                    <h1 class="font-heading text-2xl md:text-3xl font-bold tracking-tight text-ink">{{ $heading }}</h1>
-                    <p class="mt-2 text-sm text-muted">{{ $sub }}</p>
+                    <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">{{ $heading }}</h1>
+                    <p class="mt-2 text-sm text-slate-600">{{ $sub }}</p>
                 </div>
             </div>
         </div>
@@ -56,135 +56,132 @@
             <div class="mt-4 by-card border-emerald-200 bg-emerald-50/70 p-5 text-sm text-emerald-900">{{ session('success') }}</div>
         @endif
 
-        <div class="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-            <div class="by-card p-6 md:p-8 bg-surface">
+        <div class="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+            <div class="by-card p-6 md:p-8">
                 <form method="POST" action="{{ route('quote-requests.store') }}" class="space-y-6" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="request_type" value="{{ $type }}">
                 @if($type === 'freelancer')
-                    <div class="rounded-xl border border-border bg-canvas p-4 text-sm text-ink">
+                    <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-4 text-sm text-indigo-900">
                         {{ __('home.quote_form_freelancer_banner') }}
                         <div class="mt-2">
-                            <a href="{{ route('freelancer-jobs.create') }}" class="font-semibold text-cta underline">{{ __('home.quote_prefer_job_listing') }}</a>
+                            <a href="{{ route('freelancer-jobs.create') }}" class="font-semibold underline">{{ __('home.quote_prefer_job_listing') }}</a>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <input type="checkbox" name="show_customer_profile" value="1" class="h-4 w-4 rounded border-border text-cta focus:ring-cta" id="show_profile" @checked(old('show_customer_profile'))>
-                        <label for="show_profile" class="text-sm font-medium text-ink cursor-pointer">{{ __('home.quote_show_profile') }}</label>
+                    <div class="form-check">
+                        <input type="checkbox" name="show_customer_profile" value="1" class="form-check-input" id="show_profile" @checked(old('show_customer_profile'))>
+                        <label for="show_profile" class="form-check-label text-sm">{{ __('home.quote_show_profile') }}</label>
                     </div>
                 @elseif($type === 'tabela')
-                    <div class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
+                    <div class="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
                         {{ __('home.quote_form_tabela_banner') }}
                     </div>
                 @endif
 
-                <div class="rounded-xl border border-border bg-canvas p-5">
-                    <div class="flex items-center justify-between gap-4">
+                <div class="by-surface-indigo by-accent-bar">
+                    <div class="flex items-start justify-between gap-4">
                         <div>
-                            <p class="text-xs font-bold uppercase tracking-wider text-ink">{{ __('home.quote_items') }}</p>
-                            <p class="mt-0.5 text-xs text-muted">{{ __('home.quote_items_help') }}</p>
+                            <p class="text-xs font-extrabold uppercase tracking-wider text-indigo-900">{{ __('home.quote_items') }}</p>
+                            <p class="mt-1 text-sm text-slate-700">{{ __('home.quote_items_help') }}</p>
                         </div>
-                        <button type="button" class="btn btn-secondary text-xs py-2 px-3" id="add-item" @if($categories->isEmpty()) disabled @endif>+ {{ __('home.quote_add_item') }}</button>
+                        <button type="button" class="by-btn-primary" id="add-item" @if($categories->isEmpty()) disabled @endif>+ {{ __('home.quote_add_item') }}</button>
                     </div>
 
                     <div class="mt-4 space-y-4" id="items"></div>
 
                     <template id="item-template">
-                        <div class="by-card p-5 bg-surface border-border">
+                        <div class="by-card p-5 bg-white border-indigo-200/60">
                             <div class="flex flex-wrap items-center justify-between gap-3">
                                 <div class="min-w-0">
-                                    <p class="text-sm font-bold text-ink mb-0">{{ __('home.quote_item') }} <span data-item-number></span></p>
+                                    <p class="text-sm font-bold text-slate-900 mb-0">{{ __('home.quote_item') }} <span data-item-number></span></p>
                                 </div>
-                                <button type="button" class="btn btn-secondary text-xs py-1.5 px-3 text-red-600 hover:bg-red-50 hover:border-red-200" data-remove>{{ __('home.quote_remove') }}</button>
+                                <button type="button" class="by-btn-secondary px-4 py-2.5" data-remove>{{ __('home.quote_remove') }}</button>
                             </div>
 
                             <div class="mt-4 grid gap-4 md:grid-cols-2">
                                 <div>
-                                    <label class="block text-xs font-semibold text-muted mb-1">{{ __('ui.category') }}</label>
-                                    <select class="form-control" data-category required></select>
+                                    <label class="text-xs font-semibold text-slate-600">{{ __('ui.category') }}</label>
+                                    <select class="by-input mt-1" data-category required></select>
                                 </div>
                                 @if($type === 'physical_quote')
                                 <div>
-                                    <label class="block text-xs font-semibold text-muted mb-1">{{ __('ui.products') }} ({{ __('home.optional') }})</label>
-                                    <select class="form-control" data-product>
+                                    <label class="text-xs font-semibold text-slate-600">{{ __('ui.products') }} ({{ __('home.optional') }})</label>
+                                    <select class="by-input mt-1" data-product>
                                         <option value="">{{ __('home.select') }}</option>
                                     </select>
                                 </div>
                                 @else
                                 <div class="hidden"><select data-product><option value=""></option></select></div>
                                 @endif
-                                <div class="md:col-span-2 grid gap-4 sm:grid-cols-3">
+                                <div class="md:col-span-2 grid gap-4 md:grid-cols-3">
                                     <div>
-                                        <label class="block text-xs font-semibold text-muted mb-1">{{ __('home.qty') }}</label>
-                                        <input type="number" min="1" step="1" class="form-control" data-quantity>
+                                        <label class="text-xs font-semibold text-slate-600">{{ __('home.qty') }}</label>
+                                        <input type="number" min="1" step="1" class="by-input mt-1" data-quantity>
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-semibold text-muted mb-1">{{ __('home.unit') }}</label>
-                                        <input type="text" class="form-control" data-unit placeholder="adet, m², rulo...">
+                                        <label class="text-xs font-semibold text-slate-600">{{ __('home.unit') }}</label>
+                                        <input type="text" class="by-input mt-1" data-unit>
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-semibold text-muted mb-1">{{ __('home.dimension') }}</label>
-                                        <input type="text" class="form-control" data-dimension placeholder="Örn: 50x70 cm">
+                                        <label class="text-xs font-semibold text-slate-600">{{ __('home.dimension') }}</label>
+                                        <input type="text" class="by-input mt-1" data-dimension>
                                     </div>
                                 </div>
                                 <div class="md:col-span-2">
-                                    <label class="block text-xs font-semibold text-muted mb-1">{{ __('home.spec') }}</label>
-                                    <textarea class="form-control min-h-[80px]" data-spec placeholder="Kağıt gramajı, baskı yönü, laminasyon veya özel detaylar..."></textarea>
+                                    <label class="text-xs font-semibold text-slate-600">{{ __('home.spec') }}</label>
+                                    <textarea class="by-input mt-1 min-h-22.5" data-spec></textarea>
                                 </div>
                                 <div class="md:col-span-2">
-                                    <label class="block text-xs font-semibold text-muted mb-1">{{ __('home.files') }}</label>
-                                    <input type="file" class="form-control" data-files multiple>
+                                    <label class="text-xs font-semibold text-slate-600">{{ __('home.files') }}</label>
+                                    <input type="file" class="by-input mt-1" data-files multiple>
                                 </div>
                             </div>
                         </div>
                     </template>
                 </div>
 
-                <div class="rounded-xl border border-border bg-canvas p-5">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-ink mb-1">{{ __('home.description') }}</label>
-                    <textarea name="description" class="form-control min-h-[100px]" rows="4" placeholder="Talebinize dair genel açıklamalar ve özel istekler...">{{ old('description') }}</textarea>
+                <div class="by-surface-amber by-accent-bar">
+                    <p class="text-xs font-extrabold uppercase tracking-wider text-amber-900">{{ __('home.description') }}</p>
+                    <textarea name="description" class="by-input mt-1 min-h-30" rows="4">{{ old('description') }}</textarea>
                 </div>
 
-                <div class="rounded-xl border border-border bg-canvas p-5">
-                    <p class="text-xs font-bold uppercase tracking-wider text-ink mb-3">{{ __('home.delivery_contact') }}</p>
-                    <div class="grid gap-4 md:grid-cols-2">
+                <div class="by-surface-cyan by-accent-bar">
+                    <p class="text-xs font-extrabold uppercase tracking-wider text-cyan-900">{{ __('home.delivery_contact') }}</p>
+                    <div class="mt-4 grid gap-4 md:grid-cols-2">
                         <div>
-                            <label class="block text-xs font-semibold text-muted mb-1">{{ __('panel.city') }}</label>
-                            <input type="text" name="city" class="form-control" value="{{ old('city') }}">
+                            <label class="text-xs font-semibold text-slate-600">{{ __('panel.city') }}</label>
+                            <input type="text" name="city" class="by-input mt-1" value="{{ old('city') }}">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-muted mb-1">{{ __('panel.district') }}</label>
-                            <input type="text" name="district" class="form-control" value="{{ old('district') }}">
+                            <label class="text-xs font-semibold text-slate-600">{{ __('panel.district') }}</label>
+                            <input type="text" name="district" class="by-input mt-1" value="{{ old('district') }}">
                         </div>
                         <div class="md:col-span-2">
-                            <label class="block text-xs font-semibold text-muted mb-1">{{ __('panel.address') }}</label>
-                            <input type="text" name="address" class="form-control" value="{{ old('address') }}">
+                            <label class="text-xs font-semibold text-slate-600">{{ __('panel.address') }}</label>
+                            <input type="text" name="address" class="by-input mt-1" value="{{ old('address') }}">
                         </div>
                         <div class="md:col-span-2">
-                            <label class="block text-xs font-semibold text-muted mb-1">{{ __('panel.phone') }}</label>
-                            <input type="text" name="contact_phone" class="form-control" value="{{ old('contact_phone') }}">
+                            <label class="text-xs font-semibold text-slate-600">{{ __('panel.phone') }}</label>
+                            <input type="text" name="contact_phone" class="by-input mt-1" value="{{ old('contact_phone') }}">
                         </div>
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-2">
-                    <button type="submit" class="btn btn-cta" @if($categories->isEmpty()) disabled @endif>
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <button type="submit" class="by-btn-cta" @if($categories->isEmpty()) disabled @endif>
                         {{ auth()->check() ? __('home.submit') : __('home.continue_auth') }}
                     </button>
-                    <a href="{{ route('home') }}" class="btn btn-secondary">{{ __('panel.cancel') }}</a>
+                    <a href="{{ route('home') }}" class="by-btn-secondary">{{ __('panel.cancel') }}</a>
                 </div>
                 </form>
             </div>
 
             <aside class="space-y-4 lg:sticky lg:top-24 h-fit">
-                <div class="by-card p-5 bg-surface">
-                    <p class="text-xs font-bold uppercase tracking-wider text-muted">{{ __('home.summary') }}</p>
-                    <div class="mt-3 flex items-center justify-between border-t border-border pt-3">
-                        <p class="text-sm font-semibold text-ink mb-0">{{ __('home.items_count') }}</p>
-                        <p class="text-base font-bold text-ink mb-0" id="items-count">0</p>
-                    </div>
-                    <div class="mt-4 p-3 rounded-lg bg-canvas text-xs text-muted leading-relaxed">
-                        Talebiniz uzman üreticilere iletilecek ve gelen teklifler arasından en uygununu seçebileceksiniz.
+                <div class="by-card p-5 bg-white">
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('home.summary') }}</p>
+                    <div class="mt-3 flex items-center justify-between">
+                        <p class="text-sm font-semibold text-slate-700 mb-0">{{ __('home.items_count') }}</p>
+                        <p class="text-sm font-extrabold text-slate-900 mb-0" id="items-count">0</p>
                     </div>
                 </div>
             </aside>

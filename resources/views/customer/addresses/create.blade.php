@@ -1,150 +1,120 @@
 @extends('layouts.account')
 
-@section('title', 'Yeni Adres Ekle - BaskıYeri')
+@section('title', 'Yeni adres')
 
 @section('content')
-<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-    <div>
-        <h1 class="font-heading text-2xl font-bold tracking-tight text-ink">Yeni Adres Ekle</h1>
-        <p class="text-xs text-muted mt-0.5">Sipariş teslimatı ve faturalandırma için yeni adres tanımlayın</p>
-    </div>
-    <div>
-        <a href="{{ route('account.adresler.index') }}" class="btn btn-secondary text-xs">
-            ← Adreslerime Dön
-        </a>
-    </div>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h5 mb-0">Yeni adres</h1>
+    <a href="{{ route('account.adresler.index') }}" class="btn btn-outline-secondary btn-sm rounded-pill">Adreslerim</a>
 </div>
 
 @if(session('success'))
-    <x-alert type="success" class="mb-6">{{ session('success') }}</x-alert>
+    <div class="alert alert-success">{{ session('success') }}</div>
 @endif
 
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-    <div class="lg:col-span-7">
-        <form action="{{ route('account.adresler.store') }}" method="post" class="by-card p-6 bg-surface border border-border space-y-4">
+<div class="row g-3">
+    <div class="col-lg-7">
+        <form action="{{ route('account.adresler.store') }}" method="post" class="bg-white rounded-4 shadow-sm p-4">
             @csrf
-            <div>
-                <label class="block text-xs font-semibold text-muted mb-1">Adres Başlığı</label>
-                <input type="text" name="label" class="form-control text-xs" value="{{ old('label', 'Ev') }}" placeholder="Ev, Ofis, Atölye...">
+            <div class="mb-3">
+                <label class="form-label">Adres adı</label>
+                <input type="text" name="label" class="form-control" value="{{ old('label', 'Ev') }}" placeholder="Ev, İş, Ofis...">
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-xs font-semibold text-muted mb-1">Ad Soyad <span class="text-red-500">*</span></label>
-                    <input type="text" name="full_name" class="form-control text-xs" value="{{ old('full_name') }}" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-muted mb-1">Telefon <span class="text-red-500">*</span></label>
-                    <input type="text" name="phone" class="form-control text-xs" value="{{ old('phone') }}" required>
-                </div>
+            <div class="mb-3">
+                <label class="form-label">Ad Soyad</label>
+                <input type="text" name="full_name" class="form-control" value="{{ old('full_name') }}" required>
             </div>
-
+            <div class="mb-3">
+                <label class="form-label">Telefon</label>
+                <input type="text" name="phone" class="form-control" value="{{ old('phone') }}" required>
+            </div>
             @include('customer.addresses._geo_fields', ['address' => null])
-
-            <div>
-                <label class="block text-xs font-semibold text-muted mb-1">Adres Tarifi / Ek Bilgi</label>
-                <input type="text" name="line1" class="form-control text-xs" value="{{ old('line1') }}" placeholder="Apartman adı, blok, kat, zil vs.">
+            <div class="mb-3">
+                <label class="form-label">Adres tarifi (isteğe bağlı)</label>
+                <input type="text" name="line1" class="form-control" value="{{ old('line1') }}" placeholder="Örn. apartman adı, kat, tarif">
             </div>
-
-            <div class="space-y-2 pt-2 border-t border-border">
-                <label class="flex items-center gap-2 text-xs text-ink cursor-pointer">
-                    <input class="h-4 w-4 rounded border-border text-cta focus:ring-cta" type="checkbox" name="is_default" id="isd" value="1" @checked(old('is_default'))>
-                    <span>Varsayılan teslimat adresi olarak ayarla</span>
-                </label>
-                <label class="flex items-center gap-2 text-xs text-ink cursor-pointer">
-                    <input class="h-4 w-4 rounded border-border text-cta focus:ring-cta" type="checkbox" name="is_billing_default" id="isbd" value="1" @checked(old('is_billing_default', true))>
-                    <span>Varsayılan fatura adresi olarak ayarla</span>
-                </label>
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" name="is_default" id="isd" value="1" @checked(old('is_default'))>
+                <label class="form-check-label" for="isd">Varsayılan adres</label>
             </div>
-
-            <div class="rounded-xl border border-border p-4 bg-canvas/40 space-y-3">
-                <label class="flex items-center gap-2 text-xs font-bold text-ink cursor-pointer">
-                    <input class="h-4 w-4 rounded border-border text-cta focus:ring-cta" type="checkbox" name="billing_same_as_address" id="billingSameAsAddress" value="1" @checked(old('billing_same_as_address', true))>
-                    <span>Fatura adresi teslimat adresi ile aynı olsun</span>
-                </label>
-
-                <div id="billingFieldsBox" class="{{ old('billing_same_as_address', true) ? 'd-none' : '' }} space-y-3 pt-3 border-t border-border">
-                    <div>
-                        <label class="block text-xs font-semibold text-muted mb-1">Fatura Tipi</label>
-                        <select class="form-control text-xs" name="invoice_type" id="invoiceType">
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" name="is_billing_default" id="isbd" value="1" @checked(old('is_billing_default', true))>
+                <label class="form-check-label" for="isbd">Varsayılan fatura adresi</label>
+            </div>
+            <div class="border rounded-3 p-3 mb-3">
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="billing_same_as_address" id="billingSameAsAddress" value="1" @checked(old('billing_same_as_address', true))>
+                    <label class="form-check-label fw-semibold" for="billingSameAsAddress">Fatura adresi aynı olsun</label>
+                </div>
+                <div id="billingFieldsBox" class="{{ old('billing_same_as_address', true) ? 'd-none' : '' }}">
+                    <div class="mb-2">
+                        <label class="form-label">Fatura tipi</label>
+                        <select class="form-select" name="invoice_type" id="invoiceType">
                             <option value="individual" @selected(old('invoice_type', $billingProfile->invoice_type ?? 'corporate') === 'individual')>Bireysel</option>
                             <option value="corporate" @selected(old('invoice_type', $billingProfile->invoice_type ?? 'corporate') === 'corporate')>Kurumsal</option>
                         </select>
                     </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-semibold text-muted mb-1">Fatura Ad Soyad</label>
-                            <input type="text" name="invoice_full_name" class="form-control text-xs" value="{{ old('invoice_full_name', $billingProfile->full_name ?? auth()->user()->name) }}">
+                    <div class="row g-2 mb-2">
+                        <div class="col-md-6">
+                            <label class="form-label">Fatura Ad Soyad</label>
+                            <input type="text" name="invoice_full_name" class="form-control" value="{{ old('invoice_full_name', $billingProfile->full_name ?? auth()->user()->name) }}">
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-muted mb-1">Fatura Telefon</label>
-                            <input type="text" name="invoice_phone" class="form-control text-xs" value="{{ old('invoice_phone', $billingProfile->phone ?? '') }}">
+                        <div class="col-md-6">
+                            <label class="form-label">Fatura Telefon</label>
+                            <input type="text" name="invoice_phone" class="form-control" value="{{ old('invoice_phone', $billingProfile->phone ?? '') }}">
                         </div>
                     </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-muted mb-1">Fatura E-posta</label>
-                        <input type="email" name="invoice_email" class="form-control text-xs" value="{{ old('invoice_email', $billingProfile->email ?? auth()->user()->email) }}">
+                    <div class="mb-2">
+                        <label class="form-label">Fatura E-posta</label>
+                        <input type="email" name="invoice_email" class="form-control" value="{{ old('invoice_email', $billingProfile->email ?? auth()->user()->email) }}">
                     </div>
-
-                    <div class="individual-only {{ old('invoice_type', $billingProfile->invoice_type ?? 'corporate') === 'individual' ? '' : 'd-none' }}">
-                        <label class="block text-xs font-semibold text-muted mb-1">TCKN (İsteğe bağlı)</label>
-                        <input type="text" name="invoice_identity_number" class="form-control text-xs" maxlength="16" value="{{ old('invoice_identity_number', $billingProfile->identity_number ?? '') }}">
+                    <div class="individual-only mb-2 {{ old('invoice_type', $billingProfile->invoice_type ?? 'corporate') === 'individual' ? '' : 'd-none' }}">
+                        <label class="form-label">TCKN (isteğe bağlı)</label>
+                        <input type="text" name="invoice_identity_number" class="form-control" maxlength="16" value="{{ old('invoice_identity_number', $billingProfile->identity_number ?? '') }}">
                     </div>
-
-                    <div class="corporate-only space-y-3 {{ old('invoice_type', $billingProfile->invoice_type ?? 'corporate') === 'corporate' ? '' : 'd-none' }}">
-                        <div>
-                            <label class="block text-xs font-semibold text-muted mb-1">Şirket Ünvanı</label>
-                            <input type="text" name="invoice_company_name" class="form-control text-xs" value="{{ old('invoice_company_name', $billingProfile->company_name ?? '') }}">
+                    <div class="corporate-only {{ old('invoice_type', $billingProfile->invoice_type ?? 'corporate') === 'corporate' ? '' : 'd-none' }}">
+                        <div class="mb-2">
+                            <label class="form-label">Şirket ismi</label>
+                            <input type="text" name="invoice_company_name" class="form-control" value="{{ old('invoice_company_name', $billingProfile->company_name ?? '') }}">
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-muted mb-1">Şirket Adresi</label>
-                            <input type="text" name="invoice_company_address" class="form-control text-xs" value="{{ old('invoice_company_address', $billingProfile->company_address ?? '') }}">
+                        <div class="mb-2">
+                            <label class="form-label">Şirket adresi</label>
+                            <input type="text" name="invoice_company_address" class="form-control" value="{{ old('invoice_company_address', $billingProfile->company_address ?? '') }}">
                         </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-xs font-semibold text-muted mb-1">Vergi No</label>
-                                <input type="text" name="invoice_tax_number" class="form-control text-xs" maxlength="16" value="{{ old('invoice_tax_number', $billingProfile->tax_number ?? '') }}">
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label class="form-label">Vergi No</label>
+                                <input type="text" name="invoice_tax_number" class="form-control" maxlength="16" value="{{ old('invoice_tax_number', $billingProfile->tax_number ?? '') }}">
                             </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-muted mb-1">Vergi Dairesi</label>
-                                <input type="text" name="invoice_tax_office" class="form-control text-xs" value="{{ old('invoice_tax_office', $billingProfile->tax_office ?? '') }}">
+                            <div class="col-md-6">
+                                <label class="form-label">Vergi Dairesi</label>
+                                <input type="text" name="invoice_tax_office" class="form-control" value="{{ old('invoice_tax_office', $billingProfile->tax_office ?? '') }}">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div class="pt-2">
-                <button type="submit" class="btn btn-cta text-xs py-2 px-6">Adresi Kaydet</button>
-            </div>
+            <button type="submit" class="btn btn-warning rounded-pill">Kaydet</button>
         </form>
     </div>
-
-    <div class="lg:col-span-5">
-        <div class="by-card p-5 bg-surface border border-border">
-            <div class="flex justify-between items-center mb-3 pb-2 border-b border-border">
-                <h2 class="font-heading text-sm font-bold text-ink">Mevcut Kayıtlı Adresler</h2>
-                <span class="text-xs text-muted">{{ $savedAddresses->count() }} adet</span>
+    <div class="col-lg-5">
+        <div class="bg-white rounded-4 shadow-sm p-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h2 class="h6 mb-0">Kayıtlı adresler</h2>
+                <span class="small text-muted">{{ $savedAddresses->count() }} adet</span>
             </div>
-            <div class="space-y-2">
-                @forelse($savedAddresses as $item)
-                    <div class="p-3 rounded-lg border border-border bg-canvas/40 text-xs">
-                        <div class="flex items-center justify-between mb-1">
-                            <span class="font-bold text-ink">{{ $item->label ?: 'Adres' }}</span>
-                            @if($item->is_default)<x-badge variant="neutral">Varsayılan</x-badge>@endif
-                        </div>
-                        <div class="text-muted">{{ $item->full_name }}</div>
-                        <div class="text-muted mt-0.5">{{ $item->formatted }}</div>
-                    </div>
-                @empty
-                    <p class="text-xs text-muted text-center py-4">Henüz kayıtlı adres bulunmuyor.</p>
-                @endforelse
-            </div>
+            @forelse($savedAddresses as $item)
+                <div class="border rounded-3 p-2 mb-2">
+                    <div class="fw-semibold">{{ $item->label ?: 'Adres' }} @if($item->is_default)<span class="badge bg-secondary">Varsayılan</span>@endif</div>
+                    <div class="small text-muted">{{ $item->full_name }}</div>
+                    <div class="small text-muted">{{ $item->formatted }}</div>
+                </div>
+            @empty
+                <p class="small text-muted mb-0">Henüz kayıtlı adres yok.</p>
+            @endforelse
         </div>
     </div>
 </div>
-
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const sameBox = document.getElementById('billingSameAsAddress');

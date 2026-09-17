@@ -1,312 +1,230 @@
 @extends('layouts.app')
 
-@php
-    $crumbs = [
-        ['title' => 'Ürünler', 'url' => route('products.index')],
-    ];
-    if (isset($categoryTrail)) {
-        foreach($categoryTrail as $trail) {
-            $crumbs[] = ['title' => $trail->name, 'url' => route('products.index', ['category' => $trail->slug ?? $trail->id])];
-        }
-    }
-    $crumbs[] = ['title' => $product->localizedName(), 'url' => ''];
-
-    $reviewAvg = $productReviewStats->avg_rating ?? null;
-    $reviewCount = (int) ($productReviewStats->reviews_count ?? 0);
-    $isQuote = $product->isQuoteBased();
-@endphp
-
-@section('title', $product->localizedName())
-@section('meta_description', \App\Support\SeoHelper::description($product->short_description ?? $product->description))
-@section('canonical', route('products.show', $product->slug))
-
-@push('head')
-<script type="application/ld+json">
-{!! json_encode(\App\Support\SeoHelper::productJsonLd($product), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
-</script>
-@endpush
+@section('title', $product->localizedName() . ' - BaskıYeri Pazaryeri')
 
 @section('content')
     <div class="by-container py-6">
-        <x-breadcrumb :items="$crumbs" />
+        <nav class="mb-5 text-sm text-slate-500">
+            <a href="{{ route('home') }}" class="hover:text-slate-900">Anasayfa</a>
+            <span class="mx-2">/</span>
+            <a href="{{ route('products.index') }}" class="hover:text-slate-900">Ürünler</a>
+            @foreach($categoryTrail as $trail)
+                <span class="mx-2">/</span>
+                <a href="{{ route('products.index', ['category_id' => $trail->id]) }}" class="hover:text-slate-900">{{ $trail->name }}</a>
+            @endforeach
+            <span class="mx-2">/</span>
+            <span class="text-slate-700">{{ $product->localizedName() }}</span>
+        </nav>
 
-        {{-- Main Product Showcase Grid --}}
-        <div class="grid gap-8 lg:grid-cols-12 items-start mt-4">
-            {{-- Product Visual (7 cols on lg) --}}
-            <div class="lg:col-span-7">
-                <div class="rounded-2xl border border-[#DEDAD2] bg-white p-2 shadow-xs overflow-hidden">
-                    <div class="relative aspect-4/3 sm:aspect-16/10 bg-[#F7F5F0] rounded-xl overflow-hidden flex items-center justify-center">
-                        @if($product->main_image)
-                            <img 
-                                src="{{ asset('storage/'.$product->main_image) }}" 
-                                alt="{{ $product->localizedName() }}" 
-                                width="800"
-                                height="600"
-                                fetchpriority="high"
-                                class="h-full w-full object-cover"
-                            />
-                        @else
-                            <img 
-                                src="{{ asset('images/placeholder-product.svg') }}" 
-                                alt="{{ $product->localizedName() }}" 
-                                width="800"
-                                height="600"
-                                fetchpriority="high"
-                                class="h-full w-full object-contain p-8"
-                            />
-                        @endif
-
-                        @if($product->stock <= 0 && !$isQuote)
-                            <div class="absolute top-4 left-4 rounded-md bg-[#182023]/90 px-3 py-1 text-xs font-bold text-white backdrop-blur-xs">
-                                Stok Tükendi
-                            </div>
-                        @elseif($isQuote)
-                            <div class="absolute top-4 left-4 rounded-md bg-[#C2410C] px-3 py-1 text-xs font-bold text-white shadow-xs">
-                                Teklif Usulü Üretim
-                            </div>
-                        @endif
-                    </div>
-                </div>
-
-                {{-- Product Descriptions Tab / Body --}}
-                <div class="mt-8 rounded-xl border border-[#DEDAD2] bg-white p-6 shadow-xs">
-                    <h2 class="text-base font-bold text-[#182023] border-b border-[#DEDAD2] pb-3 mb-4">
-                        Ürün Açıklaması ve Özellikleri
-                    </h2>
-
-                    @if($product->localized('short_description'))
-                        <p class="text-sm font-medium text-[#182023] leading-relaxed mb-4">
-                            {{ $product->localized('short_description') }}
-                        </p>
-                    @endif
-
-                    @if($product->localized('description'))
-                        <div class="prose prose-sm max-w-none text-sm text-[#596166] leading-relaxed whitespace-pre-wrap">
-                            {{ $product->localized('description') }}
-                        </div>
+        <div class="grid gap-6 lg:grid-cols-2">
+            <div class="by-card overflow-hidden">
+                <div class="aspect-4/3 bg-slate-100 flex items-center justify-center">
+                    @if($product->main_image)
+                        <img src="{{ asset('storage/'.$product->main_image) }}" alt="{{ $product->name }}" class="h-full w-full object-cover">
                     @else
-                        <p class="text-xs text-[#596166] italic">Bu ürün için ayrıntılı açıklama girilmemiş.</p>
+                        <div class="h-full w-full flex flex-col items-center justify-center text-slate-400 bg-slate-100/80 p-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mb-2 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                            <span class="text-sm font-medium text-slate-500">Görsel hazırlanıyor</span>
+                        </div>
                     @endif
                 </div>
             </div>
 
-            {{-- Purchase & Vendor Card (5 cols on lg, sticky) --}}
-            <div class="lg:col-span-5 space-y-6 lg:sticky lg:top-24">
-                <div class="rounded-xl border border-[#DEDAD2] bg-white p-6 shadow-xs">
-                    {{-- Category & Title --}}
-                    <div class="mb-2">
-                        <span class="text-xs font-bold uppercase tracking-wider text-[#596166]">
-                            {{ $product->category?->localizedName() ?? 'Genel Kategori' }}
+            <div class="space-y-6">
+                <div class="by-card p-6">
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ $product->category?->name ?? 'Kategori' }}</p>
+                    <h1 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">{{ $product->localizedName() }}</h1>
+                    <div class="mt-4 flex flex-wrap items-center gap-3">
+                        <span class="rounded-full bg-orange-50 px-4 py-2 text-xl font-extrabold text-orange-900" id="product-display-price" data-base-price="{{ (float) $product->price }}">
+                            ₺{{ number_format($product->price, 2, ',', '.') }}
+                        </span>
+                        <span id="product-display-stock" class="by-badge {{ $product->stock > 0 ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-slate-200 bg-slate-50 text-slate-600' }}" data-base-stock="{{ (int) $product->stock }}">
+                            {{ $product->stock > 0 ? 'Stokta (' . $product->stock . ' adet)' : 'Stok yok' }}
                         </span>
                     </div>
 
-                    <h1 class="text-2xl sm:text-3xl font-extrabold text-[#182023] tracking-tight leading-snug">
-                        {{ $product->localizedName() }}
-                    </h1>
-
-                    {{-- Review Stars Summary --}}
-                    @if($reviewCount > 0)
-                        <div class="mt-3 flex items-center gap-2">
-                            <div class="flex text-amber-500 text-sm">
-                                @for($i = 1; $i <= 5; $i++)
-                                    <span>{{ $i <= (int) round((float) $reviewAvg) ? '★' : '☆' }}</span>
-                                @endfor
-                            </div>
-                            <span class="text-xs font-bold text-[#182023]">{{ number_format((float) $reviewAvg, 1, ',', '.') }}</span>
-                            <span class="text-xs text-[#596166]">({{ $reviewCount }} değerlendirme)</span>
-                        </div>
-                    @endif
-
-                    {{-- Price & Stock Row --}}
-                    <div class="mt-5 pt-4 border-t border-[#DEDAD2] flex flex-wrap items-baseline justify-between gap-3">
-                        @if($isQuote)
-                            <div>
-                                <span class="text-xl sm:text-2xl font-extrabold text-[#182023]">Teklif Alınız</span>
-                                @if($product->price_min && $product->price_max)
-                                    <p class="text-xs text-[#596166] mt-0.5">
-                                        Tahmini: ₺{{ number_format((float)$product->price_min, 0, ',', '.') }} - ₺{{ number_format((float)$product->price_max, 0, ',', '.') }}
-                                    </p>
-                                @endif
-                            </div>
-                        @else
-                            <div class="flex items-baseline gap-2">
-                                <span class="text-2xl sm:text-3xl font-extrabold text-[#182023]" id="product-display-price" data-base-price="{{ (float) $product->price }}">
-                                    ₺{{ number_format($product->price, 2, ',', '.') }}
-                                </span>
-                                <span class="text-xs text-[#596166] font-medium">+KDV</span>
-                            </div>
-
-                            <span id="product-display-stock" class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold {{ $product->stock > 0 ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-slate-100 text-slate-500 border border-slate-200' }}" data-base-stock="{{ (int) $product->stock }}">
-                                {{ $product->stock > 0 ? 'Stokta (' . $product->stock . ' adet)' : 'Tükendi' }}
-                            </span>
-                        @endif
-                    </div>
-
-                    {{-- Vendor Row with Trust Badge --}}
                     @if($product->vendor)
-                        <div class="mt-5 rounded-lg border border-[#DEDAD2] bg-[#F7F5F0]/60 p-3.5 flex items-center justify-between gap-3">
-                            <div class="min-w-0">
-                                <p class="text-[11px] font-semibold text-[#596166]">Üretici & Satıcı</p>
-                                <div class="flex items-center gap-1.5 mt-0.5">
-                                    <a href="{{ route('vendors.show', $product->vendor->slug) }}" class="text-sm font-bold text-[#182023] hover:text-[#C2410C] truncate">
+                        <div class="mt-5 rounded-2xl border border-slate-200 bg-white/70 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Satıcı</p>
+                            <div class="mt-2 flex flex-wrap items-center justify-between gap-3">
+                                <div class="flex items-center gap-2">
+                                    <a href="{{ route('vendors.show', $product->vendor->slug) }}" class="text-sm font-semibold text-slate-900 hover:underline">
                                         {{ $product->vendor->name }}
                                     </a>
                                     <x-trust-badge :vendor="$product->vendor" size="sm" />
                                 </div>
+                                <a href="{{ route('vendors.show', $product->vendor->slug) }}" class="by-btn-secondary">Profili gör</a>
                             </div>
-                            <a href="{{ route('vendors.show', $product->vendor->slug) }}" class="shrink-0 text-xs font-semibold text-[#596166] hover:text-[#182023]">
-                                Profil →
-                            </a>
                         </div>
                     @endif
 
-                    {{-- In-Cart Notice --}}
+                    @if($product->localized('short_description'))
+                        <p class="mt-5 text-sm leading-relaxed text-slate-700">{{ $product->localized('short_description') }}</p>
+                    @endif
+                    @if($product->localized('description'))
+                        <div class="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('ui.description') }}</p>
+                            <p class="mt-2 whitespace-pre-wrap text-sm text-slate-700">{{ $product->localized('description') }}</p>
+                        </div>
+                    @endif
+                </div>
+
+                <div class="by-card p-6">
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Satın alma</p>
                     @auth
                         @if($inCartQuantity > 0)
-                            <div class="mt-4 rounded-lg border border-emerald-200 bg-emerald-50/80 p-3 text-xs text-emerald-900 flex items-center justify-between">
-                                <span>Sepetinizde bu üründen <strong>{{ $inCartQuantity }} adet</strong> bulunuyor.</span>
-                                <a href="{{ route('cart.index') }}" class="font-bold underline ml-2">Sepete Git</a>
+                            <div class="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+                                <div class="flex flex-wrap items-center justify-between gap-3">
+                                    <p class="text-sm font-semibold text-emerald-900">Sepette {{ $inCartQuantity }} adet var.</p>
+                                    <a href="{{ route('cart.index') }}" class="by-btn-secondary border-emerald-200 bg-white/70">Sepete git</a>
+                                </div>
                             </div>
                         @endif
-                    @endauth
 
-                    {{-- Purchase Form / Quote Action --}}
-                    <div class="mt-6 pt-4 border-t border-[#DEDAD2]">
-                        @if($isQuote)
-                            <div class="space-y-3">
-                                <x-button href="{{ route('quote-requests.create', ['product_id' => $product->id, 'type' => 'physical_quote']) }}" variant="primary" fullWidth size="lg">
-                                    Hizmet Teklifi Al
-                                </x-button>
-                                <p class="text-[11px] text-[#596166] text-center">Özel ölçü, malzeme ve adet tercihlerinizi belirterek satıcılardan teklif toplayın.</p>
-                            </div>
-                        @else
-                            @auth
-                                @if($product->stock > 0)
-                                    <form id="product-buy-form" action="{{ route('cart.add', $product) }}" method="post" class="space-y-4">
-                                        @csrf
-                                        <input type="hidden" name="buy_now" id="buy_now_flag" value="0">
-
-                                        @if($product->variants->isNotEmpty())
-                                            <div>
-                                                <label class="block text-xs font-semibold text-[#182023] mb-1.5" for="variant-selector">Seçenek / Varyant</label>
-                                                <select name="variant_id" id="variant-selector" class="w-full min-h-[44px] rounded-lg border border-[#DEDAD2] bg-white px-3 py-2 text-sm text-[#182023] outline-none focus:border-[#C2410C]">
-                                                    @foreach($product->variants as $variant)
-                                                        @php $variantPrice = (float) $product->price + (float) $variant->price_adjustment; @endphp
-                                                        <option value="{{ $variant->id }}"
-                                                                data-price="{{ $variantPrice }}"
-                                                                data-stock="{{ (int) $variant->stock }}"
-                                                                @selected($loop->first)>
-                                                            {{ $variant->name }} — ₺{{ number_format($variantPrice, 2, ',', '.') }} (Stok: {{ $variant->stock }})
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        @endif
-
-                                        <div class="flex items-end gap-3">
-                                            <div class="w-28 shrink-0">
-                                                <label class="block text-xs font-semibold text-[#182023] mb-1.5" for="product-qty">Adet</label>
-                                                <input 
-                                                    id="product-qty" 
-                                                    type="number" 
-                                                    name="quantity" 
-                                                    value="1" 
-                                                    min="1" 
-                                                    max="{{ $product->variants->first()?->stock ?? $product->stock }}"
-                                                    class="w-full min-h-[44px] rounded-lg border border-[#DEDAD2] bg-white px-3 text-center text-sm font-bold text-[#182023] outline-none focus:border-[#C2410C]"
-                                                />
-                                            </div>
-                                            <div class="flex-1">
-                                                <button type="submit" class="w-full min-h-[44px] rounded-lg bg-[#C2410C] text-sm font-bold text-white shadow-xs hover:bg-[#9A3412] transition" onclick="document.getElementById('buy_now_flag').value='0'">
-                                                    Sepete Ekle
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </form>
-
-                                    <div class="mt-3 flex gap-2">
-                                        <button type="button" id="btn-buy-now" class="w-full min-h-[44px] rounded-lg border border-[#DEDAD2] bg-white text-xs font-bold text-[#182023] hover:bg-[#F7F5F0] transition" onclick="document.getElementById('buy_now_flag').value='1'; document.getElementById('product-buy-form').submit();">
-                                            Hemen Satın Al
-                                        </button>
+                        @if($product->stock > 0)
+                            <form id="product-buy-form" action="{{ route('cart.add', $product) }}" method="post" class="mt-4 space-y-3">
+                                @csrf
+                                <input type="hidden" name="buy_now" id="buy_now_flag" value="0">
+                                @if($product->variants->isNotEmpty())
+                                    <div>
+                                        <label class="text-xs font-semibold text-slate-600" for="variant-selector">Varyant Seçimi</label>
+                                        <select name="variant_id" id="variant-selector" class="by-input mt-1 w-full">
+                                            @foreach($product->variants as $variant)
+                                                @php $variantPrice = (float) $product->price + (float) $variant->price_adjustment; @endphp
+                                                <option value="{{ $variant->id }}"
+                                                        data-price="{{ $variantPrice }}"
+                                                        data-stock="{{ (int) $variant->stock }}"
+                                                        @selected($loop->first)>
+                                                    {{ $variant->name }} — ₺{{ number_format($variantPrice, 2, ',', '.') }} (Stok: {{ $variant->stock }})
+                                                </option>
+                                            @endforeach
+                                        </select>
                                     </div>
-                                @else
-                                    <button type="button" disabled class="w-full min-h-[48px] rounded-lg bg-slate-100 text-xs font-bold text-[#596166]/60 cursor-not-allowed border border-[#DEDAD2]">
-                                        Ürün Tükendi
-                                    </button>
                                 @endif
-
-                                <div class="mt-3 pt-3 border-t border-[#DEDAD2]">
-                                    <form action="{{ route('favorites.toggle', $product) }}" method="post">
-                                        @csrf
-                                        <button type="submit" class="w-full text-center text-xs font-semibold text-[#596166] hover:text-[#182023] py-1 transition flex items-center justify-center gap-1.5">
-                                            <span>{{ $isFavorited ? '♥ Favorilerimde Kayıtlı' : '♡ Favorilere Ekle' }}</span>
-                                        </button>
-                                    </form>
+                                <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+                                    <div class="w-full sm:w-28 shrink-0">
+                                        <label class="text-xs font-semibold text-slate-600" for="product-qty">Adet</label>
+                                        <input id="product-qty" type="number" name="quantity" value="1" min="1" max="{{ $product->variants->first()?->stock ?? $product->stock }}"
+                                               class="by-input mt-1 w-full min-h-12">
+                                    </div>
+                                    <div class="flex-1">
+                                        <button type="submit" class="w-full by-btn-primary min-h-12" onclick="document.getElementById('buy_now_flag').value='0'">Sepete ekle</button>
+                                    </div>
                                 </div>
-                            @else
-                                <div class="rounded-lg border border-[#DEDAD2] bg-[#F7F5F0] p-4 text-center">
-                                    <p class="text-xs text-[#596166] mb-3">Bu ürünü satın almak veya sepete eklemek için giriş yapmanız gerekmektedir.</p>
-                                    <x-button href="{{ route('login') }}" variant="primary" fullWidth size="md">
-                                        Giriş Yap ve Satın Al
-                                    </x-button>
-                                </div>
-                            @endauth
+                            </form>
                         @endif
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        {{-- Customer Reviews --}}
-        <div class="mt-12 rounded-xl border border-[#DEDAD2] bg-white p-6 sm:p-8 shadow-xs">
-            <h2 class="text-lg font-bold text-[#182023] tracking-tight">Değerlendirmeler ve Yorumlar</h2>
-            @if($reviewCount > 0)
-                <div class="mt-3 flex items-center gap-3">
-                    <div class="flex text-amber-500 text-lg">
-                        @for($i = 1; $i <= 5; $i++)
-                            <span>{{ $i <= (int) round((float) $reviewAvg) ? '★' : '☆' }}</span>
-                        @endfor
-                    </div>
-                    <span class="text-sm font-bold text-[#182023]">{{ number_format((float) $reviewAvg, 1, ',', '.') }} / 5</span>
-                    <span class="text-xs text-[#596166]">— {{ $reviewCount }} doğrulanmış müşteri değerlendirmesi</span>
-                </div>
-            @else
-                <p class="mt-2 text-xs text-[#596166]">Bu ürün için henüz değerlendirme yapılmamış.</p>
-            @endif
-
-            @if($productReviews->isNotEmpty())
-                <ul class="mt-6 space-y-3 border-t border-[#DEDAD2] pt-6">
-                    @foreach($productReviews as $rev)
-                        <li class="rounded-lg border border-[#DEDAD2] bg-[#F7F5F0]/40 p-4">
-                            <div class="flex items-center justify-between text-xs text-[#596166]">
-                                <span class="font-bold text-[#182023]">{{ $rev->user?->name ?? 'Müşteri' }}</span>
-                                <time datetime="{{ $rev->created_at?->toIso8601String() }}">{{ $rev->created_at?->translatedFormat('d M Y') }}</time>
-                            </div>
-                            <div class="mt-1 text-amber-500 text-xs">
-                                @for($i = 1; $i <= 5; $i++)
-                                    <span>{{ $i <= $rev->rating ? '★' : '☆' }}</span>
-                                @endfor
-                            </div>
-                            @if($rev->comment)
-                                <p class="mt-2 text-xs text-[#182023] leading-relaxed">{{ $rev->comment }}</p>
+                        <div class="mt-4 flex flex-wrap gap-2">
+                            <form action="{{ route('favorites.toggle', $product) }}" method="post">
+                                @csrf
+                                <button type="submit" class="by-btn-secondary">
+                                    {{ $isFavorited ? '♥ Favoride' : '♡ Favorilere ekle' }}
+                                </button>
+                            </form>
+                            @if($product->stock > 0)
+                                <button type="button" id="btn-buy-now" class="by-btn-secondary" onclick="document.getElementById('buy_now_flag').value='1'; document.getElementById('product-buy-form').submit();">Hızlı satın al</button>
                             @endif
-                        </li>
-                    @endforeach
-                </ul>
-            @endif
-        </div>
-
-        {{-- Related Products --}}
-        @if($related->isNotEmpty())
-            <div class="mt-12">
-                <h2 class="text-xl font-bold text-[#182023] tracking-tight mb-4">Benzer Ürünler</h2>
-                <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-                    @foreach($related as $item)
-                        <x-product-card :product="$item" />
-                    @endforeach
+                        </div>
+                    @else
+                        <p class="mt-3 text-sm text-slate-600">
+                            Sepete eklemek için <a class="font-semibold text-orange-600 hover:underline" href="{{ route('login') }}">giriş yapın</a>.
+                        </p>
+                    @endauth
                 </div>
             </div>
+        </div>
+
+    @php
+        $reviewAvg = $productReviewStats->avg_rating ?? null;
+        $reviewCount = (int) ($productReviewStats->reviews_count ?? 0);
+    @endphp
+    <div class="mt-10 by-card p-6">
+        <h2 class="text-lg font-bold tracking-tight text-slate-900">Yorumlar ve puanlama</h2>
+        @if($reviewCount > 0)
+            <div class="mt-3 flex flex-wrap items-center gap-3">
+                <div class="flex items-center gap-1" aria-label="Ortalama puan {{ $reviewAvg }} üzerinden 5">
+                    @for($i = 1; $i <= 5; $i++)
+                        <span class="{{ $i <= (int) round((float) $reviewAvg) ? 'text-amber-500' : 'text-slate-300' }}" style="font-size:1.25rem;line-height:1;">★</span>
+                    @endfor
+                </div>
+                <div class="text-sm text-slate-700">
+                    <span class="font-semibold">{{ number_format((float) $reviewAvg, 1, ',', '.') }}</span>
+                    <span class="text-slate-500">/ 5</span>
+                    <span class="text-slate-500">— {{ $reviewCount }} değerlendirme</span>
+                </div>
+            </div>
+        @else
+            <p class="mt-2 text-sm text-slate-500">Bu ürün için henüz değerlendirme yok.</p>
         @endif
+
+        @auth
+            <p class="mt-3 text-sm text-slate-600">
+                Satın aldığınız ürünü sipariş tesliminden sonra
+                <a href="{{ route('account.orders.index') }}" class="text-orange-600 hover:underline">Siparişlerim</a>
+                üzerinden puanlayabilirsiniz; sipariş başına tek değerlendirme kaydedilir.
+            </p>
+        @else
+            <p class="mt-3 text-sm text-slate-600">Değerlendirme yapmak için <a class="font-semibold text-orange-600 hover:underline" href="{{ route('login') }}">giriş yapın</a> ve teslim edilen siparişinizi açın.</p>
+        @endauth
+
+        @if($productReviews->isNotEmpty())
+            <ul class="mt-6 space-y-3 border-t border-slate-200 pt-6">
+                @foreach($productReviews as $rev)
+                    <li class="rounded-2xl border border-slate-200 bg-white/70 p-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2 text-sm text-slate-500">
+                            <span class="font-semibold text-slate-900">{{ $rev->user?->name ?? 'Müşteri' }}</span>
+                            <time datetime="{{ $rev->created_at?->toIso8601String() }}">{{ $rev->created_at?->translatedFormat('d M Y') }}</time>
+                        </div>
+                        <div class="mt-2">
+                            @for($i = 1; $i <= 5; $i++)
+                                <span class="{{ $i <= $rev->rating ? 'text-amber-500' : 'text-slate-300' }}">★</span>
+                            @endfor
+                        </div>
+                        @if($rev->comment)
+                            <p class="mt-2 text-sm text-slate-700">{{ $rev->comment }}</p>
+                        @endif
+                    </li>
+                @endforeach
+            </ul>
+        @endif
+    </div>
+
+    @if($alsoBought->isNotEmpty())
+        <div class="mt-10">
+            <h2 class="text-lg font-bold tracking-tight text-slate-900">Beraber alınan ürünler</h2>
+            <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                @foreach($alsoBought->take(4) as $item)
+                    <a href="{{ route('products.show', $item->slug) }}" class="group by-card by-card-hover overflow-hidden">
+                        <div class="aspect-4/3 bg-slate-100 flex items-center justify-center">
+                            @if($item->main_image)
+                                <img src="{{ asset('storage/'.$item->main_image) }}" alt="{{ $item->name }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
+                            @else
+                                <div class="h-full w-full flex flex-col items-center justify-center text-slate-400 bg-slate-100 p-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mb-1 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                    <span class="text-xs text-slate-400">Görsel yok</span>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="p-4">
+                            <p class="truncate text-sm font-semibold text-slate-900">{{ $item->name }}</p>
+                            <p class="mt-1 text-sm font-bold text-orange-900">₺{{ number_format($item->price, 2, ',', '.') }}</p>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
+    @if($related->isNotEmpty())
+        <div class="mt-10">
+            <h2 class="text-lg font-bold tracking-tight text-slate-900">{{ $alsoBought->isNotEmpty() ? 'Benzer ürünler' : 'Size önerilen benzer ürünler' }}</h2>
+            <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                @foreach($related as $item)
+                    <x-product-card :product="$item" />
+                @endforeach
+            </div>
+        </div>
+    @endif
     </div>
 
     <script>
@@ -336,13 +254,13 @@
 
                 if (stockEl && !isNaN(stock)) {
                     if (stock > 0) {
-                        stockEl.className = 'inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200';
+                        stockEl.className = 'by-badge border-emerald-200 bg-emerald-50 text-emerald-800';
                         stockEl.textContent = 'Stokta (' + stock + ' adet)';
                         if (qtyInput) qtyInput.max = stock;
                         if (submitBtn) submitBtn.disabled = false;
                         if (buyNowBtn) buyNowBtn.disabled = false;
                     } else {
-                        stockEl.className = 'inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-slate-100 text-slate-500 border border-slate-200';
+                        stockEl.className = 'by-badge border-red-200 bg-red-50 text-red-700';
                         stockEl.textContent = 'Stok tükendi';
                         if (submitBtn) submitBtn.disabled = true;
                         if (buyNowBtn) buyNowBtn.disabled = true;

@@ -1,44 +1,31 @@
 @extends('layouts.vendor')
-@section('title', 'Teklif Talepleri - Satıcı Paneli')
+@section('title', 'Teklif Talepleri')
 @section('content')
-<div class="mb-6">
-    <h1 class="font-heading text-2xl font-bold tracking-tight text-ink">Açık Teklif Talepleri</h1>
-    <p class="text-xs text-muted mt-0.5">Üretici kategorinize ve bölgenize uygun açık müşteri talepleri</p>
-</div>
-
-<div class="by-card bg-surface border border-border overflow-hidden">
+<div class="card p-4">
+    <h2 class="h6 mb-3">Acik teklif talepleri</h2>
     @if($quoteRequests->isEmpty())
-        <div class="p-8 text-center text-xs text-muted">Şu anda size uygun açık teklif talebi bulunmuyor.</div>
+        <p class="text-muted small mb-0">Size uygun acik talep yok.</p>
     @else
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
-                <thead>
-                    <tr class="border-b border-border bg-canvas/60 text-xs font-semibold uppercase tracking-wider text-muted">
-                        <th class="px-5 py-3">Talep</th>
-                        <th class="px-5 py-3">Kategori</th>
-                        <th class="px-5 py-3">Bölge</th>
-                        <th class="px-5 py-3 text-right">İşlem</th>
+        <table class="table table-sm mb-0">
+            <thead><tr><th>Talep</th><th>Kategori</th><th>Bolge</th><th></th></tr></thead>
+            <tbody>
+                @foreach($quoteRequests as $qr)
+                    <tr>
+                        <td>{{ Str::limit($qr->title, 40) }}</td>
+                        <td>{{ $qr->category?->name }}</td>
+                        <td>{{ $qr->city ?? '-' }}</td>
+                        <td>
+                            @if($myQuotes->contains($qr->id))
+                                <span class="badge bg-secondary">Teklif verdiniz</span>
+                            @else
+                                <a href="{{ route('vendor.quote-requests.show', $qr) }}" class="btn btn-success btn-sm">Goruntule</a>
+                            @endif
+                        </td>
                     </tr>
-                </thead>
-                <tbody class="divide-y divide-border">
-                    @foreach($quoteRequests as $qr)
-                        <tr class="hover:bg-canvas/30 transition-colors">
-                            <td class="px-5 py-3.5 font-medium text-xs text-ink">{{ Str::limit($qr->title, 45) }}</td>
-                            <td class="px-5 py-3.5 text-xs text-muted">{{ $qr->category?->name ?? '—' }}</td>
-                            <td class="px-5 py-3.5 text-xs text-muted">{{ $qr->city ?? '-' }}</td>
-                            <td class="px-5 py-3.5 text-right">
-                                @if($myQuotes->contains($qr->id))
-                                    <x-badge variant="neutral">Teklif Verdiniz</x-badge>
-                                @else
-                                    <a href="{{ route('vendor.quote-requests.show', $qr) }}" class="btn btn-cta text-xs py-1.5 px-3">Teklif Ver →</a>
-                                @endif
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-        <div class="p-4 border-t border-border">{{ $quoteRequests->links() }}</div>
+                @endforeach
+            </tbody>
+        </table>
+        <div class="mt-3">{{ $quoteRequests->links() }}</div>
     @endif
 </div>
 @endsection

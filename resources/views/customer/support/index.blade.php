@@ -1,55 +1,41 @@
 @extends('layouts.account')
 
-@section('title', 'Destek Taleplerim - BaskıYeri')
+@section('title', 'Destek talepleri')
 
 @section('content')
-@php use App\Support\UiLabels; @endphp
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+    @php use App\Support\UiLabels; @endphp
+    <nav class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <div>
-            <h1 class="font-heading text-2xl font-bold tracking-tight text-ink">Destek Taleplerim</h1>
-            <p class="text-xs text-muted mt-0.5">Sipariş, baskı ve platform ile ilgili soru ve bildirimleriniz</p>
+            <a href="{{ route('customer.dashboard') }}" class="small text-muted text-decoration-none">← Özet</a>
+            <h1 class="h4 fw-bold mt-1 mb-0">Destek talepleri</h1>
+            <p class="small text-muted mb-0">Sipariş ve platform ile ilgili sorularınızı buradan takip edin.</p>
         </div>
-        <div>
-            <a href="{{ route('account.support.create') }}" class="btn btn-cta text-xs">
-                + Yeni Destek Talebi
-            </a>
-        </div>
-    </div>
+        <a href="{{ route('account.support.create') }}" class="btn btn-warning rounded-pill px-4 fw-semibold shadow-sm">+ Yeni talep</a>
+    </nav>
 
     @if($tickets->isEmpty())
-        <div class="by-card p-12 text-center bg-surface border border-border">
-            <div class="w-12 h-12 mx-auto rounded-full bg-canvas flex items-center justify-center text-muted mb-3">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-            </div>
-            <h3 class="text-base font-bold text-ink">Henüz bir destek talebiniz bulunmuyor</h3>
-            <p class="text-sm text-muted mt-1 max-w-md mx-auto">Bir sorunuz veya yardıma ihtiyacınız olduğunda ekibimize buradan hemen yazabilirsiniz.</p>
-            <div class="mt-4">
-                <a href="{{ route('account.support.create') }}" class="btn btn-cta text-xs">Talep Oluştur</a>
-            </div>
+        <div class="text-center py-5 rounded-4 border bg-white">
+            <p class="text-muted mb-3">Henüz destek talebiniz yok.</p>
+            <a href="{{ route('account.support.create') }}" class="btn btn-outline-dark rounded-pill">İlk talebi oluştur</a>
         </div>
     @else
-        <div class="space-y-3">
+        <div class="d-flex flex-column gap-3">
             @foreach($tickets as $t)
-                @php
-                    $badgeVariant = match($t->status) {
-                        'closed' => 'neutral',
-                        'pending' => 'info',
-                        default => 'warning',
-                    };
-                @endphp
-                <a href="{{ route('account.support.show', $t) }}" class="by-card p-5 bg-surface border border-border flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-cta/50 transition-colors block">
-                    <div>
-                        <div class="font-bold text-sm text-ink hover:text-cta transition-colors">{{ $t->subject }}</div>
-                        <div class="text-xs text-muted mt-1">{{ $t->created_at->translatedFormat('d F Y, H:i') }}</div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <x-badge :variant="$badgeVariant">
-                            {{ UiLabels::supportTicketStatus($t->status) }}
-                        </x-badge>
+                <a href="{{ route('account.support.show', $t) }}" class="text-decoration-none text-dark">
+                    <div class="rounded-4 border-0 shadow-sm p-4 bg-white border-start border-4 border-warning" style="transition: transform .12s ease, box-shadow .12s ease;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 12px 28px rgba(15,23,42,.08)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+                        <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                            <div>
+                                <div class="fw-semibold fs-6">{{ $t->subject }}</div>
+                                <div class="small text-muted mt-1">{{ $t->created_at->translatedFormat('d F Y, H:i') }}</div>
+                            </div>
+                            <span class="badge rounded-pill px-3 py-2 {{ $t->status === 'closed' ? 'bg-secondary-subtle text-secondary' : ($t->status === 'pending' ? 'bg-info-subtle text-primary' : 'bg-warning-subtle text-dark') }}">
+                                {{ UiLabels::supportTicketStatus($t->status) }}
+                            </span>
+                        </div>
                     </div>
                 </a>
             @endforeach
         </div>
-        <div class="mt-5">{{ $tickets->links() }}</div>
+        <div class="mt-4">{{ $tickets->links() }}</div>
     @endif
 @endsection

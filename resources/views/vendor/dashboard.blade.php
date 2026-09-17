@@ -1,6 +1,6 @@
 @extends('layouts.vendor')
 
-@section('title', 'Genel Bakış - Satıcı Paneli')
+@section('title', 'Genel bakış')
 
 @section('content')
 @php
@@ -8,140 +8,114 @@
     use App\Domain\OrderStatus;
 @endphp
 
-<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-    <div class="by-card p-5 bg-surface border border-border">
-        <div class="text-xs font-bold uppercase tracking-wider text-muted mb-1">Toplam Hakediş (Ciro)</div>
-        <div class="text-2xl lg:text-3xl font-extrabold text-emerald-600 metric-count" data-count="{{ (int) $totalRevenue }}">
-            ₺{{ number_format($totalRevenue, 2, ',', '.') }}
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card p-3 h-100 shadow-sm border-0" style="background: linear-gradient(135deg, #ecfdf5, #ffffff);">
+            <div class="small text-muted mb-1">Toplam Hakediş (Ciro)</div>
+            <div class="h4 mb-0 fw-bold text-success metric-count" data-count="{{ (int) $totalRevenue }}">₺{{ number_format($totalRevenue, 2, ',', '.') }}</div>
+            <a href="{{ route('vendor.payout-requests.index') }}" class="small text-success text-decoration-none mt-2 d-inline-block fw-medium">Para Çekme →</a>
         </div>
-        <a href="{{ route('vendor.payout-requests.index') }}" class="text-xs font-semibold text-emerald-700 hover:underline mt-2 inline-block">Para Çekme →</a>
     </div>
-
-    <div class="by-card p-5 bg-surface border border-border">
-        <div class="text-xs font-bold uppercase tracking-wider text-muted mb-1">Aktif Siparişler</div>
-        <div class="text-2xl lg:text-3xl font-extrabold text-ink metric-count" data-count="{{ $ordersPending }}">
-            {{ $ordersPending }}
+    <div class="col-6 col-md-3">
+        <div class="card p-3 h-100 shadow-sm border-0" style="background: linear-gradient(135deg, #eff6ff, #ffffff);">
+            <div class="small text-muted mb-1">Aktif Siparişler</div>
+            <div class="h4 mb-0 fw-bold text-primary metric-count" data-count="{{ $ordersPending }}">{{ $ordersPending }}</div>
+            <a href="{{ route('vendor.orders.index') }}" class="small text-primary text-decoration-none mt-2 d-inline-block fw-medium">Tümünü Yönet →</a>
         </div>
-        <a href="{{ route('vendor.orders.index') }}" class="text-xs font-semibold text-cta hover:underline mt-2 inline-block">Tümünü Yönet →</a>
     </div>
-
-    <div class="by-card p-5 bg-surface border border-border">
-        <div class="text-xs font-bold uppercase tracking-wider text-muted mb-1">Prova Bekleyen</div>
-        <div class="text-2xl lg:text-3xl font-extrabold text-amber-600 metric-count" data-count="{{ $proofPendingCount }}">
-            {{ $proofPendingCount }}
+    <div class="col-6 col-md-3">
+        <div class="card p-3 h-100 shadow-sm border-0" style="background: linear-gradient(135deg, #fffbeb, #ffffff);">
+            <div class="small text-muted mb-1">Baskı Provası Bekleyen</div>
+            <div class="h4 mb-0 fw-bold text-warning metric-count" data-count="{{ $proofPendingCount }}">{{ $proofPendingCount }}</div>
+            <a href="{{ route('vendor.orders.index', ['status' => OrderStatus::DESIGN_REVIEW]) }}" class="small text-warning text-decoration-none mt-2 d-inline-block fw-medium">Provaları Yükle →</a>
         </div>
-        <a href="{{ route('vendor.orders.index', ['status' => OrderStatus::DESIGN_REVIEW]) }}" class="text-xs font-semibold text-amber-700 hover:underline mt-2 inline-block">Provaları Yükle →</a>
     </div>
-
-    <div class="by-card p-5 bg-surface border border-border">
-        <div class="text-xs font-bold uppercase tracking-wider text-muted mb-1">Yaklaşan Hakediş</div>
-        <div class="text-2xl lg:text-3xl font-extrabold text-ink">
-            ₺{{ number_format($upcomingPayouts ?? 0, 2, ',', '.') }}
+    <div class="col-6 col-md-3">
+        <div class="card p-3 h-100 shadow-sm border-0" style="background: linear-gradient(135deg, #faf5ff, #ffffff);">
+            <div class="small text-muted mb-1">Yaklaşan Hakediş</div>
+            <div class="h4 mb-0 fw-bold" style="color:#7c3aed;">₺{{ number_format($upcomingPayouts ?? 0, 2, ',', '.') }}</div>
+            <div class="small text-muted mt-2">Kargolanacak: {{ $readyToShipCount }}</div>
         </div>
-        <div class="text-[11px] text-muted mt-2">Kargolanacak: <strong class="text-ink">{{ $readyToShipCount }}</strong></div>
     </div>
 </div>
 
 @if(($moduleEnds ?? collect())->isNotEmpty())
-    <div class="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-950">
-        <span class="font-bold">Yaklaşan abonelik bitişleri:</span>
-        @foreach($moduleEnds as $mod => $date)
-            <span class="font-semibold">{{ $mod }}</span> ({{ $date->format('d.m.Y') }}){{ !$loop->last ? ', ' : '' }}
-        @endforeach
-    </div>
+<div class="alert alert-warning small mb-4">
+    Yaklaşan abonelik bitişleri:
+    @foreach($moduleEnds as $mod => $date)
+        <strong>{{ $mod }}</strong> {{ $date->format('d.m.Y') }}{{ !$loop->last ? ',' : '' }}
+    @endforeach
+</div>
 @endif
 
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
-    <div class="lg:col-span-8">
-        <div class="by-card p-6 bg-surface border border-border h-full flex flex-col justify-between">
-            <div>
-                <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                    <div class="flex items-center gap-2">
-                        <h2 class="font-heading text-lg font-bold text-ink">{{ $vendor->name }}</h2>
-                        @if(!$vendor->is_active)
-                            <x-badge variant="warning">Yönetici Onayı Bekliyor</x-badge>
-                        @else
-                            <x-badge variant="success">Aktif Mağaza</x-badge>
-                        @endif
-                    </div>
-                    <a href="{{ route('vendors.show', $vendor->slug) }}" target="_blank" class="text-xs text-cta hover:underline font-medium">Mağaza Sayfasını Gör ↗</a>
+<div class="row g-3 mb-4">
+    <div class="col-md-8">
+        <div class="card p-4 h-100 shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex align-items-center gap-2">
+                    <h2 class="h6 fw-bold mb-0">{{ $vendor->name }}</h2>
+                    @if(!$vendor->is_active)
+                        <span class="badge bg-warning text-dark">Yönetici Onayı Bekliyor</span>
+                    @else
+                        <span class="badge bg-success-subtle text-success">Aktif Mağaza</span>
+                    @endif
                 </div>
-                <p class="text-xs text-muted leading-relaxed mb-3">
-                    {{ $vendor->description ? Str::limit($vendor->description, 180) : 'Mağaza açıklaması henüz girilmedi.' }}
-                </p>
-                @if($vendor->businessTypes->isNotEmpty())
-                    <div class="flex flex-wrap gap-1.5 mb-4">
-                        @foreach($vendor->businessTypes as $bt)
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-canvas text-ink border border-border">{{ $bt->name }}</span>
-                        @endforeach
-                    </div>
-                @endif
+                <a href="{{ route('vendors.show', $vendor->slug) }}" target="_blank" class="small text-decoration-none">Mağaza Sayfasını Gör ↗</a>
             </div>
-            <div class="pt-3 border-t border-border flex items-center justify-between">
-                <span class="text-xs text-muted">Kullanılabilir Bakiye:</span>
-                <span class="text-lg font-bold text-ink">₺{{ number_format($vendor->balance, 2, ',', '.') }}</span>
-            </div>
+            <p class="small text-muted mb-2">
+                {{ $vendor->description ? Str::limit($vendor->description, 150) : 'Mağaza açıklaması girilmemiş.' }}
+            </p>
+            @if($vendor->businessTypes->isNotEmpty())
+                <div class="mt-2">
+                    @foreach($vendor->businessTypes as $bt)
+                        <span class="badge bg-light text-dark border me-1">{{ $bt->name }}</span>
+                    @endforeach
+                </div>
+            @endif
+            <div class="mt-3 small">Bakiye: <strong>₺{{ number_format($vendor->balance, 2, ',', '.') }}</strong></div>
         </div>
     </div>
-    <div class="lg:col-span-4 flex flex-col gap-3">
-        <a href="{{ route('vendor.products.create') }}" class="btn btn-cta py-3 text-xs flex items-center justify-center font-bold">
-            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-            Yeni Ürün Ekle
-        </a>
+    <div class="col-md-4 d-grid gap-2">
+        <a href="{{ route('vendor.products.create') }}" class="btn btn-success py-3 fw-bold">+ Yeni Ürün Ekle</a>
         @if($vendor->hasActiveQuotesModule())
-            <a href="{{ route('vendor.quote-requests.index') }}" class="btn btn-secondary py-3 text-xs flex items-center justify-center font-medium">
+            <a href="{{ route('vendor.quote-requests.index') }}" class="btn btn-outline-primary btn-sm py-2">
                 Açık Teklif Talepleri ({{ $openQuoteRequestsCount }})
             </a>
         @endif
     </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
-    <div class="lg:col-span-7">
-        <div class="by-card p-5 bg-surface border border-border h-full">
-            <div class="text-xs font-bold uppercase tracking-wider text-muted mb-3">{{ __('panel.revenue_30d') }}</div>
+<div class="row g-3 mb-4">
+    <div class="col-md-7">
+        <div class="card p-3 shadow-sm border-0 h-100">
+            <div class="small text-muted mb-2">{{ __('panel.revenue_30d') }}</div>
             <canvas id="vendorRevenueChart" height="120"></canvas>
         </div>
     </div>
-    <div class="lg:col-span-5">
-        <div class="by-card p-5 bg-surface border border-border h-full">
-            <div class="text-xs font-bold uppercase tracking-wider text-muted mb-3">{{ __('panel.order_status_chart') }}</div>
+    <div class="col-md-5">
+        <div class="card p-3 shadow-sm border-0 h-100">
+            <div class="small text-muted mb-2">{{ __('panel.order_status_chart') }}</div>
             <canvas id="vendorStatusChart" height="120"></canvas>
         </div>
     </div>
 </div>
 
-<div class="by-card bg-surface border border-border overflow-hidden mb-6">
-    <div class="p-5 border-b border-border flex items-center justify-between">
-        <h2 class="font-heading text-base font-bold text-ink">Son Siparişler</h2>
-        <a href="{{ route('vendor.orders.index') }}" class="text-xs text-cta hover:underline font-semibold">Tümünü Gör →</a>
+<div class="card p-4 mb-4 shadow-sm">
+        <a href="{{ route('vendor.orders.index') }}" class="small fw-semibold text-decoration-none">Tümü →</a>
     </div>
     @if($recentOrders->isEmpty())
-        <div class="p-8 text-center text-xs text-muted">Henüz sipariş bulunmuyor.</div>
+        <p class="text-muted small mb-0">Henüz sipariş yok.</p>
     @else
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
-                <thead>
-                    <tr class="border-b border-border bg-canvas/50 text-muted uppercase text-[10px] font-semibold">
-                        <th class="px-5 py-3">Sipariş No</th>
-                        <th class="px-5 py-3">Müşteri</th>
-                        <th class="px-5 py-3">Tutar</th>
-                        <th class="px-5 py-3">Durum</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-border">
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead><tr><th>No</th><th>Müşteri</th><th>Tutar</th><th>Durum</th></tr></thead>
+                <tbody>
                 @foreach($recentOrders as $o)
-                    <tr class="hover:bg-canvas/30 transition-colors">
-                        <td class="px-5 py-3.5 font-mono font-bold text-ink">
-                            <a href="{{ route('vendor.orders.show', $o) }}" class="hover:text-cta">#{{ $o->order_number }}</a>
-                        </td>
-                        <td class="px-5 py-3.5 text-ink font-medium">{{ $o->user?->name ?? 'Misafir Alıcı' }}</td>
-                        <td class="px-5 py-3.5 font-bold text-ink">₺{{ number_format($o->vendor_amount ?? $o->subtotal, 2, ',', '.') }}</td>
-                        <td class="px-5 py-3.5">
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-canvas text-ink border border-border">
-                                {{ class_exists(UiLabels::class) ? UiLabels::orderStatus($o->status) : $o->status }}
-                            </span>
-                        </td>
+                    <tr>
+                        <td><a href="{{ route('vendor.orders.show', $o) }}">#{{ $o->order_number }}</a></td>
+                        <td>{{ $o->user?->name }}</td>
+                        <td>₺{{ number_format($o->vendor_amount ?? $o->subtotal, 2, ',', '.') }}</td>
+                        <td><span class="badge bg-light text-dark border">{{ class_exists(UiLabels::class) ? UiLabels::orderStatus($o->status) : $o->status }}</span></td>
                     </tr>
                 @endforeach
                 </tbody>
@@ -150,36 +124,44 @@
     @endif
 </div>
 
-<div class="by-card p-6 bg-surface border border-border">
-    <div class="flex justify-between items-center mb-4 pb-3 border-b border-border">
-        <h2 class="font-heading text-base font-bold text-ink">Modül Yetkileri ve Abonelikler</h2>
-        <a href="{{ route('vendor.subscriptions.index') }}" class="text-xs text-cta hover:underline font-semibold">Yönet →</a>
+<div class="card p-4 shadow-sm">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h6 fw-bold mb-0">Modül Yetkileri ve Abonelikler</h2>
+        <a href="{{ route('vendor.subscriptions.index') }}" class="small fw-semibold text-decoration-none">Yönet →</a>
     </div>
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div class="p-4 rounded-xl border border-border bg-canvas/40">
-            <div class="text-xs text-muted mb-1">Fiziksel Ürün</div>
-            <x-badge variant="success">Aktif</x-badge>
+    <div class="row g-3">
+        <div class="col-md-3">
+            <div class="border rounded p-3 h-100">
+                <div class="small text-muted mb-1">Fiziksel Ürün</div>
+                <span class="badge bg-success-subtle text-success">Aktif</span>
+            </div>
         </div>
-        <div class="p-4 rounded-xl border border-border bg-canvas/40">
-            <div class="text-xs text-muted mb-1">Freelancer</div>
-            <x-badge :variant="$vendor->hasActiveFreelancerModule() ? 'success' : 'warning'">
-                {{ $vendor->hasActiveFreelancerModule() ? 'Aktif' : 'Pasif' }}
-            </x-badge>
-            <div class="text-[11px] text-muted mt-2">{{ optional($vendor->freelancer_expires_at)->format('d.m.Y') ?? '-' }}</div>
+        <div class="col-md-3">
+            <div class="border rounded p-3 h-100">
+                <div class="small text-muted mb-1">Freelancer</div>
+                <span class="badge {{ $vendor->hasActiveFreelancerModule() ? 'bg-success-subtle text-success' : 'bg-warning text-dark' }}">
+                    {{ $vendor->hasActiveFreelancerModule() ? 'Aktif' : 'Pasif' }}
+                </span>
+                <div class="small text-muted mt-2">{{ optional($vendor->freelancer_expires_at)->format('d.m.Y') ?? '-' }}</div>
+            </div>
         </div>
-        <div class="p-4 rounded-xl border border-border bg-canvas/40">
-            <div class="text-xs text-muted mb-1">Teklif</div>
-            <x-badge :variant="$vendor->hasActiveQuotesModule() ? 'success' : 'warning'">
-                {{ $vendor->hasActiveQuotesModule() ? 'Aktif' : 'Pasif' }}
-            </x-badge>
-            <div class="text-[11px] text-muted mt-2">{{ optional($vendor->quotes_expires_at)->format('d.m.Y') ?? '-' }}</div>
+        <div class="col-md-3">
+            <div class="border rounded p-3 h-100">
+                <div class="small text-muted mb-1">Teklif</div>
+                <span class="badge {{ $vendor->hasActiveQuotesModule() ? 'bg-success-subtle text-success' : 'bg-warning text-dark' }}">
+                    {{ $vendor->hasActiveQuotesModule() ? 'Aktif' : 'Pasif' }}
+                </span>
+                <div class="small text-muted mt-2">{{ optional($vendor->quotes_expires_at)->format('d.m.Y') ?? '-' }}</div>
+            </div>
         </div>
-        <div class="p-4 rounded-xl border border-border bg-canvas/40">
-            <div class="text-xs text-muted mb-1">Tabela</div>
-            <x-badge :variant="$vendor->hasActiveTabelaModule() ? 'success' : 'warning'">
-                {{ $vendor->hasActiveTabelaModule() ? 'Aktif' : 'Pasif' }}
-            </x-badge>
-            <div class="text-[11px] text-muted mt-2">{{ optional($vendor->tabela_expires_at)->format('d.m.Y') ?? '-' }}</div>
+        <div class="col-md-3">
+            <div class="border rounded p-3 h-100">
+                <div class="small text-muted mb-1">Tabela</div>
+                <span class="badge {{ $vendor->hasActiveTabelaModule() ? 'bg-success-subtle text-success' : 'bg-warning text-dark' }}">
+                    {{ $vendor->hasActiveTabelaModule() ? 'Aktif' : 'Pasif' }}
+                </span>
+                <div class="small text-muted mt-2">{{ optional($vendor->tabela_expires_at)->format('d.m.Y') ?? '-' }}</div>
+            </div>
         </div>
     </div>
 </div>
@@ -196,12 +178,12 @@ document.querySelectorAll('.metric-count[data-count]').forEach((el) => {
 });
 new Chart(document.getElementById('vendorRevenueChart'), {
   type: 'line',
-  data: { labels: @json($revenueTrend['labels'] ?? []), datasets: [{ data: @json($revenueTrend['values'] ?? []), borderColor: '#C2410C', backgroundColor: 'rgba(194,65,12,.1)', fill: true, tension: .35 }] },
+  data: { labels: @json($revenueTrend['labels'] ?? []), datasets: [{ data: @json($revenueTrend['values'] ?? []), borderColor: '#059669', backgroundColor: 'rgba(5,150,105,.15)', fill: true, tension: .35 }] },
   options: { plugins: { legend: { display: false } }, scales: { x: { display: false } } }
 });
 new Chart(document.getElementById('vendorStatusChart'), {
   type: 'doughnut',
-  data: { labels: @json(($statusBreakdown ?? collect())->keys()), datasets: [{ data: @json(($statusBreakdown ?? collect())->values()), backgroundColor: ['#C2410C','#2563eb','#16a34a','#eab308','#8b5cf6','#64748b'] }] },
+  data: { labels: @json(($statusBreakdown ?? collect())->keys()), datasets: [{ data: @json(($statusBreakdown ?? collect())->values()), backgroundColor: ['#6366f1','#06b6d4','#84cc16','#f97316','#a855f7','#64748b'] }] },
   options: { plugins: { legend: { position: 'bottom' } } }
 });
 </script>
