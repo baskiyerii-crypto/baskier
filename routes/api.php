@@ -42,6 +42,8 @@ Route::prefix('v1')->group(function () {
 
     Route::get('/categories', [CategoryController::class, 'index']);
     Route::get('/business-types', [CategoryController::class, 'businessTypes']);
+    Route::get('/geography/countries', [GeographyController::class, 'countries']);
+    Route::get('/geography/places', [GeographyController::class, 'places']);
     Route::get('/geography/provinces', [GeographyController::class, 'provinces']);
     Route::get('/geography/provinces/{provinceId}/districts', [GeographyController::class, 'districts'])->whereNumber('provinceId');
     Route::get('/geography/districts/{districtId}/neighborhoods', [GeographyController::class, 'neighborhoods'])->whereNumber('districtId');

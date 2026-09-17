@@ -32,6 +32,11 @@ final class OutdoorSchema
         return self::inventoriesReady() && Schema::hasColumn('ooh_inventories', 'geo_fingerprint');
     }
 
+    public static function hasCountryCode(): bool
+    {
+        return self::inventoriesReady() && Schema::hasColumn('ooh_inventories', 'country_code');
+    }
+
     public static function vendorModuleColumnsReady(): bool
     {
         return Schema::hasColumn('vendors', 'outdoor_enabled');

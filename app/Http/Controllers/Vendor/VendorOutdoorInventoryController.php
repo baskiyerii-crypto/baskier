@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Vendor;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Country;
 use App\Models\OohInventory;
 use App\Models\TurkiyeIl;
 use App\Models\TurkiyeIlce;
 use App\Services\OutdoorInventoryService;
 use App\Services\OutdoorOccupancyService;
 use App\Services\OutdoorStaffService;
+use App\Services\WorldPlaceService;
+use App\Support\IsoCountries;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 use RuntimeException;
@@ -20,6 +23,7 @@ class VendorOutdoorInventoryController extends Controller
         private OutdoorStaffService $staff,
         private OutdoorInventoryService $inventories,
         private OutdoorOccupancyService $occupancy,
+        private WorldPlaceService $places,
     ) {}
 
     private function vendor(Request $request)
@@ -54,10 +58,21 @@ class VendorOutdoorInventoryController extends Controller
         $this->authorize('create', OohInventory::class);
         $this->staff->assertCanManageInventory($request->user(), $vendor);
         $categories = Category::query()->where('channel', Category::CHANNEL_OUTDOOR)->where('is_active', true)->orderBy('name')->get();
+        $countries = Country::catalog();
         $provinces = Schema::hasTable('turkiye_iller') ? TurkiyeIl::query()->orderBy('name')->get() : collect();
         $districts = collect();
+        $citySuggestions = [];
+        $districtSuggestions = [];
 
-        return view('vendor.outdoor.inventories-form', compact('vendor', 'categories', 'provinces', 'districts'));
+        return view('vendor.outdoor.inventories-form', compact(
+            'vendor',
+            'categories',
+            'countries',
+            'provinces',
+            'districts',
+            'citySuggestions',
+            'districtSuggestions'
+        ));
     }
 
     public function store(Request $request)
@@ -82,15 +97,30 @@ class VendorOutdoorInventoryController extends Controller
         $this->staff->assertCanManageInventory($request->user(), $vendor);
         $inventory->load('images');
         $categories = Category::query()->where('channel', Category::CHANNEL_OUTDOOR)->where('is_active', true)->orderBy('name')->get();
+        $countries = Country::catalog();
         $provinces = Schema::hasTable('turkiye_iller') ? TurkiyeIl::query()->orderBy('name')->get() : collect();
         $provinceId = old('turkiye_il_id', $inventory->turkiye_il_id);
         $districts = ($provinceId && Schema::hasTable('turkiye_ilceler'))
             ? TurkiyeIlce::query()->where('province_id', $provinceId)->orderBy('name')->get()
             : collect();
+        $countryCode = old('country_code', $inventory->country_code ?: 'TR');
+        $citySuggestions = $this->places->cities((string) $countryCode);
+        $districtSuggestions = $this->places->districts((string) $countryCode, (string) old('city', $inventory->city));
         $calendar = $this->occupancy->calendar($inventory);
         $similar = $this->inventories->similarListings($inventory);
 
-        return view('vendor.outdoor.inventories-form', compact('vendor', 'inventory', 'categories', 'provinces', 'districts', 'calendar', 'similar'));
+        return view('vendor.outdoor.inventories-form', compact(
+            'vendor',
+            'inventory',
+            'categories',
+            'countries',
+            'provinces',
+            'districts',
+            'citySuggestions',
+            'districtSuggestions',
+            'calendar',
+            'similar'
+        ));
     }
 
     public function update(Request $request, OohInventory $inventory)
@@ -148,7 +178,11 @@ class VendorOutdoorInventoryController extends Controller
     {
         $vendor = $this->vendor($request);
         $this->staff->assertCanOperate($request->user(), $vendor);
-        $items = $this->inventories->poolForVendor($vendor, $request->integer('il') ?: null);
+        $items = $this->inventories->poolForVendor(
+            $vendor,
+            $request->integer('il') ?: null,
+            $request->query('ulke') ?: null
+        );
 
         return view('vendor.outdoor.pool', compact('vendor', 'items'));
     }
@@ -176,8 +210,9 @@ class VendorOutdoorInventoryController extends Controller
             'description' => ['nullable', 'string', 'max:5000'],
             'turkiye_il_id' => ['nullable', 'integer'],
             'turkiye_ilce_id' => ['nullable', 'integer'],
-            'city' => ['nullable', 'string', 'max:80'],
-            'district' => ['nullable', 'string', 'max:80'],
+            'country_code' => ['nullable', 'string', 'size:2', 'in:'.implode(',', IsoCountries::codes())],
+            'city' => ['nullable', 'string', 'max:120'],
+            'district' => ['nullable', 'string', 'max:120'],
             'address' => ['nullable', 'string', 'max:255'],
             'lat' => ['required', 'numeric', 'between:-90,90'],
             'lng' => ['required', 'numeric', 'between:-180,180'],

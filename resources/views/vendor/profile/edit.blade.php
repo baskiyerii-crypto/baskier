@@ -10,8 +10,19 @@
         <div class="col-md-6"><label class="form-label">{{ __('panel.name') }}</label><input name="name" class="form-control" value="{{ old('name', $vendor->name) }}" required></div>
         <div class="col-md-6"><label class="form-label">{{ __('panel.email') }}</label><input name="email" type="email" class="form-control" value="{{ old('email', $vendor->email) }}"></div>
         <div class="col-md-6"><label class="form-label">{{ __('panel.phone') }}</label><input name="phone" class="form-control" value="{{ old('phone', $vendor->phone) }}"></div>
-        <div class="col-md-3"><label class="form-label">{{ __('panel.city') }}</label><input name="city" class="form-control" value="{{ old('city', $vendor->city) }}"></div>
-        <div class="col-md-3"><label class="form-label">{{ __('panel.district') }}</label><input name="district" class="form-control" value="{{ old('district', $vendor->district) }}"></div>
+        <div class="col-12">
+            @include('partials.geo-location-fields', [
+                'countryValue' => $vendor->country_code ?: 'TR',
+                'cityValue' => $vendor->city,
+                'districtValue' => $vendor->district,
+                'countries' => $countries ?? collect(),
+                'provinces' => $provinces ?? collect(),
+                'trDistricts' => $districts ?? collect(),
+                'citySuggestions' => $citySuggestions ?? [],
+                'districtSuggestions' => $districtSuggestions ?? [],
+                'idPrefix' => 'vendor-geo',
+            ])
+        </div>
         <div class="col-12"><label class="form-label">{{ __('panel.address') }}</label><input name="address" class="form-control" value="{{ old('address', $vendor->address) }}"></div>
         <div class="col-12"><label class="form-label">{{ __('panel.description') }}</label><textarea name="description" class="form-control" rows="4">{{ old('description', $vendor->description) }}</textarea></div>
         <div class="col-md-6"><label class="form-label">{{ __('panel.map_embed') }}</label><input name="map_embed_url" class="form-control" value="{{ old('map_embed_url', $vendor->map_embed_url) }}"></div>

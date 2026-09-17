@@ -24,6 +24,7 @@ class OohInventoryResource extends JsonResource
             'description' => $this->description,
             'city' => $this->city,
             'district' => $this->district,
+            'country_code' => $this->country_code,
             'address' => $this->address,
             'lat' => $this->lat,
             'lng' => $this->lng,

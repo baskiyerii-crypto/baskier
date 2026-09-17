@@ -21,7 +21,7 @@
         <div class="lg:col-span-5 by-card p-5">
             <p class="text-xs uppercase tracking-wider text-slate-500">{{ $inventory->category?->name }}</p>
             <h1 class="mt-1 text-2xl font-extrabold">{{ $inventory->title }}</h1>
-            <p class="mt-2 text-sm text-slate-600">{{ $inventory->city ?: $inventory->province?->name }} / {{ $inventory->district ?: $inventory->districtRel?->name }}</p>
+            <p class="mt-2 text-sm text-slate-600">{{ $inventory->locationLabel() }}</p>
             <p class="mt-2 text-sm">Satıcı: <strong>{{ $inventory->vendor?->name }}</strong> <span class="text-slate-500">(iletişim onay sonrası)</span></p>
             @if($inventory->list_price)
                 <p class="mt-3 font-semibold">Tahmini ₺{{ number_format($inventory->list_price, 2, ',', '.') }} / {{ $inventory->price_unit }} · garanti değildir</p>

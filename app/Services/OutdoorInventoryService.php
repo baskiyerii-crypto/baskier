@@ -17,6 +17,7 @@ class OutdoorInventoryService
 {
     public function __construct(
         private OutdoorStaffService $staff,
+        private WorldPlaceService $places,
     ) {}
 
     /**
@@ -29,16 +30,17 @@ class OutdoorInventoryService
         $this->assertOutdoorCategory((int) $payload['category_id']);
 
         return DB::transaction(function () use ($vendor, $payload, $images) {
-            $inventory = OohInventory::create([
+            $geo = $this->geoFromPayload($payload);
+            $row = [
                 'vendor_id' => $vendor->id,
                 'category_id' => $payload['category_id'],
                 'title' => $payload['title'],
                 'slug' => Str::slug($payload['title']).'-'.Str::lower(Str::random(6)),
                 'description' => $payload['description'] ?? null,
-                'turkiye_il_id' => $payload['turkiye_il_id'] ?? null,
-                'turkiye_ilce_id' => $payload['turkiye_ilce_id'] ?? null,
-                'city' => $payload['city'] ?? null,
-                'district' => $payload['district'] ?? null,
+                'turkiye_il_id' => $geo['turkiye_il_id'],
+                'turkiye_ilce_id' => $geo['turkiye_ilce_id'],
+                'city' => $geo['city'],
+                'district' => $geo['district'],
                 'address' => $payload['address'] ?? null,
                 'lat' => $payload['lat'],
                 'lng' => $payload['lng'],
@@ -47,7 +49,11 @@ class OutdoorInventoryService
                 'price_unit' => $payload['price_unit'] ?? OohInventory::UNIT_MONTH,
                 'proof_radius_m' => $payload['proof_radius_m'] ?? 75,
                 'status' => OohInventory::STATUS_DRAFT,
-            ]);
+            ];
+            if (OutdoorSchema::hasCountryCode()) {
+                $row['country_code'] = $geo['country_code'];
+            }
+            $inventory = OohInventory::create($row);
 
             $this->storeImages($inventory, $images);
 
@@ -78,7 +84,18 @@ class OutdoorInventoryService
             $this->assertOutdoorCategory((int) $payload['category_id']);
         }
 
+        $geo = $this->geoFromPayload($payload);
+        unset($payload['images']);
         $inventory->fill($payload);
+        $inventory->fill([
+            'turkiye_il_id' => $geo['turkiye_il_id'],
+            'turkiye_ilce_id' => $geo['turkiye_ilce_id'],
+            'city' => $geo['city'],
+            'district' => $geo['district'],
+        ]);
+        if (OutdoorSchema::hasCountryCode()) {
+            $inventory->country_code = $geo['country_code'];
+        }
         if ($inventory->status === OohInventory::STATUS_PUBLISHED) {
             $inventory->status = OohInventory::STATUS_PENDING_REVIEW;
         }
@@ -129,8 +146,14 @@ class OutdoorInventoryService
     /**
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator<int, OohInventory>
      */
-    public function publishedCatalog(?int $provinceId, ?int $districtId, ?int $categoryId)
-    {
+    public function publishedCatalog(
+        ?int $provinceId,
+        ?int $districtId,
+        ?int $categoryId,
+        ?string $countryCode = null,
+        ?string $city = null,
+        ?string $districtName = null,
+    ) {
         if (! OutdoorSchema::inventoriesReady()) {
             return OutdoorSchema::emptyPaginator();
         }
@@ -142,12 +165,29 @@ class OutdoorInventoryService
         if (Schema::hasTable('turkiye_ilceler')) {
             $with[] = 'districtRel';
         }
+        if (Schema::hasTable('countries')) {
+            $with[] = 'country';
+        }
+
+        $countryCode = strtoupper(trim((string) $countryCode));
+        $city = trim((string) $city);
+        $districtName = trim((string) $districtName);
+        if ($countryCode !== '' && ! \App\Support\IsoCountries::isValid($countryCode)) {
+            $countryCode = '';
+        }
+        $applyTrIds = $countryCode === '' || $countryCode === 'TR';
 
         return OohInventory::query()
             ->with($with)
             ->where('status', OohInventory::STATUS_PUBLISHED)
-            ->when($provinceId, fn ($q) => $q->where('turkiye_il_id', $provinceId))
-            ->when($districtId, fn ($q) => $q->where('turkiye_ilce_id', $districtId))
+            ->when(
+                $countryCode !== '' && OutdoorSchema::hasCountryCode(),
+                fn ($q) => $q->where('country_code', $countryCode)
+            )
+            ->when($applyTrIds && $provinceId, fn ($q) => $q->where('turkiye_il_id', $provinceId))
+            ->when($applyTrIds && $districtId, fn ($q) => $q->where('turkiye_ilce_id', $districtId))
+            ->when($city !== '', fn ($q) => $q->where('city', $city))
+            ->when($districtName !== '', fn ($q) => $q->where('district', $districtName))
             ->when($categoryId, fn ($q) => $q->where('category_id', $categoryId))
             ->latest()
             ->paginate(20)
@@ -157,17 +197,26 @@ class OutdoorInventoryService
     /**
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator<int, OohInventory>
      */
-    public function poolForVendor(Vendor $vendor, ?int $provinceId = null)
+    public function poolForVendor(Vendor $vendor, ?int $provinceId = null, ?string $countryCode = null)
     {
         if (! OutdoorSchema::inventoriesReady()) {
             return OutdoorSchema::emptyPaginator();
+        }
+
+        $countryCode = strtoupper(trim((string) $countryCode));
+        if ($countryCode !== '' && ! \App\Support\IsoCountries::isValid($countryCode)) {
+            $countryCode = '';
         }
 
         return OohInventory::query()
             ->with(['images', 'vendor', 'occupancies'])
             ->where('status', OohInventory::STATUS_PUBLISHED)
             ->where('vendor_id', '!=', $vendor->id)
-            ->when($provinceId, fn ($q) => $q->where('turkiye_il_id', $provinceId))
+            ->when(
+                $countryCode !== '' && OutdoorSchema::hasCountryCode(),
+                fn ($q) => $q->where('country_code', $countryCode)
+            )
+            ->when(($countryCode === '' || $countryCode === 'TR') && $provinceId, fn ($q) => $q->where('turkiye_il_id', $provinceId))
             ->latest()
             ->paginate(20)
             ->withQueryString();
@@ -190,6 +239,21 @@ class OutdoorInventoryService
                 'sort_order' => $order,
             ]);
         }
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     * @return array{country_code: string, city: ?string, district: ?string, turkiye_il_id: mixed, turkiye_ilce_id: mixed}
+     */
+    private function geoFromPayload(array $payload): array
+    {
+        return $this->places->normalize(
+            $payload['country_code'] ?? 'TR',
+            $payload['city'] ?? null,
+            $payload['district'] ?? null,
+            $payload['turkiye_il_id'] ?? null,
+            $payload['turkiye_ilce_id'] ?? null,
+        );
     }
 
     private function assertOutdoorCategory(int $categoryId): void

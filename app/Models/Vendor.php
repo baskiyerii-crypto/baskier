@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Vendor extends Model
@@ -20,6 +21,7 @@ class Vendor extends Model
         'slug',
         'email',
         'phone',
+        'country_code',
         'city',
         'district',
         'address',
@@ -83,6 +85,11 @@ class Vendor extends Model
         'map_lat' => 'decimal:7',
         'map_lng' => 'decimal:7',
     ];
+
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class, 'country_code', 'code');
+    }
 
     public function hasTrack(string $track): bool
     {

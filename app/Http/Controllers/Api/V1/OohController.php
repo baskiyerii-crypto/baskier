@@ -24,7 +24,10 @@ class OohController extends ApiController
         $items = $service->publishedCatalog(
             $request->integer('province_id') ?: null,
             $request->integer('district_id') ?: null,
-            $request->integer('category_id') ?: null
+            $request->integer('category_id') ?: null,
+            $request->query('country_code') ?: null,
+            $request->query('city') ?: null,
+            $request->query('district') ?: null
         );
         $items->setCollection(
             $items->getCollection()->map(fn (OohInventory $inv) => (new OohInventoryResource($inv))->resolve())

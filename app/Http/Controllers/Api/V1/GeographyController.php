@@ -11,6 +11,30 @@ use Illuminate\Support\Facades\File;
 
 class GeographyController extends ApiController
 {
+    public function countries()
+    {
+        $rows = \App\Models\Country::catalog()->map(fn ($c) => [
+            'code' => $c->code,
+            'name' => $c->localizedName(),
+        ])->values();
+
+        return $this->ok($rows);
+    }
+
+    public function places(Request $request, \App\Services\WorldPlaceService $places)
+    {
+        $code = strtoupper(trim((string) $request->query('country', '')));
+        if (! \App\Support\IsoCountries::isValid($code)) {
+            return $this->fail('Geçersiz ülke kodu.', null, 422);
+        }
+        $city = trim((string) $request->query('city', ''));
+
+        return $this->ok([
+            'cities' => $places->cities($code),
+            'districts' => $city === '' ? [] : $places->districts($code, $city),
+        ]);
+    }
+
     public function provinces()
     {
         $rows = TurkiyeIl::query()->orderBy('name')->get(['id', 'name']);

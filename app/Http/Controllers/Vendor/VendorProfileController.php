@@ -3,8 +3,13 @@
 namespace App\Http\Controllers\Vendor;
 
 use App\Http\Controllers\Controller;
+use App\Models\Country;
+use App\Models\TurkiyeIl;
+use App\Models\TurkiyeIlce;
 use App\Models\VendorProfileChangeRequest;
+use App\Support\IsoCountries;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
 class VendorProfileController extends Controller
@@ -14,7 +19,25 @@ class VendorProfileController extends Controller
         $vendor = $request->user()->vendor;
         abort_unless($vendor, 403);
 
-        return view('vendor.profile.edit', compact('vendor'));
+        $countries = Country::catalog();
+        $provinces = Schema::hasTable('turkiye_iller') ? TurkiyeIl::query()->orderBy('name')->get() : collect();
+        $provinceId = old('turkiye_il_id');
+        $districts = ($provinceId && Schema::hasTable('turkiye_ilceler'))
+            ? TurkiyeIlce::query()->where('province_id', $provinceId)->orderBy('name')->get()
+            : collect();
+        $places = app(\App\Services\WorldPlaceService::class);
+        $countryCode = old('country_code', $vendor->country_code ?: 'TR');
+        $citySuggestions = $places->cities((string) $countryCode);
+        $districtSuggestions = $places->districts((string) $countryCode, (string) old('city', $vendor->city));
+
+        return view('vendor.profile.edit', compact(
+            'vendor',
+            'countries',
+            'provinces',
+            'districts',
+            'citySuggestions',
+            'districtSuggestions'
+        ));
     }
 
     public function update(Request $request)
@@ -27,8 +50,11 @@ class VendorProfileController extends Controller
             'description' => ['nullable', 'string', 'max:5000'],
             'phone' => ['nullable', 'string', 'max:32'],
             'email' => ['nullable', 'email', 'max:255'],
+            'country_code' => ['nullable', 'string', 'size:2', 'in:'.implode(',', IsoCountries::codes())],
             'city' => ['nullable', 'string', 'max:120'],
             'district' => ['nullable', 'string', 'max:120'],
+            'turkiye_il_id' => ['nullable', 'integer'],
+            'turkiye_ilce_id' => ['nullable', 'integer'],
             'address' => ['nullable', 'string', 'max:500'],
             'map_embed_url' => ['nullable', 'string', 'max:500'],
             'map_lat' => ['nullable', 'numeric'],
@@ -39,7 +65,17 @@ class VendorProfileController extends Controller
             'social_website' => ['nullable', 'url', 'max:255'],
         ]);
 
-        $payload = collect($validated)->except(['logo', 'cover_image', 'social_instagram', 'social_website'])->all();
+        $payload = collect($validated)->except(['logo', 'cover_image', 'social_instagram', 'social_website', 'turkiye_il_id', 'turkiye_ilce_id'])->all();
+        $geo = app(\App\Services\WorldPlaceService::class)->normalize(
+            $validated['country_code'] ?? $vendor->country_code,
+            $validated['city'] ?? null,
+            $validated['district'] ?? null,
+            $validated['turkiye_il_id'] ?? null,
+            $validated['turkiye_ilce_id'] ?? null,
+        );
+        $payload['country_code'] = $geo['country_code'];
+        $payload['city'] = $geo['city'];
+        $payload['district'] = $geo['district'];
         $payload['social_links'] = array_filter([
             'instagram' => $validated['social_instagram'] ?? null,
             'website' => $validated['social_website'] ?? null,

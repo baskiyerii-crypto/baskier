@@ -33,6 +33,8 @@ class SchemaMigrationUpgradeTest extends TestCase
             'ooh_inventories',
             'ooh_plans',
             'vendor_members',
+            'countries',
+            'world_places',
             'posts',
             'integration_credentials',
             'push_subscriptions',
@@ -94,5 +96,7 @@ class SchemaMigrationUpgradeTest extends TestCase
         $this->assertTrue(Schema::hasColumn('users', 'phone'));
         $this->assertTrue(Schema::hasColumn('users', 'phone_verified_at'));
         $this->assertTrue(Schema::hasColumn('users', 'is_active'));
+        $this->assertTrue(Schema::hasColumn('vendors', 'country_code'));
+        $this->assertTrue(Schema::hasColumn('ooh_inventories', 'country_code'));
     }
 }

@@ -29,7 +29,7 @@ class OohInventory extends Model
     protected $fillable = [
         'vendor_id', 'category_id', 'title', 'slug', 'description',
         'turkiye_il_id', 'turkiye_ilce_id', 'city', 'district', 'address',
-        'lat', 'lng', 'permit_no', 'geo_fingerprint', 'list_price', 'price_unit',
+        'country_code', 'lat', 'lng', 'permit_no', 'geo_fingerprint', 'list_price', 'price_unit',
         'proof_radius_m', 'status', 'rejection_reason',
     ];
 
@@ -100,6 +100,11 @@ class OohInventory extends Model
         return $this->belongsTo(TurkiyeIlce::class, 'turkiye_ilce_id');
     }
 
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class, 'country_code', 'code');
+    }
+
     public function images(): HasMany
     {
         return $this->hasMany(OohInventoryImage::class)->orderBy('sort_order');
@@ -123,5 +128,16 @@ class OohInventory extends Model
     public function coverPath(): ?string
     {
         return $this->images->first()?->path;
+    }
+
+    public function locationLabel(): string
+    {
+        $parts = array_filter([
+            $this->relationLoaded('country') ? $this->country?->localizedName() : ($this->country_code ?? null),
+            $this->city ?: $this->province?->name,
+            $this->district ?: $this->districtRel?->name,
+        ]);
+
+        return implode(' / ', $parts);
     }
 }

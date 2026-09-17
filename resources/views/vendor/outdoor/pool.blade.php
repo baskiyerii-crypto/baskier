@@ -11,7 +11,7 @@
             <div class="col-md-4">
                 <div class="card p-3 h-100">
                     <strong>{{ $inv->title }}</strong>
-                    <div class="small text-muted">{{ $inv->vendor?->name }} · {{ $inv->city }}</div>
+                    <div class="small text-muted">{{ $inv->vendor?->name }} · {{ $inv->country_code }} {{ $inv->city }}</div>
                     <a class="btn btn-outline-primary btn-sm mt-2" href="{{ route('outdoor.show', $inv->slug) }}">Katalogda aç</a>
                     <form method="POST" action="{{ route('vendor.outdoor.claims.store') }}" class="mt-2">
                         @csrf

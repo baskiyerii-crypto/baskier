@@ -90,6 +90,23 @@
                         </div>
                     @endif
 
+                    <div class="mt-6 by-divider"></div>
+                    <p class="mt-6 text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('panel.location') }}</p>
+                    <p class="mt-1 text-sm text-slate-600">{{ __('panel.location_help') }}</p>
+                    <div class="mt-4">
+                        @include('partials.geo-location-fields', [
+                            'countryValue' => old('country_code', 'TR'),
+                            'cityValue' => old('city', ''),
+                            'districtValue' => old('district', ''),
+                            'countries' => $countries ?? collect(),
+                            'provinces' => $provinces ?? collect(),
+                            'trDistricts' => $districts ?? collect(),
+                            'citySuggestions' => $citySuggestions ?? [],
+                            'districtSuggestions' => $districtSuggestions ?? [],
+                            'idPrefix' => 'reg-geo',
+                        ])
+                    </div>
+
                     <div id="physical-tax-fields" class="mt-6" style="display:none;">
                         <div class="by-divider mb-4"></div>
                         <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('panel.tax_info') }}</p>

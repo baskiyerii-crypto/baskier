@@ -24,11 +24,19 @@ class AuthController extends ApiController
         ]);
 
         if ($validated['role'] === 'vendor') {
+            $geo = app(\App\Services\WorldPlaceService::class)->normalize(
+                $validated['country_code'] ?? 'TR',
+                $validated['city'] ?? null,
+                $validated['district'] ?? null,
+            );
             $vendor = Vendor::create([
                 'user_id' => $user->id,
                 'name' => $validated['name'],
                 'slug' => Str::slug($validated['name']).'-'.$user->id,
                 'email' => $validated['email'],
+                'country_code' => $geo['country_code'],
+                'city' => $geo['city'],
+                'district' => $geo['district'],
                 'is_active' => false,
             ]);
             $user->update(['vendor_id' => $vendor->id]);

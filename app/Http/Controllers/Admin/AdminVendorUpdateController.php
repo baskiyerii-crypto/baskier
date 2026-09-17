@@ -73,7 +73,7 @@ class AdminVendorUpdateController extends Controller
 
         $vendor = $vendorProfileChangeRequest->vendor;
         $payload = $vendorProfileChangeRequest->payload ?? [];
-        $allowed = ['name', 'description', 'phone', 'email', 'city', 'district', 'address', 'logo', 'map_embed_url', 'map_lat', 'map_lng', 'social_links'];
+        $allowed = ['name', 'description', 'phone', 'email', 'country_code', 'city', 'district', 'address', 'logo', 'map_embed_url', 'map_lat', 'map_lng', 'social_links'];
         $update = array_intersect_key($payload, array_flip($allowed));
         $vendor->update($update);
         $vendor->update(['profile_pending_payload' => null]);

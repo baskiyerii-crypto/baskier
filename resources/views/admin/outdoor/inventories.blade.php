@@ -14,7 +14,7 @@
     <tbody>
     @forelse($items as $inv)
         <tr>
-            <td>{{ $inv->title }}<div class="small text-muted">{{ $inv->city }} / ruhsat {{ $inv->permit_no ?: '—' }}</div></td>
+            <td>{{ $inv->title }}<div class="small text-muted">{{ $inv->country_code }} · {{ $inv->city }} / ruhsat {{ $inv->permit_no ?: '—' }}</div></td>
             <td>{{ $inv->vendor?->name }}</td>
             <td>{{ $inv->status }}</td>
             <td>

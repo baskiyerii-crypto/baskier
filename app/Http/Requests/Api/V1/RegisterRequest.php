@@ -25,8 +25,13 @@ class RegisterRequest extends FormRequest
             'business_type_ids.*' => ['exists:business_types,id'],
         ];
 
-        if ($this->input('role') === 'vendor' && BusinessType::query()->exists()) {
-            $rules['business_type_ids'] = ['required', 'array', 'min:1'];
+        if ($this->input('role') === 'vendor') {
+            $rules['country_code'] = ['nullable', 'string', 'size:2', 'in:'.implode(',', \App\Support\IsoCountries::codes())];
+            $rules['city'] = ['nullable', 'string', 'max:120'];
+            $rules['district'] = ['nullable', 'string', 'max:120'];
+            if (BusinessType::query()->exists()) {
+                $rules['business_type_ids'] = ['required', 'array', 'min:1'];
+            }
         }
 
         return $rules;

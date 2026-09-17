@@ -3,27 +3,38 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Country;
 use App\Models\OohInventory;
 use App\Models\TurkiyeIl;
 use App\Models\TurkiyeIlce;
 use App\Services\OutdoorInventoryService;
 use App\Services\OutdoorOccupancyService;
 use App\Services\OutdoorPlanBasket;
+use App\Services\WorldPlaceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 
 class OutdoorCatalogController extends Controller
 {
-    public function index(Request $request, OutdoorInventoryService $inventories)
+    public function index(Request $request, OutdoorInventoryService $inventories, WorldPlaceService $places)
     {
+        $countryCode = strtoupper(trim((string) $request->query('ulke', '')));
+        $city = trim((string) $request->query('sehir', ''));
+        $districtName = trim((string) $request->query('ilce_adi', ''));
         $provinceId = $request->integer('il') ?: null;
         $districtId = $request->integer('ilce') ?: null;
         $categoryId = $request->integer('kategori') ?: null;
+        if ($provinceId || $districtId) {
+            $countryCode = $countryCode !== '' ? $countryCode : 'TR';
+        }
         $districts = collect();
         $provinces = collect();
         $categories = collect();
+        $countries = Country::catalog();
+        $citySuggestions = [];
+        $districtSuggestions = [];
         try {
-            $items = $inventories->publishedCatalog($provinceId, $districtId, $categoryId);
+            $items = $inventories->publishedCatalog($provinceId, $districtId, $categoryId, $countryCode ?: null, $city ?: null, $districtName ?: null);
             $provinces = Schema::hasTable('turkiye_iller')
                 ? TurkiyeIl::query()->orderBy('name')->get()
                 : collect();
@@ -37,20 +48,45 @@ class OutdoorCatalogController extends Controller
                     ->orderBy('name')
                     ->get();
             }
+            if ($countryCode !== '') {
+                $citySuggestions = $places->cities($countryCode);
+                if ($city !== '') {
+                    $districtSuggestions = $places->districts($countryCode, $city);
+                }
+            }
         } catch (\Throwable $e) {
             report($e);
             $items = \App\Support\OutdoorSchema::emptyPaginator();
         }
         $basket = app(OutdoorPlanBasket::class)->lines($request);
 
-        return view('outdoor.index', compact('items', 'provinces', 'districts', 'categories', 'provinceId', 'districtId', 'categoryId', 'basket'));
+        return view('outdoor.index', compact(
+            'items',
+            'provinces',
+            'districts',
+            'categories',
+            'countries',
+            'provinceId',
+            'districtId',
+            'categoryId',
+            'countryCode',
+            'city',
+            'districtName',
+            'citySuggestions',
+            'districtSuggestions',
+            'basket'
+        ));
     }
 
     public function show(string $slug, OutdoorOccupancyService $occupancy, OutdoorPlanBasket $basket, Request $request)
     {
         abort_unless(\App\Support\OutdoorSchema::inventoriesReady(), 404);
+        $with = ['images', 'vendor', 'category', 'province', 'districtRel'];
+        if (Schema::hasTable('countries')) {
+            $with[] = 'country';
+        }
         $inventory = OohInventory::query()
-            ->with(['images', 'vendor', 'category', 'province', 'districtRel'])
+            ->with($with)
             ->where('slug', $slug)
             ->where('status', OohInventory::STATUS_PUBLISHED)
             ->firstOrFail();

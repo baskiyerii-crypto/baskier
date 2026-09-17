@@ -248,7 +248,8 @@ class OutdoorVerticalTest extends TestCase
 
         $this->get(route('outdoor.index'))
             ->assertOk()
-            ->assertSee('Tüm ilçeler', false);
+            ->assertSee('Tüm ilçeler', false)
+            ->assertSee('Tüm ülkeler', false);
 
         $this->get(route('outdoor.show', $face->slug))
             ->assertOk()
@@ -340,5 +341,63 @@ class OutdoorVerticalTest extends TestCase
             \App\Notifications\PlatformNotification::class,
             fn ($n) => str_contains($n->title, 'hold')
         );
+    }
+
+    public function test_catalog_filters_by_country_and_remembers_typed_places(): void
+    {
+        [$user, $vendor] = $this->outdoorVendor();
+        $cat = $this->outdoorCategory();
+        $this->publishFace($vendor, $cat, 'Istanbul Pano');
+        OohInventory::create([
+            'vendor_id' => $vendor->id,
+            'category_id' => $cat->id,
+            'title' => 'Berlin Billboard',
+            'slug' => 'berlin-billboard-test',
+            'lat' => 52.52,
+            'lng' => 13.405,
+            'country_code' => 'DE',
+            'city' => 'Berlin',
+            'district' => 'Mitte',
+            'list_price' => 800,
+            'price_unit' => OohInventory::UNIT_MONTH,
+            'status' => OohInventory::STATUS_PUBLISHED,
+        ]);
+
+        $this->get(route('outdoor.index', ['ulke' => 'DE']))
+            ->assertOk()
+            ->assertSee('Berlin Billboard')
+            ->assertDontSee('Istanbul Pano');
+
+        $this->getJson('/api/v1/ooh-inventories?country_code=DE')
+            ->assertOk()
+            ->assertJsonFragment(['title' => 'Berlin Billboard', 'country_code' => 'DE'])
+            ->assertJsonMissing(['title' => 'Istanbul Pano']);
+
+        $this->actingAs($user, 'sanctum')->postJson('/api/v1/ooh-inventories', [
+            'title' => 'Hamburg Face',
+            'category_id' => $cat->id,
+            'lat' => 53.55,
+            'lng' => 9.99,
+            'price_unit' => 'month',
+            'country_code' => 'DE',
+            'city' => 'Hamburg',
+            'district' => 'Altona',
+        ])->assertCreated()
+            ->assertJsonPath('data.country_code', 'DE')
+            ->assertJsonPath('data.city', 'Hamburg');
+
+        $this->assertDatabaseHas('world_places', [
+            'country_code' => 'DE',
+            'city' => 'Hamburg',
+            'district' => 'Altona',
+        ]);
+
+        $this->getJson('/api/v1/geography/countries')
+            ->assertOk()
+            ->assertJsonFragment(['code' => 'DE']);
+
+        $this->getJson('/api/v1/geography/places?country=DE')
+            ->assertOk();
+        $this->assertContains('Hamburg', $this->getJson('/api/v1/geography/places?country=DE')->json('data.cities'));
     }
 }

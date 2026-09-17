@@ -4,32 +4,43 @@
 <div class="by-container py-10">
     <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Açık hava</p>
     <h1 class="mt-1 text-3xl font-extrabold tracking-tight text-slate-900">Mecra kataloğu</h1>
-    <p class="mt-2 text-sm text-slate-600">Panoları il / ilçe gez. Fiyat tahmindir; plan talebi satıcı başına teklife dönüşür.</p>
+    <p class="mt-2 text-sm text-slate-600">{{ __('home.path_outdoor_body') }}</p>
 
     @if(session('success'))<div class="alert alert-success mt-4">{{ session('success') }}</div>@endif
     @if(session('error'))<div class="alert alert-danger mt-4">{{ session('error') }}</div>@endif
 
-    <form class="mt-6 by-card p-4 grid gap-3 md:grid-cols-5" method="GET">
-        <select name="il" class="by-input" onchange="this.form.requestSubmit()">
-            <option value="">Tüm iller</option>
-            @foreach($provinces as $p)
-                <option value="{{ $p->id }}" @selected((int)$provinceId === (int)$p->id)>{{ $p->name }}</option>
-            @endforeach
-        </select>
-        <select name="ilce" class="by-input" @disabled(!$provinceId)>
-            <option value="">Tüm ilçeler</option>
-            @foreach($districts as $d)
-                <option value="{{ $d->id }}" @selected((int)$districtId === (int)$d->id)>{{ $d->name }}</option>
-            @endforeach
-        </select>
-        <select name="kategori" class="by-input">
-            <option value="">Tüm kategoriler</option>
-            @foreach($categories as $c)
-                <option value="{{ $c->id }}" @selected((int)$categoryId === (int)$c->id)>{{ $c->localizedName() }}</option>
-            @endforeach
-        </select>
-        <button class="by-btn-primary">Filtrele</button>
-        <a href="{{ route('outdoor.index') }}" class="by-btn-secondary text-center">Sıfırla</a>
+    <form class="mt-6 by-card p-4 space-y-3" method="GET">
+        @include('partials.geo-location-fields', [
+            'nameCountry' => 'ulke',
+            'nameCity' => 'sehir',
+            'nameDistrict' => 'ilce_adi',
+            'nameIl' => 'il',
+            'nameIlce' => 'ilce',
+            'countryValue' => $countryCode ?? '',
+            'cityValue' => $city ?? '',
+            'districtValue' => $districtName ?? '',
+            'ilValue' => $provinceId ?? '',
+            'ilceValue' => $districtId ?? '',
+            'countries' => $countries ?? collect(),
+            'provinces' => $provinces,
+            'trDistricts' => $districts,
+            'citySuggestions' => $citySuggestions ?? [],
+            'districtSuggestions' => $districtSuggestions ?? [],
+            'idPrefix' => 'ooh-cat',
+            'emptyCountry' => true,
+            'inputClass' => 'by-input',
+            'selectClass' => 'by-input',
+        ])
+        <div class="grid gap-3 md:grid-cols-3">
+            <select name="kategori" class="by-input">
+                <option value="">Tüm kategoriler</option>
+                @foreach($categories as $c)
+                    <option value="{{ $c->id }}" @selected((int)$categoryId === (int)$c->id)>{{ $c->localizedName() }}</option>
+                @endforeach
+            </select>
+            <button class="by-btn-primary">Filtrele</button>
+            <a href="{{ route('outdoor.index') }}" class="by-btn-secondary text-center">Sıfırla</a>
+        </div>
     </form>
 
     @if(count($basket))
@@ -68,7 +79,7 @@
                         @endif
                     </div>
                     <div class="p-4">
-                        <p class="text-xs text-slate-500">{{ $inv->city ?: $inv->province?->name }} {{ $inv->district ?: $inv->districtRel?->name }}</p>
+                        <p class="text-xs text-slate-500">{{ $inv->locationLabel() }}</p>
                         <h2 class="mt-1 font-bold text-slate-900">{{ $inv->title }}</h2>
                         <p class="mt-1 text-sm text-slate-600">{{ $inv->vendor?->name }}</p>
                         @if($inv->list_price)

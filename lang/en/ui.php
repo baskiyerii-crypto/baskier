@@ -30,7 +30,7 @@ return [
     'terms' => 'Terms of use',
     'privacy' => 'Privacy',
     'rights' => '© :year BaskiYeri. All rights reserved.',
-    'country' => 'Türkiye',
+    'country' => 'Global marketplace',
     'call' => 'Call',
     'description' => 'Description',
     'vendor_cta_eyebrow' => 'Are you a vendor?',

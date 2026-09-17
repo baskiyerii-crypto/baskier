@@ -85,8 +85,25 @@ class AuthController extends Controller
         $termsContract = \App\Models\Contract::query()->where('key', 'terms')->where('is_active', true)->first();
         $privacyContract = \App\Models\Contract::query()->where('key', 'privacy')->where('is_active', true)->first();
         $vendorAgreement = \App\Models\Contract::query()->where('key', 'vendor_agreement')->where('is_active', true)->first();
+        $countries = \App\Models\Country::catalog();
+        $provinces = \Illuminate\Support\Facades\Schema::hasTable('turkiye_iller')
+            ? \App\Models\TurkiyeIl::query()->orderBy('name')->get()
+            : collect();
+        $districts = collect();
+        $citySuggestions = [];
+        $districtSuggestions = [];
 
-        return view('auth.register', compact('businessTypes', 'termsContract', 'privacyContract', 'vendorAgreement'));
+        return view('auth.register', compact(
+            'businessTypes',
+            'termsContract',
+            'privacyContract',
+            'vendorAgreement',
+            'countries',
+            'provinces',
+            'districts',
+            'citySuggestions',
+            'districtSuggestions'
+        ));
     }
 
     public function register(Request $request)
@@ -104,6 +121,11 @@ class AuthController extends Controller
             'business_type_ids.*' => ['exists:business_types,id'],
             'registration_tracks' => ['nullable', 'array'],
             'registration_tracks.*' => ['in:physical_products,physical_quote,freelancer,outdoor'],
+            'country_code' => ['nullable', 'string', 'size:2', 'in:'.implode(',', \App\Support\IsoCountries::codes())],
+            'city' => ['nullable', 'string', 'max:120'],
+            'district' => ['nullable', 'string', 'max:120'],
+            'turkiye_il_id' => ['nullable', 'integer'],
+            'turkiye_ilce_id' => ['nullable', 'integer'],
             'freelancer_docs' => ['nullable', 'array'],
             'freelancer_docs.*' => ['file', 'max:12288', 'mimes:pdf,jpg,jpeg,png,webp'],
             'freelancer_doc_types' => ['nullable', 'array'],
@@ -172,6 +194,14 @@ class AuthController extends Controller
                     || in_array('physical_quote', $tracks, true)
                     || in_array('outdoor', $tracks, true);
 
+                $geo = app(\App\Services\WorldPlaceService::class)->normalize(
+                    $validated['country_code'] ?? 'TR',
+                    $validated['city'] ?? null,
+                    $validated['district'] ?? null,
+                    $validated['turkiye_il_id'] ?? null,
+                    $validated['turkiye_ilce_id'] ?? null,
+                );
+
                 $vendor = Vendor::create([
                     'user_id' => $user->id,
                     'name' => $validated['name'],
@@ -180,6 +210,9 @@ class AuthController extends Controller
                     'tax_number' => $validated['tax_number'] ?? null,
                     'slug' => \Illuminate\Support\Str::slug($validated['name']).'-'.$user->id,
                     'email' => $validated['email'],
+                    'country_code' => $geo['country_code'],
+                    'city' => $geo['city'],
+                    'district' => $geo['district'],
                     'is_active' => false,
                     'verification_status' => 'pending',
                     'registration_tracks' => $tracks,

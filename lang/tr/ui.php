@@ -30,7 +30,7 @@ return [
     'terms' => 'Kullanım koşulları',
     'privacy' => 'Gizlilik',
     'rights' => '© :year BaskıYeri. Tüm hakları saklıdır.',
-    'country' => 'Türkiye',
+    'country' => 'Küresel pazar yeri',
     'call' => 'Ara',
     'description' => 'Açıklama',
     'vendor_cta_eyebrow' => 'Satıcı mısın?',
