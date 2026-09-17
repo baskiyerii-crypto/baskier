@@ -28,10 +28,41 @@ class GeographyController extends ApiController
             return $this->fail('Geçersiz ülke kodu.', null, 422);
         }
         $city = trim((string) $request->query('city', ''));
+        $provinceId = (int) $request->query('province_id', 0);
+
+        if ($code === 'TR') {
+            $cities = collect($this->provincesPayload())
+                ->map(fn ($row) => [
+                    'id' => $row['id'] ?? null,
+                    'name' => $row['name'],
+                ])
+                ->values()
+                ->all();
+            if ($provinceId < 1 && $city !== '') {
+                $match = collect($cities)->first(fn ($row) => $row['name'] === $city);
+                $provinceId = (int) ($match['id'] ?? 0);
+            }
+            $districts = $provinceId > 0
+                ? collect($this->districtsPayload($provinceId))
+                    ->map(fn ($row) => [
+                        'id' => $row['id'] ?? null,
+                        'name' => $row['name'],
+                    ])
+                    ->values()
+                    ->all()
+                : [];
+
+            return $this->ok([
+                'cities' => $cities,
+                'districts' => $districts,
+            ]);
+        }
 
         return $this->ok([
-            'cities' => $places->cities($code),
-            'districts' => $city === '' ? [] : $places->districts($code, $city),
+            'cities' => array_map(fn ($name) => ['id' => null, 'name' => $name], $places->cities($code)),
+            'districts' => $city === ''
+                ? []
+                : array_map(fn ($name) => ['id' => null, 'name' => $name], $places->districts($code, $city)),
         ]);
     }
 
@@ -161,6 +192,42 @@ class GeographyController extends ApiController
             })
             ->values()
             ->all();
+    }
+
+    /**
+     * @return list<array{id: int, name: string}>
+     */
+    private function provincesPayload(): array
+    {
+        $rows = TurkiyeIl::query()->orderBy('name')->get(['id', 'name']);
+        if ($rows->isEmpty()) {
+            return $this->fallbackProvincesFromFile();
+        }
+
+        return $rows->map(fn (TurkiyeIl $row) => [
+            'id' => (int) $row->id,
+            'name' => (string) $row->name,
+        ])->values()->all();
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function districtsPayload(int $provinceId): array
+    {
+        $rows = TurkiyeIlce::query()
+            ->where('province_id', $provinceId)
+            ->orderBy('name')
+            ->get(['id', 'name', 'postal_code']);
+        if ($rows->isEmpty()) {
+            return $this->fallbackDistrictsFromFile($provinceId);
+        }
+
+        return $rows->map(fn (TurkiyeIlce $row) => [
+            'id' => (int) $row->id,
+            'name' => (string) $row->name,
+            'postal_code' => $row->postal_code,
+        ])->values()->all();
     }
 
     private function fallbackProvincesFromFile(): array

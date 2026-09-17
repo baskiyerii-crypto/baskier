@@ -24,8 +24,18 @@ class WorldPlaceService
         $ilId = $code === 'TR' ? ($ilId ?: null) : null;
         $ilceId = $code === 'TR' ? ($ilceId ?: null) : null;
 
+        if ($code === 'TR' && ! $ilId && $city !== '' && Schema::hasTable('turkiye_iller')) {
+            $ilId = TurkiyeIl::query()->where('name', $city)->value('id');
+        }
         if ($code === 'TR' && $city === '' && $ilId && Schema::hasTable('turkiye_iller')) {
             $city = trim((string) (TurkiyeIl::query()->find($ilId)?->name ?? ''));
+        }
+        if ($code === 'TR' && ! $ilceId && $district !== '' && Schema::hasTable('turkiye_ilceler')) {
+            $ilceQuery = TurkiyeIlce::query()->where('name', $district);
+            if ($ilId) {
+                $ilceQuery->where('province_id', $ilId);
+            }
+            $ilceId = $ilceQuery->value('id');
         }
         if ($code === 'TR' && $district === '' && $ilceId && Schema::hasTable('turkiye_ilceler')) {
             $district = trim((string) (TurkiyeIlce::query()->find($ilceId)?->name ?? ''));
@@ -63,15 +73,37 @@ class WorldPlaceService
      */
     public function cities(string $countryCode): array
     {
-        if (! Schema::hasTable('world_places')) {
-            return [];
+        $code = strtoupper($countryCode);
+        $names = collect();
+        if (Schema::hasTable('world_places')) {
+            $names = $names->merge(
+                WorldPlace::query()->where('country_code', $code)->orderBy('city')->pluck('city')
+            );
+        }
+        if (Schema::hasTable('ooh_inventories') && Schema::hasColumn('ooh_inventories', 'country_code')) {
+            $names = $names->merge(
+                \App\Models\OohInventory::query()
+                    ->where('country_code', $code)
+                    ->whereNotNull('city')
+                    ->where('city', '!=', '')
+                    ->pluck('city')
+            );
+        }
+        if (Schema::hasTable('vendors') && Schema::hasColumn('vendors', 'country_code')) {
+            $names = $names->merge(
+                \App\Models\Vendor::query()
+                    ->where('country_code', $code)
+                    ->whereNotNull('city')
+                    ->where('city', '!=', '')
+                    ->pluck('city')
+            );
         }
 
-        return WorldPlace::query()
-            ->where('country_code', strtoupper($countryCode))
-            ->orderBy('city')
-            ->pluck('city')
+        return $names
+            ->map(fn ($name) => trim((string) $name))
+            ->filter()
             ->unique()
+            ->sort()
             ->values()
             ->all();
     }
@@ -81,17 +113,45 @@ class WorldPlaceService
      */
     public function districts(string $countryCode, string $city): array
     {
-        if (! Schema::hasTable('world_places')) {
-            return [];
+        $code = strtoupper($countryCode);
+        $city = trim($city);
+        $names = collect();
+        if (Schema::hasTable('world_places')) {
+            $names = $names->merge(
+                WorldPlace::query()
+                    ->where('country_code', $code)
+                    ->where('city', $city)
+                    ->where('district', '!=', '')
+                    ->orderBy('district')
+                    ->pluck('district')
+            );
+        }
+        if (Schema::hasTable('ooh_inventories') && Schema::hasColumn('ooh_inventories', 'country_code')) {
+            $names = $names->merge(
+                \App\Models\OohInventory::query()
+                    ->where('country_code', $code)
+                    ->where('city', $city)
+                    ->whereNotNull('district')
+                    ->where('district', '!=', '')
+                    ->pluck('district')
+            );
+        }
+        if (Schema::hasTable('vendors') && Schema::hasColumn('vendors', 'country_code')) {
+            $names = $names->merge(
+                \App\Models\Vendor::query()
+                    ->where('country_code', $code)
+                    ->where('city', $city)
+                    ->whereNotNull('district')
+                    ->where('district', '!=', '')
+                    ->pluck('district')
+            );
         }
 
-        return WorldPlace::query()
-            ->where('country_code', strtoupper($countryCode))
-            ->where('city', $city)
-            ->where('district', '!=', '')
-            ->orderBy('district')
-            ->pluck('district')
+        return $names
+            ->map(fn ($name) => trim((string) $name))
+            ->filter()
             ->unique()
+            ->sort()
             ->values()
             ->all();
     }

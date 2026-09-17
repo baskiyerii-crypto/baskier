@@ -396,8 +396,9 @@ class OutdoorVerticalTest extends TestCase
             ->assertOk()
             ->assertJsonFragment(['code' => 'DE']);
 
-        $this->getJson('/api/v1/geography/places?country=DE')
-            ->assertOk();
-        $this->assertContains('Hamburg', $this->getJson('/api/v1/geography/places?country=DE')->json('data.cities'));
+        $this->getJson('/api/v1/geography/places?country=DE')->assertOk();
+        $cityNames = collect($this->getJson('/api/v1/geography/places?country=DE')->json('data.cities'))
+            ->pluck('name');
+        $this->assertTrue($cityNames->contains('Hamburg'));
     }
 }
