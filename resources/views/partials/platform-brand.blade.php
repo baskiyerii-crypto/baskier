@@ -24,7 +24,7 @@
     @if($logoUrl)
         <img src="{{ $logoUrl }}{{ $version ? '?v='.$version : '' }}" alt="{{ $siteName }}" class="{{ $logoBox }} rounded-2xl object-contain bg-white border border-slate-200/80 shadow-sm">
     @else
-        <span class="inline-flex {{ $logoBox }} items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-cyan-400 text-white shadow-sm text-sm font-bold">{{ mb_strtoupper(mb_substr($siteName, 0, 1)) }}</span>
+        <span class="inline-flex {{ $logoBox }} items-center justify-center rounded-xl bg-[#C2410C] text-white shadow-xs text-sm font-bold">{{ mb_strtoupper(mb_substr($siteName, 0, 1)) }}</span>
     @endif
     @if($showName)
         <span class="{{ $nameClass }}">{{ $siteName }}</span>

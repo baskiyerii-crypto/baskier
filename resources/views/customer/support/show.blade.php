@@ -1,43 +1,61 @@
 @extends('layouts.account')
 
-@section('title', $supportTicket->subject)
+@section('title', $supportTicket->subject . ' - BaskıYeri')
 
 @section('content')
-    @php use App\Support\UiLabels; @endphp
-    <nav class="mb-3"><a href="{{ route('account.support.index') }}" class="small text-muted text-decoration-none">← Taleplerim</a></nav>
+@php use App\Support\UiLabels; @endphp
+    <div class="mb-5">
+        <a href="{{ route('account.support.index') }}" class="inline-flex items-center text-xs font-semibold text-muted hover:text-ink transition-colors">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            Taleplerime Dön
+        </a>
+    </div>
 
-    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+    <div class="flex flex-wrap justify-between items-start gap-4 mb-6">
         <div>
-            <h1 class="h4 fw-bold mb-1">{{ $supportTicket->subject }}</h1>
-            <span class="badge rounded-pill px-3 py-2 {{ $supportTicket->status === 'closed' ? 'bg-secondary-subtle text-secondary' : 'bg-warning-subtle text-dark' }}">
+            <h1 class="font-heading text-2xl font-bold tracking-tight text-ink">{{ $supportTicket->subject }}</h1>
+            <p class="text-xs text-muted mt-1">Talep No: #{{ $supportTicket->id }} · {{ $supportTicket->created_at->format('d.m.Y H:i') }}</p>
+        </div>
+        <div>
+            @php
+                $badgeVariant = match($supportTicket->status) {
+                    'closed' => 'neutral',
+                    'pending' => 'info',
+                    default => 'warning',
+                };
+            @endphp
+            <x-badge :variant="$badgeVariant">
                 {{ UiLabels::supportTicketStatus($supportTicket->status) }}
-            </span>
+            </x-badge>
         </div>
     </div>
 
-    <div class="d-flex flex-column gap-3 mb-4">
+    <div class="space-y-4 mb-6">
         @foreach($supportTicket->messages as $m)
-            <div class="rounded-4 p-4 {{ str_starts_with($m->body, '[Yönetici]') ? 'bg-primary-subtle border border-primary-subtle' : 'bg-white border shadow-sm' }}">
-                <div class="d-flex justify-content-between small text-muted mb-2">
-                    <strong class="text-dark">{{ $m->user?->name ?? 'Kullanıcı' }}</strong>
+            @php $isAdmin = str_starts_with($m->body, '[Yönetici]'); @endphp
+            <div class="by-card p-5 border {{ $isAdmin ? 'bg-canvas border-cta/30' : 'bg-surface border-border' }}">
+                <div class="flex justify-between items-center text-xs text-muted mb-2">
+                    <strong class="text-ink font-semibold {{ $isAdmin ? 'text-cta' : '' }}">{{ $m->user?->name ?? ($isAdmin ? 'BaskıYeri Destek' : 'Kullanıcı') }}</strong>
                     <span>{{ $m->created_at->format('d.m.Y H:i') }}</span>
                 </div>
-                <div class="small" style="white-space: pre-wrap;">{{ preg_replace('/^\[Yönetici\]\s*/', '', $m->body) }}</div>
+                <div class="text-xs text-ink whitespace-pre-wrap leading-relaxed">{{ preg_replace('/^\[Yönetici\]\s*/', '', $m->body) }}</div>
             </div>
         @endforeach
     </div>
 
     @if($supportTicket->status !== 'closed')
-        <div class="rounded-4 border-0 shadow-sm p-4 bg-white">
-            <h2 class="h6 fw-semibold mb-3">Yanıt yaz</h2>
-            <form method="post" action="{{ route('account.support.reply', $supportTicket) }}">
+        <div class="by-card p-6 bg-surface border border-border">
+            <h2 class="font-heading text-base font-bold text-ink mb-3">Yanıt Yaz</h2>
+            <form method="post" action="{{ route('account.support.reply', $supportTicket) }}" class="space-y-3">
                 @csrf
-                <textarea name="body" rows="4" class="form-control rounded-3 mb-3 @error('body') is-invalid @enderror" required maxlength="5000" placeholder="Mesajınız">{{ old('body') }}</textarea>
-                @error('body')<div class="invalid-feedback d-block mb-2">{{ $message }}</div>@enderror
-                <button type="submit" class="btn btn-warning rounded-pill px-4 fw-semibold">Gönder</button>
+                <textarea name="body" rows="4" class="form-control text-xs @error('body') border-red-500 @enderror" required maxlength="5000" placeholder="Mesajınız..."></textarea>
+                @error('body')<div class="text-red-500 text-[11px]">{{ $message }}</div>@enderror
+                <button type="submit" class="btn btn-cta text-xs py-2 px-6">Yanıtı Gönder</button>
             </form>
         </div>
     @else
-        <p class="small text-muted">Bu talep kapatılmıştır.</p>
+        <div class="by-card p-4 bg-canvas border border-border text-center text-xs text-muted">
+            Bu destek talebi kapatılmıştır. Yeni bir konunuz varsa yeni talep açabilirsiniz.
+        </div>
     @endif
 @endsection

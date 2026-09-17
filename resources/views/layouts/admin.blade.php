@@ -4,30 +4,29 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex,nofollow">
-    <meta name="theme-color" content="#1d4ed8">
+    <meta name="theme-color" content="#C2410C">
     <link rel="manifest" href="/manifest.webmanifest">
     <title>@yield('title', 'Yönetim') – BaskıYeri Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
     <style>
         :root {
-            --side-bg: #f8fafc;
-            --side-border: #e2e8f0;
-            --side-text: #475569;
-            --side-text-hover: #0f172a;
-            --side-active-bg: #eff6ff;
-            --side-active-text: #1d4ed8;
-            --side-accent: #6366f1;
-            --header-bg: #ffffff;
-            --content-bg: #f1f5f9;
-            --card-radius: 14px;
+            --side-bg: #FFFFFF;
+            --side-border: #DEDAD2;
+            --side-text: #596166;
+            --side-text-hover: #182023;
+            --side-active-bg: #F7F5F0;
+            --side-active-text: #C2410C;
+            --side-accent: #C2410C;
+            --header-bg: #FFFFFF;
+            --content-bg: #F7F5F0;
+            --card-radius: 12px;
             --nav-gap: 4px;
         }
         * { box-sizing: border-box; }
-        body { font-family: 'DM Sans', sans-serif; background: var(--content-bg); color: #0f172a; min-height: 100vh; }
+        body { background: var(--content-bg); color: #182023; min-height: 100vh; }
         .admin-shell { display: flex; min-height: 100vh; }
         .admin-sidebar {
             width: 280px;
@@ -59,13 +58,6 @@
             scrollbar-width: thin;
             scrollbar-color: #cbd5e1 transparent;
         }
-        .admin-sidebar .nav::-webkit-scrollbar { width: 6px; }
-        .admin-sidebar .nav::-webkit-scrollbar-track { background: transparent; }
-        .admin-sidebar .nav::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 999px;
-        }
-        .admin-sidebar .nav::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         .admin-sidebar details.nav-acc {
             width: 100%;
             flex: 0 0 auto;
@@ -76,9 +68,9 @@
             border-radius: 10px; display: flex; justify-content: space-between; align-items: center;
         }
         .admin-sidebar details.nav-acc > summary::-webkit-details-marker { display: none; }
-        .admin-sidebar details.nav-acc[open] > summary { background: rgba(99,102,241,.08); color: var(--side-active-text); }
+        .admin-sidebar details.nav-acc[open] > summary { background: rgba(194,65,12,.08); color: var(--side-active-text); }
         .admin-sidebar details.nav-acc .nav-acc-body { display: flex; flex-direction: column; flex-wrap: nowrap; gap: 2px; padding: 4px 0 8px 8px; width: 100%; }
-        .sidebar-backdrop { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.35); z-index: 35; }
+        .sidebar-backdrop { display: none; position: fixed; inset: 0; background: rgba(24,32,35,.35); z-index: 35; }
         .sidebar-backdrop.show { display: block; }
         @media (max-width: 991.98px) {
             .admin-sidebar { transform: translateX(-100%); }
@@ -94,8 +86,8 @@
             .admin-content .btn-group { flex-wrap: wrap; }
             .admin-content .d-flex.gap-2 { flex-wrap: wrap; }
         }
-        .metric-card, .card { transition: transform .15s ease, box-shadow .15s ease; }
-        .metric-card:hover, .card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(15,23,42,.08) !important; }
+        .metric-card, .card { transition: transform .15s ease, box-shadow .15s ease; border: 1px solid var(--side-border); border-radius: var(--card-radius); background: #FFFFFF; }
+        .metric-card:hover, .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px -2px rgba(24,32,35,.08) !important; }
         .admin-sidebar .brand {
             padding: 1.5rem 1.25rem;
             border-bottom: 1px solid var(--side-border);
@@ -122,11 +114,12 @@
         }
         .admin-sidebar .nav-link:hover {
             color: var(--side-text-hover);
-            background: rgba(99, 102, 241, 0.06);
+            background: rgba(194, 65, 12, 0.06);
         }
         .admin-sidebar .nav-link.active {
             color: var(--side-active-text);
             background: var(--side-active-bg);
+            font-weight: 700;
         }
         .admin-sidebar .nav-link svg {
             flex-shrink: 0;
@@ -145,8 +138,8 @@
             width: 100%;
             padding: 10px 14px;
             font-size: 0.875rem;
-            font-weight: 500;
-            color: #64748b;
+            font-weight: 600;
+            color: #596166;
             background: #fff;
             border: 1px solid var(--side-border);
             border-radius: 10px;
@@ -170,7 +163,7 @@
             top: 0;
             z-index: 30;
         }
-        .admin-header .page-title { font-size: 1.0625rem; font-weight: 600; color: #0f172a; }
+        .admin-header .page-title { font-size: 1.0625rem; font-weight: 700; color: #182023; }
         .admin-header .user-menu {
             display: flex;
             align-items: center;
@@ -178,7 +171,7 @@
         }
         .admin-header .user-menu .sep { width: 1px; height: 20px; background: var(--side-border); }
         .admin-header .user-menu a {
-            color: #64748b;
+            color: #596166;
             font-size: 0.875rem;
             text-decoration: none;
             font-weight: 500;
@@ -188,7 +181,7 @@
             padding: 6px 12px;
             font-size: 0.8125rem;
             font-weight: 500;
-            color: #64748b;
+            color: #596166;
             background: transparent;
             border: 1px solid var(--side-border);
             border-radius: 8px;
@@ -206,12 +199,6 @@
             background: #fff; color: #475569; cursor: pointer;
         }
         .admin-content { flex: 1; padding: 1.5rem; }
-        .admin-content .card {
-            border: 1px solid var(--side-border);
-            border-radius: var(--card-radius);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-            background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
-        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -303,7 +290,7 @@
                 @include('partials.locale-switcher')
                 <span class="sep"></span>
                 <span class="text-muted small">{{ auth()->user()?->publicCode() }}</span>
-                <a href="{{ route('home') }}" target="_blank">{{ __('panel.view_site') }}</a>
+                <a href="{{ route('home') }}" target="_blank">{{ __('panel.view_site') }} ↗</a>
                 <span class="sep"></span>
                 <span class="text-muted small">{{ auth()->user()->name ?? '' }}</span>
                 <form method="POST" action="{{ route('logout') }}" class="d-inline">

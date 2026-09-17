@@ -76,6 +76,7 @@ Route::get('/kullanim-kosullari', [PageController::class, 'terms'])->name('pages
 Route::get('/hakkimizda', [PageController::class, 'about'])->name('pages.about');
 Route::get('/iletisim', [PageController::class, 'contact'])->name('pages.contact');
 Route::get('/sozlesme/{key}', [ContractController::class, 'show'])->name('contracts.show');
+Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
 
 // Hizmet Talepleri (Canonical)
 Route::get('/hizmet-talepleri', [FreelancerJobController::class, 'index'])->name('service-requests.index');

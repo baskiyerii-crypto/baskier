@@ -3,34 +3,36 @@
 @section('title', 'Giriş Yap - BaskıYeri')
 
 @section('content')
-<div class="by-container py-10">
+<div class="by-container py-12 md:py-16">
     <div class="mx-auto max-w-md">
         <div class="mb-6 text-center">
-            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Hesabın</p>
-            <h1 class="mt-1 text-3xl font-extrabold tracking-tight text-slate-900">Giriş yap</h1>
-            <p class="mt-2 text-sm text-slate-600">Tekliflerin, siparişlerin ve mesajların için.</p>
+            <p class="text-xs font-bold uppercase tracking-wider text-muted">BaskıYeri Hesabınız</p>
+            <h1 class="font-heading text-2xl md:text-3xl font-bold tracking-tight text-ink mt-1">Giriş Yap</h1>
+            <p class="mt-1.5 text-xs text-muted">Siparişleriniz, teklifleriniz ve atölyeniz için oturum açın.</p>
         </div>
 
-        <div class="by-card p-6 md:p-8">
-
-            <form method="POST" action="{{ route('login') }}" class="mt-4 space-y-4">
+        <div class="by-card p-6 md:p-8 bg-surface border border-border">
+            <form method="POST" action="{{ route('login') }}" class="space-y-4">
                 @csrf
                 <div>
-                    <label for="email" class="form-label">E-posta</label>
-                    <input type="email" class="form-control mt-1" id="email" name="email" value="{{ old('email') }}" required autofocus>
+                    <label for="email" class="block text-xs font-semibold text-muted mb-1">E-posta Adresi <span class="text-red-500">*</span></label>
+                    <input type="email" class="form-control text-xs" id="email" name="email" value="{{ old('email') }}" required autofocus placeholder="ornek@baskiyeri.com">
                 </div>
 
                 <div>
-                    <label for="password" class="form-label">Şifre</label>
-                    <div class="mt-1 flex items-center gap-2">
-                        <input type="password" class="form-control flex-1" id="password" name="password" required>
+                    <div class="flex items-center justify-between mb-1">
+                        <label for="password" class="block text-xs font-semibold text-muted">Şifre <span class="text-red-500">*</span></label>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="password" class="form-control text-xs flex-1" id="password" name="password" required placeholder="••••••••">
                         <button
                             type="button"
-                            class="by-btn-secondary px-4 py-3"
+                            class="btn btn-secondary text-xs px-3 py-2"
                             id="toggle-password-visibility"
                             aria-label="Şifreyi basılı tutunca göster"
+                            title="Basılı tutarak şifreyi gör"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/>
                                 <circle cx="12" cy="12" r="3"/>
                             </svg>
@@ -38,17 +40,19 @@
                     </div>
                 </div>
 
-                <label class="flex items-center gap-2 text-sm text-slate-700">
-                    <input type="checkbox" class="h-4 w-4 rounded border-slate-300" id="remember" name="remember" value="1" {{ old('remember') ? 'checked' : '' }}>
-                    Beni hatırla
-                </label>
+                <div class="flex items-center justify-between pt-1">
+                    <label class="flex items-center gap-2 text-xs text-ink cursor-pointer">
+                        <input type="checkbox" class="h-4 w-4 rounded border-border text-cta focus:ring-cta" id="remember" name="remember" value="1" {{ old('remember') ? 'checked' : '' }}>
+                        <span>Beni hatırla</span>
+                    </label>
+                </div>
 
-                <button type="submit" class="w-full by-btn-cta">Giriş Yap</button>
+                <button type="submit" class="btn btn-cta w-full text-xs py-2.5 font-bold">Giriş Yap</button>
             </form>
 
-            <p class="mt-6 text-center text-sm text-slate-600">
-                Hesabınız yok mu? <a href="{{ route('register') }}" class="by-link">Kayıt olun</a>
-            </p>
+            <div class="mt-6 pt-6 border-t border-border text-center text-xs text-muted">
+                Henüz hesabınız yok mu? <a href="{{ route('register') }}" class="font-bold text-cta hover:underline">Hemen Ücretsiz Kayıt Olun</a>
+            </div>
         </div>
     </div>
 </div>

@@ -3,27 +3,25 @@
 @section('title', ($contract->title ?? 'Sözleşme') . ' - BaskıYeri')
 
 @section('content')
-<div class="content-shell py-6">
-    <div class="by-container">
-        <div class="by-card p-6">
-            <div class="flex items-start justify-between gap-4 flex-wrap">
+<div class="by-container py-10 md:py-16">
+    <div class="max-w-3xl mx-auto">
+        <div class="by-card p-6 md:p-10 bg-surface border border-border">
+            <div class="flex items-start justify-between gap-4 flex-wrap pb-4 border-b border-border mb-6">
                 <div>
-                    <div class="text-xs text-slate-500">Sürüm: v{{ (int) $contract->version }}</div>
-                    <h1 class="text-2xl font-bold tracking-tight mt-1">{{ $contract->title }}</h1>
+                    <span class="text-xs font-semibold text-muted">Sürüm: v{{ (int) $contract->version }}</span>
+                    <h1 class="font-heading text-2xl md:text-3xl font-bold tracking-tight text-ink mt-1">{{ $contract->title }}</h1>
                 </div>
-                <a href="{{ url()->previous() }}" class="by-btn-secondary">Geri dön</a>
+                <a href="{{ url()->previous() }}" class="btn btn-secondary text-xs">
+                    ← Geri Dön
+                </a>
             </div>
 
-            <div class="by-divider my-5"></div>
-
             @if(empty($contract->content_html))
-                <div class="by-surface-amber p-4">
-                    <div class="by-accent-bar mb-3"></div>
-                    <div class="font-semibold">Bu sözleşme içeriği henüz eklenmedi.</div>
-                    <div class="text-sm text-slate-600 mt-1">Admin panelden sözleşme metnini doldurabilirsiniz.</div>
+                <div class="p-6 rounded-xl bg-canvas text-center text-xs text-muted">
+                    Bu sözleşme metni henüz eklenmemiştir.
                 </div>
             @else
-                <article class="prose prose-slate max-w-none prose-a:text-indigo-600 prose-a:no-underline hover:prose-a:underline">
+                <article class="prose max-w-none text-xs text-ink leading-relaxed space-y-3">
                     {!! $contract->content_html !!}
                 </article>
             @endif
@@ -31,4 +29,3 @@
     </div>
 </div>
 @endsection
-
