@@ -27,7 +27,12 @@ class VendorOutdoorOpsController extends Controller
         if (! $vendor || ! $vendor->hasActiveOutdoorModule()) {
             abort(403, 'Açık hava modülü aktif değil.');
         }
-        $this->staff->ensureOwner($vendor);
+        \App\Support\OutdoorSchema::abortIfVendorPanelUnavailable();
+        try {
+            $this->staff->ensureOwner($vendor);
+        } catch (RuntimeException $e) {
+            abort(403, $e->getMessage());
+        }
 
         return $vendor;
     }

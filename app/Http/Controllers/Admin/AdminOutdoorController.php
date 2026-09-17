@@ -9,12 +9,20 @@ use App\Models\OohPlan;
 use App\Services\OutdoorClaimService;
 use App\Services\OutdoorInventoryService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class AdminOutdoorController extends Controller
 {
     public function inventories(Request $request)
     {
         $status = $request->get('status', 'pending_review');
+        if (! \App\Support\OutdoorSchema::inventoriesReady()) {
+            $items = \App\Support\OutdoorSchema::emptyPaginator();
+            $collisionCounts = collect();
+
+            return view('admin.outdoor.inventories', compact('items', 'status', 'collisionCounts'));
+        }
+
         $items = OohInventory::query()
             ->with(['vendor', 'category'])
             ->when($status !== 'all', fn ($q) => $q->where('status', $status))
@@ -22,7 +30,7 @@ class AdminOutdoorController extends Controller
             ->paginate(20)
             ->withQueryString();
         $fingerprints = $items->getCollection()->pluck('geo_fingerprint')->filter()->unique();
-        $collisionCounts = $fingerprints->isEmpty()
+        $collisionCounts = ($fingerprints->isEmpty() || ! \App\Support\OutdoorSchema::hasGeoFingerprint())
             ? collect()
             : OohInventory::query()
                 ->selectRaw('geo_fingerprint, count(*) as c')
@@ -58,6 +66,12 @@ class AdminOutdoorController extends Controller
 
     public function claims(Request $request)
     {
+        if (! Schema::hasTable('ooh_inventory_claims')) {
+            $claims = \App\Support\OutdoorSchema::emptyPaginator();
+
+            return view('admin.outdoor.claims', compact('claims'));
+        }
+
         $claims = OohInventoryClaim::query()
             ->with(['inventory.vendor', 'reporterVendor'])
             ->when($request->get('status', 'pending') !== 'all', fn ($q) => $q->where('status', $request->get('status', 'pending')))
@@ -81,6 +95,12 @@ class AdminOutdoorController extends Controller
 
     public function plans()
     {
+        if (! \App\Support\OutdoorSchema::plansReady()) {
+            $plans = \App\Support\OutdoorSchema::emptyPaginator();
+
+            return view('admin.outdoor.plans', compact('plans'));
+        }
+
         $plans = OohPlan::query()
             ->with(['planner', 'vendorRequests'])
             ->latest()

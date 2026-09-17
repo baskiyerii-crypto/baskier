@@ -15,6 +15,10 @@ class OutdoorStaffService
 {
     public function ensureOwner(Vendor $vendor): VendorMember
     {
+        if (! \Illuminate\Support\Facades\Schema::hasTable('vendor_members')) {
+            throw new RuntimeException('Açık hava ekip tablosu henüz kurulmadı.');
+        }
+
         $existing = VendorMember::query()
             ->where('vendor_id', $vendor->id)
             ->where('staff_role', VendorMember::ROLE_OWNER)
@@ -36,6 +40,10 @@ class OutdoorStaffService
 
     public function roleFor(User $user, Vendor $vendor): ?string
     {
+        if (! \Illuminate\Support\Facades\Schema::hasTable('vendor_members')) {
+            return (int) $vendor->user_id === (int) $user->id ? VendorMember::ROLE_OWNER : null;
+        }
+
         $this->ensureOwner($vendor);
 
         return VendorMember::query()

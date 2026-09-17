@@ -15,6 +15,12 @@ class CustomerOutdoorPlanController extends Controller
 {
     public function index(Request $request)
     {
+        if (! \App\Support\OutdoorSchema::plansReady()) {
+            $plans = \App\Support\OutdoorSchema::emptyPaginator();
+
+            return view('customer.outdoor.plans-index', compact('plans'));
+        }
+
         $plans = OohPlan::query()
             ->with(['vendorRequests.latestQuote', 'items.inventory'])
             ->where('planner_user_id', $request->user()->id)

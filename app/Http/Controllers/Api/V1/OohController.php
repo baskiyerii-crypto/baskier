@@ -35,6 +35,9 @@ class OohController extends ApiController
 
     public function show(string $id)
     {
+        if (! \App\Support\OutdoorSchema::inventoriesReady()) {
+            return $this->fail('Kayıt bulunamadı.', null, 404);
+        }
         $inventory = OohInventory::query()
             ->with(['images', 'vendor', 'category'])
             ->where(fn ($q) => $q->where('id', $id)->orWhere('slug', $id))
@@ -48,6 +51,9 @@ class OohController extends ApiController
 
     public function storeInventory(OohInventoryStoreRequest $request, OutdoorInventoryService $service)
     {
+        if (! \App\Support\OutdoorSchema::inventoriesReady()) {
+            return $this->fail('Açık hava şeması henüz kurulmadı.', null, 503);
+        }
         $vendor = $request->user()->vendor;
         try {
             $inventory = $service->create(
@@ -73,6 +79,9 @@ class OohController extends ApiController
 
     public function storePlan(OohPlanStoreRequest $request, OutdoorPlanService $plans)
     {
+        if (! \App\Support\OutdoorSchema::inventoriesReady() || ! \App\Support\OutdoorSchema::plansReady()) {
+            return $this->fail('Açık hava şeması henüz kurulmadı.', null, 503);
+        }
         $this->authorize('create', OohPlan::class);
         $plannerVendor = null;
         if ($request->user()->isVendor()) {
@@ -104,6 +113,10 @@ class OohController extends ApiController
 
     public function myPlans(Request $request)
     {
+        if (! \App\Support\OutdoorSchema::plansReady()) {
+            return $this->ok(\App\Support\OutdoorSchema::emptyPaginator());
+        }
+
         $plans = OohPlan::query()
             ->with(['items.inventory', 'vendorRequests.latestQuote'])
             ->where('planner_user_id', $request->user()->id)
@@ -140,6 +153,9 @@ class OohController extends ApiController
         if (! $vendor?->hasActiveOutdoorModule()) {
             return $this->fail('Açık hava modülü aktif değil.', null, 403);
         }
+        if (! \App\Support\OutdoorSchema::inventoriesReady()) {
+            return $this->ok(\App\Support\OutdoorSchema::emptyPaginator());
+        }
         $items = $vendor->oohInventories()->with('images')->latest()->paginate(20);
 
         return $this->ok($items);
@@ -150,6 +166,9 @@ class OohController extends ApiController
         $vendor = $request->user()->vendor;
         if (! $vendor?->hasActiveOutdoorModule()) {
             return $this->fail('Açık hava modülü aktif değil.', null, 403);
+        }
+        if (! \App\Support\OutdoorSchema::plansReady()) {
+            return $this->ok(\App\Support\OutdoorSchema::emptyPaginator());
         }
         $staff->assertCanOperate($request->user(), $vendor);
         $rows = OohVendorRequest::query()

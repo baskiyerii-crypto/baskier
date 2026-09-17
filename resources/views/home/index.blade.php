@@ -124,6 +124,7 @@
                 </div>
             </a>
             <a href="{{ route('quote-requests.create', ['type' => 'ozalit']) }}" class="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-900 shadow-lg shadow-slate-900/10 transition hover:-translate-y-1 hover:shadow-xl">
+                <img src="{{ asset('images/home/path-ozalit.png') }}" alt="{{ __('home.path_ozalit_title') }}" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
                 <div class="absolute inset-0 bg-linear-to-t from-slate-950 via-sky-950/50 to-cyan-700/20"></div>
                 <div class="relative flex min-h-60 flex-col justify-end p-6 sm:min-h-70">
                     <span class="inline-flex w-fit rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white/90 backdrop-blur">{{ __('home.path_ozalit_eyebrow') }}</span>

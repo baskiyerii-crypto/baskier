@@ -6,8 +6,10 @@ use App\Models\Category;
 use App\Models\OohInventory;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Support\OutdoorSchema;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use RuntimeException;
 
@@ -58,6 +60,10 @@ class OutdoorInventoryService
      */
     public function similarListings(OohInventory $inventory)
     {
+        if (! OutdoorSchema::hasGeoFingerprint()) {
+            return collect();
+        }
+
         return $inventory->similarListings();
     }
 
@@ -125,8 +131,20 @@ class OutdoorInventoryService
      */
     public function publishedCatalog(?int $provinceId, ?int $districtId, ?int $categoryId)
     {
+        if (! OutdoorSchema::inventoriesReady()) {
+            return OutdoorSchema::emptyPaginator();
+        }
+
+        $with = ['images', 'vendor', 'category'];
+        if (Schema::hasTable('turkiye_iller')) {
+            $with[] = 'province';
+        }
+        if (Schema::hasTable('turkiye_ilceler')) {
+            $with[] = 'districtRel';
+        }
+
         return OohInventory::query()
-            ->with(['images', 'vendor', 'category', 'province', 'districtRel'])
+            ->with($with)
             ->where('status', OohInventory::STATUS_PUBLISHED)
             ->when($provinceId, fn ($q) => $q->where('turkiye_il_id', $provinceId))
             ->when($districtId, fn ($q) => $q->where('turkiye_ilce_id', $districtId))
@@ -141,6 +159,10 @@ class OutdoorInventoryService
      */
     public function poolForVendor(Vendor $vendor, ?int $provinceId = null)
     {
+        if (! OutdoorSchema::inventoriesReady()) {
+            return OutdoorSchema::emptyPaginator();
+        }
+
         return OohInventory::query()
             ->with(['images', 'vendor', 'occupancies'])
             ->where('status', OohInventory::STATUS_PUBLISHED)

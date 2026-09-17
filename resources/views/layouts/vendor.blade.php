@@ -140,9 +140,14 @@
         </div>
         @php
             $v = auth()->user()->vendor;
-            $oohRole = ($v && ($v->hasActiveOutdoorModule() || $v->hasOutdoorTrack()))
-                ? app(\App\Services\OutdoorStaffService::class)->roleFor(auth()->user(), $v)
-                : null;
+            $oohRole = null;
+            try {
+                if ($v && \Illuminate\Support\Facades\Schema::hasTable('vendor_members') && ($v->hasActiveOutdoorModule() || $v->hasOutdoorTrack())) {
+                    $oohRole = app(\App\Services\OutdoorStaffService::class)->roleFor(auth()->user(), $v);
+                }
+            } catch (\Throwable) {
+                $oohRole = null;
+            }
         @endphp
         <nav class="nav">
             <a href="{{ route('vendor.dashboard') }}" class="nav-link {{ request()->routeIs('vendor.dashboard') ? 'active' : '' }}">

@@ -19,18 +19,28 @@ class OutdoorCatalogController extends Controller
         $provinceId = $request->integer('il') ?: null;
         $districtId = $request->integer('ilce') ?: null;
         $categoryId = $request->integer('kategori') ?: null;
-        $items = $inventories->publishedCatalog($provinceId, $districtId, $categoryId);
-        $provinces = Schema::hasTable('turkiye_iller')
-            ? TurkiyeIl::query()->orderBy('name')->get()
-            : collect();
-        $districts = ($provinceId && Schema::hasTable('turkiye_ilceler'))
-            ? TurkiyeIlce::query()->where('province_id', $provinceId)->orderBy('name')->get()
-            : collect();
-        $categories = Category::query()
-            ->where('channel', Category::CHANNEL_OUTDOOR)
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->get();
+        $districts = collect();
+        $provinces = collect();
+        $categories = collect();
+        try {
+            $items = $inventories->publishedCatalog($provinceId, $districtId, $categoryId);
+            $provinces = Schema::hasTable('turkiye_iller')
+                ? TurkiyeIl::query()->orderBy('name')->get()
+                : collect();
+            $districts = ($provinceId && Schema::hasTable('turkiye_ilceler'))
+                ? TurkiyeIlce::query()->where('province_id', $provinceId)->orderBy('name')->get()
+                : collect();
+            if (Schema::hasColumn('categories', 'channel')) {
+                $categories = Category::query()
+                    ->where('channel', Category::CHANNEL_OUTDOOR)
+                    ->when(Schema::hasColumn('categories', 'is_active'), fn ($q) => $q->where('is_active', true))
+                    ->orderBy('name')
+                    ->get();
+            }
+        } catch (\Throwable $e) {
+            report($e);
+            $items = \App\Support\OutdoorSchema::emptyPaginator();
+        }
         $basket = app(OutdoorPlanBasket::class)->lines($request);
 
         return view('outdoor.index', compact('items', 'provinces', 'districts', 'categories', 'provinceId', 'districtId', 'categoryId', 'basket'));
@@ -38,6 +48,7 @@ class OutdoorCatalogController extends Controller
 
     public function show(string $slug, OutdoorOccupancyService $occupancy, OutdoorPlanBasket $basket, Request $request)
     {
+        abort_unless(\App\Support\OutdoorSchema::inventoriesReady(), 404);
         $inventory = OohInventory::query()
             ->with(['images', 'vendor', 'category', 'province', 'districtRel'])
             ->where('slug', $slug)
@@ -51,6 +62,7 @@ class OutdoorCatalogController extends Controller
 
     public function addToPlan(Request $request, string $slug, OutdoorPlanBasket $basket, OutdoorOccupancyService $occupancy)
     {
+        abort_unless(\App\Support\OutdoorSchema::inventoriesReady(), 404);
         $inventory = OohInventory::query()
             ->where('slug', $slug)
             ->where('status', OohInventory::STATUS_PUBLISHED)

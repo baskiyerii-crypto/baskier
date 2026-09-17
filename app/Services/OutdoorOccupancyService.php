@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\OohInventory;
 use App\Models\OohOccupancy;
 use App\Models\OohPlan;
+use App\Support\OutdoorSchema;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,10 @@ class OutdoorOccupancyService
 
     public function expireHolds(): int
     {
+        if (! OutdoorSchema::occupanciesReady()) {
+            return 0;
+        }
+
         $expired = OohOccupancy::query()
             ->with(['inventory', 'planItem.plan.planner'])
             ->where('kind', OohOccupancy::KIND_HOLD)
@@ -56,6 +61,10 @@ class OutdoorOccupancyService
 
     public function isAvailable(OohInventory $inventory, CarbonInterface $start, CarbonInterface $end, ?int $ignoreOccupancyId = null): bool
     {
+        if (! OutdoorSchema::occupanciesReady()) {
+            return true;
+        }
+
         $this->expireHolds();
 
         return ! $this->overlapQuery($inventory->id, $start, $end, $ignoreOccupancyId)->exists();
@@ -121,6 +130,10 @@ class OutdoorOccupancyService
      */
     public function calendar(OohInventory $inventory): array
     {
+        if (! OutdoorSchema::occupanciesReady()) {
+            return [];
+        }
+
         $this->expireHolds();
 
         return $inventory->occupancies()

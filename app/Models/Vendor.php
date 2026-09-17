@@ -135,6 +135,10 @@ class Vendor extends Model
 
     public function hasActiveOutdoorModule(): bool
     {
+        if (! \Illuminate\Support\Facades\Schema::hasColumn($this->getTable(), 'outdoor_enabled')) {
+            return false;
+        }
+
         return (bool) $this->outdoor_enabled
             && ($this->outdoor_expires_at === null || $this->outdoor_expires_at->isFuture());
     }
