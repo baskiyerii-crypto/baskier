@@ -4,9 +4,10 @@ namespace App\Notifications;
 
 use App\Models\QuoteRequest;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class QuoteRequestMatchedNotification extends Notification
+class QuoteRequestMatchedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 

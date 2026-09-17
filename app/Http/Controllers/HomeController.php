@@ -24,12 +24,8 @@ class HomeController extends Controller
             ->orderBy('name')
             ->get();
 
-        $featuredProducts = Product::query()
-            ->published()
-            ->where('is_featured', true)
-            ->with(['vendor', 'category'])
-            ->limit(50)
-            ->get();
+        $discoveryProducts = app(\App\Services\FairProductDiscoveryService::class)->getDiscoveryProducts(24);
+        $featuredProducts = $discoveryProducts;
 
         $digitalProducts = Product::query()
             ->published()
@@ -65,6 +61,7 @@ class HomeController extends Controller
             'featuredCategories',
             'categories',
             'featuredProducts',
+            'discoveryProducts',
             'digitalProducts',
             'freelancerJobs',
             'freelancerCategories',

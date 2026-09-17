@@ -105,6 +105,19 @@ class User extends Authenticatable
         return $this->role === 'customer';
     }
 
+    public function isFreelancer(): bool
+    {
+        if ($this->role === 'freelancer') {
+            return true;
+        }
+
+        if ($this->isVendor()) {
+            return (bool) ($this->vendor?->freelancer_enabled ?? false);
+        }
+
+        return $this->freelancerProfile()->exists();
+    }
+
     public function orders(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Order::class);

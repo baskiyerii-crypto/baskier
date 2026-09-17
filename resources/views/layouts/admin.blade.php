@@ -227,10 +227,11 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
                 <span>{{ __('panel.nav_dashboard') }}</span>
             </a>
-            <details class="nav-acc" @if(request()->routeIs('admin.vendors.*','admin.customers.*','admin.vendor-updates.*','admin.vendor-category-requests.*')) open @endif>
+            <details class="nav-acc" @if(request()->routeIs('admin.vendors.*','admin.verifications.*','admin.customers.*','admin.vendor-updates.*','admin.vendor-category-requests.*')) open @endif>
                 <summary>{{ __('panel.nav_people') }} <span>▾</span></summary>
                 <div class="nav-acc-body">
                     <a href="{{ route('admin.vendors.index') }}" class="nav-link {{ request()->routeIs('admin.vendors.*') ? 'active' : '' }}"><span>{{ __('panel.nav_vendors') }}</span></a>
+                    <a href="{{ route('admin.verifications.index') }}" class="nav-link {{ request()->routeIs('admin.verifications.*') ? 'active' : '' }}"><span>Doğrulamalar</span></a>
                     <a href="{{ route('admin.customers.index') }}" class="nav-link {{ request()->routeIs('admin.customers.*') ? 'active' : '' }}"><span>{{ __('panel.nav_customers') }}</span></a>
                     <a href="{{ route('admin.vendor-updates.index') }}" class="nav-link {{ request()->routeIs('admin.vendor-updates.*') ? 'active' : '' }}"><span>{{ __('panel.nav_vendor_updates') }}</span></a>
                     @if(Route::has('admin.vendor-category-requests.index'))
@@ -250,7 +251,7 @@
                     @endif
                 </div>
             </details>
-            <details class="nav-acc" @if(request()->routeIs('admin.finance.*','admin.payouts.*','admin.contracts.*','admin.settings.*','admin.menu.*','admin.api-management.*','admin.support-tickets.*','admin.vendor-payout-requests.*')) open @endif>
+            <details class="nav-acc" @if(request()->routeIs('admin.finance.*','admin.payouts.*','admin.contracts.*','admin.settings.*','admin.menu.*','admin.api-management.*','admin.support-tickets.*','admin.vendor-payout-requests.*','admin.failed-jobs.*','admin.metrics.*')) open @endif>
                 <summary>{{ __('panel.nav_ops') }} <span>▾</span></summary>
                 <div class="nav-acc-body">
                     @if(Route::has('admin.finance.index'))
@@ -270,6 +271,12 @@
                     @endif
                     @if(Route::has('admin.vendor-payout-requests.index'))
                     <a href="{{ route('admin.vendor-payout-requests.index') }}" class="nav-link {{ request()->routeIs('admin.vendor-payout-requests.*') ? 'active' : '' }}"><span>Ödeme Talepleri</span></a>
+                    @endif
+                    @if(Route::has('admin.metrics.index'))
+                    <a href="{{ route('admin.metrics.index') }}" class="nav-link {{ request()->routeIs('admin.metrics.*') ? 'active' : '' }}"><span>Sistem Metrikleri</span></a>
+                    @endif
+                    @if(Route::has('admin.failed-jobs.index'))
+                    <a href="{{ route('admin.failed-jobs.index') }}" class="nav-link {{ request()->routeIs('admin.failed-jobs.*') ? 'active' : '' }}"><span>Başarısız İşler</span></a>
                     @endif
                 </div>
             </details>

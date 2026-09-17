@@ -30,7 +30,7 @@ class OtpService
         }
 
         if ($channel === 'whatsapp') {
-            $this->whatsapp->sendOtp($destination, $code);
+            \App\Jobs\SendWhatsAppMessageJob::dispatch($destination, __('panel.otp_whatsapp_message', ['code' => $code]));
         }
 
         return $otp;

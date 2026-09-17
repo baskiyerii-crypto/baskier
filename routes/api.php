@@ -30,9 +30,11 @@ use App\Http\Controllers\Api\V1\VendorQuoteController;
 use App\Http\Controllers\Api\V1\VendorOrderController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/ready', \App\Http\Controllers\ReadyCheckController::class);
+
 Route::prefix('v1')->group(function () {
-    Route::post('/auth/register', [AuthController::class, 'register']);
-    Route::post('/auth/login', [AuthController::class, 'login']);
+    Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:register');
+    Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:login');
 
     Route::get('/home', [HomeContentController::class, 'index']);
     Route::get('/pages/{slug}', [PageContentController::class, 'show'])->where('slug', 'privacy|terms|about');
@@ -49,9 +51,17 @@ Route::prefix('v1')->group(function () {
     Route::get('/products/{slug}', [ProductController::class, 'show']);
     Route::get('/vendors', [VendorController::class, 'index']);
     Route::get('/vendors/{slug}', [VendorController::class, 'show']);
-    Route::get('/freelancer-jobs', [FreelancerJobController::class, 'index']);
-    Route::middleware('auth:sanctum')->get('/freelancer-jobs/mine', [FreelancerJobController::class, 'myListings']);
-    Route::get('/freelancer-jobs/{job}', [FreelancerJobController::class, 'show']);
+    // Service Requests (Canonical)
+    Route::get('/service-requests', [FreelancerJobController::class, 'index']);
+    Route::middleware('auth:sanctum')->get('/service-requests/mine', [FreelancerJobController::class, 'myListings']);
+    Route::get('/service-requests/{job}', [FreelancerJobController::class, 'show']);
+
+    // Legacy /freelancer-jobs with deprecation headers
+    Route::middleware(\App\Http\Middleware\ApiDeprecationMiddleware::class)->group(function () {
+        Route::get('/freelancer-jobs', [FreelancerJobController::class, 'index']);
+        Route::middleware('auth:sanctum')->get('/freelancer-jobs/mine', [FreelancerJobController::class, 'myListings']);
+        Route::get('/freelancer-jobs/{job}', [FreelancerJobController::class, 'show']);
+    });
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/auth/user', [AuthController::class, 'user']);
@@ -69,7 +79,7 @@ Route::prefix('v1')->group(function () {
         Route::put('/addresses/{address}', [AddressController::class, 'update']);
         Route::delete('/addresses/{address}', [AddressController::class, 'destroy']);
 
-        Route::post('/checkout', [CheckoutController::class, 'store']);
+        Route::post('/checkout', [CheckoutController::class, 'store'])->middleware('throttle:checkout');
 
         Route::get('/orders', [OrderController::class, 'index']);
         Route::get('/orders/{order}', [OrderController::class, 'show']);
@@ -100,9 +110,17 @@ Route::prefix('v1')->group(function () {
         Route::post('/quote-requests/{quoteRequest}/files', [QuoteRequestController::class, 'storeFiles']);
         Route::post('/quote-requests/{quoteRequest}/quotes/{quote}/select', [QuoteRequestController::class, 'selectQuote']);
 
-        Route::post('/freelancer-jobs', [FreelancerJobController::class, 'store']);
-        Route::post('/freelancer-jobs/{job}/bids', [FreelancerJobController::class, 'storeBid']);
-        Route::post('/freelancer-jobs/{job}/bids/{bid}/select', [FreelancerJobController::class, 'selectBid']);
+        // Service Requests (Canonical)
+        Route::post('/service-requests', [FreelancerJobController::class, 'store']);
+        Route::post('/service-requests/{job}/bids', [FreelancerJobController::class, 'storeBid'])->middleware('throttle:bids');
+        Route::post('/service-requests/{job}/bids/{bid}/select', [FreelancerJobController::class, 'selectBid']);
+
+        // Legacy /freelancer-jobs with deprecation headers
+        Route::middleware(\App\Http\Middleware\ApiDeprecationMiddleware::class)->group(function () {
+            Route::post('/freelancer-jobs', [FreelancerJobController::class, 'store']);
+            Route::post('/freelancer-jobs/{job}/bids', [FreelancerJobController::class, 'storeBid']);
+            Route::post('/freelancer-jobs/{job}/bids/{bid}/select', [FreelancerJobController::class, 'selectBid']);
+        });
 
         Route::middleware('role:vendor')->prefix('vendor')->group(function () {
             Route::get('/dashboard', [VendorPanelController::class, 'dashboard']);

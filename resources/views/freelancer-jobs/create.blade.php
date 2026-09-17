@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', __('home.path_freelancer_cta'))
+@section('title', 'Hizmet Teklifi Al')
 
 @section('content')
 <div class="content-shell py-4" style="max-width:640px;">
-    <h1 class="h5 mb-4">{{ __('home.path_freelancer_cta') }}</h1>
-    <form action="{{ route('freelancer-jobs.store') }}" method="post" class="bg-white rounded-4 shadow-sm p-4">
+    <h1 class="h5 mb-4">Hizmet Teklifi Al</h1>
+    <form action="{{ route('service-requests.store') }}" method="post" class="bg-white rounded-4 shadow-sm p-4">
         @csrf
         <div class="mb-3">
             <label class="form-label">{{ __('ui.category') }}</label>

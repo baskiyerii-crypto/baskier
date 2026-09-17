@@ -478,7 +478,7 @@ export function HomeScreen() {
                             <Text>Satıcılar</Text>
                         </Pressable>
                         <Pressable style={[S.chip, S.chipOn]} onPress={() => navigation.navigate('FreelancerJobs')}>
-                            <Text>İş ilanları</Text>
+                            <Text>Hizmet Talepleri</Text>
                         </Pressable>
                         <Pressable style={S.chip} onPress={() => navigation.navigate('Tabs', { screen: 'Kategoriler' })}>
                             <Text>Kategoriler</Text>
@@ -487,7 +487,7 @@ export function HomeScreen() {
 
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                         <View style={S.sectionHead}>
-                            <Text style={S.sectionTitle}>Öne çıkan ürünler</Text>
+                            <Text style={S.sectionTitle}>Keşfedilecek Ürünler</Text>
                         </View>
                         <Pressable onPress={() => navigation.navigate('ProductList')}>
                             <Text style={S.sectionLink}>Tümünü gör →</Text>
@@ -508,7 +508,7 @@ export function HomeScreen() {
                             </Pressable>
                         ))}
                     </View>
-                    {fp.length === 0 ? <Text style={S.muted}>Öne çıkan ürün yok.</Text> : null}
+                    {fp.length === 0 ? <Text style={S.muted}>Keşfedilecek ürün yok.</Text> : null}
 
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
                         <Text style={S.sectionTitle}>Dijital ürünler</Text>
@@ -827,7 +827,7 @@ export function VendorDetailScreen() {
         (async () => {
             try {
                 const data = await api(`/vendors/${encodeURIComponent(slug)}`);
-                setV(data);
+                setV(unwrapData(data));
             } catch {
                 setV(null);
             } finally {
@@ -863,7 +863,14 @@ export function VendorDetailScreen() {
             <FlatList
                 ListHeaderComponent={
                     <View style={S.listPad}>
-                        <Text style={{ fontSize: 22, fontWeight: '800' }}>{v.name}</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                            <Text style={{ fontSize: 22, fontWeight: '800' }}>{v.name}</Text>
+                            {v.trust_level > 0 ? (
+                                <View style={{ backgroundColor: '#ecfdf5', borderColor: '#10b981', borderWidth: 1, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 }}>
+                                    <Text style={{ color: '#059669', fontSize: 11, fontWeight: '700' }}>✓ {v.trust_badge_label || `${v.trust_level} Tik`}</Text>
+                                </View>
+                            ) : null}
+                        </View>
                         <Text style={S.hint}>{v.description || ''}</Text>
                         <Text style={[S.sectionTitle, { marginTop: 16 }]}>Ürünler</Text>
                     </View>
@@ -928,9 +935,9 @@ export function FreelancerJobsScreen() {
                 <Pressable onPress={() => navigation.goBack()}>
                     <Text style={{ color: '#ea580c', fontWeight: '600' }}>← Geri</Text>
                 </Pressable>
-                <Text style={S.brand}>İş ilanları</Text>
+                <Text style={S.brand}>Hizmet Talepleri</Text>
                 <Pressable onPress={() => navigation.navigate('CreateFreelancerJob')}>
-                    <Text style={{ color: '#ea580c', fontWeight: '600' }}>+ İlan</Text>
+                    <Text style={{ color: '#ea580c', fontWeight: '600' }}>+ Talep Oluştur</Text>
                 </Pressable>
             </View>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ backgroundColor: '#fff', maxHeight: 48, borderBottomWidth: 1, borderBottomColor: '#e5e7eb' }} contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 10, alignItems: 'center' }}>
@@ -956,7 +963,7 @@ export function FreelancerJobsScreen() {
                             </Text>
                         </Pressable>
                     )}
-                    ListEmptyComponent={<Text style={S.muted}>İlan yok.</Text>}
+                    ListEmptyComponent={<Text style={S.muted}>Talep yok.</Text>}
                 />
             )}
         </View>
@@ -1525,6 +1532,7 @@ const VENDOR_NEXT_STATUSES = {
 
 const STATUS_LABELS = {
     pending: 'Beklemede',
+    pending_payment: 'Ödeme bekleniyor',
     confirmed: 'Onaylı',
     design_review: 'Tasarım inceleme',
     in_production: 'Üretimde',
@@ -1558,7 +1566,7 @@ export function OrderDetailScreen() {
         setLoading(true);
         try {
             const data = await api(`/orders/${orderId}`);
-            setO(data);
+            setO(unwrapData(data));
         } catch {
             setO(null);
         } finally {
@@ -1814,12 +1822,32 @@ export function CreateQuoteRequestScreen() {
 
 export function CreateFreelancerJobScreen() {
     const navigation = useNavigation();
-    const { token } = useAuth();
+    const { token, user } = useAuth();
     const [category, setCategory] = useState('logo');
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [err, setErr] = useState('');
     const [loading, setLoading] = useState(false);
+
+    if (user && (user.is_freelancer || user.role === 'vendor')) {
+        return (
+            <ScrollView style={S.flex}>
+                <View style={S.topBar}>
+                    <Pressable onPress={() => navigation.goBack()}>
+                        <Text style={{ color: '#ea580c', fontWeight: '600' }}>← Geri</Text>
+                    </Pressable>
+                    <Text style={S.brand}>Talep Oluştur</Text>
+                </View>
+                <View style={[S.listPad, { alignItems: 'center', paddingTop: 48 }]}>
+                    <Text style={{ fontSize: 40, marginBottom: 16 }}>🚫</Text>
+                    <Text style={{ fontSize: 16, fontWeight: '700', textAlign: 'center', marginBottom: 8 }}>Bu alan müşterilere özel</Text>
+                    <Text style={{ fontSize: 14, color: '#6b7280', textAlign: 'center', lineHeight: 22 }}>
+                        Freelancer ve satıcı hesapları hizmet talebi oluşturamaz. Yalnızca müşteri hesapları talep açabilir; siz uygun taleplere teklif verebilirsiniz.
+                    </Text>
+                </View>
+            </ScrollView>
+        );
+    }
 
     const cats = [
         { key: 'logo', label: 'Logo' },
@@ -2592,7 +2620,7 @@ export function VendorOrderDetailScreen() {
         setLoading(true);
         try {
             const data = await api(`/vendor/orders/${orderId}`);
-            setO(data);
+            setO(unwrapData(data));
         } catch {
             setO(null);
         } finally {

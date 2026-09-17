@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Domain\OrderStatus;
+use App\Domain\PaymentStatus;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
@@ -224,14 +225,14 @@ class QuoteRequestController extends Controller
             'vendor_id' => $quote->vendor_id,
             'type' => 'quote',
             'quote_id' => $quote->id,
-            'status' => OrderStatus::CONFIRMED,
-            'payment_status' => 'paid',
+            'status' => OrderStatus::PENDING_PAYMENT,
+            'payment_status' => PaymentStatus::PENDING,
             'subtotal' => $quote->amount,
             'commission_rate' => $rate,
             'commission_amount' => $commissionAmount,
             'vendor_amount' => $vendorAmount,
-            'paid_at' => now(),
-            'commission_ready_at' => now()->addDays($waitDays),
+            'paid_at' => null,
+            'commission_ready_at' => null,
             'termin_due_at' => now()->addDays(max(1, (int) ($quote->delivery_days ?? 7))),
         ]);
 

@@ -231,13 +231,16 @@ class CompetitorBenchmarkingTest extends TestCase
         ]);
         $checkoutRes->assertRedirect(route('account.orders.index'));
 
-        // Stok 50'den 48'e düştü mü?
-        $this->assertEquals(48, $variant->fresh()->stock);
-
         // Sipariş oluştu mu?
         $createdOrder = Order::where('user_id', $customer->id)->latest()->first();
         $this->assertNotNull($createdOrder);
         $this->assertEquals(700.00, (float) $createdOrder->subtotal); // 2 * 350
-        $this->assertEquals(OrderStatus::CONFIRMED, $createdOrder->status);
+
+        // Havale/EFT yönetici/sağlayıcı onayı ile confirmed ve stok düşümü gerçekleşir (Faz 2 çekirdek kuralı)
+        app(\App\Services\MarketplaceOrderService::class)->confirmPaidOrder($createdOrder);
+
+        // Stok 50'den 48'e düştü mü?
+        $this->assertEquals(48, $variant->fresh()->stock);
+        $this->assertEquals(OrderStatus::CONFIRMED, $createdOrder->fresh()->status);
     }
 }

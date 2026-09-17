@@ -181,14 +181,26 @@ class AuthController extends Controller
                 $user->update(['vendor_id' => $vendor->id]);
                 $vendor->businessTypes()->sync($request->input('business_type_ids', []));
 
+                $storageService = app(\App\Services\DocumentStorageService::class);
+
                 if ($needsPhysical && $request->hasFile('tax_plate')) {
-                    $path = $request->file('tax_plate')->store("vendor-documents/{$vendor->id}", 'public');
-                    VendorDocument::create([
-                        'vendor_id' => $vendor->id,
-                        'document_type' => 'tax_plate',
-                        'path' => $path,
-                        'status' => 'pending',
-                    ]);
+                    try {
+                        $stored = $storageService->storeUploadedDocument($request->file('tax_plate'), $vendor->id);
+                        VendorDocument::create([
+                            'vendor_id' => $vendor->id,
+                            'document_type' => 'tax_plate',
+                            'disk' => $stored['disk'],
+                            'file_path' => $stored['file_path'],
+                            'path' => $stored['file_path'],
+                            'original_filename' => $stored['original_filename'],
+                            'mime_type' => $stored['mime_type'],
+                            'file_size' => $stored['file_size'],
+                            'quarantine_status' => $stored['quarantine_status'],
+                            'status' => 'pending',
+                        ]);
+                    } catch (\Throwable $e) {
+                        // ignore upload errors during registration to avoid blocking account creation
+                    }
                 }
 
                 $files = $request->file('freelancer_docs', []);
@@ -197,13 +209,23 @@ class AuthController extends Controller
                     if (! $file) {
                         continue;
                     }
-                    $path = $file->store("vendor-documents/{$vendor->id}", 'public');
-                    VendorDocument::create([
-                        'vendor_id' => $vendor->id,
-                        'document_type' => $types[$i] ?? 'certificate',
-                        'path' => $path,
-                        'status' => 'pending',
-                    ]);
+                    try {
+                        $stored = $storageService->storeUploadedDocument($file, $vendor->id);
+                        VendorDocument::create([
+                            'vendor_id' => $vendor->id,
+                            'document_type' => $types[$i] ?? 'certificate',
+                            'disk' => $stored['disk'],
+                            'file_path' => $stored['file_path'],
+                            'path' => $stored['file_path'],
+                            'original_filename' => $stored['original_filename'],
+                            'mime_type' => $stored['mime_type'],
+                            'file_size' => $stored['file_size'],
+                            'quarantine_status' => $stored['quarantine_status'],
+                            'status' => 'pending',
+                        ]);
+                    } catch (\Throwable $e) {
+                        // ignore upload errors during registration
+                    }
                 }
             }
         });

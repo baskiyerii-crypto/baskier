@@ -11,6 +11,11 @@ use Illuminate\Support\Str;
 
 class BasitKargoService
 {
+    public const STATUS_NOT_CONFIGURED = 'not_configured';
+    public const STATUS_RETRYABLE = 'retryable';
+    public const STATUS_FAILED = 'failed';
+    public const STATUS_SUCCESS = 'success';
+
     public function isConfigured(): bool
     {
         return Setting::apiEnabled('basitkargo')
@@ -41,38 +46,64 @@ class BasitKargoService
         }
     }
 
-    public function createShipment(Order $order, ?string $carrierCode = null): Order
+    /**
+     * @return array{status: string, tracking_number?: ?string, label_url?: ?string, error?: ?string, message?: ?string}
+     */
+    public function createShipment(Order $order, ?string $carrierCode = null): array
     {
-        $tracking = 'BK-'.strtoupper(Str::random(10));
-        $labelPath = 'shipping-labels/'.$order->id.'-'.$tracking.'.txt';
-        Storage::disk('public')->put($labelPath, "Basit Kargo Etiket\nSiparis: {$order->order_number}\nTakip: {$tracking}\n");
-
-        if ($this->isConfigured()) {
-            try {
-                $res = Http::withToken(Setting::get('basitkargo_api_key'))
-                    ->timeout(30)
-                    ->post(rtrim(Setting::get('basitkargo_base_url'), '/').'/shipments', [
-                        'order_number' => $order->order_number,
-                        'carrier' => $carrierCode,
-                        'address' => $order->shipping_address,
-                        'amount' => $order->subtotal,
-                    ]);
-                $data = $res->json() ?? [];
-                $tracking = $data['tracking_number'] ?? $tracking;
-                if (! empty($data['label_url'])) {
-                    $labelPath = $data['label_url'];
-                }
-            } catch (\Throwable $e) {
-                Log::warning('basitkargo_create_failed', ['order' => $order->id, 'error' => $e->getMessage()]);
-            }
+        if (! $this->isConfigured()) {
+            return [
+                'status' => self::STATUS_NOT_CONFIGURED,
+                'message' => 'Basit Kargo entegrasyonu yapılandırılmamış.',
+                'tracking_number' => null,
+                'label_url' => null,
+            ];
         }
 
-        $order->update([
-            'tracking_number' => $tracking,
-            'shipping_label_path' => $labelPath,
-            'carrier_code' => $carrierCode,
-        ]);
+        try {
+            $res = Http::withToken(Setting::get('basitkargo_api_key'))
+                ->timeout(20)
+                ->post(rtrim(Setting::get('basitkargo_base_url'), '/').'/shipments', [
+                    'order_number' => $order->order_number,
+                    'carrier' => $carrierCode,
+                    'address' => $order->shipping_address,
+                    'amount' => $order->subtotal,
+                ]);
 
-        return $order->fresh();
+            if ($res->successful()) {
+                $data = $res->json() ?? [];
+                return [
+                    'status' => self::STATUS_SUCCESS,
+                    'tracking_number' => $data['tracking_number'] ?? null,
+                    'label_url' => $data['label_url'] ?? null,
+                ];
+            }
+
+            if ($res->serverError()) {
+                Log::warning('basitkargo_create_server_error', ['order' => $order->id, 'status' => $res->status()]);
+                return [
+                    'status' => self::STATUS_RETRYABLE,
+                    'error' => 'Kargo sağlayıcı sunucu hatası: '.$res->status(),
+                ];
+            }
+
+            Log::error('basitkargo_create_client_error', ['order' => $order->id, 'status' => $res->status(), 'body' => $res->body()]);
+            return [
+                'status' => self::STATUS_FAILED,
+                'error' => 'Kargo sağlayıcı isteği reddetti: '.$res->status(),
+            ];
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            Log::warning('basitkargo_create_timeout', ['order' => $order->id, 'error' => $e->getMessage()]);
+            return [
+                'status' => self::STATUS_RETRYABLE,
+                'error' => 'Kargo sağlayıcı bağlantı zaman aşımı: '.$e->getMessage(),
+            ];
+        } catch (\Throwable $e) {
+            Log::error('basitkargo_create_failed', ['order' => $order->id, 'error' => $e->getMessage()]);
+            return [
+                'status' => self::STATUS_FAILED,
+                'error' => $e->getMessage(),
+            ];
+        }
     }
 }

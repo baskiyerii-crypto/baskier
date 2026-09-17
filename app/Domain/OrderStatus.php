@@ -6,6 +6,8 @@ final class OrderStatus
 {
     public const PENDING = 'pending';
 
+    public const PENDING_PAYMENT = 'pending_payment';
+
     public const CONFIRMED = 'confirmed';
 
     public const DESIGN_REVIEW = 'design_review';
@@ -31,6 +33,7 @@ final class OrderStatus
     {
         return [
             self::PENDING,
+            self::PENDING_PAYMENT,
             self::CONFIRMED,
             self::DESIGN_REVIEW,
             self::IN_PRODUCTION,

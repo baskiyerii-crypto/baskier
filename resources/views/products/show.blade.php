@@ -47,9 +47,12 @@
                         <div class="mt-5 rounded-2xl border border-slate-200 bg-white/70 p-4">
                             <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Satıcı</p>
                             <div class="mt-2 flex flex-wrap items-center justify-between gap-3">
-                                <a href="{{ route('vendors.show', $product->vendor->slug) }}" class="text-sm font-semibold text-slate-900 hover:underline">
-                                    {{ $product->vendor->name }}
-                                </a>
+                                <div class="flex items-center gap-2">
+                                    <a href="{{ route('vendors.show', $product->vendor->slug) }}" class="text-sm font-semibold text-slate-900 hover:underline">
+                                        {{ $product->vendor->name }}
+                                    </a>
+                                    <x-trust-badge :vendor="$product->vendor" size="sm" />
+                                </div>
                                 <a href="{{ route('vendors.show', $product->vendor->slug) }}" class="by-btn-secondary">Profili gör</a>
                             </div>
                         </div>
@@ -217,22 +220,7 @@
             <h2 class="text-lg font-bold tracking-tight text-slate-900">{{ $alsoBought->isNotEmpty() ? 'Benzer ürünler' : 'Size önerilen benzer ürünler' }}</h2>
             <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 @foreach($related as $item)
-                    <a href="{{ route('products.show', $item->slug) }}" class="group by-card by-card-hover overflow-hidden">
-                        <div class="aspect-4/3 bg-slate-100 flex items-center justify-center">
-                            @if($item->main_image)
-                                <img src="{{ asset('storage/'.$item->main_image) }}" alt="{{ $item->name }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
-                            @else
-                                <div class="h-full w-full flex flex-col items-center justify-center text-slate-400 bg-slate-100 p-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mb-1 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                    <span class="text-xs text-slate-400">Görsel yok</span>
-                                </div>
-                            @endif
-                        </div>
-                        <div class="p-4">
-                            <p class="truncate text-sm font-semibold text-slate-900">{{ $item->name }}</p>
-                            <p class="mt-1 text-sm font-bold text-orange-900">₺{{ number_format($item->price, 2, ',', '.') }}</p>
-                        </div>
-                    </a>
+                    <x-product-card :product="$item" />
                 @endforeach
             </div>
         </div>

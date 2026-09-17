@@ -23,7 +23,10 @@
                     @endif
                 </div>
                 <div class="flex-1 min-w-0 pb-1">
-                    <h1 class="truncate text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">{{ $vendor->name }}</h1>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <h1 class="truncate text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">{{ $vendor->name }}</h1>
+                        <x-trust-badge :vendor="$vendor" size="md" />
+                    </div>
                     <p class="mt-1 text-sm text-slate-500">{{ __('ui.marketplace_vendor') }}</p>
                     <div class="mt-2 flex flex-wrap items-center gap-2">
                         @if($vendor->rating_average)

@@ -56,7 +56,6 @@ class VendorProductController extends ApiController
             'price_min' => ['nullable', 'numeric', 'min:0'],
             'price_max' => ['nullable', 'numeric', 'min:0'],
             'is_active' => ['nullable', 'boolean'],
-            'is_featured' => ['nullable', 'boolean'],
             'short_description' => ['nullable', 'string', 'max:500'],
             'description' => ['nullable', 'string', 'max:5000'],
         ]);
@@ -69,7 +68,7 @@ class VendorProductController extends ApiController
             'catalog_type' => $validated['catalog_type'] ?? 'standard',
             'pricing_type' => $validated['pricing_type'] ?? 'fixed',
             'is_active' => (bool) ($validated['is_active'] ?? true),
-            'is_featured' => (bool) ($validated['is_featured'] ?? false),
+            'is_featured' => false,
         ]));
 
         // Ensure uniqueness-ish without heavy logic.
@@ -98,7 +97,6 @@ class VendorProductController extends ApiController
             'price_min' => ['nullable', 'numeric', 'min:0'],
             'price_max' => ['nullable', 'numeric', 'min:0'],
             'is_active' => ['nullable', 'boolean'],
-            'is_featured' => ['nullable', 'boolean'],
             'short_description' => ['nullable', 'string', 'max:500'],
             'description' => ['nullable', 'string', 'max:5000'],
         ]);
@@ -107,7 +105,10 @@ class VendorProductController extends ApiController
             $validated['slug'] = Str::slug($validated['name']).'-'.$product->id;
         }
 
-        $product->fill($validated)->save();
+        unset($validated['is_featured']);
+        $product->fill($validated);
+        $product->is_featured = false;
+        $product->save();
 
         return $this->ok($product->fresh()->load('category'), 'Ürün güncellendi.');
     }

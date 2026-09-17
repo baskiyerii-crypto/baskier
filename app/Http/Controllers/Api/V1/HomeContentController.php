@@ -29,12 +29,7 @@ class HomeContentController extends ApiController
             ->orderBy('name')
             ->get();
 
-        $featuredProducts = Product::query()
-            ->published()
-            ->where('is_featured', true)
-            ->with(['vendor', 'category'])
-            ->limit(50)
-            ->get();
+        $featuredProducts = app(\App\Services\FairProductDiscoveryService::class)->getDiscoveryProducts(24);
 
         $digitalProducts = Product::query()
             ->published()
@@ -70,6 +65,7 @@ class HomeContentController extends ApiController
             'featured_categories' => CategoryResource::collection($featuredCategories)->resolve(),
             'categories' => CategoryResource::collection($categories)->resolve(),
             'featured_products' => ProductResource::collection($featuredProducts)->resolve(),
+            'discovery_products' => ProductResource::collection($featuredProducts)->resolve(),
             'digital_products' => ProductResource::collection($digitalProducts)->resolve(),
             'freelancer_jobs' => $freelancerJobs,
             'freelancer_categories' => $freelancerCategories,

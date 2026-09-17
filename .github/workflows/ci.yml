@@ -1,0 +1,67 @@
+name: CI & Quality Gates
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  laravel-tests:
+    name: PHP Test Suite & Quality Gates
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, bcmath, fileinfo, gd
+          coverage: none
+
+      - name: Validate composer.json
+        run: composer validate --strict
+
+      - name: Install Composer Dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction --optimize-autoloader
+
+      - name: Prepare Environment & SQLite DB
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          touch database/database.sqlite
+
+      - name: Verify Migrations and Routes
+        run: |
+          php artisan migrate --force
+          php artisan route:list
+
+      - name: Run PHPUnit Feature & Unit Tests
+        run: php artisan test --stop-on-failure
+
+      - name: Verify Readiness Probe
+        run: |
+          php artisan test --filter=ProductionReadinessTest
+
+  frontend-assets:
+    name: Node.js & Vite Asset Build Gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install NPM Dependencies
+        run: npm ci
+
+      - name: Build Assets for Production
+        run: npm run build

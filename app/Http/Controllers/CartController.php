@@ -24,6 +24,9 @@ class CartController extends Controller
     public function add(Request $request, Product $product)
     {
         if (! $product->is_active) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Bu ürün satışta değil.'], 422);
+            }
             return back()->with('error', 'Bu ürün satışta değil.');
         }
         $validated = $request->validate([
@@ -36,13 +39,29 @@ class CartController extends Controller
         if (! empty($validated['variant_id'])) {
             $variant = $product->variants()->find($validated['variant_id']);
             if (! $variant) {
+                if ($request->expectsJson()) {
+                    return response()->json(['message' => 'Seçilen varyant geçersiz.'], 422);
+                }
                 return back()->with('error', 'Seçilen varyant geçersiz.');
             }
         }
 
         $availableStock = $variant ? (int) $variant->stock : (int) $product->stock;
         if ($availableStock < $qty) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Yeterli stok yok.'], 422);
+            }
             return back()->with('error', 'Yeterli stok yok.');
+        }
+
+        if ($request->boolean('buy_now')) {
+            $request->session()->put('quick_buy', [
+                'product_id' => $product->id,
+                'variant_id' => $variant?->id,
+                'quantity' => $qty,
+            ]);
+
+            return redirect()->route('checkout.index');
         }
 
         $row = CartItem::firstOrNew([
@@ -52,13 +71,21 @@ class CartController extends Controller
         ]);
         $newQty = ($row->exists ? $row->quantity : 0) + $qty;
         if ($newQty > 999 || $availableStock < $newQty) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Sepetteki miktar stoku aşamaz.'], 422);
+            }
             return back()->with('error', 'Sepetteki miktar stoku aşamaz.');
         }
         $row->quantity = $newQty;
         $row->save();
 
-        if ($request->boolean('buy_now')) {
-            return redirect()->route('checkout.index')->with('success', 'Ürün sepete eklendi. Ödemeye devam edin.');
+        if ($request->expectsJson()) {
+            $cartCount = (int) CartItem::where('user_id', $request->user()->id)->sum('quantity');
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Ürün sepete eklendi.',
+                'cart_count' => $cartCount,
+            ]);
         }
 
         return back()->with('success', 'Ürün sepete eklendi.');

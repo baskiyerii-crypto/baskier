@@ -30,6 +30,11 @@ class Vendor extends Model
         'description',
         'is_active',
         'verification_status',
+        'trust_level',
+        'is_suspended',
+        'suspended_at',
+        'suspended_by',
+        'suspension_reason',
         'freelancer_enabled',
         'freelancer_expires_at',
         'quotes_enabled',
@@ -50,6 +55,8 @@ class Vendor extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
+        'is_suspended' => 'boolean',
+        'trust_level' => 'integer',
         'freelancer_enabled' => 'boolean',
         'quotes_enabled' => 'boolean',
         'tabela_enabled' => 'boolean',
@@ -57,6 +64,7 @@ class Vendor extends Model
         'rating_average' => 'decimal:2',
         'risk_score' => 'decimal:2',
         'contract_suspended_at' => 'datetime',
+        'suspended_at' => 'datetime',
         'freelancer_expires_at' => 'datetime',
         'quotes_expires_at' => 'datetime',
         'tabela_expires_at' => 'datetime',
@@ -112,8 +120,24 @@ class Vendor extends Model
         }
 
         return $this->documents()
-            ->where('document_type', 'tax_plate')
+            ->whereIn('document_type', ['tax_plate', 'company_registration'])
             ->where('status', 'approved')
+            ->where(function ($query) {
+                $query->whereNull('expires_at')
+                    ->orWhereDate('expires_at', '>=', now()->toDateString());
+            })
+            ->exists();
+    }
+
+    public function hasApprovedFreelancerCredential(): bool
+    {
+        return $this->documents()
+            ->whereIn('document_type', ['diploma', 'certificate', 'portfolio_accreditation'])
+            ->where('status', 'approved')
+            ->where(function ($query) {
+                $query->whereNull('expires_at')
+                    ->orWhereDate('expires_at', '>=', now()->toDateString());
+            })
             ->exists();
     }
 
@@ -152,6 +176,7 @@ class Vendor extends Model
             'rating_average' => $avg !== null ? round((float) $avg, 2) : null,
             'reviews_count' => $count,
         ]);
+        app(\App\Services\TrustBadgeService::class)->recalculateAndSave($this);
     }
 
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo

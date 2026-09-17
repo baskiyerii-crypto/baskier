@@ -50,10 +50,15 @@
 
         <div class="api-card" data-api="iyzico">
             <div class="api-card-head">
-                <h2>iyzico</h2>
-                <div class="form-check form-switch m-0">
-                    <input class="form-check-input api-toggle" type="checkbox" role="switch" name="api_iyzico_enabled" value="1" id="api_iyzico" @checked($iyzico_enabled)>
-                    <label class="form-check-label" for="api_iyzico">{{ $iyzico_enabled ? 'Açık' : 'Kapalı' }}</label>
+                <div class="d-flex align-items-center gap-2">
+                    <h2 class="m-0">iyzico</h2>
+                    <span class="badge bg-{{ $iyzico_mode === 'live' ? 'danger' : 'warning text-dark' }}">{{ strtoupper($iyzico_mode) }}</span>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="form-check form-switch m-0">
+                        <input class="form-check-input api-toggle" type="checkbox" role="switch" name="api_iyzico_enabled" value="1" id="api_iyzico" @checked($iyzico_enabled)>
+                        <label class="form-check-label" for="api_iyzico">{{ $iyzico_enabled ? 'Açık' : 'Kapalı' }}</label>
+                    </div>
                 </div>
             </div>
             <div class="api-fields row g-3" data-disabled="{{ $iyzico_enabled ? '0' : '1' }}">
@@ -74,7 +79,7 @@
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Secret Key</label>
-                    <input type="password" name="iyzico_secret_key" class="form-control" value="{{ $iyzico_secret_key }}">
+                    <input type="password" name="iyzico_secret_key" class="form-control" value="{{ $iyzico_secret_key }}" placeholder="Değiştirmek için yeni anahtar girin">
                 </div>
             </div>
         </div>

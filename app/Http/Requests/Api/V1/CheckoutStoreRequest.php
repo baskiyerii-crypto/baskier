@@ -24,6 +24,13 @@ class CheckoutStoreRequest extends FormRequest
     {
         return [
             'address_id' => ['required', 'integer', 'exists:addresses,id'],
+            'billing_address_id' => ['nullable', 'integer', 'exists:addresses,id'],
+            'payment_method' => ['nullable', 'string', 'in:credit_card,bank_transfer,cash_on_delivery'],
+            'idempotency_key' => ['nullable', 'string', 'max:100'],
+            'invoice_type' => ['nullable', 'string', 'in:individual,corporate'],
+            'invoice_full_name' => ['nullable', 'string', 'max:255'],
+            'invoice_email' => ['nullable', 'email', 'max:190'],
+            'invoice_phone' => ['nullable', 'string', 'max:20'],
         ];
     }
 }

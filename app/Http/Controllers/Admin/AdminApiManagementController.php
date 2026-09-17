@@ -4,34 +4,45 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Services\IyzicoClient;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class AdminApiManagementController extends Controller
 {
     private const API_KEYS = ['shopify', 'iyzico', 'basitkargo', 'openai', 'evolution'];
 
+    private const SECRET_KEYS = [
+        'iyzico_secret_key',
+        'shopify_admin_token',
+        'basitkargo_api_key',
+        'openai_api_key',
+        'evolution_api_key',
+    ];
+
     public function index()
     {
         return view('admin.api-management.index', [
-            'payment_provider' => Setting::get('payment_provider', 'shopify'),
+            'payment_provider' => Setting::get('payment_provider', 'iyzico'),
             'shopify_enabled' => Setting::apiEnabled('shopify'),
             'shopify_shop_domain' => Setting::get('shopify_shop_domain', ''),
-            'shopify_admin_token' => Setting::get('shopify_admin_token', ''),
+            'shopify_admin_token' => $this->mask(Setting::get('shopify_admin_token', '')),
             'shopify_api_version' => Setting::get('shopify_api_version', '2024-01'),
             'iyzico_enabled' => Setting::apiEnabled('iyzico'),
             'iyzico_mode' => Setting::get('iyzico_mode', 'sandbox'),
             'iyzico_api_key' => Setting::get('iyzico_api_key', ''),
-            'iyzico_secret_key' => Setting::get('iyzico_secret_key', ''),
+            'iyzico_secret_key' => $this->mask(Setting::get('iyzico_secret_key', '')),
             'iyzico_base_url' => Setting::get('iyzico_base_url', 'https://sandbox-api.iyzipay.com'),
+            'iyzico_last_test' => Setting::get('iyzico_last_test_result'),
             'basitkargo_enabled' => Setting::apiEnabled('basitkargo'),
-            'basitkargo_api_key' => Setting::get('basitkargo_api_key', ''),
+            'basitkargo_api_key' => $this->mask(Setting::get('basitkargo_api_key', '')),
             'basitkargo_base_url' => Setting::get('basitkargo_base_url', ''),
             'openai_enabled' => Setting::apiEnabled('openai'),
-            'openai_api_key' => Setting::get('openai_api_key', ''),
+            'openai_api_key' => $this->mask(Setting::get('openai_api_key', '')),
             'openai_model' => Setting::get('openai_model', 'gpt-4o-mini'),
             'evolution_enabled' => Setting::apiEnabled('evolution'),
             'evolution_base_url' => Setting::get('evolution_base_url', config('evolution.base_url')),
-            'evolution_api_key' => Setting::get('evolution_api_key', config('evolution.api_key')),
+            'evolution_api_key' => $this->mask(Setting::get('evolution_api_key', config('evolution.api_key'))),
             'evolution_instance' => Setting::get('evolution_instance', config('evolution.instance')),
         ]);
     }
@@ -61,9 +72,61 @@ class AdminApiManagementController extends Controller
         }
 
         foreach ($validated as $key => $value) {
-            Setting::set($key, (string) ($value ?? ''));
+            if (in_array($key, self::SECRET_KEYS, true)) {
+                // If value is masked with bullets, skip overwriting
+                if (empty($value) || str_starts_with((string) $value, '••••')) {
+                    continue;
+                }
+                Setting::setSecret($key, (string) $value);
+            } else {
+                Setting::set($key, (string) ($value ?? ''));
+            }
         }
 
         return back()->with('success', __('panel.settings_saved'));
+    }
+
+    public function testIyzico(Request $request, IyzicoClient $client)
+    {
+        if (! $client->isConfigured()) {
+            return back()->with('error', 'iyzico API anahtarları henüz girilmemiş.');
+        }
+
+        try {
+            $headers = $client->generateV2Headers('/payment/test', '{}');
+            $response = Http::withHeaders($headers)
+                ->timeout(10)
+                ->get($client->baseUrl() . '/payment/test');
+
+            $status = $response->status();
+            $ok = $response->successful();
+
+            Setting::set('iyzico_last_test_result', json_encode([
+                'timestamp' => now()->toIso8601String(),
+                'status' => $ok ? 'success' : 'failed',
+                'http_code' => $status,
+            ]));
+
+            if ($ok) {
+                return back()->with('success', "iyzico {$client->mode()} bağlantısı başarılı! (HTTP {$status})");
+            }
+
+            return back()->with('error', "iyzico yanıt verdi ancak hata kodu döndü: HTTP {$status}");
+        } catch (\Throwable $e) {
+            return back()->with('error', 'iyzico sunucusuna erişilemedi: ' . $e->getMessage());
+        }
+    }
+
+    private function mask(?string $val): string
+    {
+        if (empty($val)) {
+            return '';
+        }
+        $len = strlen($val);
+        if ($len <= 4) {
+            return '••••';
+        }
+
+        return '••••••••' . substr($val, -4);
     }
 }

@@ -103,12 +103,6 @@ class VendorOrderController extends Controller
             $carrier = $validated['carrier'] ?? $validated['carrier_code'] ?? null;
             $tracking = $validated['tracking_number'] ?? null;
 
-            if (! $carrier || ! $tracking) {
-                $shipment = $this->shipping->createShipment($order->fresh(), $validated['carrier_code'] ?? $carrier);
-                $carrier = $carrier ?: ($shipment->carrier_code ?? 'basitkargo');
-                $tracking = $tracking ?: ($shipment->tracking_number ?? null);
-            }
-
             if ($carrier && $tracking) {
                 Shipment::updateOrCreate(
                     ['order_id' => $order->id],
@@ -118,11 +112,17 @@ class VendorOrderController extends Controller
                         'shipped_at' => now(),
                     ]
                 );
+                $order->update([
+                    'carrier_code' => $carrier,
+                    'tracking_number' => $tracking,
+                ]);
+            } else {
+                \App\Jobs\CreateShipmentJob::dispatch($order->fresh(), $validated['carrier_code'] ?? $carrier);
             }
         }
 
         if ($targetStatus === OrderStatus::READY_TO_SHIP) {
-            $this->shipping->createShipment($order->fresh(), $validated['carrier_code'] ?? null);
+            \App\Jobs\CreateShipmentJob::dispatch($order->fresh(), $validated['carrier_code'] ?? null);
         }
 
         try {

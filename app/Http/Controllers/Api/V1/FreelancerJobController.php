@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Domain\OrderStatus;
+use App\Domain\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Models\FreelancerJobBid;
 use App\Models\FreelancerJobListing;
@@ -41,6 +42,10 @@ class FreelancerJobController extends Controller
 
     public function store(Request $request)
     {
+        if (! $request->user()->isCustomer() || $request->user()->isFreelancer()) {
+            return response()->json(['message' => 'Yalnızca müşteriler hizmet teklifi talebi oluşturabilir.'], 403);
+        }
+
         $validated = $request->validate([
             'category' => ['required', 'in:logo,wordpress,brochure,digital,other'],
             'title' => ['required', 'string', 'max:255'],
@@ -59,10 +64,19 @@ class FreelancerJobController extends Controller
     public function storeBid(Request $request, FreelancerJobListing $job)
     {
         if ($job->status !== 'open') {
-            return response()->json(['message' => 'İlan kapalı.'], 422);
+            return response()->json(['message' => 'Hizmet talebi kapalı.'], 422);
         }
         if ($job->user_id === $request->user()->id) {
-            return response()->json(['message' => 'Kendi ilanınıza teklif veremezsiniz.'], 422);
+            return response()->json(['message' => 'Kendi talebinize teklif veremezsiniz.'], 422);
+        }
+
+        $user = $request->user();
+        $vendor = $user->vendor;
+        $isVerified = ($vendor && $vendor->hasActiveFreelancerModule() && ($vendor->verification_status === 'verified' || $vendor->hasApprovedTaxPlate() || $vendor->documents()->where('status', 'approved')->exists()))
+            || ($user->freelancerProfile && $user->freelancerProfile->is_verified);
+
+        if (! $isVerified) {
+            return response()->json(['message' => 'Yalnızca aktif ve doğrulanmış freelancerlar teklif verebilir.'], 403);
         }
 
         $validated = $request->validate([
@@ -85,8 +99,8 @@ class FreelancerJobController extends Controller
 
     public function selectBid(Request $request, FreelancerJobListing $job, FreelancerJobBid $bid)
     {
-        if ($job->user_id !== $request->user()->id) {
-            abort(403);
+        if ($job->user_id !== $request->user()->id || ! $request->user()->isCustomer()) {
+            return response()->json(['message' => 'Yalnızca talep sahibi müşteri teklifi seçebilir.'], 403);
         }
         if ($bid->freelancer_job_listing_id !== $job->id || $bid->status !== 'pending') {
             return response()->json(['message' => 'Geçersiz teklif.'], 400);
@@ -113,14 +127,14 @@ class FreelancerJobController extends Controller
                 'contractor_user_id' => $bid->user_id,
                 'type' => 'freelancer',
                 'freelancer_job_id' => $job->id,
-                'status' => OrderStatus::CONFIRMED,
-                'payment_status' => 'paid',
+                'status' => OrderStatus::PENDING_PAYMENT,
+                'payment_status' => PaymentStatus::PENDING,
                 'subtotal' => $bid->amount,
                 'commission_rate' => $rate,
                 'commission_amount' => $commissionAmount,
                 'vendor_amount' => $vendorAmount,
-                'paid_at' => now(),
-                'commission_ready_at' => now()->addDays($waitDays),
+                'paid_at' => null,
+                'commission_ready_at' => null,
                 'shipping_address' => 'Freelancer proje: ' . $job->title,
             ]);
 

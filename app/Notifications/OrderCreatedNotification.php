@@ -4,9 +4,10 @@ namespace App\Notifications;
 
 use App\Models\Order;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class OrderCreatedNotification extends Notification
+class OrderCreatedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 

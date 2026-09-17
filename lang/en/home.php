@@ -99,9 +99,9 @@ return [
     'digital_empty' => 'Digital products coming soon.',
     'digital_browse' => 'Browse digital products',
 
-    'featured_eyebrow' => 'New collection',
-    'featured_title' => 'Featured products',
-    'featured_body' => 'Latest print and advertising products.',
+    'featured_eyebrow' => 'Daily discovery',
+    'featured_title' => 'Products for you',
+    'featured_body' => 'Curated products from trusted vendors, updated with fair daily rotation.',
     'see_all_products' => 'See all products',
     'no_products' => 'No products yet.',
     'vendor_fallback' => 'Vendor',

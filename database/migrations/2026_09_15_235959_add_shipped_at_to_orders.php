@@ -8,16 +8,20 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->timestamp('shipped_at')->nullable()->index();
-        });
+        if (Schema::hasTable('orders') && ! Schema::hasColumn('orders', 'shipped_at')) {
+            Schema::table('orders', function (Blueprint $table) {
+                $table->timestamp('shipped_at')->nullable()->index();
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->dropIndex(['shipped_at']);
-            $table->dropColumn('shipped_at');
-        });
+        if (Schema::hasTable('orders') && Schema::hasColumn('orders', 'shipped_at')) {
+            Schema::table('orders', function (Blueprint $table) {
+                $table->dropIndex(['shipped_at']);
+                $table->dropColumn('shipped_at');
+            });
+        }
     }
 };

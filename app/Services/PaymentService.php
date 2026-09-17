@@ -2,41 +2,43 @@
 
 namespace App\Services;
 
+use App\Domain\OrderStatus;
+use App\Domain\PaymentStatus;
+use App\Exceptions\PaymentNotConfiguredException;
+use App\Models\Address;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Models\PaymentAttempt;
 use App\Models\Setting;
-use Illuminate\Support\Facades\Http;
+use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class PaymentService
 {
+    public function __construct(
+        private IyzicoClient $iyzicoClient,
+        private MarketplaceOrderService $orderService
+    ) {}
+
+    public function isIyzicoConfigured(): bool
+    {
+        return $this->iyzicoClient->isConfigured();
+    }
+
     public function isShopifyConfigured(): bool
     {
-        return Setting::apiEnabled('shopify')
+        return config('marketplace.enable_shopify', false)
+            && Setting::apiEnabled('shopify')
             && filled(Setting::get('shopify_shop_domain'))
             && filled(Setting::get('shopify_admin_token'));
     }
 
-    public function isIyzicoConfigured(): bool
-    {
-        return Setting::apiEnabled('iyzico')
-            && filled(Setting::get('iyzico_api_key'))
-            && filled(Setting::get('iyzico_secret_key'));
-    }
-
     public function provider(): string
     {
-        $p = Setting::get('payment_provider', 'shopify');
-        if (! in_array($p, ['shopify', 'iyzico'], true)) {
-            $p = 'shopify';
-        }
-        // If preferred provider disabled, fall back to the other if enabled.
-        if ($p === 'shopify' && ! Setting::apiEnabled('shopify')) {
-            $p = Setting::apiEnabled('iyzico') ? 'iyzico' : 'shopify';
-        }
-        if ($p === 'iyzico' && ! Setting::apiEnabled('iyzico')) {
-            $p = Setting::apiEnabled('shopify') ? 'shopify' : 'iyzico';
+        $p = Setting::get('payment_provider', 'iyzico');
+        if (! in_array($p, ['iyzico', 'shopify'], true)) {
+            $p = 'iyzico';
         }
 
         return $p;
@@ -44,239 +46,195 @@ class PaymentService
 
     public function isConfigured(): bool
     {
-        return $this->provider() === 'shopify'
-            ? $this->isShopifyConfigured()
-            : $this->isIyzicoConfigured();
-    }
-
-    public function mode(): string
-    {
-        return Setting::get('iyzico_mode', 'sandbox') === 'live' ? 'live' : 'sandbox';
-    }
-
-    public function baseUrl(): string
-    {
-        $custom = Setting::get('iyzico_base_url');
-        if ($custom) {
-            return rtrim($custom, '/');
-        }
-
-        return $this->mode() === 'live'
-            ? 'https://api.iyzipay.com'
-            : 'https://sandbox-api.iyzipay.com';
-    }
-
-    public function recordDemoPayment(Order $order): Payment
-    {
-        return Payment::create([
-            'order_id' => $order->id,
-            'provider' => 'demo',
-            'reference' => 'DEMO-'.$order->order_number,
-            'amount' => $order->subtotal,
-            'status' => 'completed',
-            'meta' => ['note' => 'Demo payment'],
-        ]);
+        return $this->provider() === 'iyzico'
+            ? $this->isIyzicoConfigured()
+            : $this->isShopifyConfigured();
     }
 
     /**
-     * Create Shopify draft order and return invoice/checkout URL.
-     * Falls back to demo paid + null URL when Shopify is not configured.
+     * Prepare an iyzico Checkout Form session for one or more orders under a single PaymentAttempt.
+     *
+     * @param list<Order> $orders
      */
-    public function createShopifyCheckout(Order $order): array
-    {
-        if (! $this->isShopifyConfigured()) {
-            $payment = $this->recordDemoPayment($order);
-            $order->update(['payment_status' => 'paid']);
-
-            return ['url' => null, 'payment' => $payment, 'demo' => true];
-        }
-
-        $shop = preg_replace('#^https?://#', '', rtrim((string) Setting::get('shopify_shop_domain'), '/'));
-        $token = Setting::get('shopify_admin_token');
-        $apiVersion = Setting::get('shopify_api_version', '2024-01');
-
-        $payload = [
-            'draft_order' => [
-                'line_items' => [[
-                    'title' => 'Siparis '.$order->order_number,
-                    'quantity' => 1,
-                    'price' => number_format((float) $order->subtotal, 2, '.', ''),
-                ]],
-                'note' => 'BaskiYeri order #'.$order->order_number,
-                'email' => $order->invoice_email,
-                'tags' => 'baskiyeri,order-'.$order->id,
-                'use_customer_default_address' => true,
-            ],
-        ];
-
-        try {
-            $res = Http::withHeaders([
-                'X-Shopify-Access-Token' => $token,
-                'Content-Type' => 'application/json',
-            ])
-                ->timeout(30)
-                ->post("https://{$shop}/admin/api/{$apiVersion}/draft_orders.json", $payload);
-
-            $body = $res->json() ?? [];
-            $draft = $body['draft_order'] ?? [];
-            $invoiceUrl = $draft['invoice_url'] ?? null;
-
-            $payment = Payment::create([
-                'order_id' => $order->id,
-                'provider' => 'shopify',
-                'reference' => (string) ($draft['id'] ?? ('SH-'.$order->order_number)),
-                'amount' => $order->subtotal,
-                'status' => $invoiceUrl ? 'pending' : 'failed',
-                'meta' => $body,
-            ]);
-
-            $order->update([
-                'payment_status' => $invoiceUrl ? 'pending' : 'failed',
-            ]);
-
-            if (! $invoiceUrl) {
-                throw new \RuntimeException($body['errors'] ?? 'Shopify ödeme bağlantısı oluşturulamadı.');
-            }
-
-            return ['url' => $invoiceUrl, 'payment' => $payment, 'demo' => false];
-        } catch (\Throwable $e) {
-            Log::warning('shopify_checkout_failed', ['order' => $order->id, 'error' => $e->getMessage()]);
-            throw $e;
-        }
-    }
-
-    public function markShopifyPaid(Order $order, ?string $reference = null): Payment
-    {
-        $payment = Payment::query()
-            ->where('order_id', $order->id)
-            ->where('provider', 'shopify')
-            ->latest()
-            ->first();
-
-        if ($payment) {
-            $payment->update([
-                'status' => 'completed',
-                'reference' => $reference ?: $payment->reference,
-            ]);
-        } else {
-            $payment = Payment::create([
-                'order_id' => $order->id,
-                'provider' => 'shopify',
-                'reference' => $reference ?: ('SH-DONE-'.$order->order_number),
-                'amount' => $order->subtotal,
-                'status' => 'completed',
-                'meta' => [],
-            ]);
-        }
-
-        $order->update(['payment_status' => 'paid']);
-
-        return $payment;
-    }
-
-    public function chargeCard(Order $order, array $card): Payment
-    {
-        if ($this->provider() === 'shopify') {
-            throw new \RuntimeException('Aktif ödeme sağlayıcısı Shopify. Kart ile iyzico için API yönetiminden geçiş yapın.');
-        }
-
+    public function initializeIyzicoCheckout(
+        PaymentAttempt $attempt,
+        array $orders,
+        User $user,
+        Address $shippingAddress,
+        Address $billingAddress
+    ): array {
         if (! $this->isIyzicoConfigured()) {
-            $payment = $this->recordDemoPayment($order);
-            $order->update(['payment_status' => 'paid']);
-
-            return $payment;
+            throw new PaymentNotConfiguredException('iyzico ödeme entegrasyonu yapılandırılmamıştır.');
         }
 
-        $conversationId = 'BY-'.$order->order_number.'-'.Str::random(6);
+        $totalPrice = '0.00';
+        $basketItems = [];
+
+        foreach ($orders as $order) {
+            foreach ($order->items as $item) {
+                $itemTotal = bcmul((string) $item->price, (string) $item->quantity, 2);
+                $totalPrice = bcadd($totalPrice, $itemTotal, 2);
+
+                $basketItem = [
+                    'id' => (string) $item->id,
+                    'name' => mb_substr((string) $item->name, 0, 100),
+                    'category1' => 'Baski',
+                    'itemType' => ($item->product && $item->product->isDigital()) ? 'VIRTUAL' : 'PHYSICAL',
+                    'price' => number_format((float) $itemTotal, 2, '.', ''),
+                ];
+
+                // Marketplace sub-merchant support if vendor has sub-merchant key
+                $subKey = $order->vendor?->sub_merchant_key;
+                if ($subKey) {
+                    $basketItem['subMerchantKey'] = $subKey;
+                    $basketItem['subMerchantPrice'] = number_format((float) $order->vendor_amount, 2, '.', '');
+                }
+
+                $basketItems[] = $basketItem;
+            }
+        }
+
+        $formattedTotal = number_format((float) $totalPrice, 2, '.', '');
+
+        $nameParts = explode(' ', trim($user->name));
+        $buyerName = $nameParts[0] ?? 'Musteri';
+        $buyerSurname = count($nameParts) > 1 ? implode(' ', array_slice($nameParts, 1)) : 'Kullanici';
+
         $payload = [
             'locale' => 'tr',
-            'conversationId' => $conversationId,
-            'price' => number_format((float) $order->subtotal, 2, '.', ''),
-            'paidPrice' => number_format((float) $order->subtotal, 2, '.', ''),
+            'conversationId' => $attempt->conversation_id,
+            'price' => $formattedTotal,
+            'paidPrice' => $formattedTotal,
             'currency' => 'TRY',
-            'installment' => 1,
-            'paymentChannel' => 'WEB',
+            'basketId' => 'BY-BASKET-' . $attempt->id,
             'paymentGroup' => 'PRODUCT',
-            'paymentCard' => [
-                'cardHolderName' => $card['card_holder_name'] ?? '',
-                'cardNumber' => preg_replace('/\D/', '', $card['card_number'] ?? ''),
-                'expireMonth' => substr((string) ($card['card_expiry'] ?? ''), 0, 2),
-                'expireYear' => '20'.substr((string) ($card['card_expiry'] ?? ''), -2),
-                'cvc' => $card['card_cvc'] ?? '',
-            ],
+            'callbackUrl' => route('payment.iyzico.callback'),
+            'enabledInstallments' => [1, 2, 3, 6, 9, 12],
             'buyer' => [
-                'id' => (string) $order->user_id,
-                'name' => $order->invoice_full_name ?: 'Musteri',
-                'surname' => 'BY',
-                'email' => $order->invoice_email ?: 'info@baskiyeri.com',
-                'identityNumber' => $order->invoice_identity_number ?: '11111111111',
-                'registrationAddress' => $order->shipping_address ?: 'Adres',
-                'city' => 'Istanbul',
+                'id' => (string) $user->id,
+                'name' => $buyerName,
+                'surname' => $buyerSurname,
+                'email' => $user->email ?: 'musteri@baskiyeri.com',
+                'identityNumber' => $user->identity_number ?: '11111111111',
+                'registrationAddress' => $shippingAddress->formatted,
+                'city' => $shippingAddress->city ?: 'Istanbul',
                 'country' => 'Turkey',
-            ],
-            'billingAddress' => [
-                'contactName' => $order->invoice_full_name ?: 'Musteri',
-                'city' => 'Istanbul',
-                'country' => 'Turkey',
-                'address' => $order->shipping_address ?: 'Adres',
+                'ip' => request()->ip() ?: '127.0.0.1',
             ],
             'shippingAddress' => [
-                'contactName' => $order->invoice_full_name ?: 'Musteri',
-                'city' => 'Istanbul',
+                'contactName' => $shippingAddress->full_name ?: $user->name,
+                'city' => $shippingAddress->city ?: 'Istanbul',
                 'country' => 'Turkey',
-                'address' => $order->shipping_address ?: 'Adres',
+                'address' => $shippingAddress->formatted,
             ],
-            'basketItems' => [[
-                'id' => (string) $order->id,
-                'name' => 'Siparis '.$order->order_number,
-                'category1' => 'Genel',
-                'itemType' => 'PHYSICAL',
-                'price' => number_format((float) $order->subtotal, 2, '.', ''),
-            ]],
+            'billingAddress' => [
+                'contactName' => $billingAddress->full_name ?: $user->name,
+                'city' => $billingAddress->city ?: 'Istanbul',
+                'country' => 'Turkey',
+                'address' => $billingAddress->formatted,
+            ],
+            'basketItems' => $basketItems,
         ];
 
-        try {
-            $response = Http::withHeaders($this->authHeaders(json_encode($payload)))
-                ->timeout(30)
-                ->post($this->baseUrl().'/payment/auth', $payload);
+        $response = $this->iyzicoClient->initializeCheckoutForm($payload);
 
-            $body = $response->json() ?? [];
-            $ok = ($body['status'] ?? '') === 'success';
-
-            $payment = Payment::create([
-                'order_id' => $order->id,
-                'provider' => 'iyzico',
-                'reference' => $body['paymentId'] ?? $conversationId,
-                'amount' => $order->subtotal,
-                'status' => $ok ? 'completed' : 'failed',
-                'meta' => $body,
+        $status = $response['status'] ?? 'failure';
+        if ($status !== 'success') {
+            $errorMsg = $response['errorMessage'] ?? 'Ödeme formu başlatılamadı.';
+            $attempt->update([
+                'status' => PaymentStatus::FAILED,
+                'error_code' => $response['errorCode'] ?? 'INIT_FAIL',
+                'error_message' => $errorMsg,
             ]);
 
-            $order->update(['payment_status' => $ok ? 'paid' : 'failed']);
-
-            if (! $ok) {
-                throw new \RuntimeException($body['errorMessage'] ?? 'iyzico ödeme başarısız.');
-            }
-
-            return $payment;
-        } catch (\Throwable $e) {
-            Log::warning('iyzico_charge_failed', ['order' => $order->id, 'error' => $e->getMessage()]);
-            throw $e;
+            throw new \RuntimeException($errorMsg);
         }
-    }
 
-    private function authHeaders(string $requestBody): array
-    {
-        $apiKey = Setting::get('iyzico_api_key');
-        $secret = Setting::get('iyzico_secret_key');
-        $random = Str::random(8).microtime(true);
-        $hashStr = $apiKey.$random.$secret.$requestBody;
-        $hash = base64_encode(sha1($hashStr, true));
+        $attempt->update([
+            'status' => PaymentStatus::PROCESSING,
+            'metadata' => [
+                'token' => $response['token'] ?? null,
+                'paymentPageUrl' => $response['paymentPageUrl'] ?? null,
+            ],
+        ]);
 
         return [
-            'Authorization' => 'IYZWS '.$apiKey.':'.$hash,
-            'x-iyzi-rnd' => $random,
-            'Content-Type' => 'application/json',
+            'token' => $response['token'] ?? null,
+            'checkoutFormContent' => $response['checkoutFormContent'] ?? null,
+            'paymentPageUrl' => $response['paymentPageUrl'] ?? null,
+        ];
+    }
+
+    /**
+     * Handle and verify server-to-server callback from iyzico.
+     */
+    public function verifyAndProcessIyzicoCallback(string $token): array
+    {
+        $attempt = PaymentAttempt::where('metadata->token', $token)->first();
+        if (! $attempt) {
+            Log::warning('iyzico_callback_attempt_not_found', ['token' => $token]);
+            throw new \InvalidArgumentException('Geçersiz veya süresi dolmuş ödeme oturumu.');
+        }
+
+        $detail = $this->iyzicoClient->getCheckoutFormDetail($token, $attempt->conversation_id);
+
+        $status = $detail['status'] ?? 'failure';
+        $paymentStatus = $detail['paymentStatus'] ?? 'FAILURE';
+
+        if ($status === 'success' && $paymentStatus === 'SUCCESS') {
+            // Validate currency and amount
+            $paidCurrency = $detail['currency'] ?? 'TRY';
+            $paidPrice = $detail['paidPrice'] ?? '0.00';
+
+            if ($paidCurrency !== 'TRY') {
+                Log::error('iyzico_currency_mismatch', ['expected' => 'TRY', 'actual' => $paidCurrency]);
+                throw new \RuntimeException('Geçersiz para birimi.');
+            }
+
+            $attempt->update([
+                'status' => PaymentStatus::PAID,
+                'provider_reference' => (string) ($detail['paymentId'] ?? ''),
+                'paid_at' => now(),
+                'metadata' => array_merge((array) $attempt->metadata, ['detail' => $detail]),
+            ]);
+
+            // Confirm all orders under this payment attempt
+            $orderIds = (array) ($attempt->order_ids ?? []);
+            $confirmedOrders = [];
+            foreach ($orderIds as $orderId) {
+                $order = Order::find($orderId);
+                if ($order) {
+                    $confirmedOrders[] = $this->orderService->confirmPaidOrder($order, $attempt, $detail);
+                }
+            }
+
+            return [
+                'success' => true,
+                'attempt' => $attempt,
+                'orders' => $confirmedOrders,
+            ];
+        }
+
+        // Payment failed or cancelled
+        $errorMessage = $detail['errorMessage'] ?? 'Ödeme işlemi onaylanmadı.';
+        $attempt->update([
+            'status' => PaymentStatus::FAILED,
+            'error_code' => $detail['errorCode'] ?? 'PAYMENT_FAILED',
+            'error_message' => $errorMessage,
+        ]);
+
+        $orderIds = (array) ($attempt->order_ids ?? []);
+        foreach ($orderIds as $orderId) {
+            $order = Order::find($orderId);
+            if ($order) {
+                $this->orderService->failOrder($order, $errorMessage);
+            }
+        }
+
+        return [
+            'success' => false,
+            'attempt' => $attempt,
+            'errorMessage' => $errorMessage,
         ];
     }
 }

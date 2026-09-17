@@ -1,17 +1,17 @@
 @extends('layouts.app')
 
-@section('title', $job->title . ' - İş ilanı - BaskıYeri')
+@section('title', $job->title . ' - Hizmet Talebi - BaskıYeri')
 
 @section('content')
     <div class="content-shell py-4">
         <nav class="mb-3">
-            <a href="{{ route('freelancer-jobs.index') }}" class="small text-decoration-none text-muted">← İş ilanları</a>
+            <a href="{{ route('service-requests.index') }}" class="small text-decoration-none text-muted">← Hizmet talepleri</a>
         </nav>
 
         <div class="rounded-4 overflow-hidden shadow-sm mb-4 p-4 p-md-5 text-white" style="background: linear-gradient(135deg, #1e293b, #334155);">
-            <span class="badge bg-white/20 text-white border border-white/30 px-3 py-1.5 rounded-pill">{{ $job->category }}</span>
+            <span class="badge bg-white/20 text-white border border-white/30 px-3 py-1.5 rounded-pill">{{ \App\Support\FreelancerCategories::label($job->category) }}</span>
             <h1 class="h3 fw-bold mt-2 mb-1 text-white">{{ $job->title }}</h1>
-            <p class="text-white/70 small mb-0">İlan No: #{{ $job->id }} · Yayınlanma: {{ $job->created_at->format('d.m.Y') }}</p>
+            <p class="text-white/70 small mb-0">Talep No: #{{ $job->id }} · Yayınlanma: {{ $job->created_at->format('d.m.Y') }}</p>
         </div>
 
         <div class="row">
@@ -51,7 +51,7 @@
                                     <div class="fw-semibold">{{ $bid->user?->name }} — ₺{{ number_format($bid->amount, 2, ',', '.') }}</div>
                                     @if($bid->proposal)<div class="text-muted mt-1">{{ Str::limit($bid->proposal, 120) }}</div>@endif
                                     @if($bid->status === 'pending')
-                                        <form action="{{ route('freelancer-jobs.select-bid', [$job, $bid]) }}" method="post" class="mt-2" onsubmit="return confirm('Bu teklifi seçmek sipariş oluşturur. Devam?');">
+                                        <form action="{{ route('service-requests.select-bid', [$job, $bid]) }}" method="post" class="mt-2" onsubmit="return confirm('Bu teklifi seçmek sipariş oluşturur. Devam?');">
                                             @csrf
                                             <button type="submit" class="btn btn-sm btn-success w-100">Bu teklifi seç</button>
                                         </form>
@@ -64,7 +64,7 @@
                             @endforelse
                         @else
                             <h3 class="h6">Teklif ver</h3>
-                            <form action="{{ route('freelancer-jobs.bid', $job) }}" method="post">
+                            <form action="{{ route('service-requests.bid', $job) }}" method="post">
                                 @csrf
                                 <div class="mb-2">
                                     <label class="form-label small">Tutar (₺)</label>

@@ -14,13 +14,34 @@ class Setting extends Model
         $settings = Cache::remember('settings', 3600, function () {
             return self::pluck('value', 'key')->toArray();
         });
-        return $settings[$key] ?? $default;
+        $val = $settings[$key] ?? $default;
+
+        if (is_string($val) && str_starts_with($val, 'enc:')) {
+            try {
+                return \Illuminate\Support\Facades\Crypt::decryptString(substr($val, 4));
+            } catch (\Throwable) {
+                return $default;
+            }
+        }
+
+        return $val;
     }
 
     public static function set(string $key, $value): void
     {
         self::updateOrCreate(['key' => $key], ['value' => (string) $value]);
         Cache::forget('settings');
+    }
+
+    public static function setSecret(string $key, ?string $value): void
+    {
+        if (empty($value)) {
+            self::set($key, '');
+            return;
+        }
+
+        $encrypted = \Illuminate\Support\Facades\Crypt::encryptString($value);
+        self::set($key, 'enc:' . $encrypted);
     }
 
     public static function commissionRate(): float

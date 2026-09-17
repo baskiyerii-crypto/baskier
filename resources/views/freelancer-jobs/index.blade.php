@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('ui.jobs').' - BaskiYeri')
+@section('title', 'Hizmet Talepleri - BaskiYeri')
 
 @section('content')
     <div class="content-shell py-4">
@@ -9,13 +9,17 @@
             @if(!empty($currentCategory))
                 {{ \App\Support\FreelancerCategories::label($currentCategory) }}
             @else
-                {{ __('ui.jobs') }}
+                Hizmet Talepleri
             @endif
         </h1>
             <div class="flex flex-wrap gap-3 items-center">
                 @auth
-                    <a href="{{ route('freelancer-jobs.create') }}" class="btn btn-warning btn-sm rounded-pill">+ {{ __('home.path_freelancer_cta') }}</a>
-                    <a href="{{ route('freelancer-jobs.my') }}" class="small text-decoration-none">{{ __('ui.jobs') }}</a>
+                    @if(auth()->user()->isCustomer())
+                        <a href="{{ route('service-requests.create') }}" class="btn btn-warning btn-sm rounded-pill">+ Hizmet Teklifi Al</a>
+                        <a href="{{ route('service-requests.my') }}" class="small text-decoration-none">Hizmet Taleplerim</a>
+                    @else
+                        <span class="badge bg-light text-dark">Açık Talepler</span>
+                    @endif
                 @endauth
                 <a href="{{ route('home') }}" class="small text-decoration-none text-muted">← {{ __('ui.home') }}</a>
             </div>
@@ -23,14 +27,14 @@
 
         @if($jobs->isEmpty())
             <div class="alert alert-light border rounded-4">
-                {{ __('home.no_jobs_open') }}
+                Şu an açık hizmet talebi bulunmuyor.
             </div>
         @else
             <div class="row g-3 g-md-4">
                 @foreach($jobs as $job)
                     <div class="col-12 col-md-6 col-lg-4">
                         <div class="bg-white border rounded-4 overflow-hidden h-100 shadow-sm d-flex flex-column" style="transition: transform .2s, box-shadow .2s;">
-                            <a href="{{ route('freelancer-jobs.show', $job) }}" class="text-decoration-none text-dark flex-grow-1 d-flex flex-column">
+                            <a href="{{ route('service-requests.show', $job) }}" class="text-decoration-none text-dark flex-grow-1 d-flex flex-column">
                                 <div class="ratio ratio-16x10 bg-light overflow-hidden">
                                     <div class="bg-indigo-50 text-indigo-700 p-6 font-semibold">{{ \App\Support\FreelancerCategories::label($job->category) }}</div>
                                 </div>
@@ -51,7 +55,7 @@
                                 </div>
                             </a>
                             <div class="p-3 pt-0">
-                                <a href="{{ route('freelancer-jobs.show', $job) }}" class="btn btn-warning rounded-pill w-100 btn-sm">İlanı incele ve teklif ver</a>
+                                <a href="{{ route('service-requests.show', $job) }}" class="btn btn-warning rounded-pill w-100 btn-sm">Talebi incele ve teklif ver</a>
                             </div>
                         </div>
                     </div>

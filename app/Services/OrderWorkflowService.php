@@ -71,5 +71,9 @@ class OrderWorkflowService
         }
 
         $order->update($updates);
+
+        if ($order->vendor && in_array($to, [OrderStatus::DELIVERED, OrderStatus::COMPLETED, OrderStatus::CANCELLED, OrderStatus::DISPUTED], true)) {
+            app(\App\Services\TrustBadgeService::class)->recalculateAndSave($order->vendor);
+        }
     }
 }

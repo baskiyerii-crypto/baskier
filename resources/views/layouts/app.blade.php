@@ -278,14 +278,17 @@
                     @endauth
 
                     @auth
-                        <a href="{{ route('cart.index') }}" class="by-btn-primary px-4 py-2.5">
-                            {{ __('ui.cart') }}
-                            <span class="rounded-full bg-white/20 px-2 py-0.5 text-xs font-bold">
+                        <a href="{{ route('cart.index') }}" class="by-btn-primary px-4 py-2.5 flex items-center gap-2">
+                            <span>{{ __('ui.cart') }}</span>
+                            <span class="cart-count-badge rounded-full bg-white/20 px-2 py-0.5 text-xs font-bold">
                                 {{ auth()->user()->cartItems()->sum('quantity') }}
                             </span>
                         </a>
                     @else
-                        <a href="{{ route('login') }}" class="by-btn-primary px-4 py-2.5">{{ __('ui.cart') }}</a>
+                        <a href="{{ route('login') }}" class="by-btn-primary px-4 py-2.5 flex items-center gap-2">
+                            <span>{{ __('ui.cart') }}</span>
+                            <span class="cart-count-badge hidden rounded-full bg-white/20 px-2 py-0.5 text-xs font-bold">0</span>
+                        </a>
                     @endauth
                 </div>
             </div>
@@ -402,6 +405,7 @@
 @include('partials.pwa-install')
 @include('partials.floating-actions')
 @include('partials.floating-support')
+@include('partials.product-card-scripts')
 <style>
 #mobile-search-sheet:not([hidden]) { display: block; }
 </style>

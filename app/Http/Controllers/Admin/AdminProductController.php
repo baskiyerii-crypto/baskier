@@ -54,11 +54,10 @@ class AdminProductController extends Controller
             'product_type' => ['nullable', 'in:physical,digital'],
             'digital_link' => ['nullable', 'url', 'max:500'],
             'is_active' => ['boolean'],
-            'is_featured' => ['boolean'],
         ]);
         $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']) . '-' . time();
         $validated['is_active'] = $request->boolean('is_active');
-        $validated['is_featured'] = $request->boolean('is_featured');
+        $validated['is_featured'] = false;
         $validated['product_type'] = $validated['product_type'] ?? 'physical';
         if (\Illuminate\Support\Facades\Schema::hasColumn('products', 'moderation_status')) {
             $validated['moderation_status'] = Product::MODERATION_APPROVED;
@@ -93,11 +92,10 @@ class AdminProductController extends Controller
             'description_en' => ['nullable', 'string'],
             'main_image' => ['nullable', 'image', 'max:2048'],
             'is_active' => ['boolean'],
-            'is_featured' => ['boolean'],
         ]);
         $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']) . '-' . $product->id;
         $validated['is_active'] = $request->boolean('is_active');
-        $validated['is_featured'] = $request->boolean('is_featured');
+        $validated['is_featured'] = false;
         if ($request->hasFile('main_image')) {
             if ($product->main_image) {
                 Storage::disk('public')->delete($product->main_image);

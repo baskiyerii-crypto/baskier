@@ -57,9 +57,13 @@
                                 ['label' => 'Teklif taleplerim', 'route' => 'quote-requests.index', 'match' => 'quote-requests.*'],
                                 ['label' => __('panel.direct_quotes'), 'route' => 'customer.direct-quotes.index', 'match' => 'customer.direct-quotes.*'],
                                 ['label' => 'Destek talepleri', 'route' => 'account.support.index', 'match' => 'account.support.*'],
-                                ['label' => 'İş ilanları', 'route' => 'freelancer-jobs.index', 'match' => 'freelancer-jobs.index'],
-                                ['label' => 'İlanlarım', 'route' => 'freelancer-jobs.my', 'match' => 'freelancer-jobs.my'],
                             ];
+
+                            if (auth()->user()->isCustomer()) {
+                                $items[] = ['label' => 'Hizmet Taleplerim', 'route' => 'service-requests.my', 'match' => 'service-requests.*'];
+                            } else {
+                                $items[] = ['label' => 'Açık Hizmet Talepleri', 'route' => 'service-requests.index', 'match' => 'service-requests.*'];
+                            }
                         @endphp
 
                         @if(auth()->user()?->role === 'customer')

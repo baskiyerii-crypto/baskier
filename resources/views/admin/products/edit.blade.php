@@ -72,13 +72,9 @@
             <textarea name="description" class="form-control" rows="5">{{ old('description', $product->description) }}</textarea>
         </div>
         <div class="mb-4">
-            <div class="form-check form-check-inline">
+            <div class="form-check">
                 <input type="checkbox" name="is_active" value="1" class="form-check-input" @checked(old('is_active', $product->is_active))>
                 <label class="form-check-label">Aktif</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input type="checkbox" name="is_featured" value="1" class="form-check-input" @checked(old('is_featured', $product->is_featured))>
-                <label class="form-check-label">Öne çıkan</label>
             </div>
         </div>
         <button type="submit" class="btn btn-primary">Güncelle</button>

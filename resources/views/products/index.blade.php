@@ -54,18 +54,27 @@
                             @endif
                         </div>
 
-                        <form class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row" action="{{ route('products.index') }}">
+                        <form class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row items-center" action="{{ route('products.index') }}">
                             @if(request('category_id'))
                                 <input type="hidden" name="category_id" value="{{ request('category_id') }}">
                             @endif
                             @if(request('type'))
                                 <input type="hidden" name="type" value="{{ request('type') }}">
                             @endif
+
+                            <select name="sort" onchange="this.form.submit()" class="w-full sm:w-auto rounded-full border border-slate-200 bg-white/90 px-3.5 py-2.5 text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-orange-400">
+                                <option value="fair" @selected(request('sort', 'fair') === 'fair')>Adil Sıralama</option>
+                                <option value="newest" @selected(request('sort') === 'newest')>En Yeni</option>
+                                <option value="price_asc" @selected(request('sort') === 'price_asc')>Fiyat: Düşükten Yükseğe</option>
+                                <option value="price_desc" @selected(request('sort') === 'price_desc')>Fiyat: Yüksekten Düşüğe</option>
+                                <option value="rating" @selected(request('sort') === 'rating')>En Yüksek Puan</option>
+                            </select>
+
                             <input
                                 name="q"
                                 value="{{ request('q') }}"
                                 placeholder="{{ __('ui.search_placeholder') }}"
-                                class="w-full rounded-full border border-slate-200 bg-white/80 px-4 py-2.5 text-sm outline-none ring-orange-400 focus:ring-2 sm:w-85"
+                                class="w-full rounded-full border border-slate-200 bg-white/80 px-4 py-2.5 text-sm outline-none ring-orange-400 focus:ring-2 sm:w-60"
                             />
                             <button class="by-btn-primary" type="submit">{{ __('ui.search') }}</button>
                         </form>
@@ -81,27 +90,7 @@
                     @else
                         <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
                             @foreach($products as $product)
-                                <a href="{{ route('products.show', $product->slug) }}" class="group by-card by-card-hover overflow-hidden">
-                                    <div class="aspect-4/3 bg-slate-100">
-                                        @if($product->main_image)
-                                            <img src="{{ asset('storage/'.$product->main_image) }}" alt="{{ $product->localizedName() }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
-                                        @else
-                                            <div class="h-full flex items-center justify-center text-sm text-slate-500">{{ __('ui.no_image') }}</div>
-                                        @endif
-                                    </div>
-                                    <div class="p-4">
-                                        <div class="flex flex-wrap items-start justify-between gap-3">
-                                            <div class="min-w-0">
-                                                <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ $product->category?->localizedName() ?? __('ui.category') }}</p>
-                                                <p class="mt-1 text-sm font-semibold text-slate-900">{{ $product->localizedName() }}</p>
-                                                <p class="mt-1 text-xs text-slate-500">{{ $product->vendor?->name ?? __('ui.vendor') }}</p>
-                                            </div>
-                                            <span class="rounded-full bg-orange-50 px-3 py-1 text-sm font-bold text-orange-900">
-                                                ₺{{ number_format($product->price, 2, ',', '.') }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </a>
+                                <x-product-card :product="$product" />
                             @endforeach
                         </div>
 

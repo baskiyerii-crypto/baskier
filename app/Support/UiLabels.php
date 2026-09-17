@@ -86,8 +86,10 @@ final class UiLabels
     {
         return [
             'tax_plate' => __('panel.doc_tax_plate'),
+            'company_registration' => __('panel.doc_company_registration'),
             'certificate' => __('panel.doc_certificate'),
             'diploma' => __('panel.doc_diploma'),
+            'portfolio_accreditation' => __('panel.doc_portfolio_accreditation'),
             'course' => __('panel.doc_course'),
             'other' => __('panel.doc_other'),
         ];
@@ -96,6 +98,16 @@ final class UiLabels
     public static function documentType(?string $type): string
     {
         return self::documentTypes()[$type] ?? ($type ?: '—');
+    }
+
+    public static function trustLevels(): array
+    {
+        return \App\Domain\TrustLevel::labels();
+    }
+
+    public static function trustLevel(?int $level): string
+    {
+        return \App\Domain\TrustLevel::label($level ?? 0);
     }
 
     public static function verificationStatuses(): array

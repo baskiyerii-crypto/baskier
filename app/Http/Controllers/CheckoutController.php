@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\OrderStatus;
 use App\Models\Address;
 use App\Models\BillingProfile;
 use App\Models\Contract;
-use App\Models\OrderContractAcceptance;
-use App\Services\MarketplaceOrderService;
+use App\Models\Product;
+use App\Models\ProductVariant;
+use App\Services\CheckoutService;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -14,21 +16,54 @@ use Illuminate\Validation\Rule;
 class CheckoutController extends Controller
 {
     public function __construct(
-        private MarketplaceOrderService $orderService,
+        private CheckoutService $checkoutService,
         private PaymentService $paymentService
     ) {}
 
     public function index(Request $request)
     {
         $user = $request->user();
-        $items = $user->cartItems()->with(['product.vendor', 'product.category', 'variant'])->get();
-        if ($items->isEmpty()) {
-            return redirect()->route('cart.index')->with('info', 'Sepetiniz boş.');
+
+        // Support isolated Quick Buy session
+        $quickBuy = $request->session()->get('quick_buy');
+        $customItem = null;
+        if ($quickBuy && ! empty($quickBuy['product_id'])) {
+            $product = Product::with(['vendor', 'category'])->find($quickBuy['product_id']);
+            if ($product) {
+                $variant = ! empty($quickBuy['variant_id'])
+                    ? ProductVariant::find($quickBuy['variant_id'])
+                    : null;
+                $quantity = max(1, (int) ($quickBuy['quantity'] ?? 1));
+
+                $basePrice = (string) $product->price;
+                $adj = $variant ? (string) ($variant->price_adjustment ?? 0) : '0';
+                $unitPrice = bcadd($basePrice, $adj, 2);
+                $lineTotal = bcmul($unitPrice, (string) $quantity, 2);
+
+                $customItem = (object) [
+                    'product' => $product,
+                    'variant' => $variant,
+                    'quantity' => $quantity,
+                    'unit_price' => $unitPrice,
+                    'line_total' => $lineTotal,
+                ];
+            }
         }
-        $total = '0';
-        foreach ($items as $item) {
-            $total = bcadd($total, $item->lineTotal(), 2);
+
+        if (! $customItem) {
+            $items = $user->cartItems()->with(['product.vendor', 'product.category', 'variant'])->get();
+            if ($items->isEmpty()) {
+                return redirect()->route('cart.index')->with('info', 'Sepetiniz boş.');
+            }
+            $total = '0.00';
+            foreach ($items as $item) {
+                $total = bcadd($total, $item->lineTotal(), 2);
+            }
+        } else {
+            $items = collect([$customItem]);
+            $total = $customItem->line_total;
         }
+
         $addresses = $user->addresses()->orderByDesc('is_default')->get();
         $defaultBillingAddress = $user->addresses()->where('is_billing_default', true)->latest()->first();
         $billingProfile = $user->billingProfiles()->latest('updated_at')->first();
@@ -36,37 +71,39 @@ class CheckoutController extends Controller
         $carriers = app(\App\Services\BasitKargoService::class)->carriers();
         $paymentProvider = $this->paymentService->provider();
 
-        return view('checkout.index', compact('items', 'total', 'addresses', 'billingProfile', 'defaultBillingAddress', 'distanceSalesContract', 'carriers', 'paymentProvider'));
+        return view('checkout.index', compact(
+            'items',
+            'total',
+            'addresses',
+            'billingProfile',
+            'defaultBillingAddress',
+            'distanceSalesContract',
+            'carriers',
+            'paymentProvider',
+            'quickBuy'
+        ));
     }
 
     public function store(Request $request)
     {
-        $provider = $this->paymentService->provider();
-        $methods = ['credit_card', 'bank_transfer', 'cash_on_delivery', 'shopify'];
+        $methods = ['credit_card', 'bank_transfer', 'cash_on_delivery'];
         $validated = $request->validate([
             'shipping_address_id' => ['required', 'exists:addresses,id'],
             'use_shipping_for_billing' => ['nullable', 'boolean'],
             'billing_address_id' => ['nullable', 'exists:addresses,id'],
             'payment_method' => ['required', Rule::in($methods)],
             'accept_distance_sales' => ['accepted'],
-            'card_holder_name' => ['nullable', 'string', 'max:120'],
-            'card_number' => ['nullable', 'string', 'max:32'],
-            'card_expiry' => ['nullable', 'string', 'max:7'],
-            'card_cvc' => ['nullable', 'string', 'max:4'],
+            'idempotency_key' => ['nullable', 'string', 'max:100'],
             'bank_iban' => ['nullable', 'string', 'max:34'],
             'invoice_type' => ['required', Rule::in(['individual', 'corporate'])],
             'invoice_full_name' => ['required', 'string', 'max:255'],
             'invoice_email' => ['required', 'email', 'max:190'],
-            'invoice_phone' => ['required', 'string', 'max:11', 'regex:/^[0-9]{10,11}$/'],
+            'invoice_phone' => ['required', 'string', 'max:15'],
             'invoice_identity_number' => ['nullable', 'string', 'max:16'],
             'invoice_company_name' => ['nullable', 'string', 'max:255'],
             'invoice_tax_number' => ['nullable', 'string', 'max:16'],
             'invoice_tax_office' => ['nullable', 'string', 'max:120'],
         ]);
-
-        if ($provider === 'shopify' && ($validated['payment_method'] ?? '') === 'credit_card') {
-            $validated['payment_method'] = 'shopify';
-        }
 
         if ($validated['invoice_type'] === 'corporate') {
             $request->validate([
@@ -75,143 +112,80 @@ class CheckoutController extends Controller
                 'invoice_tax_office' => ['required', 'string', 'max:120'],
             ]);
         }
-        if ($validated['payment_method'] === 'credit_card') {
-            $request->validate([
-                'card_holder_name' => ['required', 'string', 'max:120'],
-                'card_number' => ['required', 'string', 'min:12', 'max:32'],
-                'card_expiry' => ['required', 'string', 'max:7'],
-                'card_cvc' => ['required', 'string', 'min:3', 'max:4'],
-            ]);
-        }
-        if ($validated['payment_method'] === 'bank_transfer') {
-            $request->validate([
-                'bank_iban' => ['required', 'string', 'min:10', 'max:34'],
-            ]);
+
+        // Check if this is an isolated Quick Buy session
+        $quickBuy = $request->session()->get('quick_buy');
+        $customItems = null;
+        if ($quickBuy && ! empty($quickBuy['product_id'])) {
+            $customItems = [[
+                'product_id' => (int) $quickBuy['product_id'],
+                'variant_id' => ! empty($quickBuy['variant_id']) ? (int) $quickBuy['variant_id'] : null,
+                'quantity' => max(1, (int) ($quickBuy['quantity'] ?? 1)),
+            ]];
         }
 
-        $shippingAddress = Address::findOrFail($validated['shipping_address_id']);
-        if ($shippingAddress->user_id !== $request->user()->id) {
-            abort(403);
+        $result = $this->checkoutService->processCheckout($request->user(), array_merge($validated, [
+            'custom_items' => $customItems,
+            'idempotency_key' => $validated['idempotency_key'] ?? $request->input('idempotency_key'),
+        ]));
+
+        if (! $result['success']) {
+            return back()->withInput()->with('error', $result['error'] ?? 'Sipariş oluşturulamadı.');
         }
 
-        $useShippingForBilling = (bool) ($validated['use_shipping_for_billing'] ?? false);
-        $billingAddress = $shippingAddress;
-        if (! $useShippingForBilling && ! empty($validated['billing_address_id'])) {
-            $billingAddress = Address::findOrFail($validated['billing_address_id']);
-            if ($billingAddress->user_id !== $request->user()->id) {
-                abort(403);
+        // Clear quick buy session once successfully dispatched
+        if ($customItems) {
+            $request->session()->forget('quick_buy');
+        }
+
+        // If payment gateway requires hosted form or redirect (iyzico)
+        if (! empty($result['requires_action'])) {
+            if (! empty($result['payment_page_url'])) {
+                return redirect()->away($result['payment_page_url']);
             }
-        } elseif (! $useShippingForBilling) {
-            $billingAddress = $request->user()->addresses()->where('is_billing_default', true)->latest()->first() ?? $shippingAddress;
-        }
-
-        $invoiceData = [
-            'invoice_type' => $validated['invoice_type'],
-            'invoice_full_name' => $validated['invoice_full_name'],
-            'invoice_email' => $validated['invoice_email'],
-            'invoice_phone' => $validated['invoice_phone'],
-            'invoice_identity_number' => $validated['invoice_type'] === 'individual'
-                ? ($validated['invoice_identity_number'] ?? null)
-                : null,
-            'invoice_company_name' => $validated['invoice_type'] === 'corporate'
-                ? ($validated['invoice_company_name'] ?? null)
-                : null,
-            'invoice_tax_number' => $validated['invoice_type'] === 'corporate'
-                ? ($validated['invoice_tax_number'] ?? null)
-                : null,
-            'invoice_tax_office' => $validated['invoice_type'] === 'corporate'
-                ? ($validated['invoice_tax_office'] ?? null)
-                : null,
-        ];
-        $paymentData = [
-            'payment_method' => $validated['payment_method'],
-        ];
-
-        BillingProfile::query()->updateOrCreate(
-            ['user_id' => $request->user()->id, 'invoice_type' => $invoiceData['invoice_type']],
-            [
-                'full_name' => $invoiceData['invoice_full_name'],
-                'email' => $invoiceData['invoice_email'],
-                'phone' => $invoiceData['invoice_phone'],
-                'identity_number' => $invoiceData['invoice_identity_number'],
-                'company_name' => $invoiceData['invoice_company_name'],
-                'tax_number' => $invoiceData['invoice_tax_number'],
-                'tax_office' => $invoiceData['invoice_tax_office'],
-            ],
-        );
-
-        try {
-            $orders = $this->orderService->createPaidOrdersFromCart(
-                $request->user(),
-                $shippingAddress,
-                $billingAddress,
-                $invoiceData,
-                $paymentData
-            );
-
-            $contract = Contract::query()->where('key', 'distance_sales')->where('is_active', true)->first();
-            $shopifyRedirect = null;
-            foreach ($orders as $order) {
-                if ($contract) {
-                    OrderContractAcceptance::create([
-                        'user_id' => $request->user()->id,
-                        'order_id' => $order->id,
-                        'contract_id' => $contract->id,
-                        'ip' => $request->ip(),
-                        'scrolled_at' => $request->input('contract_scrolled_at') ? now() : now(),
-                        'accepted_at' => now(),
-                    ]);
-                }
-                $method = $paymentData['payment_method'] ?? '';
-                if ($method === 'shopify' || ($provider === 'shopify' && $method === 'credit_card')) {
-                    try {
-                        $result = $this->paymentService->createShopifyCheckout($order);
-                        if (! empty($result['url']) && ! $shopifyRedirect) {
-                            $shopifyRedirect = $result['url'];
-                        }
-                    } catch (\Throwable $e) {
-                        return redirect()->route('account.orders.index')
-                            ->with('error', 'Sipariş oluşturuldu ancak Shopify ödemesi başarısız: '.$e->getMessage());
-                    }
-                } elseif ($method === 'credit_card') {
-                    try {
-                        $this->paymentService->chargeCard($order, [
-                            'card_holder_name' => $validated['card_holder_name'] ?? '',
-                            'card_number' => $validated['card_number'] ?? '',
-                            'card_expiry' => $validated['card_expiry'] ?? '',
-                            'card_cvc' => $validated['card_cvc'] ?? '',
-                        ]);
-                    } catch (\Throwable $e) {
-                        return redirect()->route('account.orders.index')
-                            ->with('error', 'Sipariş oluşturuldu ancak kart ödemesi başarısız: '.$e->getMessage());
-                    }
-                } else {
-                    $this->paymentService->recordDemoPayment($order);
-                }
+            if (! empty($result['checkout_form_content'])) {
+                return response()->view('checkout.iyzico', [
+                    'checkoutFormContent' => $result['checkout_form_content'],
+                ]);
             }
-        } catch (\InvalidArgumentException $e) {
-            return redirect()->route('cart.index')->with('error', $e->getMessage());
         }
 
-        if ($shopifyRedirect) {
-            return redirect()->away($shopifyRedirect);
-        }
-
-        $first = $orders[0]->order_number;
-        $msg = count($orders) > 1
-            ? count($orders) . ' sipariş oluşturuldu. İlk sipariş no: #' . $first
-            : 'Siparişiniz alındı. Sipariş no: #' . $first;
+        // Manual / offline methods (Havale / Kapıda Ödeme)
+        $orders = $result['orders'] ?? [];
+        $count = count($orders);
+        $first = $orders[0]->order_number ?? '';
+        $msg = $count > 1
+            ? "{$count} adet siparişiniz alındı (İlk sipariş no: #{$first}). Ödemeniz onaylandıktan sonra üretime başlanacaktır."
+            : "Siparişiniz alındı (Sipariş no: #{$first}). Ödemeniz onaylandıktan sonra üretime başlanacaktır.";
 
         return redirect()->route('account.orders.index')->with('success', $msg);
     }
 
+    public function quickBuy(Request $request, Product $product)
+    {
+        $validated = $request->validate([
+            'variant_id' => ['nullable', 'exists:product_variants,id'],
+            'quantity' => ['nullable', 'integer', 'min:1', 'max:999'],
+        ]);
+
+        $request->session()->put('quick_buy', [
+            'product_id' => $product->id,
+            'variant_id' => $validated['variant_id'] ?? null,
+            'quantity' => $validated['quantity'] ?? 1,
+        ]);
+
+        return redirect()->route('checkout.index');
+    }
+
+    public function cancelQuickBuy(Request $request)
+    {
+        $request->session()->forget('quick_buy');
+
+        return redirect()->route('checkout.index');
+    }
+
     public function shopifyReturn(Request $request, \App\Models\Order $order)
     {
-        if ($order->user_id !== $request->user()->id) {
-            abort(403);
-        }
-        $this->paymentService->markShopifyPaid($order, $request->string('ref')->toString() ?: null);
-
-        return redirect()->route('account.orders.index')->with('success', 'Shopify ödemesi kaydedildi. Sipariş #'.$order->order_number);
+        abort(404, 'Shopify entegrasyonu kapalıdır.');
     }
 }

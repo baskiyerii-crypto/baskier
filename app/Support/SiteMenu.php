@@ -73,7 +73,7 @@ final class SiteMenu
             ['label' => 'Ürünler', 'type' => 'route', 'target' => 'products.index', 'placement' => 'drawer', 'sort' => 2, 'is_active' => true],
             ['label' => 'Satıcılar', 'type' => 'route', 'target' => 'vendors.index', 'placement' => 'drawer', 'sort' => 3, 'is_active' => true],
             ['label' => 'İletişim', 'type' => 'route', 'target' => 'pages.contact', 'placement' => 'drawer', 'sort' => 4, 'is_active' => true],
-            ['label' => 'İş ilanları', 'type' => 'route', 'target' => 'freelancer-jobs.index', 'placement' => 'drawer', 'sort' => 5, 'is_active' => true],
+            ['label' => 'Hizmet Talepleri', 'type' => 'route', 'target' => 'service-requests.index', 'placement' => 'drawer', 'sort' => 5, 'is_active' => true],
             ['label' => 'Kategoriler', 'type' => 'categories_accordion', 'target' => null, 'placement' => 'drawer', 'sort' => 10, 'is_active' => true],
         ];
     }
@@ -86,7 +86,7 @@ final class SiteMenu
             ['value' => 'products.index', 'label' => 'Ürünler'],
             ['value' => 'vendors.index', 'label' => 'Satıcılar'],
             ['value' => 'pages.contact', 'label' => 'İletişim'],
-            ['value' => 'freelancer-jobs.index', 'label' => 'İş ilanları'],
+            ['value' => 'service-requests.index', 'label' => 'Hizmet Talepleri'],
             ['value' => 'blog.index', 'label' => 'Blog'],
             ['value' => 'quote-requests.create', 'label' => 'Teklif talebi'],
         ];

@@ -10,6 +10,15 @@
         <div class="alert alert-warning mb-4" role="status">Kart ödemesi test modunda. Gerçek kart bilgilerinizi kullanmayın; bu modda gerçek tahsilat yapılmaz.</div>
     @endif
 
+    @if(! empty($quickBuy))
+        <div class="alert alert-info d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <strong>Hızlı Satın Alma:</strong> Şu anda seçtiğiniz ürün için özel satın alma oturumundasınız. Sepetinizdeki diğer ürünler korunur ve etkilenmez.
+            </div>
+            <a href="{{ route('checkout.cancel-quick-buy') }}" class="btn btn-sm btn-outline-secondary ms-3">Normal Sepete Dön</a>
+        </div>
+    @endif
+
     @if($items->isEmpty())
         <p><a href="{{ route('cart.index') }}">Sepete dön</a></p>
     @elseif($addresses->isEmpty())
@@ -17,8 +26,9 @@
     @else
         <div class="row g-4">
             <div class="col-lg-7">
-                <form action="{{ route('checkout.store') }}" method="post" class="bg-white rounded-4 shadow-sm p-4">
+                <form action="{{ route('checkout.store') }}" method="post" id="checkout-form" class="bg-white rounded-4 shadow-sm p-4">
                     @csrf
+                    <input type="hidden" name="idempotency_key" value="{{ (string) \Illuminate\Support\Str::uuid() }}">
                     @php($defaultBillingId = old('billing_address_id', $defaultBillingAddress?->id))
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <h2 class="h6 mb-0">Teslimat adresi</h2>
@@ -59,55 +69,36 @@
                     <hr>
                     <h2 class="h6 mb-3">Ödeme yöntemi</h2>
                     <div class="border rounded-3 p-3 mb-3">
-                        @php $provider = $paymentProvider ?? 'shopify'; @endphp
-                        @if($provider === 'shopify')
-                            <div class="form-check mb-2">
-                                <input class="form-check-input payment-method-radio" type="radio" name="payment_method" id="payShopify" value="shopify" checked>
-                                <label class="form-check-label" for="payShopify">Shopify ile güvenli ödeme</label>
-                            </div>
-                            <p class="small text-muted mb-0">Sipariş sonrası Shopify ödeme sayfasına yönlendirilirsiniz. Kart bilgileri sitemizde tutulmaz.</p>
-                        @else
-                        <div class="form-check mb-2">
+                        <div class="form-check mb-3">
                             <input class="form-check-input payment-method-radio" type="radio" name="payment_method" id="payCreditCard" value="credit_card" @checked(old('payment_method', 'credit_card') === 'credit_card')>
-                            <label class="form-check-label" for="payCreditCard">Kredi / Banka Kartı (iyzico)</label>
-                        </div>
-                        <div class="payment-method-box payment-credit-card {{ old('payment_method', 'credit_card') === 'credit_card' ? '' : 'd-none' }}">
-                            <div class="row g-2 mb-2">
-                                <div class="col-md-6">
-                                    <label class="form-label">Kart üzerindeki isim</label>
-                                    <input type="text" name="card_holder_name" class="form-control" value="{{ old('card_holder_name', auth()->user()->name) }}">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Kart numarası</label>
-                                    <input type="text" name="card_number" class="form-control" value="{{ old('card_number') }}" placeholder="**** **** **** ****">
-                                </div>
-                            </div>
-                            <div class="row g-2">
-                                <div class="col-md-6">
-                                    <label class="form-label">Son kullanma</label>
-                                    <input type="text" name="card_expiry" class="form-control" value="{{ old('card_expiry') }}" placeholder="AA/YY">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">CVC</label>
-                                    <input type="text" name="card_cvc" class="form-control" value="{{ old('card_cvc') }}" placeholder="***">
-                                </div>
+                            <label class="form-check-label fw-bold" for="payCreditCard">
+                                Kredi / Banka Kartı (iyzico Güvenli Ödeme)
+                            </label>
+                            <div class="small text-muted mt-1">
+                                Siparişinizi onayladıktan sonra 256-bit SSL korumalı iyzico 3DS ödeme ekranına yönlendirilirsiniz. Kart bilgileriniz sunucularımızda saklanmaz.
                             </div>
                         </div>
-                        @endif
 
-                        <div class="form-check mb-2 mt-3">
+                        <div class="form-check mb-3">
                             <input class="form-check-input payment-method-radio" type="radio" name="payment_method" id="payBankTransfer" value="bank_transfer" @checked(old('payment_method') === 'bank_transfer')>
-                            <label class="form-check-label" for="payBankTransfer">Banka Havalesi / EFT</label>
-                        </div>
-                        <div class="payment-method-box payment-bank-transfer {{ old('payment_method') === 'bank_transfer' ? '' : 'd-none' }}">
-                            <label class="form-label">Gönderim yapılacak IBAN</label>
-                            <input type="text" name="bank_iban" class="form-control mb-2" value="{{ old('bank_iban') }}" placeholder="TR..">
-                            <p class="small text-muted mb-0">Demo mod: Havale seçimi siparişi oluşturur, manuel kontrol varsayılır.</p>
+                            <label class="form-check-label fw-bold" for="payBankTransfer">
+                                Banka Havalesi / EFT
+                            </label>
+                            <div class="payment-method-box payment-bank-transfer mt-2 {{ old('payment_method') === 'bank_transfer' ? '' : 'd-none' }}">
+                                <label class="form-label small">Gönderim yapacağınız IBAN</label>
+                                <input type="text" name="bank_iban" class="form-control form-control-sm mb-1" value="{{ old('bank_iban') }}" placeholder="TR..">
+                                <p class="small text-muted mb-0">Havale/EFT ile ödemelerde siparişiniz kaydedilir ve yönetici onayı sonrasında üretime alınır.</p>
+                            </div>
                         </div>
 
-                        <div class="form-check mt-3">
+                        <div class="form-check">
                             <input class="form-check-input payment-method-radio" type="radio" name="payment_method" id="payCashOnDelivery" value="cash_on_delivery" @checked(old('payment_method') === 'cash_on_delivery')>
-                            <label class="form-check-label" for="payCashOnDelivery">Kapıda Ödeme</label>
+                            <label class="form-check-label fw-bold" for="payCashOnDelivery">
+                                Kapıda Ödeme
+                            </label>
+                            <div class="small text-muted mt-1">
+                                Siparişiniz onay bekliyor durumunda oluşturulur.
+                            </div>
                         </div>
                     </div>
                     <hr>
@@ -341,6 +332,16 @@
             closeModal();
         });
         syncCheckoutSubmit();
+
+        const checkoutForm = document.getElementById('checkout-form');
+        if (checkoutForm) {
+            checkoutForm.addEventListener('submit', function () {
+                if (checkoutSubmit && !checkoutSubmit.disabled) {
+                    checkoutSubmit.disabled = true;
+                    checkoutSubmit.innerText = 'İşleniyor, lütfen bekleyin...';
+                }
+            });
+        }
     });
 </script>
 @endsection

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Domain\OrderStatus;
+use App\Domain\PaymentStatus;
 use App\Models\FreelancerJobBid;
 use App\Models\FreelancerJobListing;
 use App\Models\Order;
@@ -16,6 +17,10 @@ class FreelancerJobWebController extends Controller
 {
     public function create(Request $request)
     {
+        if (! $request->user()->isCustomer() || $request->user()->isFreelancer()) {
+            abort(403, 'Yalnızca müşteriler hizmet teklifi talebi oluşturabilir.');
+        }
+
         $selectedCategory = $request->get('category');
         $allowed = ['logo', 'wordpress', 'brochure', 'digital', 'other'];
         if (! in_array($selectedCategory, $allowed, true)) {
@@ -27,6 +32,10 @@ class FreelancerJobWebController extends Controller
 
     public function store(Request $request)
     {
+        if (! $request->user()->isCustomer() || $request->user()->isFreelancer()) {
+            abort(403, 'Yalnızca müşteriler hizmet teklifi talebi oluşturabilir.');
+        }
+
         $validated = $request->validate([
             'category' => ['required', 'in:logo,wordpress,brochure,digital,other'],
             'title' => ['required', 'string', 'max:255'],
@@ -39,7 +48,7 @@ class FreelancerJobWebController extends Controller
         $validated['status'] = 'open';
         $job = FreelancerJobListing::create($validated);
 
-        return redirect()->route('freelancer-jobs.show', $job)->with('success', 'İlanınız yayında.');
+        return redirect()->route('service-requests.show', $job)->with('success', 'Hizmet talebiniz yayınlandı.');
     }
 
     public function myListings(Request $request)
@@ -52,10 +61,19 @@ class FreelancerJobWebController extends Controller
     public function storeBid(Request $request, FreelancerJobListing $job)
     {
         if ($job->status !== 'open') {
-            return back()->with('error', 'İlan kapalı.');
+            return back()->with('error', 'Hizmet talebi kapalı.');
         }
         if ($job->user_id === $request->user()->id) {
-            return back()->with('error', 'Kendi ilanınıza teklif veremezsiniz.');
+            return back()->with('error', 'Kendi talebinize teklif veremezsiniz.');
+        }
+
+        $user = $request->user();
+        $vendor = $user->vendor;
+        $isVerified = ($vendor && $vendor->hasActiveFreelancerModule() && ($vendor->verification_status === 'verified' || $vendor->hasApprovedTaxPlate() || $vendor->documents()->where('status', 'approved')->exists()))
+            || ($user->freelancerProfile && $user->freelancerProfile->is_verified);
+
+        if (! $isVerified) {
+            return back()->with('error', 'Yalnızca aktif ve doğrulanmış freelancerlar teklif verebilir.');
         }
 
         $validated = $request->validate([
@@ -78,8 +96,8 @@ class FreelancerJobWebController extends Controller
 
     public function selectBid(Request $request, FreelancerJobListing $job, FreelancerJobBid $bid)
     {
-        if ($job->user_id !== $request->user()->id) {
-            abort(403);
+        if ($job->user_id !== $request->user()->id || ! $request->user()->isCustomer()) {
+            abort(403, 'Yalnızca talep sahibi müşteri teklifi seçebilir.');
         }
         if ($bid->freelancer_job_listing_id !== $job->id || $bid->status !== 'pending') {
             return back()->with('error', 'Bu teklif seçilemez.');
@@ -106,14 +124,14 @@ class FreelancerJobWebController extends Controller
                 'contractor_user_id' => $bid->user_id,
                 'type' => 'freelancer',
                 'freelancer_job_id' => $job->id,
-                'status' => OrderStatus::CONFIRMED,
-                'payment_status' => 'paid',
+                'status' => OrderStatus::PENDING_PAYMENT,
+                'payment_status' => PaymentStatus::PENDING,
                 'subtotal' => $bid->amount,
                 'commission_rate' => $rate,
                 'commission_amount' => $commissionAmount,
                 'vendor_amount' => $vendorAmount,
-                'paid_at' => now(),
-                'commission_ready_at' => now()->addDays($waitDays),
+                'paid_at' => null,
+                'commission_ready_at' => null,
                 'shipping_address' => 'Freelancer proje: ' . $job->title,
             ]);
 

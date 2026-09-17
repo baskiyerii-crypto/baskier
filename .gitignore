@@ -18,6 +18,12 @@
 /public/storage
 /storage/*.key
 /storage/pail
+/storage/app/backups/*
+!/storage/app/backups/.gitignore
+/storage/app/private/*
+!/storage/app/private/.gitignore
+database/*.sqlite*
+!database/database.sqlite.example
 /vendor
 Homestead.json
 Homestead.yaml

@@ -33,22 +33,34 @@ class AdminVendorUpdateController extends Controller
         return view('admin.vendor-updates.index', compact('documents', 'profileRequests'));
     }
 
-    public function approveDocument(Request $request, VendorDocument $document, FreelancerTierService $tiers)
+    public function approveDocument(Request $request, VendorDocument $document)
     {
-        $document->update(['status' => 'approved']);
+        $document->update([
+            'status' => 'approved',
+            'reviewed_by' => $request->user()?->id,
+            'reviewed_at' => now(),
+            'rejection_reason' => null,
+        ]);
         $vendor = $document->vendor;
-        if ($document->document_type === 'tax_plate') {
-            $vendor->update(['verification_status' => 'verified']);
+        if ($vendor) {
+            app(\App\Services\TrustBadgeService::class)->recalculateAndSave($vendor);
         }
-        $override = $request->input('freelancer_tier');
-        $tiers->apply($vendor, $override ?: null);
 
         return back()->with('success', __('panel.document_approved'));
     }
 
-    public function rejectDocument(VendorDocument $document)
+    public function rejectDocument(Request $request, VendorDocument $document)
     {
-        $document->update(['status' => 'rejected']);
+        $document->update([
+            'status' => 'rejected',
+            'reviewed_by' => $request->user()?->id,
+            'reviewed_at' => now(),
+            'rejection_reason' => $request->input('rejection_reason', 'Yönetici tarafından onaylanmadı.'),
+        ]);
+        $vendor = $document->vendor;
+        if ($vendor) {
+            app(\App\Services\TrustBadgeService::class)->recalculateAndSave($vendor);
+        }
 
         return back()->with('success', __('panel.document_rejected'));
     }

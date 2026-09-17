@@ -196,11 +196,12 @@ class CustomerOrderWorkflowTest extends TestCase
 
         $order = Order::where('quote_id', $quote->id)->first();
         $this->assertNotNull($order);
-        $this->assertEquals(OrderStatus::CONFIRMED, $order->status);
-        $this->assertEquals('paid', $order->payment_status);
+        // Teklif seçimi sipariş oluşturur ama ödeme beklenir
+        $this->assertEquals(OrderStatus::PENDING_PAYMENT, $order->status);
+        $this->assertEquals('pending', $order->payment_status);
 
-        // Satıcı bu siparişi allowedTransitions üzerinden üretime alabilir
+        // Satıcı siparişi ödeme gerçekleşmeden üretime alamaz (pending_payment'tan geçiş yok)
         $workflow = app(\App\Services\OrderWorkflowService::class);
-        $this->assertTrue($workflow->canTransition($order, OrderStatus::IN_PRODUCTION));
+        $this->assertFalse($workflow->canTransition($order, OrderStatus::IN_PRODUCTION));
     }
 }

@@ -99,9 +99,9 @@ return [
     'digital_empty' => 'Dijital ürünler yakında eklenecek.',
     'digital_browse' => 'Dijital ürünlere göz at',
 
-    'featured_eyebrow' => 'Yeni koleksiyon',
-    'featured_title' => 'Öne çıkan ürünler',
-    'featured_body' => 'En güncel baskı ve reklam ürünleri.',
+    'featured_eyebrow' => 'Günlük keşif',
+    'featured_title' => 'Keşfedilecek Ürünler',
+    'featured_body' => 'Her gün adil rotasyonla yenilenen, güvenilir satıcılarımızdan seçilmiş ürünler.',
     'see_all_products' => 'Tüm ürünleri gör',
     'no_products' => 'Henüz ürün yok.',
     'vendor_fallback' => 'Satıcı',

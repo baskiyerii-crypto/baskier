@@ -88,8 +88,27 @@ class Product extends Model
         return $this->hasMany(ProductVariant::class);
     }
 
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
     public function isDigital(): bool
     {
         return $this->product_type === 'digital';
+    }
+
+    public function isQuoteBased(): bool
+    {
+        return $this->pricing_type === 'quote' || $this->catalog_type === 'quote_only';
+    }
+
+    public function hasVariants(): bool
+    {
+        if ($this->relationLoaded('variants')) {
+            return $this->variants->isNotEmpty();
+        }
+
+        return $this->variants()->exists();
     }
 }

@@ -73,6 +73,16 @@ return [
             'replace_placeholders' => true,
         ],
 
+        'json' => [
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'formatter' => \Monolog\Formatter\JsonFormatter::class,
+            'with' => [
+                'stream' => storage_path('logs/laravel-json.log'),
+            ],
+            'level' => env('LOG_LEVEL', 'info'),
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),

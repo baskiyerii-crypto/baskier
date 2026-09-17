@@ -16,8 +16,7 @@ class ProductController extends Controller
     {
         $query = Product::query()
             ->published()
-            ->with(['vendor', 'category'])
-            ->latest();
+            ->with(['vendor', 'category', 'variants']);
 
         if ($search = $request->string('q')->toString()) {
             $term = '%'.addcslashes($search, '%_\\').'%';
@@ -41,6 +40,22 @@ class ProductController extends Controller
 
         if ($request->input('type') === 'digital') {
             $query->where('product_type', 'digital');
+        }
+
+        $sort = $request->string('sort')->toString();
+        if ($sort === 'price_asc') {
+            $query->orderBy('price', 'asc');
+        } elseif ($sort === 'price_desc') {
+            $query->orderBy('price', 'desc');
+        } elseif ($sort === 'rating') {
+            $query->withAvg('reviews', 'rating')->orderByDesc('reviews_avg_rating')->latest('id');
+        } elseif ($sort === 'fair') {
+            // Deterministic vendor seed based on today's day of year
+            $daySeed = (int) date('z');
+            $query->orderByRaw('(products.vendor_id + ?) % 100', [$daySeed])->latest('id');
+        } else {
+            // Default newest
+            $query->latest('id');
         }
 
         $products = $query->paginate(20)->withQueryString();
