@@ -147,7 +147,7 @@ class LegalTemplateService
     private function openConsentHtml(string $name): string
     {
         return "<h2>Açık Rıza Onay Metni</h2>
-<p>Teklif (RFQ) ve özel üretim süreçlerinde, işin yürütülebilmesi için ad, telefon, e-posta ve teslimat adresimin ilgili satıcı ile {$name} üzerinden paylaşılmasına 6698 sayılı Kanun md. 5/1 uyarınca açık rıza veriyorum.</p>
+<p>Teklif (RFQ), özel üretim ve açık hava plan taleplerinde, işin yürütülebilmesi için ad, telefon, e-posta ve teslimat adresimin ilgili satıcı ile {$name} üzerinden paylaşılmasına 6698 sayılı Kanun md. 5/1 uyarınca açık rıza veriyorum.</p>
 <p>Hazır ürün (katalog) satışlarında bu paylaşım yapılmaz. Rızamı dilediğim zaman {{email}} adresinden geri çekebilirim; geri çekme, rıza tarihinden önceki işlemleri etkilemez.</p>";
     }
 

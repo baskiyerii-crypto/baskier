@@ -58,6 +58,7 @@
                                 ['label' => 'Favorilerim', 'route' => 'favorites.index', 'match' => 'favorites.*'],
                                 ['label' => 'Adreslerim', 'route' => 'account.adresler.index', 'match' => 'account.adresler.*'],
                                 ['label' => 'Teklif taleplerim', 'route' => 'quote-requests.index', 'match' => 'quote-requests.*'],
+                                ['label' => 'Planlarım', 'route' => 'customer.outdoor.plans.index', 'match' => 'customer.outdoor.plans.*'],
                                 ['label' => 'Mesajlar', 'route' => 'customer.messages.index', 'match' => 'customer.messages.*'],
                                 ['label' => 'Ürün sorularım', 'route' => 'customer.product-questions.index', 'match' => 'customer.product-questions.*'],
                                 ['label' => 'Sipariş sorularım', 'route' => 'customer.order-questions.index', 'match' => 'customer.order-questions.*'],

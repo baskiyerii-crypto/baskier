@@ -103,7 +103,7 @@ class AuthController extends Controller
             'business_type_ids' => ['nullable', 'array'],
             'business_type_ids.*' => ['exists:business_types,id'],
             'registration_tracks' => ['nullable', 'array'],
-            'registration_tracks.*' => ['in:physical_products,physical_quote,freelancer'],
+            'registration_tracks.*' => ['in:physical_products,physical_quote,freelancer,outdoor'],
             'freelancer_docs' => ['nullable', 'array'],
             'freelancer_docs.*' => ['file', 'max:12288', 'mimes:pdf,jpg,jpeg,png,webp'],
             'freelancer_doc_types' => ['nullable', 'array'],
@@ -116,7 +116,9 @@ class AuthController extends Controller
             $rules['accept_vendor_agreement'] = ['accepted'];
             $rules['accept_vendor_agreement_scrolled_at'] = ['required', 'date'];
 
-            $needsPhysical = in_array('physical_products', $tracks, true) || in_array('physical_quote', $tracks, true);
+            $needsPhysical = in_array('physical_products', $tracks, true)
+                || in_array('physical_quote', $tracks, true)
+                || in_array('outdoor', $tracks, true);
             $freelancerOnly = in_array('freelancer', $tracks, true) && ! $needsPhysical;
 
             if ($needsPhysical) {
@@ -132,6 +134,10 @@ class AuthController extends Controller
 
             if ($freelancerOnly || in_array('freelancer', $tracks, true)) {
                 $rules['freelancer_docs'] = ['required', 'array', 'min:1'];
+            }
+
+            if (in_array('outdoor', $tracks, true)) {
+                $rules['outdoor_permit'] = ['required', 'file', 'max:12288', 'mimes:pdf,jpg,jpeg,png,webp'];
             }
 
             if (BusinessType::query()->exists()) {
@@ -162,7 +168,9 @@ class AuthController extends Controller
 
             if ($validated['role'] === 'vendor') {
                 $tracks = array_values(array_unique($validated['registration_tracks'] ?? []));
-                $needsPhysical = in_array('physical_products', $tracks, true) || in_array('physical_quote', $tracks, true);
+                $needsPhysical = in_array('physical_products', $tracks, true)
+                    || in_array('physical_quote', $tracks, true)
+                    || in_array('outdoor', $tracks, true);
 
                 $vendor = Vendor::create([
                     'user_id' => $user->id,
@@ -177,9 +185,13 @@ class AuthController extends Controller
                     'registration_tracks' => $tracks,
                     'freelancer_enabled' => in_array('freelancer', $tracks, true),
                     'quotes_enabled' => in_array('physical_quote', $tracks, true),
+                    'outdoor_enabled' => false,
                 ]);
                 $user->update(['vendor_id' => $vendor->id]);
                 $vendor->businessTypes()->sync($request->input('business_type_ids', []));
+                if (in_array('outdoor', $tracks, true)) {
+                    app(\App\Services\OutdoorStaffService::class)->ensureOwner($vendor);
+                }
 
                 $storageService = app(\App\Services\DocumentStorageService::class);
 
@@ -200,6 +212,25 @@ class AuthController extends Controller
                         ]);
                     } catch (\Throwable $e) {
                         // ignore upload errors during registration to avoid blocking account creation
+                    }
+                }
+
+                if (in_array('outdoor', $tracks, true) && $request->hasFile('outdoor_permit')) {
+                    try {
+                        $stored = $storageService->storeUploadedDocument($request->file('outdoor_permit'), $vendor->id);
+                        VendorDocument::create([
+                            'vendor_id' => $vendor->id,
+                            'document_type' => 'outdoor_permit',
+                            'disk' => $stored['disk'],
+                            'file_path' => $stored['file_path'],
+                            'path' => $stored['file_path'],
+                            'original_filename' => $stored['original_filename'],
+                            'mime_type' => $stored['mime_type'],
+                            'file_size' => $stored['file_size'],
+                            'quarantine_status' => $stored['quarantine_status'],
+                            'status' => 'pending',
+                        ]);
+                    } catch (\Throwable $e) {
                     }
                 }
 

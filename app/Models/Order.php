@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Order extends Model
 {
     protected $fillable = [
-        'order_number', 'user_id', 'vendor_id', 'contractor_user_id', 'type', 'quote_id', 'freelancer_job_id',
+        'order_number', 'user_id', 'vendor_id', 'contractor_user_id', 'type', 'quote_id', 'freelancer_job_id', 'ooh_vendor_request_id',
         'status', 'payment_status', 'subtotal', 'commission_rate', 'commission_amount', 'vendor_amount', 'payment_method',
         'paid_at', 'delivered_at', 'shipped_at', 'termin_due_at', 'tracking_number', 'shipping_label_path', 'carrier_code',
         'commission_ready_at', 'payout_approved', 'payout_at',
@@ -57,6 +57,11 @@ class Order extends Model
     public function quote(): BelongsTo
     {
         return $this->belongsTo(Quote::class);
+    }
+
+    public function oohVendorRequest(): BelongsTo
+    {
+        return $this->belongsTo(OohVendorRequest::class, 'ooh_vendor_request_id');
     }
 
     public function items(): HasMany

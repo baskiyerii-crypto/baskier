@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\V1\FreelancerJobController;
 use App\Http\Controllers\Api\V1\GeographyController;
 use App\Http\Controllers\Api\V1\HomeContentController;
 use App\Http\Controllers\Api\V1\NotificationController;
+use App\Http\Controllers\Api\V1\OohController;
 use App\Http\Controllers\Api\V1\OrderController;
 use App\Http\Controllers\Api\V1\PageContentController;
 use App\Http\Controllers\Api\V1\PriceEstimateController;
@@ -51,6 +52,8 @@ Route::prefix('v1')->group(function () {
     Route::get('/products/{slug}', [ProductController::class, 'show']);
     Route::get('/vendors', [VendorController::class, 'index']);
     Route::get('/vendors/{slug}', [VendorController::class, 'show']);
+    Route::get('/ooh-inventories', [OohController::class, 'inventories']);
+    Route::get('/ooh-inventories/{id}', [OohController::class, 'show']);
     // Service Requests (Canonical)
     Route::get('/service-requests', [FreelancerJobController::class, 'index']);
     Route::middleware('auth:sanctum')->get('/service-requests/mine', [FreelancerJobController::class, 'myListings']);
@@ -110,6 +113,12 @@ Route::prefix('v1')->group(function () {
         Route::post('/quote-requests/{quoteRequest}/files', [QuoteRequestController::class, 'storeFiles']);
         Route::post('/quote-requests/{quoteRequest}/quotes/{quote}/select', [QuoteRequestController::class, 'selectQuote']);
 
+        Route::post('/ooh-inventories', [OohController::class, 'storeInventory']);
+        Route::get('/ooh-plans', [OohController::class, 'myPlans']);
+        Route::post('/ooh-plans', [OohController::class, 'storePlan']);
+        Route::get('/ooh-plans/{oohPlan}', [OohController::class, 'showPlan']);
+        Route::post('/ooh-plans/{oohPlan}/vendor-requests/{vendorRequest}/quotes/{quote}/select', [OohController::class, 'selectQuote']);
+
         // Service Requests (Canonical)
         Route::post('/service-requests', [FreelancerJobController::class, 'store']);
         Route::post('/service-requests/{job}/bids', [FreelancerJobController::class, 'storeBid'])->middleware('throttle:bids');
@@ -135,6 +144,11 @@ Route::prefix('v1')->group(function () {
             Route::get('/matched-quote-requests', [VendorPanelController::class, 'matchedQuoteRequests']);
             Route::post('/quote-requests/{quoteRequest}/meeting', [VendorQuoteController::class, 'purchaseMeeting']);
             Route::post('/quote-requests/{quoteRequest}/quotes', [VendorQuoteController::class, 'store']);
+            Route::get('/ooh-inventories', [OohController::class, 'vendorInventories']);
+            Route::post('/ooh-inventories', [OohController::class, 'storeInventory']);
+            Route::get('/ooh-requests', [OohController::class, 'vendorRequests']);
+            Route::post('/ooh-requests/{vendorRequest}/quotes', [OohController::class, 'vendorQuote']);
+            Route::post('/ooh-proofs', [OohController::class, 'vendorProof']);
             Route::get('/payout-requests', [VendorPayoutController::class, 'index']);
             Route::post('/payout-requests', [VendorPayoutController::class, 'store']);
         });

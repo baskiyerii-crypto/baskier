@@ -32,6 +32,7 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule): void {
         $schedule->command('contracts:suspend-overdue')->hourly();
+        $schedule->command('ooh:notify-upcoming')->dailyAt('08:00');
         $schedule->command('platform:backup')->dailyAt('03:00');
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -44,6 +44,10 @@ return [
     'path_ozalit_title' => 'Ozalit / paper printout',
     'path_ozalit_body' => 'Collect quotes for ozalit and paper printouts in a separate channel.',
     'path_ozalit_cta' => 'Get an ozalit quote',
+    'path_outdoor_eyebrow' => 'Outdoor',
+    'path_outdoor_title' => 'Plan outdoor media',
+    'path_outdoor_body' => 'Browse billboard faces by city, pick dates, and request quotes from each owner.',
+    'path_outdoor_cta' => 'Open outdoor catalog',
 
     'quote_form_print_help' => 'Only print categories are listed. Add line items so vendors can bid precisely.',
     'quote_form_tabela_help' => 'Only signage categories are listed. Include size and material details.',

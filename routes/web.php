@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\AdminContractController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminFinanceController;
 use App\Http\Controllers\Admin\AdminMenuController;
+use App\Http\Controllers\Admin\AdminOutdoorController;
 use App\Http\Controllers\Admin\AdminPayoutController;
 use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\AdminProductModerationController;
@@ -29,6 +30,7 @@ use App\Http\Controllers\Customer\CustomerDashboardController;
 use App\Http\Controllers\Customer\CustomerMessageController;
 use App\Http\Controllers\Customer\CustomerOrderController;
 use App\Http\Controllers\Customer\CustomerOrderDesignController;
+use App\Http\Controllers\Customer\CustomerOutdoorPlanController;
 use App\Http\Controllers\Customer\CustomerPriceEstimateController;
 use App\Http\Controllers\Customer\CustomerQuestionController;
 use App\Http\Controllers\Customer\CustomerReviewController;
@@ -39,6 +41,7 @@ use App\Http\Controllers\FreelancerJobWebController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\NotificationWebController;
+use App\Http\Controllers\OutdoorCatalogController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\QuoteRequestController;
@@ -49,6 +52,9 @@ use App\Http\Controllers\Vendor\VendorDocumentController;
 use App\Http\Controllers\Vendor\VendorFreelancerController;
 use App\Http\Controllers\Vendor\VendorMessageController;
 use App\Http\Controllers\Vendor\VendorOzalitController;
+use App\Http\Controllers\Vendor\VendorOutdoorInventoryController;
+use App\Http\Controllers\Vendor\VendorOutdoorOpsController;
+use App\Http\Controllers\Vendor\VendorOutdoorRequestController;
 use App\Http\Controllers\Vendor\VendorOrderController;
 use App\Http\Controllers\Vendor\VendorOrderDesignController;
 use App\Http\Controllers\Vendor\VendorPayoutRequestWebController;
@@ -77,6 +83,10 @@ Route::get('/urunler', [ProductController::class, 'index'])->name('products.inde
 Route::get('/urun/{slug}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/saticilar', [VendorController::class, 'index'])->name('vendors.index');
 Route::get('/satici/{slug}', [VendorController::class, 'show'])->name('vendors.show');
+Route::get('/acik-hava', [OutdoorCatalogController::class, 'index'])->name('outdoor.index');
+Route::get('/acik-hava/{slug}', [OutdoorCatalogController::class, 'show'])->name('outdoor.show');
+Route::post('/acik-hava/{slug}/plan', [OutdoorCatalogController::class, 'addToPlan'])->name('outdoor.plan.add');
+Route::post('/acik-hava-sepet/kaldir', [OutdoorCatalogController::class, 'removeFromPlan'])->name('outdoor.basket.remove');
 Route::get('/gizlilik', [PageController::class, 'privacy'])->name('pages.privacy');
 Route::get('/kullanim-kosullari', [PageController::class, 'terms'])->name('pages.terms');
 Route::get('/hakkimizda', [PageController::class, 'about'])->name('pages.about');
@@ -188,6 +198,10 @@ Route::middleware(['auth', 'role:customer'])->prefix('hesabim')->name('customer.
     Route::get('/siparis-sorularim', [CustomerQuestionController::class, 'orders'])->name('order-questions.index');
     Route::post('/siparis-sorularim/{question}', [CustomerQuestionController::class, 'replyOrder'])->name('order-questions.reply');
     Route::post('/siparisler/{order}/soru', [CustomerQuestionController::class, 'storeOrder'])->name('orders.questions.store');
+    Route::get('/planlarim', [CustomerOutdoorPlanController::class, 'index'])->name('outdoor.plans.index');
+    Route::post('/planlarim', [CustomerOutdoorPlanController::class, 'store'])->name('outdoor.plans.store');
+    Route::get('/planlarim/{plan}', [CustomerOutdoorPlanController::class, 'show'])->name('outdoor.plans.show');
+    Route::post('/planlarim/{plan}/satir/{vendorRequest}/teklif/{quote}/sec', [CustomerOutdoorPlanController::class, 'accept'])->name('outdoor.plans.accept');
 });
 
 // Satıcı paneli
@@ -222,6 +236,28 @@ Route::middleware(['auth', 'role:vendor', 'vendor.not_suspended'])->prefix('sati
     Route::get('tabela', [VendorTabelaController::class, 'index'])->name('tabela.index');
     Route::post('tabela/gorusme', [VendorTabelaController::class, 'startMeeting'])->name('tabela.meeting');
     Route::get('ozalit', [VendorOzalitController::class, 'index'])->name('ozalit.index');
+    Route::get('outdoor', [VendorOutdoorInventoryController::class, 'index'])->name('outdoor.inventories.index');
+    Route::get('outdoor/yeni', [VendorOutdoorInventoryController::class, 'create'])->name('outdoor.inventories.create');
+    Route::post('outdoor', [VendorOutdoorInventoryController::class, 'store'])->name('outdoor.inventories.store');
+    Route::get('outdoor/{inventory}/duzenle', [VendorOutdoorInventoryController::class, 'edit'])->name('outdoor.inventories.edit');
+    Route::put('outdoor/{inventory}', [VendorOutdoorInventoryController::class, 'update'])->name('outdoor.inventories.update');
+    Route::post('outdoor/{inventory}/inceleme', [VendorOutdoorInventoryController::class, 'submit'])->name('outdoor.inventories.submit');
+    Route::post('outdoor/{inventory}/bloke', [VendorOutdoorInventoryController::class, 'block'])->name('outdoor.inventories.block');
+    Route::get('outdoor-havuz', [VendorOutdoorInventoryController::class, 'pool'])->name('outdoor.pool');
+    Route::get('outdoor-talepler', [VendorOutdoorRequestController::class, 'index'])->name('outdoor.requests.index');
+    Route::get('outdoor-talepler/{vendorRequest}', [VendorOutdoorRequestController::class, 'show'])->name('outdoor.requests.show');
+    Route::post('outdoor-talepler/{vendorRequest}/teklif', [VendorOutdoorRequestController::class, 'quote'])->name('outdoor.requests.quote');
+    Route::post('outdoor-talepler/{vendorRequest}/red', [VendorOutdoorRequestController::class, 'decline'])->name('outdoor.requests.decline');
+    Route::get('outdoor-planlar', [VendorOutdoorRequestController::class, 'myPlans'])->name('outdoor.plans.index');
+    Route::post('outdoor-planlar', [VendorOutdoorRequestController::class, 'storePlan'])->name('outdoor.plans.store');
+    Route::get('outdoor-planlar/{plan}', [VendorOutdoorRequestController::class, 'showPlan'])->name('outdoor.plans.show');
+    Route::get('outdoor-ekip', [VendorOutdoorOpsController::class, 'staffIndex'])->name('outdoor.staff');
+    Route::post('outdoor-ekip', [VendorOutdoorOpsController::class, 'staffInvite'])->name('outdoor.staff.invite');
+    Route::get('outdoor-isler', [VendorOutdoorOpsController::class, 'jobs'])->name('outdoor.jobs');
+    Route::post('outdoor-isler/{occupancy}/ata', [VendorOutdoorOpsController::class, 'assign'])->name('outdoor.jobs.assign');
+    Route::post('outdoor-isler/{occupancy}/kanit', [VendorOutdoorOpsController::class, 'proof'])->name('outdoor.jobs.proof');
+    Route::get('outdoor-raporlar', [VendorOutdoorOpsController::class, 'claims'])->name('outdoor.claims');
+    Route::post('outdoor-raporlar', [VendorOutdoorOpsController::class, 'storeClaim'])->name('outdoor.claims.store');
     Route::get('urun-sorulari', [VendorQuestionController::class, 'products'])->name('product-questions.index');
     Route::get('urun-sorulari/{question}', [VendorQuestionController::class, 'showProduct'])->name('product-questions.show');
     Route::post('urun-sorulari/{question}', [VendorQuestionController::class, 'answerProduct'])->name('product-questions.answer');
@@ -311,6 +347,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('alt-markalar', [AdminBrandController::class, 'store'])->name('brands.store');
     Route::put('alt-markalar/{brand}', [AdminBrandController::class, 'update'])->name('brands.update');
     Route::delete('alt-markalar/{brand}', [AdminBrandController::class, 'destroy'])->name('brands.destroy');
+
+    Route::get('outdoor/envanter', [AdminOutdoorController::class, 'inventories'])->name('outdoor.inventories');
+    Route::post('outdoor/envanter/{inventory}/yayinla', [AdminOutdoorController::class, 'publish'])->name('outdoor.inventories.publish');
+    Route::post('outdoor/envanter/{inventory}/reddet', [AdminOutdoorController::class, 'reject'])->name('outdoor.inventories.reject');
+    Route::get('outdoor/raporlar', [AdminOutdoorController::class, 'claims'])->name('outdoor.claims');
+    Route::post('outdoor/raporlar/{claim}/karar', [AdminOutdoorController::class, 'resolveClaim'])->name('outdoor.claims.resolve');
+    Route::get('outdoor/planlar', [AdminOutdoorController::class, 'plans'])->name('outdoor.plans');
 
     // Platform Metrikleri ve Gözlemlenebilirlik
     Route::get('metrikler', [\App\Http\Controllers\Admin\AdminMetricsController::class, 'index'])->name('metrics.index');

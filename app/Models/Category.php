@@ -36,6 +36,10 @@ class Category extends Model
 
     public const CHANNEL_TABELA = 'tabela';
 
+    public const CHANNEL_OZALIT = 'ozalit';
+
+    public const CHANNEL_OUTDOOR = 'outdoor';
+
     protected $casts = [
         'is_active' => 'boolean',
         'requires_quote' => 'boolean',

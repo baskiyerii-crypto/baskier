@@ -254,6 +254,7 @@
                 <summary>{{ __('panel.nav_catalog') }} <span>▾</span></summary>
                 <div class="nav-acc-body">
                     <a href="{{ route('admin.categories.index') }}" class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}"><span>{{ __('panel.nav_categories') }}</span></a>
+                    <a href="{{ route('admin.outdoor.inventories') }}" class="nav-link {{ request()->routeIs('admin.outdoor.*') ? 'active' : '' }}"><span>Açık hava</span></a>
                     <a href="{{ route('admin.business-types.index') }}" class="nav-link {{ request()->routeIs('admin.business-types.*') ? 'active' : '' }}"><span>{{ __('panel.nav_business_types') }}</span></a>
                     <a href="{{ route('admin.products.index') }}" class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}"><span>{{ __('panel.nav_products') }}</span></a>
                     <a href="{{ route('admin.product-approvals.index') }}" class="nav-link {{ request()->routeIs('admin.product-approvals.*') ? 'active' : '' }}"><span>{{ __('panel.nav_product_approvals') }}</span></a>

@@ -9,6 +9,7 @@
         <li>Teklif verme (toplu baskı / üretim) aylık abonelik ile açılır.</li>
         <li>Tabela görüşme modülü aylık abonelik + görüşme başına ücret ile çalışır.</li>
         <li>Ozalit / kağıt çıktı teklifleri ayrı aylık abonelik ile açılır; teklif başı ücret yoktur.</li>
+        <li>Açık hava (OOH) envanter ve plan talepleri ayrı aylık abonelik ile açılır; sipariş komisyonu yoktur.</li>
     </ul>
 </div>
 
@@ -86,6 +87,23 @@
             <form method="POST" action="{{ route('vendor.subscriptions.activate') }}" class="mt-auto js-subscription-form" data-module="ozalit">
                 @csrf
                 <input type="hidden" name="module" value="ozalit">
+                <button class="btn btn-outline-primary btn-sm w-100 js-subscription-btn" type="submit">1 Ay Aktif Et / Uzat</button>
+            </form>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h3 class="h6 mb-0">Açık Hava Modülü</h3>
+                <span class="badge {{ $vendor->hasActiveOutdoorModule() ? 'bg-success-subtle text-success' : 'bg-warning text-dark' }}">
+                    {{ $vendor->hasActiveOutdoorModule() ? 'Aktif' : 'Pasif' }}
+                </span>
+            </div>
+            <p class="small mb-2">Aylık ücret: <strong>₺{{ number_format($outdoorMonthlyFee ?? 249, 2, ',', '.') }}</strong></p>
+            <p class="small text-muted">Bitiş: {{ optional($vendor->outdoor_expires_at)->format('d.m.Y H:i') ?? '-' }}</p>
+            <form method="POST" action="{{ route('vendor.subscriptions.activate') }}" class="mt-auto js-subscription-form" data-module="outdoor">
+                @csrf
+                <input type="hidden" name="module" value="outdoor">
                 <button class="btn btn-outline-primary btn-sm w-100 js-subscription-btn" type="submit">1 Ay Aktif Et / Uzat</button>
             </form>
         </div>

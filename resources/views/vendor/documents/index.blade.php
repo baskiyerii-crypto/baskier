@@ -143,10 +143,15 @@
                 <div class="col-md-4">
                     <label class="form-label small fw-semibold">Belge Türü <span class="text-danger">*</span></label>
                     <select name="document_type" class="form-select" required>
-                        @if($vendor->hasPhysicalTrack() || empty($vendor->registration_tracks))
+                        @if($vendor->hasPhysicalTrack() || $vendor->hasOutdoorTrack() || empty($vendor->registration_tracks))
                             <optgroup label="Fiziki Mağaza / Üretim">
                                 <option value="tax_plate">{{ __('panel.doc_tax_plate') }}</option>
                                 <option value="company_registration">{{ __('panel.doc_company_registration') }}</option>
+                            </optgroup>
+                        @endif
+                        @if($vendor->hasOutdoorTrack())
+                            <optgroup label="Açık hava">
+                                <option value="outdoor_permit">{{ __('panel.outdoor_permit') }}</option>
                             </optgroup>
                         @endif
                         @if($vendor->hasFreelancerTrack())

@@ -138,14 +138,20 @@
                 @if($sidebarVendor)<span class="badge bg-light text-dark border">#{{ $sidebarVendor->id }}</span>@endif
             </div>
         </div>
-        @php $v = auth()->user()->vendor; @endphp
+        @php
+            $v = auth()->user()->vendor;
+            $oohRole = ($v && ($v->hasActiveOutdoorModule() || $v->hasOutdoorTrack()))
+                ? app(\App\Services\OutdoorStaffService::class)->roleFor(auth()->user(), $v)
+                : null;
+        @endphp
         <nav class="nav">
             <a href="{{ route('vendor.dashboard') }}" class="nav-link {{ request()->routeIs('vendor.dashboard') ? 'active' : '' }}">
                 <span>Özet</span>
             </a>
-            <details class="nav-acc" @if(request()->routeIs('vendor.orders.*','vendor.products.*','vendor.quote-requests.*','vendor.direct-quotes.*','vendor.freelancer.*','vendor.tabela.*')) open @endif>
+            <details class="nav-acc" @if(request()->routeIs('vendor.orders.*','vendor.products.*','vendor.quote-requests.*','vendor.direct-quotes.*','vendor.freelancer.*','vendor.tabela.*','vendor.ozalit.*','vendor.outdoor.*')) open @endif>
                 <summary>{{ __('panel.nav_work') }} <span>▾</span></summary>
                 <div class="nav-acc-body">
+                    @if($oohRole !== 'field')
                     <a href="{{ route('vendor.orders.index') }}" class="nav-link {{ request()->routeIs('vendor.orders.*') ? 'active' : '' }}"><span>Siparişler</span></a>
                     @if(!$v || $v->hasTrack('physical_products') || empty($v->registration_tracks))
                     <a href="{{ route('vendor.products.index') }}" class="nav-link {{ request()->routeIs('vendor.products.*') ? 'active' : '' }}"><span>Ürünlerim</span></a>
@@ -163,8 +169,24 @@
                     @if($v?->hasActiveOzalitModule() && Route::has('vendor.ozalit.index'))
                     <a href="{{ route('vendor.ozalit.index') }}" class="nav-link {{ request()->routeIs('vendor.ozalit.*') ? 'active' : '' }}"><span>Ozalit teklifleri</span></a>
                     @endif
+                    @endif
+                    @if($v?->hasActiveOutdoorModule() && Route::has('vendor.outdoor.inventories.index'))
+                    @if($oohRole !== 'field')
+                    <a href="{{ route('vendor.outdoor.inventories.index') }}" class="nav-link {{ request()->routeIs('vendor.outdoor.inventories.*') ? 'active' : '' }}"><span>Açık hava envanter</span></a>
+                    <a href="{{ route('vendor.outdoor.requests.index') }}" class="nav-link {{ request()->routeIs('vendor.outdoor.requests.*') ? 'active' : '' }}"><span>Açık hava talepleri</span></a>
+                    <a href="{{ route('vendor.outdoor.pool') }}" class="nav-link {{ request()->routeIs('vendor.outdoor.pool') ? 'active' : '' }}"><span>Envanter havuzu</span></a>
+                    <a href="{{ route('vendor.outdoor.plans.index') }}" class="nav-link {{ request()->routeIs('vendor.outdoor.plans.*') ? 'active' : '' }}"><span>Havuz planlarım</span></a>
+                    @endif
+                    <a href="{{ route('vendor.outdoor.jobs') }}" class="nav-link {{ request()->routeIs('vendor.outdoor.jobs*') ? 'active' : '' }}"><span>Asım işleri</span></a>
+                    @if($oohRole === 'owner')
+                    <a href="{{ route('vendor.outdoor.staff') }}" class="nav-link {{ request()->routeIs('vendor.outdoor.staff*') ? 'active' : '' }}"><span>Açık hava ekibi</span></a>
+                    <a href="{{ route('vendor.outdoor.claims') }}" class="nav-link {{ request()->routeIs('vendor.outdoor.claims*') ? 'active' : '' }}"><span>Çift ilan raporları</span></a>
+                    @endif
+                    @endif
+                    @if($oohRole !== 'field')
                     <a href="{{ route('vendor.product-questions.index') }}" class="nav-link {{ request()->routeIs('vendor.product-questions.*') ? 'active' : '' }}"><span>Ürün soruları</span></a>
                     <a href="{{ route('vendor.order-questions.index') }}" class="nav-link {{ request()->routeIs('vendor.order-questions.*') ? 'active' : '' }}"><span>Sipariş soruları</span></a>
+                    @endif
                 </div>
             </details>
             <details class="nav-acc" @if(request()->routeIs('vendor.documents.*','vendor.profile.*','vendor.categories.*','vendor.contracts.*','vendor.subscriptions.*')) open @endif>

@@ -23,6 +23,7 @@
                 <option value="freelancer" @selected(old('channel', $channel ?? '') === 'freelancer')>Freelancer</option>
                 <option value="tabela" @selected(old('channel', $channel ?? '') === 'tabela')>Tabela</option>
                 <option value="ozalit" @selected(old('channel', $channel ?? '') === 'ozalit')>Ozalit / kağıt çıktı</option>
+                <option value="outdoor" @selected(old('channel', $channel ?? '') === 'outdoor')>Açık hava (OOH)</option>
             </select>
         </div>
         <div class="mb-3">

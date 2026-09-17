@@ -9,6 +9,7 @@
         <a href="{{ route('admin.categories.index', ['channel' => 'freelancer']) }}" class="btn {{ ($channel ?? '') === 'freelancer' ? 'btn-primary' : 'btn-outline-primary' }}">Freelancer</a>
         <a href="{{ route('admin.categories.index', ['channel' => 'tabela']) }}" class="btn {{ ($channel ?? '') === 'tabela' ? 'btn-primary' : 'btn-outline-primary' }}">Tabela</a>
         <a href="{{ route('admin.categories.index', ['channel' => 'ozalit']) }}" class="btn {{ ($channel ?? '') === 'ozalit' ? 'btn-primary' : 'btn-outline-primary' }}">Ozalit</a>
+        <a href="{{ route('admin.categories.index', ['channel' => 'outdoor']) }}" class="btn {{ ($channel ?? '') === 'outdoor' ? 'btn-primary' : 'btn-outline-primary' }}">Açık hava</a>
     </div>
     <a href="{{ route('admin.categories.create', ['channel' => $channel ?? 'physical_quote']) }}" class="btn btn-primary btn-sm">Yeni Kategori</a>
 </div>

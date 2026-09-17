@@ -11,6 +11,7 @@
         </div>
         <div class="flex flex-wrap gap-2">
             <a href="{{ route('products.index') }}" class="by-btn-secondary">Alışveriş</a>
+            <a href="{{ route('outdoor.index') }}" class="by-btn-secondary">Açık hava</a>
             <a href="{{ route('quote-requests.create') }}" class="by-btn-primary">+ Teklif talebi</a>
         </div>
     </div>

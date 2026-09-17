@@ -114,6 +114,10 @@
                     <label class="form-label fw-semibold">Ozalit modülü aylık ücreti (₺)</label>
                     <input type="number" name="ozalit_monthly_fee" class="form-control" value="{{ old('ozalit_monthly_fee', $ozalit_monthly_fee ?? 199) }}" min="0" max="100000" step="0.01">
                 </div>
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Açık hava (OOH) aylık ücreti (₺)</label>
+                    <input type="number" name="outdoor_monthly_fee" class="form-control" value="{{ old('outdoor_monthly_fee', $outdoor_monthly_fee ?? 249) }}" min="0" max="100000" step="0.01">
+                </div>
 
                 <hr class="my-4">
                 <h2 class="h6 fw-bold mb-3">Yasal kimlik (sözleşme şablonları)</h2>

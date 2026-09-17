@@ -44,6 +44,10 @@ return [
     'path_ozalit_title' => 'Ozalit / kağıt çıktı',
     'path_ozalit_body' => 'Ozalit ve kağıt çıktı işleri için ayrı teklif toplayın.',
     'path_ozalit_cta' => 'Ozalit teklifi al',
+    'path_outdoor_eyebrow' => 'Açık hava',
+    'path_outdoor_title' => 'Mecra planı oluştur',
+    'path_outdoor_body' => 'Billboard ve açık hava yüzlerini il ilçe gez, tarih seç, panolardan teklif topla.',
+    'path_outdoor_cta' => 'Açık hava katalogu',
 
     'quote_form_print_help' => 'Yalnızca baskı / matbaa kategorileri listelenir. Kalem kalem yaz, satıcılar net teklif versin.',
     'quote_form_tabela_help' => 'Yalnızca tabela kategorileri listelenir. Ölçü ve malzeme yaz; tabela satıcıları teklif versin.',

@@ -64,6 +64,7 @@
                             'physical_products' => __('panel.track_physical_products'),
                             'physical_quote' => __('panel.track_physical_quote'),
                             'freelancer' => __('panel.track_freelancer'),
+                            'outdoor' => __('panel.track_outdoor'),
                         ] as $track => $label)
                             <label class="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white/70 px-4 py-3 text-sm text-slate-800">
                                 <input class="h-4 w-4 track-cb" type="checkbox" name="registration_tracks[]" value="{{ $track }}"
@@ -114,6 +115,15 @@
                         </div>
                     </div>
 
+                    <div id="outdoor-permit-fields" class="mt-6" style="display:none;">
+                        <div class="by-divider mb-4"></div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('panel.outdoor_permit') }}</p>
+                        <p class="mt-1 text-sm text-slate-600">{{ __('panel.outdoor_permit_help') }}</p>
+                        <div class="mt-4">
+                            <input type="file" class="form-control mt-1" name="outdoor_permit" accept=".pdf,image/*">
+                            @error('outdoor_permit')<div class="mt-2 text-sm font-semibold text-rose-600">{{ $message }}</div>@enderror
+                        </div>
+                    </div>
                     <div id="freelancer-doc-fields" class="mt-6" style="display:none;">
                         <div class="by-divider mb-4"></div>
                         <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('panel.freelancer_docs') }}</p>
@@ -179,12 +189,15 @@ window.toggleVendorBiz = function () {
 window.toggleVendorTracks = function () {
     var checks = document.querySelectorAll('.track-cb:checked');
     var tracks = Array.from(checks).map(function (c) { return c.value; });
-    var physical = tracks.indexOf('physical_products') >= 0 || tracks.indexOf('physical_quote') >= 0;
+    var physical = tracks.indexOf('physical_products') >= 0 || tracks.indexOf('physical_quote') >= 0 || tracks.indexOf('outdoor') >= 0;
     var freelancer = tracks.indexOf('freelancer') >= 0;
+    var outdoor = tracks.indexOf('outdoor') >= 0;
     var tax = document.getElementById('physical-tax-fields');
     var docs = document.getElementById('freelancer-doc-fields');
+    var permit = document.getElementById('outdoor-permit-fields');
     if (tax) tax.style.display = physical ? 'block' : 'none';
     if (docs) docs.style.display = freelancer ? 'block' : 'none';
+    if (permit) permit.style.display = outdoor ? 'block' : 'none';
 };
 document.addEventListener('DOMContentLoaded', function () {
     try {

@@ -75,6 +75,7 @@ final class UiLabels
             'freelancer' => __('panel.channel_freelancer'),
             'tabela' => __('panel.channel_tabela'),
             'ozalit' => 'Ozalit / kağıt çıktı',
+            'outdoor' => 'Açık hava (OOH)',
         ];
     }
 
@@ -92,6 +93,7 @@ final class UiLabels
             'diploma' => __('panel.doc_diploma'),
             'portfolio_accreditation' => __('panel.doc_portfolio_accreditation'),
             'course' => __('panel.doc_course'),
+            'outdoor_permit' => __('panel.outdoor_permit'),
             'other' => __('panel.doc_other'),
         ];
     }
@@ -166,6 +168,7 @@ final class UiLabels
             'physical_products' => __('panel.track_physical_products'),
             'physical_quote' => __('panel.track_physical_quote'),
             'freelancer' => __('panel.track_freelancer'),
+            'outdoor' => __('panel.track_outdoor'),
         ];
     }
 

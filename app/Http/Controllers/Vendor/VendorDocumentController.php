@@ -55,7 +55,7 @@ class VendorDocumentController extends Controller
         }
 
         $validated = $request->validate([
-            'document_type' => ['required', 'string', 'in:tax_plate,company_registration,certificate,diploma,portfolio_accreditation,course,other'],
+            'document_type' => ['required', 'string', 'in:tax_plate,company_registration,certificate,diploma,portfolio_accreditation,course,outdoor_permit,other'],
             'issuing_institution' => ['nullable', 'string', 'max:255'],
             'document_number' => ['nullable', 'string', 'max:128'],
             'issued_at' => ['nullable', 'date'],
@@ -63,8 +63,12 @@ class VendorDocumentController extends Controller
             'file' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:'.config('uploads.max_kb', 10240)],
         ]);
 
-        if (in_array($validated['document_type'], ['tax_plate', 'company_registration'], true) && ! $vendor->hasPhysicalTrack()) {
+        if (in_array($validated['document_type'], ['tax_plate', 'company_registration'], true) && ! $vendor->hasPhysicalTrack() && ! $vendor->hasOutdoorTrack()) {
             return back()->with('error', __('panel.tax_plate_only_physical') ?: 'Bu belge türü yalnızca fiziksel ürün / teklif sağlayan satıcılar içindir.');
+        }
+
+        if ($validated['document_type'] === 'outdoor_permit' && ! $vendor->hasOutdoorTrack()) {
+            return back()->with('error', 'Bu belge türü yalnızca açık hava satıcıları içindir.');
         }
 
         if (in_array($validated['document_type'], ['diploma', 'certificate', 'portfolio_accreditation'], true) && ! $vendor->hasFreelancerTrack()) {

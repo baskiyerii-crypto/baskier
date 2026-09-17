@@ -48,8 +48,9 @@ class TrustBadgeService
 
         $hasPhysical = $vendor->hasPhysicalTrack();
         $hasFreelancer = $vendor->hasFreelancerTrack();
+        $hasOutdoor = $vendor->hasOutdoorTrack();
 
-        if ($hasPhysical) {
+        if ($hasPhysical || $hasOutdoor) {
             $hasPhysicalDoc = $this->hasApprovedTrackDocument(
                 $vendor,
                 ['tax_plate', 'company_registration'],
@@ -162,8 +163,9 @@ class TrustBadgeService
 
         $hasPhysical = $vendor->hasPhysicalTrack();
         $hasFreelancer = $vendor->hasFreelancerTrack();
+        $hasOutdoor = $vendor->hasOutdoorTrack();
 
-        $physicalDocApproved = $hasPhysical
+        $physicalDocApproved = ($hasPhysical || $hasOutdoor)
             ? $this->hasApprovedTrackDocument($vendor, ['tax_plate', 'company_registration'], $today)
             : null;
 

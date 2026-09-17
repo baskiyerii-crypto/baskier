@@ -44,6 +44,8 @@ class Vendor extends Model
         'tabela_expires_at',
         'ozalit_enabled',
         'ozalit_expires_at',
+        'outdoor_enabled',
+        'outdoor_expires_at',
         'risk_band',
         'risk_score',
         'contract_suspended_at',
@@ -64,6 +66,7 @@ class Vendor extends Model
         'quotes_enabled' => 'boolean',
         'tabela_enabled' => 'boolean',
         'ozalit_enabled' => 'boolean',
+        'outdoor_enabled' => 'boolean',
         'balance' => 'decimal:2',
         'rating_average' => 'decimal:2',
         'risk_score' => 'decimal:2',
@@ -73,6 +76,7 @@ class Vendor extends Model
         'quotes_expires_at' => 'datetime',
         'tabela_expires_at' => 'datetime',
         'ozalit_expires_at' => 'datetime',
+        'outdoor_expires_at' => 'datetime',
         'registration_tracks' => 'array',
         'profile_pending_payload' => 'array',
         'social_links' => 'array',
@@ -100,6 +104,11 @@ class Vendor extends Model
         return $this->hasTrack('freelancer');
     }
 
+    public function hasOutdoorTrack(): bool
+    {
+        return $this->hasTrack('outdoor');
+    }
+
     public function hasActiveFreelancerModule(): bool
     {
         return $this->freelancer_enabled
@@ -122,6 +131,12 @@ class Vendor extends Model
     {
         return (bool) $this->ozalit_enabled
             && ($this->ozalit_expires_at === null || $this->ozalit_expires_at->isFuture());
+    }
+
+    public function hasActiveOutdoorModule(): bool
+    {
+        return (bool) $this->outdoor_enabled
+            && ($this->outdoor_expires_at === null || $this->outdoor_expires_at->isFuture());
     }
 
     public function hasApprovedTaxPlate(): bool
@@ -243,6 +258,16 @@ class Vendor extends Model
     public function documents(): HasMany
     {
         return $this->hasMany(VendorDocument::class);
+    }
+
+    public function members(): HasMany
+    {
+        return $this->hasMany(VendorMember::class);
+    }
+
+    public function oohInventories(): HasMany
+    {
+        return $this->hasMany(OohInventory::class);
     }
 
     public function payoutRequests(): HasMany

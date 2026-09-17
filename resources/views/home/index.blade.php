@@ -82,7 +82,7 @@
     </section>
 
     <section class="by-container -mt-2">
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             <a href="{{ route('products.index') }}" class="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-900 shadow-lg shadow-slate-900/10 transition hover:-translate-y-1 hover:shadow-xl">
                 <img src="{{ asset('images/home/path-ready-products.png') }}" alt="{{ __('home.path_ready_title') }}" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
                 <div class="absolute inset-0 bg-linear-to-t from-slate-950 via-slate-950/55 to-indigo-900/25"></div>
@@ -130,6 +130,16 @@
                     <h3 class="mt-3 text-2xl font-extrabold tracking-tight text-white">{{ __('home.path_ozalit_title') }}</h3>
                     <p class="mt-2 max-w-sm text-sm leading-relaxed text-white/80">{{ __('home.path_ozalit_body') }}</p>
                     <span class="mt-5 inline-flex items-center gap-2 text-sm font-bold text-sky-200">{{ __('home.path_ozalit_cta') }} →</span>
+                </div>
+            </a>
+            <a href="{{ route('outdoor.index') }}" class="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-900 shadow-lg shadow-slate-900/10 transition hover:-translate-y-1 hover:shadow-xl">
+                <img src="{{ asset('images/home/path-outdoor.png') }}" alt="{{ __('home.path_outdoor_title') }}" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
+                <div class="absolute inset-0 bg-linear-to-t from-slate-950 via-lime-950/50 to-emerald-800/20"></div>
+                <div class="relative flex min-h-60 flex-col justify-end p-6 sm:min-h-70">
+                    <span class="inline-flex w-fit rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white/90 backdrop-blur">{{ __('home.path_outdoor_eyebrow') }}</span>
+                    <h3 class="mt-3 text-2xl font-extrabold tracking-tight text-white">{{ __('home.path_outdoor_title') }}</h3>
+                    <p class="mt-2 max-w-sm text-sm leading-relaxed text-white/80">{{ __('home.path_outdoor_body') }}</p>
+                    <span class="mt-5 inline-flex items-center gap-2 text-sm font-bold text-lime-200">{{ __('home.path_outdoor_cta') }} →</span>
                 </div>
             </a>
         </div>
