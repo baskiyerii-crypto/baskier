@@ -21,6 +21,7 @@
                 <option value="physical_quote" @selected(old('channel', $category->channel ?? 'physical_quote') === 'physical_quote')>Fiziksel + Teklif</option>
                 <option value="freelancer" @selected(old('channel', $category->channel ?? '') === 'freelancer')>Freelancer</option>
                 <option value="tabela" @selected(old('channel', $category->channel ?? '') === 'tabela')>Tabela</option>
+                <option value="ozalit" @selected(old('channel', $category->channel ?? '') === 'ozalit')>Ozalit / kağıt çıktı</option>
             </select>
         </div>
         <div class="mb-3">

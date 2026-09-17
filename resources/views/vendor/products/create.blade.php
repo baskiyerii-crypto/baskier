@@ -41,6 +41,10 @@
                 @error('main_image')<div class="text-danger small">{{ $message }}</div>@enderror
             </div>
             <div class="mb-3">
+                <label class="form-label fw-semibold">Galeri</label>
+                <input type="file" name="gallery[]" class="form-control" accept="image/jpeg,image/png,image/webp" multiple>
+            </div>
+            <div class="mb-3">
                 <label class="form-label fw-semibold">Kısa açıklama</label>
                 <textarea name="short_description" class="form-control" rows="2">{{ old('short_description') }}</textarea>
             </div>

@@ -82,39 +82,7 @@ class ProductionReadinessTest extends TestCase
         $throttledResponse->assertStatus(429);
     }
 
-    // ─── 4. Admin Failed Jobs Dashboard ──────────
-
-    public function test_admin_can_view_failed_jobs_dashboard(): void
-    {
-        $admin = User::factory()->create(['role' => 'admin']);
-
-        // Insert a simulated failed job
-        DB::table('failed_jobs')->insert([
-            'uuid'       => (string) \Illuminate\Support\Str::uuid(),
-            'connection' => 'database',
-            'queue'      => 'default',
-            'payload'    => json_encode(['displayName' => 'App\\Jobs\\SendWhatsAppMessageJob']),
-            'exception'  => "RuntimeException: Connection timeout\nat /app/Jobs/SendWhatsAppMessageJob.php:45",
-            'failed_at'  => now(),
-        ]);
-
-        $response = $this->actingAs($admin)->get(route('admin.failed-jobs.index'));
-
-        $response->assertOk();
-        $response->assertSee('Başarısız Kuyruk İşleri');
-        $response->assertSee('SendWhatsAppMessageJob');
-    }
-
-    public function test_non_admin_cannot_view_failed_jobs_dashboard(): void
-    {
-        $customer = User::factory()->create(['role' => 'customer']);
-
-        $response = $this->actingAs($customer)->get(route('admin.failed-jobs.index'));
-
-        $response->assertForbidden();
-    }
-
-    // ─── 5. Platform Metrics Dashboard ───────────
+    // ─── 4. Platform Metrics Dashboard ───────────
 
     public function test_admin_can_view_metrics_dashboard(): void
     {

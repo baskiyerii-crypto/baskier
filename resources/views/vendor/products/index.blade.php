@@ -56,8 +56,8 @@
                 @forelse($products as $p)
                     <tr>
                         <td>
-                            @if($p->main_image)
-                                <img src="{{ asset('storage/'.$p->main_image) }}" alt="" class="rounded border" style="width: 44px; height: 44px; object-fit: cover;">
+                            @if($p->displayImageUrl())
+                                <img src="{{ $p->displayImageUrl() }}" alt="" class="rounded border" style="width: 44px; height: 44px; object-fit: cover;">
                             @else
                                 <div class="rounded border bg-light text-muted d-flex align-items-center justify-content-center small" style="width: 44px; height: 44px;">
                                     📷

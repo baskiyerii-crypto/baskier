@@ -6,6 +6,7 @@
     <meta name="robots" content="noindex,nofollow">
     <title>@yield('title', 'Panel') – BaskıYeri Satıcı</title>
     <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
     <meta name="theme-color" content="#059669">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -126,9 +127,16 @@
 <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
 <div class="vendor-shell" id="vendorShell">
     <aside class="vendor-sidebar" id="vendorSidebar">
-        <div class="brand d-flex justify-content-between align-items-center">
-            <a href="{{ route('vendor.dashboard') }}">Baskı<span class="accent">Yeri</span> <span class="accent">Satıcı</span></a>
-            <button type="button" class="btn-close d-lg-none" onclick="toggleSidebar()" aria-label="Kapat"></button>
+        <div class="brand">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{{ route('vendor.dashboard') }}">Baskı<span class="accent">Yeri</span> <span class="accent">Satıcı</span></a>
+                <button type="button" class="btn-close d-lg-none" onclick="toggleSidebar()" aria-label="Kapat"></button>
+            </div>
+            @php $sidebarVendor = auth()->user()?->vendor; @endphp
+            <div class="mt-2 small">
+                <span class="badge bg-success-subtle text-success border">Satıcı ID: {{ auth()->user()?->publicCode() }}</span>
+                @if($sidebarVendor)<span class="badge bg-light text-dark border">#{{ $sidebarVendor->id }}</span>@endif
+            </div>
         </div>
         @php $v = auth()->user()->vendor; @endphp
         <nav class="nav">
@@ -152,6 +160,11 @@
                     @if($v?->hasActiveTabelaModule() && Route::has('vendor.tabela.index'))
                     <a href="{{ route('vendor.tabela.index') }}" class="nav-link {{ request()->routeIs('vendor.tabela.*') ? 'active' : '' }}"><span>{{ __('panel.nav_tabela') }}</span></a>
                     @endif
+                    @if($v?->hasActiveOzalitModule() && Route::has('vendor.ozalit.index'))
+                    <a href="{{ route('vendor.ozalit.index') }}" class="nav-link {{ request()->routeIs('vendor.ozalit.*') ? 'active' : '' }}"><span>Ozalit teklifleri</span></a>
+                    @endif
+                    <a href="{{ route('vendor.product-questions.index') }}" class="nav-link {{ request()->routeIs('vendor.product-questions.*') ? 'active' : '' }}"><span>Ürün soruları</span></a>
+                    <a href="{{ route('vendor.order-questions.index') }}" class="nav-link {{ request()->routeIs('vendor.order-questions.*') ? 'active' : '' }}"><span>Sipariş soruları</span></a>
                 </div>
             </details>
             <details class="nav-acc" @if(request()->routeIs('vendor.documents.*','vendor.profile.*','vendor.categories.*','vendor.contracts.*','vendor.subscriptions.*')) open @endif>
@@ -212,7 +225,9 @@
             <div class="user-menu">
                 @include('partials.locale-switcher')
                 <span class="sep"></span>
-                <span class="text-muted small">{{ auth()->user()?->publicCode() }}</span>
+                @include('partials.notification-bell', ['variant' => 'bootstrap'])
+                <span class="sep"></span>
+                <span class="badge bg-light text-dark border">{{ auth()->user()?->publicCode() }}</span>
                 <a href="{{ route('home') }}" target="_blank">{{ __('panel.view_site') }} ↗</a>
                 <span class="sep"></span>
                 <span class="text-muted small fw-medium">{{ auth()->user()->name ?? '' }}</span>
@@ -222,6 +237,12 @@
             </div>
         </header>
         <div class="vendor-content">
+            @php $sidebarVendor = $sidebarVendor ?? auth()->user()?->vendor; @endphp
+            @if($sidebarVendor?->is_suspended)
+                <div class="alert alert-danger">Hesabınız askıya alındı: {{ $sidebarVendor->suspension_reason ?: 'Yönetim incelemesi devam ediyor.' }} Ürün, teklif ve mesaj gönderemezsiniz.</div>
+            @elseif($sidebarVendor?->contract_suspended_at)
+                <div class="alert alert-warning">Bekleyen sözleşmeleri onaylayana kadar faaliyetiniz donduruldu.</div>
+            @endif
             @if(session('success'))<div class="alert alert-success alert-dismissible fade show small mb-3" role="alert">{{ session('success') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>@endif
             @if(session('error'))<div class="alert alert-danger alert-dismissible fade show small mb-3" role="alert">{{ session('error') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>@endif
             @include('partials.validation-errors')

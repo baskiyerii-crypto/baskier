@@ -29,6 +29,7 @@ class VendorSubscriptionController extends Controller
             'freelancerMonthlyFee' => Setting::freelancerMonthlyFee(),
             'quotesMonthlyFee' => Setting::quotesMonthlyFee(),
             'tabelaMonthlyFee' => Setting::tabelaMonthlyFee(),
+            'ozalitMonthlyFee' => Setting::ozalitMonthlyFee(),
         ]);
     }
 
@@ -36,7 +37,7 @@ class VendorSubscriptionController extends Controller
     {
         $vendor = $this->getVendor($request);
         $validated = $request->validate([
-            'module' => ['required', 'in:freelancer,quotes,tabela'],
+            'module' => ['required', 'in:freelancer,quotes,tabela,ozalit'],
         ]);
 
         $module = $validated['module'];
@@ -44,12 +45,14 @@ class VendorSubscriptionController extends Controller
             'freelancer' => Setting::freelancerMonthlyFee(),
             'quotes' => Setting::quotesMonthlyFee(),
             'tabela' => Setting::tabelaMonthlyFee(),
+            'ozalit' => Setting::ozalitMonthlyFee(),
         };
 
         $labels = [
             'freelancer' => 'Freelancer',
             'quotes' => 'Teklif Verme',
             'tabela' => 'Tabela',
+            'ozalit' => 'Ozalit',
         ];
 
         try {

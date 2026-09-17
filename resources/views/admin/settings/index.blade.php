@@ -110,7 +110,27 @@
                     <label class="form-check-label" for="fc">Ara yüzen buton</label>
                 </div>
 
-                <p class="small text-muted mb-3">Menü düzenleme: <a href="{{ route('admin.menu.index') }}">Menü yönetimi</a> (sürükle-bırak).</p>
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Ozalit modülü aylık ücreti (₺)</label>
+                    <input type="number" name="ozalit_monthly_fee" class="form-control" value="{{ old('ozalit_monthly_fee', $ozalit_monthly_fee ?? 199) }}" min="0" max="100000" step="0.01">
+                </div>
+
+                <hr class="my-4">
+                <h2 class="h6 fw-bold mb-3">Yasal kimlik (sözleşme şablonları)</h2>
+                <div class="mb-2"><input name="legal_company_title" class="form-control" placeholder="Unvan" value="{{ old('legal_company_title', $legal_company_title ?? '') }}"></div>
+                <div class="mb-2"><input name="legal_address" class="form-control" placeholder="Adres" value="{{ old('legal_address', $legal_address ?? '') }}"></div>
+                <div class="row g-2 mb-2">
+                    <div class="col-md-6"><input name="legal_tax_office" class="form-control" placeholder="Vergi dairesi" value="{{ old('legal_tax_office', $legal_tax_office ?? '') }}"></div>
+                    <div class="col-md-6"><input name="legal_tax_number" class="form-control" placeholder="Vergi no" value="{{ old('legal_tax_number', $legal_tax_number ?? '') }}"></div>
+                </div>
+                <div class="row g-2 mb-2">
+                    <div class="col-md-6"><input name="legal_mersis" class="form-control" placeholder="MERSİS" value="{{ old('legal_mersis', $legal_mersis ?? '') }}"></div>
+                    <div class="col-md-6"><input name="legal_kep" class="form-control" placeholder="KEP" value="{{ old('legal_kep', $legal_kep ?? '') }}"></div>
+                </div>
+                <div class="row g-2 mb-4">
+                    <div class="col-md-6"><input name="legal_email" type="email" class="form-control" placeholder="Yasal e-posta" value="{{ old('legal_email', $legal_email ?? '') }}"></div>
+                    <div class="col-md-6"><input name="legal_phone" class="form-control" placeholder="Yasal telefon" value="{{ old('legal_phone', $legal_phone ?? '') }}"></div>
+                </div>
                 <button type="submit" class="btn btn-primary mt-2">{{ __('panel.save') }}</button>
             </form>
         </div>

@@ -13,10 +13,10 @@
     <div>
         {{-- Product Image (Links to Detail) --}}
         <a href="{{ route('products.show', $product->slug) }}" class="relative block aspect-4/3 bg-slate-100 overflow-hidden" title="{{ $product->localizedName() }}">
-            @if($product->main_image)
-                <img src="{{ asset('storage/'.$product->main_image) }}" alt="{{ $product->localizedName() }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]" loading="lazy">
+            @if($product->displayImageUrl())
+                <img src="{{ $product->displayImageUrl() }}" alt="{{ $product->localizedName() }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]" loading="lazy">
             @else
-                <img src="https://picsum.photos/900/700?random=urun{{ $product->id }}" alt="{{ $product->localizedName() }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]" loading="lazy">
+                <div class="h-full w-full flex items-center justify-center bg-slate-100 text-slate-400 text-sm font-semibold">Görsel yok</div>
             @endif
 
             @if($isOutOfStock)

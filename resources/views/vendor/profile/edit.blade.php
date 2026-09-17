@@ -20,6 +20,7 @@
         <div class="col-md-6"><label class="form-label">Instagram</label><input name="social_instagram" class="form-control" value="{{ old('social_instagram', $vendor->social_links['instagram'] ?? '') }}"></div>
         <div class="col-md-6"><label class="form-label">Website</label><input name="social_website" class="form-control" value="{{ old('social_website', $vendor->social_links['website'] ?? '') }}"></div>
         <div class="col-md-6"><label class="form-label">Logo</label><input type="file" name="logo" class="form-control" accept="image/*"></div>
+        <div class="col-md-6"><label class="form-label">Kapak (duvar) görseli</label><input type="file" name="cover_image" class="form-control" accept="image/*"></div>
     </div>
     <p class="small text-muted mt-3">{{ __('panel.profile_approval_help') }}</p>
     <button class="btn btn-primary mt-2">{{ __('panel.submit_for_approval') }}</button>

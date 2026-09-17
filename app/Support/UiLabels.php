@@ -74,6 +74,7 @@ final class UiLabels
             'physical_quote' => __('panel.channel_physical'),
             'freelancer' => __('panel.channel_freelancer'),
             'tabela' => __('panel.channel_tabela'),
+            'ozalit' => 'Ozalit / kağıt çıktı',
         ];
     }
 

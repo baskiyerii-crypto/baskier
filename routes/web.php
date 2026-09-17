@@ -3,6 +3,7 @@
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\Admin\AdminApiManagementController;
 use App\Http\Controllers\Admin\AdminBlogController;
+use App\Http\Controllers\Admin\AdminBrandController;
 use App\Http\Controllers\Admin\AdminBusinessTypeController;
 use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminContractController;
@@ -25,9 +26,11 @@ use App\Http\Controllers\IyzicoCallbackController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\Customer\CustomerAddressController;
 use App\Http\Controllers\Customer\CustomerDashboardController;
+use App\Http\Controllers\Customer\CustomerMessageController;
 use App\Http\Controllers\Customer\CustomerOrderController;
 use App\Http\Controllers\Customer\CustomerOrderDesignController;
 use App\Http\Controllers\Customer\CustomerPriceEstimateController;
+use App\Http\Controllers\Customer\CustomerQuestionController;
 use App\Http\Controllers\Customer\CustomerReviewController;
 use App\Http\Controllers\Customer\CustomerSupportTicketController;
 use App\Http\Controllers\FavoriteController;
@@ -35,6 +38,7 @@ use App\Http\Controllers\FreelancerJobController;
 use App\Http\Controllers\FreelancerJobWebController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\NotificationWebController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\QuoteRequestController;
@@ -44,10 +48,12 @@ use App\Http\Controllers\Vendor\VendorDashboardController;
 use App\Http\Controllers\Vendor\VendorDocumentController;
 use App\Http\Controllers\Vendor\VendorFreelancerController;
 use App\Http\Controllers\Vendor\VendorMessageController;
+use App\Http\Controllers\Vendor\VendorOzalitController;
 use App\Http\Controllers\Vendor\VendorOrderController;
 use App\Http\Controllers\Vendor\VendorOrderDesignController;
 use App\Http\Controllers\Vendor\VendorPayoutRequestWebController;
 use App\Http\Controllers\Vendor\VendorProductController;
+use App\Http\Controllers\Vendor\VendorQuestionController;
 use App\Http\Controllers\Vendor\VendorQuoteRequestController;
 use App\Http\Controllers\Vendor\VendorSubscriptionController;
 use App\Http\Controllers\Vendor\VendorContractController;
@@ -78,15 +84,13 @@ Route::get('/iletisim', [PageController::class, 'contact'])->name('pages.contact
 Route::get('/sozlesme/{key}', [ContractController::class, 'show'])->name('contracts.show');
 
 // Hizmet Talepleri (Canonical)
-Route::get('/hizmet-talepleri', [FreelancerJobController::class, 'index'])->name('service-requests.index');
-Route::get('/hizmet-talebi/{job}', [FreelancerJobController::class, 'show'])->name('service-requests.show');
+Route::get('/hizmet-talepleri', fn () => redirect()->route('quote-requests.create', ['type' => 'freelancer'], 301))->name('service-requests.index');
+Route::get('/hizmet-talebi/{job}', fn () => redirect()->route('quote-requests.create', ['type' => 'freelancer'], 301))->name('service-requests.show');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/hizmet-talebi-olustur', [FreelancerJobWebController::class, 'create'])->name('service-requests.create');
-    Route::post('/hizmet-talepleri', [FreelancerJobWebController::class, 'store'])->name('service-requests.store');
-    Route::get('/hesap/hizmet-taleplerim', [FreelancerJobWebController::class, 'myListings'])->name('service-requests.my');
-    Route::post('/hizmet-talepleri/{job}/teklif', [FreelancerJobWebController::class, 'storeBid'])->name('service-requests.bid')->middleware('throttle:bids');
-    Route::post('/hizmet-talepleri/{job}/teklif/{bid}/sec', [FreelancerJobWebController::class, 'selectBid'])->name('service-requests.select-bid');
+    Route::get('/hizmet-talebi-olustur', fn () => redirect()->route('quote-requests.create', ['type' => 'freelancer'], 301))->name('service-requests.create');
+    Route::post('/hizmet-talepleri', fn () => redirect()->route('quote-requests.create', ['type' => 'freelancer'], 301))->name('service-requests.store');
+    Route::get('/hesap/hizmet-taleplerim', fn () => redirect()->route('quote-requests.index', [], 301))->name('service-requests.my');
 });
 
 // Eski /is-ilanlari GET linkleri için 301 Kalıcı Yönlendirme (SEO koruma)
@@ -161,6 +165,11 @@ Route::middleware('auth')->group(function () {
         Route::post('adresler/{address}/varsayilan', [CustomerAddressController::class, 'setDefault'])->name('adresler.set-default');
         Route::post('adresler/{address}/fatura-varsayilan', [CustomerAddressController::class, 'setBillingDefault'])->name('adresler.set-billing-default');
     });
+
+    Route::get('/bildirimler', [NotificationWebController::class, 'index'])->name('notifications.index');
+    Route::get('/bildirimler/{id}', [NotificationWebController::class, 'open'])->name('notifications.open');
+    Route::post('/bildirimler/okundu', [NotificationWebController::class, 'markAll'])->name('notifications.read-all');
+    Route::post('/urunler/{product}/soru', [CustomerQuestionController::class, 'storeProduct'])->name('products.questions.store');
 });
 
 // Müşteri paneli (giriş yapmış, rol fark etmez ama dashboard müşteri için)
@@ -172,10 +181,17 @@ Route::middleware(['auth', 'role:customer'])->prefix('hesabim')->name('customer.
     Route::post('/bireysel-teklifler', [CustomerDirectQuoteController::class, 'store'])->name('direct-quotes.store');
     Route::get('/bireysel-teklifler/{directQuote}', [CustomerDirectQuoteController::class, 'show'])->name('direct-quotes.show');
     Route::post('/bireysel-teklifler/{directQuote}/kabul', [CustomerDirectQuoteController::class, 'accept'])->name('direct-quotes.accept');
+    Route::get('/mesajlar', [CustomerMessageController::class, 'index'])->name('messages.index');
+    Route::get('/mesajlar/{conversation}', [CustomerMessageController::class, 'show'])->name('messages.show');
+    Route::post('/mesajlar/{conversation}', [CustomerMessageController::class, 'store'])->name('messages.store');
+    Route::get('/urun-sorularim', [CustomerQuestionController::class, 'products'])->name('product-questions.index');
+    Route::get('/siparis-sorularim', [CustomerQuestionController::class, 'orders'])->name('order-questions.index');
+    Route::post('/siparis-sorularim/{question}', [CustomerQuestionController::class, 'replyOrder'])->name('order-questions.reply');
+    Route::post('/siparisler/{order}/soru', [CustomerQuestionController::class, 'storeOrder'])->name('orders.questions.store');
 });
 
 // Satıcı paneli
-Route::middleware(['auth', 'role:vendor'])->prefix('satici-panel')->name('vendor.')->group(function () {
+Route::middleware(['auth', 'role:vendor', 'vendor.not_suspended'])->prefix('satici-panel')->name('vendor.')->group(function () {
     Route::get('/', [VendorDashboardController::class, 'index'])->name('dashboard');
     Route::get('/urunler', [VendorProductController::class, 'index'])->name('products.index');
     Route::get('/urunler/sablon', [VendorProductController::class, 'downloadTemplate'])->name('products.template');
@@ -205,6 +221,14 @@ Route::middleware(['auth', 'role:vendor'])->prefix('satici-panel')->name('vendor
     Route::get('freelancerim', [VendorFreelancerController::class, 'index'])->name('freelancer.index');
     Route::get('tabela', [VendorTabelaController::class, 'index'])->name('tabela.index');
     Route::post('tabela/gorusme', [VendorTabelaController::class, 'startMeeting'])->name('tabela.meeting');
+    Route::get('ozalit', [VendorOzalitController::class, 'index'])->name('ozalit.index');
+    Route::get('urun-sorulari', [VendorQuestionController::class, 'products'])->name('product-questions.index');
+    Route::get('urun-sorulari/{question}', [VendorQuestionController::class, 'showProduct'])->name('product-questions.show');
+    Route::post('urun-sorulari/{question}', [VendorQuestionController::class, 'answerProduct'])->name('product-questions.answer');
+    Route::get('siparis-sorulari', [VendorQuestionController::class, 'orders'])->name('order-questions.index');
+    Route::get('siparis-sorulari/{question}', [VendorQuestionController::class, 'showOrder'])->name('order-questions.show');
+    Route::post('siparis-sorulari/{question}', [VendorQuestionController::class, 'replyOrder'])->name('order-questions.reply');
+    Route::post('siparisler/{order}/soru', [VendorQuestionController::class, 'storeOrder'])->name('orders.questions.store');
     Route::get('abonelikler', [VendorSubscriptionController::class, 'index'])->name('subscriptions.index');
     Route::post('abonelikler/aktiflestir', [VendorSubscriptionController::class, 'activate'])->name('subscriptions.activate');
     Route::get('sozlesmeler', [VendorContractController::class, 'index'])->name('contracts.index');
@@ -282,13 +306,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('satici-kategori-talepleri/{vendorCategoryRequest}/onayla', [AdminVendorCategoryRequestController::class, 'approve'])->name('vendor-category-requests.approve');
     Route::post('satici-kategori-talepleri/{vendorCategoryRequest}/reddet', [AdminVendorCategoryRequestController::class, 'reject'])->name('vendor-category-requests.reject');
     Route::resource('contracts', AdminContractController::class)->only(['index', 'create', 'store', 'edit', 'update']);
-
-    // Başarısız Kuyruk İşleri (Dead-Letter)
-    Route::get('failed-jobs', [\App\Http\Controllers\Admin\AdminFailedJobController::class, 'index'])->name('failed-jobs.index');
-    Route::post('failed-jobs/{id}/retry', [\App\Http\Controllers\Admin\AdminFailedJobController::class, 'retry'])->name('failed-jobs.retry');
-    Route::post('failed-jobs/retry-all', [\App\Http\Controllers\Admin\AdminFailedJobController::class, 'retryAll'])->name('failed-jobs.retry-all');
-    Route::delete('failed-jobs/{id}', [\App\Http\Controllers\Admin\AdminFailedJobController::class, 'destroy'])->name('failed-jobs.destroy');
-    Route::delete('failed-jobs', [\App\Http\Controllers\Admin\AdminFailedJobController::class, 'destroyAll'])->name('failed-jobs.destroy-all');
+    Route::post('contracts/sablonlari-olustur', [AdminContractController::class, 'generateTemplates'])->name('contracts.generate');
+    Route::get('alt-markalar', [AdminBrandController::class, 'index'])->name('brands.index');
+    Route::post('alt-markalar', [AdminBrandController::class, 'store'])->name('brands.store');
+    Route::put('alt-markalar/{brand}', [AdminBrandController::class, 'update'])->name('brands.update');
+    Route::delete('alt-markalar/{brand}', [AdminBrandController::class, 'destroy'])->name('brands.destroy');
 
     // Platform Metrikleri ve Gözlemlenebilirlik
     Route::get('metrikler', [\App\Http\Controllers\Admin\AdminMetricsController::class, 'index'])->name('metrics.index');

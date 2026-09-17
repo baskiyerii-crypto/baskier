@@ -160,6 +160,13 @@
                         </div>
                         <input type="hidden" name="contract_scrolled_at" id="contract_scrolled_at" value="">
                         <div class="form-text">Onay kutusu, sözleşmeyi sonuna kadar okuduktan sonra aktif olur.</div>
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" id="accept-kvkk" name="accept_kvkk" value="1" required>
+                            <label class="form-check-label" for="accept-kvkk">
+                                <strong>KVKK Aydınlatma Metni</strong>'ni okudum.
+                                <a href="{{ route('contracts.show', 'kvkk') }}" target="_blank">Metni aç</a>
+                            </label>
+                        </div>
                     </div>
                     <button type="submit" class="btn btn-warning rounded-pill px-5" id="checkout-submit" disabled>Siparişi tamamla</button>
                 </form>

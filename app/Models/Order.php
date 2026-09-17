@@ -64,6 +64,11 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function questions(): HasMany
+    {
+        return $this->hasMany(OrderQuestion::class);
+    }
+
     public function designApprovals(): HasMany
     {
         return $this->hasMany(DesignApproval::class);

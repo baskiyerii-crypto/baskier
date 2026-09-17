@@ -18,8 +18,39 @@
         <span class="badge {{ $riskClass }} mt-2">{{ $riskLabel }} · {{ number_format($vendor->risk_score ?? 0, 1) }}</span>
     </div>
     <div class="d-flex gap-2">
+        @if($vendor->is_suspended)
+            <form method="post" action="{{ route('admin.verifications.unsuspend', $vendor) }}">
+                @csrf
+                <button class="btn btn-success btn-sm">Askıyı kaldır</button>
+            </form>
+        @else
+            <button type="button" class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#vendorSuspendModal">Askıya al</button>
+        @endif
         <a href="{{ route('admin.vendors.edit', $vendor) }}" class="btn btn-outline-secondary btn-sm">Düzenle</a>
         <a href="{{ route('vendors.show', $vendor->slug) }}" target="_blank" class="btn btn-outline-primary btn-sm">Vitrin</a>
+    </div>
+</div>
+
+@if($vendor->is_suspended)
+    <div class="alert alert-danger">Askıda: {{ $vendor->suspension_reason ?: 'Gerekçe belirtilmedi.' }}</div>
+@endif
+
+<div class="modal fade" id="vendorSuspendModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form method="post" action="{{ route('admin.verifications.suspend', $vendor) }}" class="modal-content">
+            @csrf
+            <div class="modal-header">
+                <h5 class="modal-title">Satıcıyı askıya al</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <label class="form-label">Gerekçe</label>
+                <textarea name="suspension_reason" class="form-control" rows="3" required minlength="5"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-warning">Askıya al</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -38,6 +69,7 @@
                 <li>Freelancer: {{ $vendor->hasActiveFreelancerModule() ? 'Aktif' : 'Pasif' }} ({{ optional($vendor->freelancer_expires_at)->format('d.m.Y') ?? '-' }})</li>
                 <li>Teklif: {{ $vendor->hasActiveQuotesModule() ? 'Aktif' : 'Pasif' }} ({{ optional($vendor->quotes_expires_at)->format('d.m.Y') ?? '-' }})</li>
                 <li>Tabela: {{ $vendor->hasActiveTabelaModule() ? 'Aktif' : 'Pasif' }} ({{ optional($vendor->tabela_expires_at)->format('d.m.Y') ?? '-' }})</li>
+                <li>Ozalit: {{ $vendor->hasActiveOzalitModule() ? 'Aktif' : 'Pasif' }} ({{ optional($vendor->ozalit_expires_at)->format('d.m.Y') ?? '-' }})</li>
             </ul>
         </div>
         <div class="card p-4 mb-4">

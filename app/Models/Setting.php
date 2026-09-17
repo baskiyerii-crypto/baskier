@@ -84,6 +84,11 @@ class Setting extends Model
         return (float) self::get('tabela_meeting_fee', 50);
     }
 
+    public static function ozalitMonthlyFee(): float
+    {
+        return (float) self::get('ozalit_monthly_fee', 199);
+    }
+
     public static function platformExpenses(): float
     {
         return (float) self::get('platform_expenses', 0);

@@ -22,6 +22,7 @@
                 <option value="physical_quote" @selected(old('channel', $channel ?? '') === 'physical_quote')>Fiziksel + Teklif</option>
                 <option value="freelancer" @selected(old('channel', $channel ?? '') === 'freelancer')>Freelancer</option>
                 <option value="tabela" @selected(old('channel', $channel ?? '') === 'tabela')>Tabela</option>
+                <option value="ozalit" @selected(old('channel', $channel ?? '') === 'ozalit')>Ozalit / kağıt çıktı</option>
             </select>
         </div>
         <div class="mb-3">

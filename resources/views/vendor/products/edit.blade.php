@@ -40,6 +40,17 @@
                 <div class="form-text">JPG, PNG veya WebP · en fazla 2 MB · önerilen oran 4:3</div>
             </div>
             <div class="mb-3">
+                <label class="form-label fw-semibold">Galeri</label>
+                <input type="file" name="gallery[]" class="form-control" accept="image/jpeg,image/png,image/webp" multiple>
+                @if($product->images->isNotEmpty())
+                    <div class="d-flex flex-wrap gap-2 mt-2">
+                        @foreach($product->images as $img)
+                            <img src="{{ $img->url() }}" alt="" class="rounded border" style="height:48px;width:48px;object-fit:cover;">
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+            <div class="mb-3">
                 <label class="form-label fw-semibold">Kısa açıklama</label>
                 <textarea name="short_description" class="form-control" rows="2">{{ old('short_description', $product->short_description) }}</textarea>
                 <label class="form-label fw-semibold mt-2">Kısa açıklama (EN)</label>

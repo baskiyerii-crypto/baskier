@@ -20,7 +20,7 @@ class ProductResource extends JsonResource
             'main_image' => $this->main_image,
             'price' => $this->price,
             'stock' => $this->stock,
-            'is_featured' => false,
+            'is_featured' => (bool) $this->is_featured,
             'is_active' => $this->is_active,
             'is_quote_based' => $this->isQuoteBased(),
             'has_variants' => $this->hasVariants(),

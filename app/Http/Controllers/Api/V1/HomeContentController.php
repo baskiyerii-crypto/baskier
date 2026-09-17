@@ -29,7 +29,13 @@ class HomeContentController extends ApiController
             ->orderBy('name')
             ->get();
 
-        $featuredProducts = app(\App\Services\FairProductDiscoveryService::class)->getDiscoveryProducts(24);
+        $featuredProducts = Product::query()
+            ->published()
+            ->where('is_featured', true)
+            ->with(['vendor', 'category', 'images'])
+            ->latest()
+            ->limit(24)
+            ->get();
 
         $digitalProducts = Product::query()
             ->published()

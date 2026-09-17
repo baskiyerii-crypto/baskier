@@ -23,8 +23,26 @@ class VendorDocumentController extends Controller
             abort(403);
         }
 
-        $documents = $vendor->documents()->latest()->get();
-        $criteria = $this->trustBadgeService->getCriteriaBreakdown($vendor);
+        $documents = \Illuminate\Support\Facades\Schema::hasTable('vendor_documents')
+            ? $vendor->documents()->latest()->get()
+            : collect();
+
+        try {
+            $criteria = $this->trustBadgeService->getCriteriaBreakdown($vendor);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('vendor_documents_criteria_failed', [
+                'vendor_id' => $vendor->id,
+                'error' => $e->getMessage(),
+            ]);
+            $criteria = [
+                'current_level' => (int) ($vendor->trust_level ?? 0),
+                'is_suspended' => (bool) ($vendor->is_suspended ?? false),
+                'suspension_reason' => $vendor->suspension_reason ?? null,
+                'level_1' => ['passed' => false, 'email_verified' => false, 'phone_verified' => false],
+                'level_2' => ['passed' => false, 'has_physical' => false, 'physical_doc_approved' => null, 'has_freelancer' => false, 'freelancer_doc_approved' => null],
+                'level_3' => ['passed' => false, 'completed_orders_count' => 0, 'rating_average' => 0, 'total_orders_last_12m' => 0, 'problematic_orders' => 0, 'dispute_rate_percent' => 0, 'no_sanctions' => true],
+            ];
+        }
 
         return view('vendor.documents.index', compact('vendor', 'documents', 'criteria'));
     }

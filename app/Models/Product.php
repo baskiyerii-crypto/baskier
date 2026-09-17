@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Support\HasLocalizedFields;
+use App\Support\MediaUrl;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -93,6 +94,34 @@ class Product extends Model
         return $this->hasMany(Review::class);
     }
 
+    public function images(): HasMany
+    {
+        return $this->hasMany(ProductImage::class)->orderBy('sort_order')->orderBy('id');
+    }
+
+    public function questions(): HasMany
+    {
+        return $this->hasMany(ProductQuestion::class);
+    }
+
+    public function displayImagePath(): ?string
+    {
+        if ($this->main_image) {
+            return $this->main_image;
+        }
+
+        $first = $this->relationLoaded('images')
+            ? $this->images->first()
+            : $this->images()->first();
+
+        return $first?->path;
+    }
+
+    public function displayImageUrl(): ?string
+    {
+        return MediaUrl::public($this->displayImagePath());
+    }
+
     public function isDigital(): bool
     {
         return $this->product_type === 'digital';
@@ -110,5 +139,21 @@ class Product extends Model
         }
 
         return $this->variants()->exists();
+    }
+
+    /**
+     * @param  array<int, \Illuminate\Http\UploadedFile>  $files
+     */
+    public function attachGallery(array $files): void
+    {
+        $sort = (int) $this->images()->max('sort_order');
+        foreach ($files as $file) {
+            $sort++;
+            $path = $file->store('products', 'public');
+            $this->images()->create(['path' => $path, 'sort_order' => $sort]);
+            if (! $this->main_image) {
+                $this->update(['main_image' => $path]);
+            }
+        }
     }
 }

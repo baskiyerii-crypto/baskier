@@ -3,7 +3,7 @@
   "short_name": "BaskıYeri",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
+  "background_color": "#ffffff",
   "theme_color": "#ea580c",
   "lang": "tr",
   "icons": [

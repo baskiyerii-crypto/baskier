@@ -74,7 +74,16 @@ class VendorDashboardController extends Controller
             'freelancer' => $vendor->freelancer_expires_at,
             'quotes' => $vendor->quotes_expires_at,
             'tabela' => $vendor->tabela_expires_at,
+            'ozalit' => $vendor->ozalit_expires_at,
         ])->filter(fn ($d) => $d && $d->isFuture() && $d->lte(now()->addDays(14)));
+
+        $pendingContractsCount = 0;
+        if (\Illuminate\Support\Facades\Schema::hasTable('contract_vendor_acceptances')) {
+            $pendingContractsCount = \App\Models\ContractVendorAcceptance::query()
+                ->where('vendor_id', $vendor->id)
+                ->whereIn('status', ['pending', 'expired'])
+                ->count();
+        }
 
         $revenueTrend = ['labels' => [], 'values' => []];
         for ($i = 29; $i >= 0; $i--) {
@@ -104,6 +113,7 @@ class VendorDashboardController extends Controller
             'openQuoteRequestsCount',
             'upcomingPayouts',
             'moduleEnds',
+            'pendingContractsCount',
             'revenueTrend',
             'statusBreakdown'
         ));

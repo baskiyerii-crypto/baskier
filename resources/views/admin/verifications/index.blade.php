@@ -93,7 +93,7 @@
                         @endphp
                         <tr>
                             <td>
-                                <div class="fw-bold">{{ $v?->name ?: '—' }}</div>
+                                <div class="fw-bold">{{ $v?->name ?: '—' }} <code class="small">{{ $u?->publicCode() }}</code> <span class="text-muted">#{{ $v?->id }}</span></div>
                                 <div class="small text-muted">{{ $v?->company_name }}</div>
                                 <div class="mt-1 d-flex flex-wrap gap-1 align-items-center">
                                     <x-trust-badge :vendor="$v" size="sm" />

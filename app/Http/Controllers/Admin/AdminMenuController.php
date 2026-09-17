@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Product;
 use App\Models\Setting;
 use App\Support\SiteMenu;
 use Illuminate\Http\Request;
@@ -19,9 +20,16 @@ class AdminMenuController extends Controller
             ->orderBy('name')
             ->get(['id', 'name']);
 
+        $products = Product::query()
+            ->published()
+            ->orderBy('name')
+            ->limit(300)
+            ->get(['id', 'name']);
+
         return view('admin.menu.index', [
             'items' => $items,
             'categories' => $categories,
+            'products' => $products,
             'routeOptions' => SiteMenu::routeOptions(),
         ]);
     }
@@ -32,10 +40,14 @@ class AdminMenuController extends Controller
             'items' => ['nullable', 'array'],
             'items.*.label' => ['required', 'string', 'max:80'],
             'items.*.label_en' => ['nullable', 'string', 'max:80'],
-            'items.*.type' => ['required', 'in:route,url,category,products,page,categories_accordion'],
+            'items.*.type' => ['required', 'in:route,url,category,product,products,page,categories_accordion'],
             'items.*.target' => ['nullable', 'string', 'max:500'],
             'items.*.placement' => ['required', 'in:top,drawer'],
             'items.*.is_active' => ['nullable'],
+            'items.*.children' => ['nullable', 'array'],
+            'items.*.children.*.label' => ['required', 'string', 'max:80'],
+            'items.*.children.*.type' => ['required', 'in:route,url,category,product,page'],
+            'items.*.children.*.target' => ['nullable', 'string', 'max:500'],
         ]);
 
         $items = [];
@@ -53,6 +65,16 @@ class AdminMenuController extends Controller
                 'placement' => $row['placement'],
                 'sort' => $i + 1,
                 'is_active' => filter_var($row['is_active'] ?? true, FILTER_VALIDATE_BOOLEAN),
+                'children' => collect($row['children'] ?? [])
+                    ->filter(fn ($c) => is_array($c) && ! empty($c['label']))
+                    ->map(fn ($c) => [
+                        'label' => trim($c['label']),
+                        'type' => $c['type'] ?? 'url',
+                        'target' => $c['target'] ?? null,
+                        'is_active' => true,
+                    ])
+                    ->values()
+                    ->all(),
             ];
         }
 

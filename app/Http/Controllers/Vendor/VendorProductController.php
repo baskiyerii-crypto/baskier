@@ -86,11 +86,14 @@ class VendorProductController extends Controller
             'short_description' => ['nullable', 'string'],
             'short_description_en' => ['nullable', 'string'],
             'main_image' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
+            'gallery' => ['nullable', 'array', 'max:8'],
+            'gallery.*' => ['image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
             'description' => ['nullable', 'string'],
             'description_en' => ['nullable', 'string'],
             'variant_lines' => ['nullable', 'string'],
         ]);
         $validated['vendor_id'] = $vendor->id;
+        unset($validated['gallery']);
         $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']) . '-' . time();
         $validated['is_active'] = false;
         $validated['product_type'] = 'physical';
@@ -105,6 +108,9 @@ class VendorProductController extends Controller
         }
         $product = Product::create($validated);
         $this->syncVariants($product, (string) $request->input('variant_lines', ''));
+        if ($request->hasFile('gallery')) {
+            $product->attachGallery($request->file('gallery', []));
+        }
         return redirect()->route('vendor.products.index')->with('success', 'Ürün eklendi; admin onayından sonra yayınlanır.');
     }
 
@@ -114,7 +120,7 @@ class VendorProductController extends Controller
         if ($product->vendor_id !== $vendor->id) {
             abort(403, 'Bu ürün size ait değil.');
         }
-        $product->load('variants');
+        $product->load(['variants', 'images']);
         $categories = Category::where('is_active', true)
             ->where(function ($q) {
                 $q->whereNull('channel')->orWhere('channel', 'physical_quote');
@@ -140,11 +146,14 @@ class VendorProductController extends Controller
             'short_description_en' => ['nullable', 'string'],
             'is_active' => ['boolean'],
             'main_image' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
+            'gallery' => ['nullable', 'array', 'max:8'],
+            'gallery.*' => ['image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
             'description' => ['nullable', 'string'],
             'description_en' => ['nullable', 'string'],
             'variant_lines' => ['nullable', 'string'],
         ]);
         $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']) . '-' . $product->id;
+        unset($validated['gallery']);
         $validated['is_active'] = false;
         $validated['product_type'] = 'physical';
         $validated['digital_link'] = null;
@@ -161,6 +170,9 @@ class VendorProductController extends Controller
         }
         $product->update($validated);
         $this->syncVariants($product, (string) $request->input('variant_lines', ''));
+        if ($request->hasFile('gallery')) {
+            $product->attachGallery($request->file('gallery', []));
+        }
         return redirect()->route('vendor.products.index')->with('success', 'Ürün güncellendi; yeniden onay bekliyor.');
     }
 

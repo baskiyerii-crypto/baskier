@@ -19,15 +19,21 @@
         <div class="grid gap-6 lg:grid-cols-2">
             <div class="by-card overflow-hidden">
                 <div class="aspect-4/3 bg-slate-100 flex items-center justify-center">
-                    @if($product->main_image)
-                        <img src="{{ asset('storage/'.$product->main_image) }}" alt="{{ $product->name }}" class="h-full w-full object-cover">
+                    @if($product->displayImageUrl())
+                        <img src="{{ $product->displayImageUrl() }}" alt="{{ $product->name }}" class="h-full w-full object-cover">
                     @else
                         <div class="h-full w-full flex flex-col items-center justify-center text-slate-400 bg-slate-100/80 p-6">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mb-2 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                            <span class="text-sm font-medium text-slate-500">Görsel hazırlanıyor</span>
+                            <span class="text-sm font-medium text-slate-500">Görsel yok</span>
                         </div>
                     @endif
                 </div>
+                @if($product->images->count() > 1)
+                    <div class="grid grid-cols-4 gap-2 p-3">
+                        @foreach($product->images as $img)
+                            <img src="{{ $img->url() }}" alt="" class="h-16 w-full object-cover rounded-lg">
+                        @endforeach
+                    </div>
+                @endif
             </div>
 
             <div class="space-y-6">
@@ -189,6 +195,32 @@
         @endif
     </div>
 
+    <div class="mt-10 by-card p-6">
+        <h2 class="text-lg font-bold">Satıcıya sor</h2>
+        <p class="text-sm text-slate-500 mt-1">Ürünle ilgili sorularınız burada kalır; telefon veya sosyal medya paylaşmayın.</p>
+        @auth
+            @if(auth()->user()->isCustomer())
+                <form method="POST" action="{{ route('products.questions.store', $product) }}" class="mt-4">
+                    @csrf
+                    <textarea name="question" class="w-full rounded-2xl border border-slate-200 p-3 text-sm" rows="3" required maxlength="2000"></textarea>
+                    <button class="by-btn-primary mt-2">Soruyu gönder</button>
+                </form>
+            @endif
+        @else
+            <a href="{{ route('login') }}" class="by-btn-secondary mt-3 inline-flex">Sormak için giriş yapın</a>
+        @endauth
+        <div class="mt-6 space-y-3">
+            @forelse($product->questions->where('status', 'answered') as $q)
+                <div class="rounded-2xl border border-slate-200 p-4">
+                    <p class="text-sm font-semibold">{{ $q->question }}</p>
+                    <p class="text-sm mt-2 text-slate-700">{{ $q->answer }}</p>
+                </div>
+            @empty
+                <p class="text-sm text-slate-500">Henüz yanıtlanmış soru yok.</p>
+            @endforelse
+        </div>
+    </div>
+
     @if($alsoBought->isNotEmpty())
         <div class="mt-10">
             <h2 class="text-lg font-bold tracking-tight text-slate-900">Beraber alınan ürünler</h2>
@@ -196,8 +228,8 @@
                 @foreach($alsoBought->take(4) as $item)
                     <a href="{{ route('products.show', $item->slug) }}" class="group by-card by-card-hover overflow-hidden">
                         <div class="aspect-4/3 bg-slate-100 flex items-center justify-center">
-                            @if($item->main_image)
-                                <img src="{{ asset('storage/'.$item->main_image) }}" alt="{{ $item->name }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
+                            @if($item->displayImageUrl())
+                                <img src="{{ $item->displayImageUrl() }}" alt="{{ $item->name }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]">
                             @else
                                 <div class="h-full w-full flex flex-col items-center justify-center text-slate-400 bg-slate-100 p-4">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mb-1 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>

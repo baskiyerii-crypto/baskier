@@ -68,6 +68,7 @@ class CheckoutController extends Controller
         $defaultBillingAddress = $user->addresses()->where('is_billing_default', true)->latest()->first();
         $billingProfile = $user->billingProfiles()->latest('updated_at')->first();
         $distanceSalesContract = Contract::query()->where('key', 'distance_sales')->where('is_active', true)->first();
+        $kvkkContract = Contract::query()->where('key', 'kvkk')->where('is_active', true)->first();
         $carriers = app(\App\Services\BasitKargoService::class)->carriers();
         $paymentProvider = $this->paymentService->provider();
 
@@ -78,6 +79,7 @@ class CheckoutController extends Controller
             'billingProfile',
             'defaultBillingAddress',
             'distanceSalesContract',
+            'kvkkContract',
             'carriers',
             'paymentProvider',
             'quickBuy'
@@ -93,6 +95,7 @@ class CheckoutController extends Controller
             'billing_address_id' => ['nullable', 'exists:addresses,id'],
             'payment_method' => ['required', Rule::in($methods)],
             'accept_distance_sales' => ['accepted'],
+            'accept_kvkk' => ['accepted'],
             'idempotency_key' => ['nullable', 'string', 'max:100'],
             'bank_iban' => ['nullable', 'string', 'max:34'],
             'invoice_type' => ['required', Rule::in(['individual', 'corporate'])],

@@ -11,7 +11,7 @@ class CommissionService
 {
     public const PRODUCT_TYPES = ['product'];
 
-    public const ZERO_COMMISSION_TYPES = ['quote', 'freelancer', 'tabela', 'tabela_meeting'];
+    public const ZERO_COMMISSION_TYPES = ['quote', 'freelancer', 'tabela', 'tabela_meeting', 'ozalit'];
 
     public function rateForVendor(?Vendor $vendor = null): float
     {

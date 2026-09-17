@@ -6,6 +6,7 @@
     <meta name="robots" content="noindex,nofollow">
     <meta name="theme-color" content="#1d4ed8">
     <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
     <title>@yield('title', 'Yönetim') – BaskıYeri Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
@@ -227,6 +228,16 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
                 <span>{{ __('panel.nav_dashboard') }}</span>
             </a>
+            <details class="nav-acc" @if(request()->routeIs('admin.product-approvals.*','admin.vendor-category-requests.*','admin.verifications.*')) open @endif>
+                <summary>Onaylar <span>▾</span></summary>
+                <div class="nav-acc-body">
+                    <a href="{{ route('admin.product-approvals.index') }}" class="nav-link {{ request()->routeIs('admin.product-approvals.*') ? 'active' : '' }}"><span>{{ __('panel.nav_product_approvals') }} @if(($pendingProductApprovals ?? 0) > 0)<span class="badge bg-warning text-dark">{{ $pendingProductApprovals }}</span>@endif</span></a>
+                    @if(Route::has('admin.vendor-category-requests.index'))
+                    <a href="{{ route('admin.vendor-category-requests.index') }}" class="nav-link {{ request()->routeIs('admin.vendor-category-requests.*') ? 'active' : '' }}"><span>{{ __('panel.nav_category_requests') }} @if(($pendingCategoryRequests ?? 0) > 0)<span class="badge bg-warning text-dark">{{ $pendingCategoryRequests }}</span>@endif</span></a>
+                    @endif
+                    <a href="{{ route('admin.verifications.index') }}" class="nav-link {{ request()->routeIs('admin.verifications.*') ? 'active' : '' }}"><span>Belgeler @if(($pendingDocumentApprovals ?? 0) > 0)<span class="badge bg-warning text-dark">{{ $pendingDocumentApprovals }}</span>@endif</span></a>
+                </div>
+            </details>
             <details class="nav-acc" @if(request()->routeIs('admin.vendors.*','admin.verifications.*','admin.customers.*','admin.vendor-updates.*','admin.vendor-category-requests.*')) open @endif>
                 <summary>{{ __('panel.nav_people') }} <span>▾</span></summary>
                 <div class="nav-acc-body">
@@ -251,7 +262,7 @@
                     @endif
                 </div>
             </details>
-            <details class="nav-acc" @if(request()->routeIs('admin.finance.*','admin.payouts.*','admin.contracts.*','admin.settings.*','admin.menu.*','admin.api-management.*','admin.support-tickets.*','admin.vendor-payout-requests.*','admin.failed-jobs.*','admin.metrics.*')) open @endif>
+            <details class="nav-acc" @if(request()->routeIs('admin.finance.*','admin.payouts.*','admin.contracts.*','admin.settings.*','admin.menu.*','admin.api-management.*','admin.support-tickets.*','admin.vendor-payout-requests.*','admin.metrics.*')) open @endif>
                 <summary>{{ __('panel.nav_ops') }} <span>▾</span></summary>
                 <div class="nav-acc-body">
                     @if(Route::has('admin.finance.index'))
@@ -275,8 +286,8 @@
                     @if(Route::has('admin.metrics.index'))
                     <a href="{{ route('admin.metrics.index') }}" class="nav-link {{ request()->routeIs('admin.metrics.*') ? 'active' : '' }}"><span>Sistem Metrikleri</span></a>
                     @endif
-                    @if(Route::has('admin.failed-jobs.index'))
-                    <a href="{{ route('admin.failed-jobs.index') }}" class="nav-link {{ request()->routeIs('admin.failed-jobs.*') ? 'active' : '' }}"><span>Başarısız İşler</span></a>
+                    @if(Route::has('admin.brands.index'))
+                    <a href="{{ route('admin.brands.index') }}" class="nav-link {{ request()->routeIs('admin.brands.*') ? 'active' : '' }}"><span>Alt markalar</span></a>
                     @endif
                 </div>
             </details>
@@ -302,7 +313,9 @@
             <div class="user-menu">
                 @include('partials.locale-switcher')
                 <span class="sep"></span>
-                <span class="text-muted small">{{ auth()->user()?->publicCode() }}</span>
+                @include('partials.notification-bell', ['variant' => 'bootstrap'])
+                <span class="sep"></span>
+                <span class="badge bg-light text-dark border">{{ auth()->user()?->publicCode() }}</span>
                 <a href="{{ route('home') }}" target="_blank">{{ __('panel.view_site') }}</a>
                 <span class="sep"></span>
                 <span class="text-muted small">{{ auth()->user()->name ?? '' }}</span>

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#ea580c">
     <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
     <title>@yield('title', 'Hesabım') – BaskıYeri</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
@@ -22,7 +23,8 @@
                     </div>
                     <div class="flex items-center gap-2">
                         @include('partials.locale-switcher')
-                        <span class="hidden sm:inline text-xs font-mono text-slate-500">{{ auth()->user()?->publicCode() }}</span>
+                        @include('partials.notification-bell', ['variant' => 'tailwind'])
+                        <span class="hidden sm:inline text-xs font-mono rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-slate-700">{{ auth()->user()?->publicCode() }}</span>
                         <a href="{{ route('products.index') }}" class="hidden sm:inline-flex by-btn-secondary">Alışveriş</a>
                         <a href="{{ route('otp.show') }}" class="hidden sm:inline-flex by-btn-secondary">{{ __('panel.verify_account') }}</a>
                         <a href="{{ route('cart.index') }}" class="by-btn-primary px-4 py-2.5">Sepet</a>
@@ -41,6 +43,7 @@
                         <div>
                             <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Hesabım</p>
                             <p class="mt-1 text-sm font-semibold text-slate-900">{{ auth()->user()->name ?? '' }}</p>
+                            <p class="mt-1"><span class="inline-flex rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 font-mono text-xs text-slate-700">Müşteri ID: {{ auth()->user()?->publicCode() }}</span></p>
                         </div>
                         <button type="button" class="md:hidden by-btn-secondary px-3 py-2" data-account-nav-toggle aria-label="{{ __('panel.toggle_nav') }}">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -55,6 +58,9 @@
                                 ['label' => 'Favorilerim', 'route' => 'favorites.index', 'match' => 'favorites.*'],
                                 ['label' => 'Adreslerim', 'route' => 'account.adresler.index', 'match' => 'account.adresler.*'],
                                 ['label' => 'Teklif taleplerim', 'route' => 'quote-requests.index', 'match' => 'quote-requests.*'],
+                                ['label' => 'Mesajlar', 'route' => 'customer.messages.index', 'match' => 'customer.messages.*'],
+                                ['label' => 'Ürün sorularım', 'route' => 'customer.product-questions.index', 'match' => 'customer.product-questions.*'],
+                                ['label' => 'Sipariş sorularım', 'route' => 'customer.order-questions.index', 'match' => 'customer.order-questions.*'],
                                 ['label' => __('panel.direct_quotes'), 'route' => 'customer.direct-quotes.index', 'match' => 'customer.direct-quotes.*'],
                                 ['label' => 'Destek talepleri', 'route' => 'account.support.index', 'match' => 'account.support.*'],
                             ];

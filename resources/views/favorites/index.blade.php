@@ -10,8 +10,8 @@
                 <a href="{{ route('products.show', $p->slug) }}" class="text-decoration-none text-dark">
                     <div class="bg-white rounded-4 shadow-sm h-100 overflow-hidden">
                         <div class="ratio ratio-4x3 bg-light">
-                            @if($p->main_image)
-                                <img src="{{ asset('storage/'.$p->main_image) }}" alt="" class="w-100 h-100" style="object-fit:cover;">
+                            @if($p->displayImageUrl())
+                                <img src="{{ $p->displayImageUrl() }}" alt="" class="w-100 h-100" style="object-fit:cover;">
                             @else
                                 <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-muted p-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" class="opacity-50 mb-1"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>

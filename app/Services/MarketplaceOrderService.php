@@ -204,6 +204,20 @@ class MarketplaceOrderService
                 }
 
                 $orders[] = $order;
+                try {
+                    $order->loadMissing('vendor.user');
+                    if ($order->vendor?->user) {
+                        $order->vendor->user->notify(new \App\Notifications\OrderCreatedNotification($order));
+                    }
+                    app(\App\Services\NotificationService::class)->notify(
+                        $user,
+                        'Sipariş alındı',
+                        '#'.$order->order_number,
+                        ['type' => 'order'],
+                        route('account.orders.show', $order)
+                    );
+                } catch (\Throwable) {
+                }
             }
 
             return [

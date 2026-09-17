@@ -80,7 +80,7 @@ class ProductController extends Controller
     {
         $product = Product::where('slug', $slug)
             ->published()
-            ->with(['vendor', 'category.parent', 'variants'])
+            ->with(['vendor', 'category.parent', 'variants', 'images', 'questions.customer'])
             ->firstOrFail();
 
         $related = Product::published()

@@ -223,6 +223,7 @@ class CompetitorBenchmarkingTest extends TestCase
             'use_shipping_for_billing' => 1,
             'payment_method' => 'bank_transfer',
             'accept_distance_sales' => 1,
+            'accept_kvkk' => 1,
             'bank_iban' => 'TR123456789012345678901234',
             'invoice_type' => 'individual',
             'invoice_full_name' => 'Can Müşteri',

@@ -7,7 +7,7 @@
     <title>@yield('title', __('ui.default_title'))</title>
     <link rel="manifest" href="/manifest.webmanifest">
     <meta name="theme-color" content="#ea580c">
-    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -242,8 +242,26 @@
 
                 <nav class="hidden flex-1 items-center justify-center gap-1 lg:flex">
                     @foreach(\App\Support\SiteMenu::forPlacement('top') as $item)
-                        @php $menuHref = \App\Support\SiteMenu::href($item); @endphp
-                        @if($menuHref)
+                        @php
+                            $menuHref = \App\Support\SiteMenu::href($item);
+                            $children = collect($item['children'] ?? [])->filter(fn ($c) => ($c['is_active'] ?? true));
+                        @endphp
+                        @if($children->isNotEmpty())
+                            <div class="relative group">
+                                <a href="{{ $menuHref ?: '#' }}" class="rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 inline-flex items-center gap-1">
+                                    {{ \App\Support\SiteMenu::displayLabel($item) }}
+                                    <span class="text-[10px]">▾</span>
+                                </a>
+                                <div class="invisible absolute left-0 top-full z-40 min-w-48 rounded-xl border border-slate-200 bg-white p-2 shadow-lg opacity-0 group-hover:visible group-hover:opacity-100">
+                                    @foreach($children as $child)
+                                        @php $childHref = \App\Support\SiteMenu::href($child); @endphp
+                                        @if($childHref)
+                                            <a href="{{ $childHref }}" class="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">{{ \App\Support\SiteMenu::displayLabel($child) }}</a>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            </div>
+                        @elseif($menuHref)
                             <a href="{{ $menuHref }}" class="rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 {{ request()->url() === $menuHref ? 'bg-orange-50 text-orange-900' : '' }}">{{ \App\Support\SiteMenu::displayLabel($item) }}</a>
                         @endif
                     @endforeach
@@ -380,7 +398,7 @@
                     <div class="mt-3 space-y-2 text-sm">
                         <a class="block text-slate-700 hover:text-slate-900" href="{{ route('products.index') }}">{{ __('ui.products') }}</a>
                         <a class="block text-slate-700 hover:text-slate-900" href="{{ route('vendors.index') }}">{{ __('ui.vendors') }}</a>
-                        <a class="block text-slate-700 hover:text-slate-900" href="{{ route('freelancer-jobs.index') }}">{{ __('ui.jobs') }}</a>
+                        <a class="block text-slate-700 hover:text-slate-900" href="{{ route('quote-requests.create', ['type' => 'freelancer']) }}">{{ __('ui.jobs') }}</a>
                     </div>
                 </div>
                 <div>
@@ -388,11 +406,29 @@
                     <div class="mt-3 space-y-2 text-sm">
                         <a class="block text-slate-700 hover:text-slate-900" href="{{ route('pages.about') }}">{{ __('ui.about') }}</a>
                         <a class="block text-slate-700 hover:text-slate-900" href="{{ route('pages.contact') }}">{{ __('ui.contact') }}</a>
-                        <a class="block text-slate-700 hover:text-slate-900" href="{{ route('pages.terms') }}">{{ __('ui.terms') }}</a>
-                        <a class="block text-slate-700 hover:text-slate-900" href="{{ route('pages.privacy') }}">{{ __('ui.privacy') }}</a>
+                        <a class="block text-slate-700 hover:text-slate-900" href="{{ route('contracts.show', 'terms') }}">{{ __('ui.terms') }}</a>
+                        <a class="block text-slate-700 hover:text-slate-900" href="{{ route('contracts.show', 'privacy') }}">{{ __('ui.privacy') }}</a>
+                        <a class="block text-slate-700 hover:text-slate-900" href="{{ route('contracts.show', 'kvkk') }}">KVKK</a>
                     </div>
                 </div>
             </div>
+
+            @if(!empty($footerBrands) && $footerBrands->isNotEmpty())
+                <div class="mt-10 border-t border-slate-200 pt-6">
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Markalarımız</p>
+                    <div class="flex flex-wrap items-center gap-4">
+                        @foreach($footerBrands as $brand)
+                            @php $brandHref = $brand->website_url ?: '#'; @endphp
+                            <a href="{{ $brandHref }}" @if($brand->website_url) target="_blank" rel="noopener noreferrer" @endif class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 hover:border-orange-200">
+                                @if($brand->logoUrl())
+                                    <img src="{{ $brand->logoUrl() }}" alt="{{ $brand->name }}" class="h-8 w-auto object-contain">
+                                @endif
+                                <span class="text-sm font-semibold text-slate-700">{{ $brand->name }}</span>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
 
             <div class="mt-10 flex flex-col gap-2 border-t border-slate-200 pt-6 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
                 <p>{{ __('ui.rights', ['year' => date('Y')]) }}</p>

@@ -18,7 +18,7 @@ class QuoteRequestController extends Controller
     public function create(Request $request)
     {
         $type = $request->get('type', 'physical_quote');
-        if (! in_array($type, ['physical_quote', 'freelancer', 'tabela'], true)) {
+        if (! in_array($type, ['physical_quote', 'freelancer', 'tabela', 'ozalit'], true)) {
             $type = 'physical_quote';
         }
 
@@ -60,8 +60,9 @@ class QuoteRequestController extends Controller
             'district' => ['nullable', 'string', 'max:100'],
             'address' => ['nullable', 'string'],
             'contact_phone' => ['nullable', 'string', 'max:11', 'regex:/^[0-9]{10,11}$/'],
-            'request_type' => ['nullable', 'in:physical_quote,freelancer,tabela'],
+            'request_type' => ['nullable', 'in:physical_quote,freelancer,tabela,ozalit'],
             'show_customer_profile' => ['nullable', 'boolean'],
+            'accept_open_consent' => ['accepted'],
 
             // Multi-item RFQ
             'items' => [$hasItems ? 'required' : 'nullable', 'array', 'min:1'],
@@ -102,7 +103,7 @@ class QuoteRequestController extends Controller
         if (! $request->user()) {
             // Files can't be carried through session. We persist items payload only.
             $pending = $validated;
-            unset($pending['items']);
+            unset($pending['items'], $pending['accept_open_consent']);
             $pending['items'] = collect($items)->map(function ($it) {
                 return [
                     'category_id' => $it['category_id'] ?? null,
@@ -120,7 +121,7 @@ class QuoteRequestController extends Controller
         $validated['status'] = 'open';
 
         DB::transaction(function () use ($request, $validated, $items) {
-            $qr = QuoteRequest::create(collect($validated)->except(['items'])->all());
+            $qr = QuoteRequest::create(collect($validated)->except(['items', 'accept_open_consent'])->all());
 
             foreach (array_values($items) as $idx => $it) {
                 $item = $qr->items()->create([
@@ -241,6 +242,21 @@ class QuoteRequestController extends Controller
             'price' => $quote->amount,
             'quantity' => 1,
         ]);
+
+        $quote->loadMissing('vendor.user');
+        try {
+            if ($quote->vendor?->user) {
+                $quote->vendor->user->notify(new \App\Notifications\OrderCreatedNotification($order));
+            }
+            app(\App\Services\NotificationService::class)->notify(
+                $request->user(),
+                'Teklif kabul edildi',
+                '#'.$order->order_number,
+                ['type' => 'order'],
+                route('account.orders.show', $order)
+            );
+        } catch (\Throwable) {
+        }
 
         return redirect()->route('quote-requests.show', $quoteRequest)
             ->with('success', __('panel.quote_selected', ['number' => $order->order_number]));

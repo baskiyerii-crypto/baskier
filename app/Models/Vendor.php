@@ -27,6 +27,7 @@ class Vendor extends Model
         'rating_average',
         'reviews_count',
         'logo',
+        'cover_image',
         'description',
         'is_active',
         'verification_status',
@@ -41,6 +42,8 @@ class Vendor extends Model
         'quotes_expires_at',
         'tabela_enabled',
         'tabela_expires_at',
+        'ozalit_enabled',
+        'ozalit_expires_at',
         'risk_band',
         'risk_score',
         'contract_suspended_at',
@@ -60,6 +63,7 @@ class Vendor extends Model
         'freelancer_enabled' => 'boolean',
         'quotes_enabled' => 'boolean',
         'tabela_enabled' => 'boolean',
+        'ozalit_enabled' => 'boolean',
         'balance' => 'decimal:2',
         'rating_average' => 'decimal:2',
         'risk_score' => 'decimal:2',
@@ -68,6 +72,7 @@ class Vendor extends Model
         'freelancer_expires_at' => 'datetime',
         'quotes_expires_at' => 'datetime',
         'tabela_expires_at' => 'datetime',
+        'ozalit_expires_at' => 'datetime',
         'registration_tracks' => 'array',
         'profile_pending_payload' => 'array',
         'social_links' => 'array',
@@ -111,6 +116,12 @@ class Vendor extends Model
     {
         return (bool) $this->tabela_enabled
             && ($this->tabela_expires_at === null || $this->tabela_expires_at->isFuture());
+    }
+
+    public function hasActiveOzalitModule(): bool
+    {
+        return (bool) $this->ozalit_enabled
+            && ($this->ozalit_expires_at === null || $this->ozalit_expires_at->isFuture());
     }
 
     public function hasApprovedTaxPlate(): bool
@@ -166,6 +177,11 @@ class Vendor extends Model
         }
 
         return asset('storage/'.$path);
+    }
+
+    public function coverUrl(): ?string
+    {
+        return \App\Support\MediaUrl::public($this->cover_image);
     }
 
     public function recalculateRating(): void

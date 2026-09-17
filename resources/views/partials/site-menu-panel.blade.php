@@ -26,8 +26,26 @@
                     </div>
                 </details>
             @else
-                @php $menuHref = \App\Support\SiteMenu::href($item); @endphp
-                @if($menuHref)
+                @php
+                    $menuHref = \App\Support\SiteMenu::href($item);
+                    $children = collect($item['children'] ?? [])->filter(fn ($c) => ($c['is_active'] ?? true));
+                @endphp
+                @if($children->isNotEmpty())
+                    <details class="site-menu-acc">
+                        <summary>{{ \App\Support\SiteMenu::displayLabel($item) }}</summary>
+                        <div class="site-menu-acc-body">
+                            @if($menuHref)
+                                <a href="{{ $menuHref }}">{{ \App\Support\SiteMenu::displayLabel($item) }}</a>
+                            @endif
+                            @foreach($children as $child)
+                                @php $childHref = \App\Support\SiteMenu::href($child); @endphp
+                                @if($childHref)
+                                    <a class="is-child" href="{{ $childHref }}">{{ \App\Support\SiteMenu::displayLabel($child) }}</a>
+                                @endif
+                            @endforeach
+                        </div>
+                    </details>
+                @elseif($menuHref)
                     <a class="site-menu-link {{ request()->url() === $menuHref ? 'is-active' : '' }}" href="{{ $menuHref }}">
                         <span>{{ \App\Support\SiteMenu::displayLabel($item) }}</span>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>

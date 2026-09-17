@@ -37,45 +37,40 @@
                     <p class="text-sm text-slate-600">{{ __('ui.no_vendors') }}</p>
                 </div>
             @else
-                <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach($vendors as $vendor)
-                        <a href="{{ route('vendors.show', $vendor->slug) }}" class="group by-card by-card-hover p-5">
-                            <div class="flex items-start gap-3">
-                                <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-orange-50 text-lg font-extrabold text-orange-900 border border-orange-200">
-                                    {{ mb_substr($vendor->name, 0, 1) }}
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    <p class="truncate text-sm font-semibold text-slate-900">{{ $vendor->name }}</p>
-                                    <div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-                                        @if($vendor->rating_average)
-                                            <span class="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 font-semibold text-amber-800">
-                                                ★ {{ number_format($vendor->rating_average, 1) }} <span class="font-normal text-amber-700">({{ $vendor->reviews_count }})</span>
-                                            </span>
-                                        @endif
-                                        @if($vendor->email)
-                                            <span class="truncate">{{ $vendor->email }}</span>
-                                        @endif
-                                    </div>
+                        <a href="{{ route('vendors.show', $vendor->slug) }}" class="group by-card by-card-hover overflow-hidden">
+                            <div class="relative h-28 bg-slate-800">
+                                @if($vendor->coverUrl())
+                                    <img src="{{ $vendor->coverUrl() }}" alt="" class="h-full w-full object-cover">
+                                @else
+                                    <div class="h-full w-full bg-gradient-to-br from-slate-900 via-slate-800 to-orange-900"></div>
+                                @endif
+                                <div class="absolute -bottom-6 left-4 h-14 w-14 overflow-hidden rounded-2xl border-2 border-white bg-white shadow">
+                                    @if($vendor->logoUrl())
+                                        <img src="{{ $vendor->logoUrl() }}" alt="{{ $vendor->name }}" class="h-full w-full object-contain p-1">
+                                    @else
+                                        <div class="flex h-full w-full items-center justify-center bg-orange-50 text-lg font-extrabold text-orange-900">{{ mb_substr($vendor->name, 0, 1) }}</div>
+                                    @endif
                                 </div>
                             </div>
-
-                            <p class="mt-4 text-sm leading-relaxed text-slate-600">
-                                {{ \Illuminate\Support\Str::limit($vendor->description, 120) }}
-                            </p>
-
-                            <div class="mt-4 flex items-center justify-between">
-                                <span class="text-xs font-semibold text-slate-500">Profili görüntüle</span>
-                                <span class="text-slate-400 transition group-hover:text-slate-700">→</span>
+                            <div class="p-5 pt-8">
+                                <div class="flex items-center gap-2">
+                                    <p class="truncate text-sm font-semibold text-slate-900">{{ $vendor->name }}</p>
+                                    <x-trust-badge :vendor="$vendor" size="sm" />
+                                </div>
+                                <div class="mt-1 text-xs text-slate-500">
+                                    @if($vendor->rating_average)
+                                        ★ {{ number_format($vendor->rating_average, 1) }} ({{ $vendor->reviews_count }})
+                                    @endif
+                                </div>
+                                <p class="mt-3 text-sm text-slate-600">{{ \Illuminate\Support\Str::limit($vendor->description, 110) }}</p>
                             </div>
                         </a>
                     @endforeach
                 </div>
-
-                <div class="mt-6">
-                    {{ $vendors->links() }}
-                </div>
+                <div class="mt-6">{{ $vendors->links() }}</div>
             @endif
         </div>
     </div>
 @endsection
-

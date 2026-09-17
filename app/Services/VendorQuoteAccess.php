@@ -9,18 +9,21 @@ class VendorQuoteAccess
 {
     public function moduleEnabled(Vendor $vendor, ?QuoteRequest $request = null): bool
     {
-        return $request?->request_type === 'freelancer'
-            ? $vendor->hasActiveFreelancerModule()
-            : $vendor->hasActiveQuotesModule();
+        return match ($request?->request_type) {
+            'freelancer' => $vendor->hasActiveFreelancerModule(),
+            'tabela' => $vendor->hasActiveTabelaModule(),
+            'ozalit' => $vendor->hasActiveOzalitModule(),
+            default => $vendor->hasActiveQuotesModule(),
+        };
     }
 
     public function categoryAllowed(Vendor $vendor, QuoteRequest $request): bool
     {
         $ids = $vendor->quoteCategories()->pluck('categories.id');
 
-        // The freelancer inbox accepts all categories when none are selected.
-        if ($request->request_type === 'freelancer') {
-            return $ids->isEmpty() || $ids->contains($request->category_id);
+        if (in_array($request->request_type, ['freelancer', 'tabela', 'ozalit'], true)) {
+            return $ids->isEmpty() || $ids->contains($request->category_id)
+                || $request->items()->whereIn('category_id', $ids)->exists();
         }
 
         if ($ids->isEmpty()) {

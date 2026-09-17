@@ -8,6 +8,7 @@ use App\Models\VendorDocument;
 use App\Services\TrustBadgeService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class AdminVerificationQueueController extends Controller
 {
@@ -21,15 +22,31 @@ class AdminVerificationQueueController extends Controller
         $search = $request->query('q');
         $type = $request->query('type');
 
+        if (! Schema::hasTable('vendor_documents')) {
+            $documents = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
+            $counts = ['pending' => 0, 'approved' => 0, 'rejected' => 0, 'expired' => 0, 'all' => 0];
+
+            return view('admin.verifications.index', compact('documents', 'status', 'counts', 'search', 'type'));
+        }
+
+        $with = ['vendor.user'];
+        if (Schema::hasColumn('vendor_documents', 'reviewed_by')) {
+            $with[] = 'reviewer';
+        }
+
         $query = VendorDocument::query()
-            ->with(['vendor.user', 'reviewer'])
+            ->with($with)
             ->latest();
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('document_number', 'like', "%{$search}%")
-                    ->orWhere('issuing_institution', 'like', "%{$search}%")
-                    ->orWhereHas('vendor', fn ($vq) => $vq->where('name', 'like', "%{$search}%"));
+                if (Schema::hasColumn('vendor_documents', 'document_number')) {
+                    $q->where('document_number', 'like', "%{$search}%");
+                }
+                if (Schema::hasColumn('vendor_documents', 'issuing_institution')) {
+                    $q->orWhere('issuing_institution', 'like', "%{$search}%");
+                }
+                $q->orWhereHas('vendor', fn ($vq) => $vq->where('name', 'like', "%{$search}%"));
             });
         }
 
@@ -42,28 +59,39 @@ class AdminVerificationQueueController extends Controller
         if ($status === 'pending') {
             $query->where('status', 'pending');
         } elseif ($status === 'approved') {
-            $query->where('status', 'approved')
-                ->where(function ($q) use ($today) {
+            $query->where('status', 'approved');
+            if (Schema::hasColumn('vendor_documents', 'expires_at')) {
+                $query->where(function ($q) use ($today) {
                     $q->whereNull('expires_at')->orWhereDate('expires_at', '>=', $today);
                 });
+            }
         } elseif ($status === 'rejected') {
             $query->where('status', 'rejected');
         } elseif ($status === 'expired') {
-            $query->where('status', 'approved')
-                ->whereNotNull('expires_at')
-                ->whereDate('expires_at', '<', $today);
+            $query->where('status', 'approved');
+            if (Schema::hasColumn('vendor_documents', 'expires_at')) {
+                $query->whereNotNull('expires_at')->whereDate('expires_at', '<', $today);
+            } else {
+                $query->whereRaw('1 = 0');
+            }
         }
 
         $documents = $query->paginate(20)->withQueryString();
 
-        // Count totals for tab badges
+        $approvedQuery = VendorDocument::query()->where('status', 'approved');
+        $expiredQuery = VendorDocument::query()->where('status', 'approved');
+        if (Schema::hasColumn('vendor_documents', 'expires_at')) {
+            $approvedQuery->where(fn ($q) => $q->whereNull('expires_at')->orWhereDate('expires_at', '>=', $today));
+            $expiredQuery->whereNotNull('expires_at')->whereDate('expires_at', '<', $today);
+        } else {
+            $expiredQuery->whereRaw('1 = 0');
+        }
+
         $counts = [
             'pending' => VendorDocument::query()->where('status', 'pending')->count(),
-            'approved' => VendorDocument::query()->where('status', 'approved')
-                ->where(fn ($q) => $q->whereNull('expires_at')->orWhereDate('expires_at', '>=', $today))->count(),
+            'approved' => $approvedQuery->count(),
             'rejected' => VendorDocument::query()->where('status', 'rejected')->count(),
-            'expired' => VendorDocument::query()->where('status', 'approved')
-                ->whereNotNull('expires_at')->whereDate('expires_at', '<', $today)->count(),
+            'expired' => $expiredQuery->count(),
             'all' => VendorDocument::query()->count(),
         ];
 
@@ -127,6 +155,16 @@ class AdminVerificationQueueController extends Controller
             'suspension_reason' => $validated['suspension_reason'],
             'trust_level' => 0,
         ]);
+
+        if ($vendor->user) {
+            app(\App\Services\NotificationService::class)->notify(
+                $vendor->user,
+                'Hesabınız askıya alındı',
+                $validated['suspension_reason'],
+                ['type' => 'vendor_suspend'],
+                route('vendor.dashboard')
+            );
+        }
 
         return back()->with('success', "Satıcı (#{$vendor->id}) gerekçeli olarak askıya alındı ve güven seviyesi sıfırlandı.");
     }

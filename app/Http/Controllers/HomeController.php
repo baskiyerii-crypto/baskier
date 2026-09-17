@@ -3,10 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use App\Models\FreelancerJobListing;
 use App\Models\Product;
 use App\Support\FreelancerCategories;
-use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
@@ -24,8 +22,13 @@ class HomeController extends Controller
             ->orderBy('name')
             ->get();
 
-        $discoveryProducts = app(\App\Services\FairProductDiscoveryService::class)->getDiscoveryProducts(24);
-        $featuredProducts = $discoveryProducts;
+        $featuredProducts = Product::query()
+            ->published()
+            ->where('is_featured', true)
+            ->with(['vendor', 'category', 'images'])
+            ->latest()
+            ->limit(24)
+            ->get();
 
         $digitalProducts = Product::query()
             ->published()
@@ -35,25 +38,13 @@ class HomeController extends Controller
             ->limit(8)
             ->get();
 
-        $freelancerJobs = FreelancerJobListing::query()
-            ->where('status', 'open')
-            ->with('user')
-            ->latest()
-            ->limit(6)
-            ->get();
-
-        $openCounts = FreelancerJobListing::query()
-            ->where('status', 'open')
-            ->selectRaw('category, count(*) as total')
-            ->groupBy('category')
-            ->pluck('total', 'category');
         $freelancerCategories = [];
         foreach (FreelancerCategories::catalog() as $key => $config) {
             $freelancerCategories[] = [
                 'key' => $key,
                 'label' => $config['label'],
                 'seed' => $config['seed'],
-                'count' => (int) ($openCounts[$key] ?? 0),
+                'count' => 0,
             ];
         }
 
@@ -61,9 +52,7 @@ class HomeController extends Controller
             'featuredCategories',
             'categories',
             'featuredProducts',
-            'discoveryProducts',
             'digitalProducts',
-            'freelancerJobs',
             'freelancerCategories',
         ));
     }

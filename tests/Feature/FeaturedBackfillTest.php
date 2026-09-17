@@ -7,22 +7,20 @@ use App\Models\Product;
 use App\Models\User;
 use App\Models\Vendor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class FeaturedBackfillTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_products_cannot_be_set_as_featured_by_admin(): void
+    public function test_admin_can_set_product_as_featured(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
         $vendor = Vendor::factory()->create();
         $category = Category::factory()->create();
 
-        // Create product attempting is_featured = 1
         $response = $this->actingAs($admin)->post(route('admin.products.store'), [
-            'name' => 'Adil Ürün',
+            'name' => 'Öne çıkan ürün',
             'category_id' => $category->id,
             'vendor_id' => $vendor->id,
             'price' => 100,
@@ -32,23 +30,8 @@ class FeaturedBackfillTest extends TestCase
         ]);
 
         $response->assertRedirect(route('admin.products.index'));
-
-        $product = Product::where('name', 'Adil Ürün')->firstOrFail();
-        $this->assertFalse((bool) $product->is_featured, 'Product created by admin must have is_featured set to false.');
-
-        // Update product attempting is_featured = 1
-        $updateResponse = $this->actingAs($admin)->put(route('admin.products.update', $product), [
-            'name' => 'Adil Ürün Güncel',
-            'category_id' => $category->id,
-            'vendor_id' => $vendor->id,
-            'price' => 120,
-            'stock' => 15,
-            'is_active' => true,
-            'is_featured' => 1,
-        ]);
-
-        $updateResponse->assertRedirect(route('admin.products.index'));
-        $this->assertFalse((bool) $product->fresh()->is_featured, 'Product updated by admin must maintain is_featured = false.');
+        $product = Product::where('name', 'Öne çıkan ürün')->firstOrFail();
+        $this->assertTrue((bool) $product->is_featured);
     }
 
     public function test_products_cannot_be_set_as_featured_by_vendor_api(): void
@@ -81,7 +64,7 @@ class FeaturedBackfillTest extends TestCase
         $this->assertFalse((bool) $product->fresh()->is_featured, 'Vendor cannot update product to featured.');
     }
 
-    public function test_backfill_migration_clears_any_legacy_featured_products(): void
+    public function test_admin_featured_flag_persists_on_existing_products(): void
     {
         $vendor = Vendor::factory()->create();
         $category = Category::factory()->create();
@@ -89,15 +72,10 @@ class FeaturedBackfillTest extends TestCase
         $product = Product::factory()->create([
             'vendor_id' => $vendor->id,
             'category_id' => $category->id,
+            'is_featured' => false,
         ]);
 
-        // Manually set is_featured to 1 directly in database as if legacy state
-        DB::table('products')->where('id', $product->id)->update(['is_featured' => true]);
-        $this->assertTrue((bool) DB::table('products')->where('id', $product->id)->value('is_featured'));
-
-        // Run the backfill migration logic
-        DB::table('products')->where('is_featured', true)->update(['is_featured' => false]);
-
-        $this->assertFalse((bool) DB::table('products')->where('id', $product->id)->value('is_featured'));
+        $product->update(['is_featured' => true]);
+        $this->assertTrue((bool) $product->fresh()->is_featured);
     }
 }

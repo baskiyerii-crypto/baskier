@@ -4,7 +4,8 @@ namespace App\Http\Controllers\Vendor;
 
 use App\Http\Controllers\Controller;
 use App\Models\Conversation;
-use App\Models\Message;
+use App\Services\ModerationService;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class VendorMessageController extends Controller
@@ -35,22 +36,35 @@ class VendorMessageController extends Controller
         return view('vendor.messages.show', compact('conversation', 'vendor'));
     }
 
-    public function store(Request $request, Conversation $conversation)
+    public function store(Request $request, Conversation $conversation, ModerationService $moderation, NotificationService $notifications)
     {
         $vendor = $this->getVendor($request);
         if ($conversation->vendor_id !== $vendor->id) {
             abort(403);
         }
         $validated = $request->validate(['body' => ['required', 'string', 'max:2000']]);
-        if (Message::containsRedirect($validated['body'])) {
-            return back()->with('error', 'Mesajda link, telefon veya platform dışı yönlendirme kullanılamaz.');
+        $result = $moderation->moderateMessage($validated['body']);
+        if ($result['blocked']) {
+            return back()->with('error', $moderation->rejectionMessage());
         }
         $conversation->messages()->create([
             'user_id' => $request->user()->id,
             'is_from_vendor' => true,
             'body' => $validated['body'],
+            'display_body' => $result['display'],
+            'blocked' => false,
+            'moderation_flags' => $result['flags'],
         ]);
         $conversation->update(['last_message_at' => now()]);
+        if ($conversation->user) {
+            $notifications->notify(
+                $conversation->user,
+                'Yeni mesaj',
+                $vendor->name.' size mesaj gönderdi.',
+                ['type' => 'message'],
+                route('customer.messages.show', $conversation)
+            );
+        }
         return back()->with('success', 'Mesaj gönderildi.');
     }
 }

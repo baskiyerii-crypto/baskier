@@ -37,6 +37,9 @@ class ConversationController extends ApiController
         ]);
 
         $moderation = app(ModerationService::class)->moderateMessage($validated['body']);
+        if ($moderation['blocked']) {
+            return $this->fail(app(ModerationService::class)->rejectionMessage(), $moderation['flags'], 422);
+        }
         $message = $conversation->messages()->create([
             'user_id' => $request->user()->id,
             'is_from_vendor' => $request->user()->isVendor(),

@@ -5,6 +5,7 @@
         echo match ($type) {
             'freelancer' => __('home.path_freelancer_title'),
             'tabela' => __('home.path_tabela_title'),
+            'ozalit' => __('home.path_ozalit_title'),
             default => __('home.path_quote_title'),
         };
     @endphp
@@ -15,16 +16,19 @@
     $heading = match($type) {
         'freelancer' => __('home.path_freelancer_title'),
         'tabela' => __('home.path_tabela_title'),
+        'ozalit' => __('home.path_ozalit_title'),
         default => __('home.path_quote_title'),
     };
     $sub = match($type) {
         'freelancer' => __('home.quote_form_freelancer_help'),
         'tabela' => __('home.quote_form_tabela_help'),
+        'ozalit' => __('home.quote_form_ozalit_help'),
         default => __('home.quote_form_print_help'),
     };
     $eyebrow = match($type) {
         'freelancer' => __('home.path_freelancer_eyebrow'),
         'tabela' => __('home.path_tabela_eyebrow'),
+        'ozalit' => __('home.path_ozalit_eyebrow'),
         default => __('home.path_quote_eyebrow'),
     };
 @endphp
@@ -64,9 +68,6 @@
                 @if($type === 'freelancer')
                     <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-4 text-sm text-indigo-900">
                         {{ __('home.quote_form_freelancer_banner') }}
-                        <div class="mt-2">
-                            <a href="{{ route('freelancer-jobs.create') }}" class="font-semibold underline">{{ __('home.quote_prefer_job_listing') }}</a>
-                        </div>
                     </div>
                     <div class="form-check">
                         <input type="checkbox" name="show_customer_profile" value="1" class="form-check-input" id="show_profile" @checked(old('show_customer_profile'))>
@@ -75,6 +76,10 @@
                 @elseif($type === 'tabela')
                     <div class="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
                         {{ __('home.quote_form_tabela_banner') }}
+                    </div>
+                @elseif($type === 'ozalit')
+                    <div class="rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-950">
+                        {{ __('home.quote_form_ozalit_help') }}
                     </div>
                 @endif
 
@@ -167,6 +172,14 @@
                     </div>
                 </div>
 
+                <div class="mb-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <label class="flex items-start gap-2 text-sm text-slate-700">
+                        <input type="checkbox" name="accept_open_consent" value="1" class="mt-1" required>
+                        <span>Açık rıza metnini okudum; teklif sürecinde iletişim paylaşımını kabul ediyorum.
+                            <a href="{{ route('contracts.show', 'open_consent') }}" target="_blank" class="underline">Metni aç</a>
+                        </span>
+                    </label>
+                </div>
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <button type="submit" class="by-btn-cta" @if($categories->isEmpty()) disabled @endif>
                         {{ auth()->check() ? __('home.submit') : __('home.continue_auth') }}

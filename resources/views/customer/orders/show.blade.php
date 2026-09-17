@@ -311,4 +311,16 @@
             <p class="small text-muted mb-0">⭐ Bu sipariş için değerlendirmeniz kaydedilmiştir. Teşekkür ederiz.</p>
         </div>
     @endif
+
+    <div class="bg-white rounded-4 shadow-sm p-4 mb-4">
+        <h2 class="h6 fw-bold mb-2">Sipariş sorusu</h2>
+        <p class="small text-muted">Siparişle ilgili sorularınız burada kalır; telefon veya sosyal medya paylaşmayın.</p>
+        <form method="POST" action="{{ route('orders.questions.store', $order) }}" class="mt-2">
+            @csrf
+            <input type="text" name="subject" class="form-control mb-2" placeholder="Konu (opsiyonel)" maxlength="180">
+            <textarea name="body" class="form-control" rows="3" required maxlength="2000" placeholder="Sorunuz"></textarea>
+            <button class="btn btn-primary btn-sm mt-2">Gönder</button>
+        </form>
+        <a href="{{ route('customer.order-questions.index') }}" class="small d-inline-block mt-2">Tüm sipariş sorularım</a>
+    </div>
 @endsection

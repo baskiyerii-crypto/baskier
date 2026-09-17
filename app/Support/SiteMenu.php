@@ -22,6 +22,21 @@ final class SiteMenu
                 return collect($decoded)
                     ->filter(fn ($i) => is_array($i) && ! empty($i['label']))
                     ->map(function (array $i) {
+                        $children = [];
+                        if (! empty($i['children']) && is_array($i['children'])) {
+                            $children = collect($i['children'])
+                                ->filter(fn ($c) => is_array($c) && ! empty($c['label']))
+                                ->map(fn (array $c) => [
+                                    'label' => (string) $c['label'],
+                                    'label_en' => isset($c['label_en']) && $c['label_en'] !== '' ? (string) $c['label_en'] : null,
+                                    'type' => (string) ($c['type'] ?? 'url'),
+                                    'target' => isset($c['target']) && $c['target'] !== '' ? (string) $c['target'] : null,
+                                    'is_active' => (bool) ($c['is_active'] ?? true),
+                                ])
+                                ->values()
+                                ->all();
+                        }
+
                         return [
                             'label' => (string) $i['label'],
                             'label_en' => isset($i['label_en']) && $i['label_en'] !== '' ? (string) $i['label_en'] : null,
@@ -30,6 +45,7 @@ final class SiteMenu
                             'placement' => in_array(($i['placement'] ?? 'drawer'), ['top', 'drawer'], true) ? $i['placement'] : 'drawer',
                             'sort' => (int) ($i['sort'] ?? 0),
                             'is_active' => (bool) ($i['is_active'] ?? true),
+                            'children' => $children,
                         ];
                     })
                     ->sortBy(fn ($i) => (int) ($i['sort'] ?? 0))
@@ -106,6 +122,7 @@ final class SiteMenu
             'route' => $target && \Illuminate\Support\Facades\Route::has($target) ? route($target) : null,
             'url' => $target,
             'category' => $target ? route('products.index', ['category_id' => $target]) : route('products.index'),
+            'product' => self::productHref($target),
             'products' => route('products.index'),
             'page' => $target && \Illuminate\Support\Facades\Route::has('pages.'.$target)
                 ? route('pages.'.$target)
@@ -141,5 +158,17 @@ final class SiteMenu
         }
 
         return (string) ($item['label'] ?? '');
+    }
+
+    private static function productHref(?string $target): string
+    {
+        if (! $target) {
+            return route('products.index');
+        }
+        $product = is_numeric($target)
+            ? \App\Models\Product::query()->find((int) $target)
+            : \App\Models\Product::query()->where('slug', $target)->first();
+
+        return $product ? route('products.show', $product->slug) : route('products.index');
     }
 }

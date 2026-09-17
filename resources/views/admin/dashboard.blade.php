@@ -23,6 +23,38 @@
 </div>
 
 <div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <a href="{{ route('admin.product-approvals.index') }}" class="text-decoration-none">
+            <div class="card p-3 border-0 shadow-sm h-100">
+                <div class="small text-muted">Ürün onayları</div>
+                <div class="h4 mb-0">{{ $pendingProductApprovals ?? 0 }}</div>
+                <div class="small text-muted">Bekleyen</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        @if(Route::has('admin.vendor-category-requests.index'))
+        <a href="{{ route('admin.vendor-category-requests.index') }}" class="text-decoration-none">
+            <div class="card p-3 border-0 shadow-sm h-100">
+                <div class="small text-muted">Kategori talepleri</div>
+                <div class="h4 mb-0">{{ $pendingCategoryRequests ?? 0 }}</div>
+                <div class="small text-muted">Bekleyen</div>
+            </div>
+        </a>
+        @endif
+    </div>
+    <div class="col-md-4">
+        <a href="{{ route('admin.verifications.index') }}" class="text-decoration-none">
+            <div class="card p-3 border-0 shadow-sm h-100">
+                <div class="small text-muted">Belge onayları</div>
+                <div class="h4 mb-0">{{ $pendingDocumentApprovals ?? 0 }}</div>
+                <div class="small text-muted">Bekleyen</div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
     <div class="col-6 col-md-3"><div class="card p-3 border-0 shadow-sm" style="background:linear-gradient(135deg,#ecfdf5,#fff)"><div class="small text-muted">{{ __('panel.shipped') }}</div><div class="h5 mb-0 metric-count" data-count="{{ $metrics['shipped'] ?? 0 }}">{{ $metrics['shipped'] ?? 0 }}</div></div></div>
     <div class="col-6 col-md-3"><div class="card p-3 border-0 shadow-sm"><div class="small text-muted">{{ __('panel.not_shipped') }}</div><div class="h5 mb-0 metric-count" data-count="{{ $metrics['not_shipped'] ?? 0 }}">{{ $metrics['not_shipped'] ?? 0 }}</div></div></div>
     <div class="col-6 col-md-3"><div class="card p-3 border-0 shadow-sm"><div class="small text-muted">{{ __('panel.late_termin') }}</div><div class="h5 mb-0 text-danger metric-count" data-count="{{ $metrics['late_termin'] ?? 0 }}">{{ $metrics['late_termin'] ?? 0 }}</div></div></div>

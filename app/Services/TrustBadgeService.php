@@ -6,7 +6,9 @@ use App\Domain\OrderStatus;
 use App\Domain\TrustLevel;
 use App\Models\Vendor;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class TrustBadgeService
 {
@@ -47,33 +49,24 @@ class TrustBadgeService
         $hasPhysical = $vendor->hasPhysicalTrack();
         $hasFreelancer = $vendor->hasFreelancerTrack();
 
-        // Physical track check: tax_plate or company_registration
         if ($hasPhysical) {
-            $hasPhysicalDoc = $vendor->documents()
-                ->whereIn('document_type', ['tax_plate', 'company_registration'])
-                ->where('status', 'approved')
-                ->where(function ($query) use ($today) {
-                    $query->whereNull('expires_at')
-                        ->orWhereDate('expires_at', '>=', $today);
-                })
-                ->exists();
+            $hasPhysicalDoc = $this->hasApprovedTrackDocument(
+                $vendor,
+                ['tax_plate', 'company_registration'],
+                $today
+            );
 
             if (! $hasPhysicalDoc) {
                 return TrustLevel::LEVEL_1;
             }
         }
 
-        // Freelancer track check: diploma, certificate, or portfolio_accreditation
-        // NOTE: tax_plate explicitly does NOT satisfy freelancer qualification
         if ($hasFreelancer) {
-            $hasFreelancerDoc = $vendor->documents()
-                ->whereIn('document_type', ['diploma', 'certificate', 'portfolio_accreditation'])
-                ->where('status', 'approved')
-                ->where(function ($query) use ($today) {
-                    $query->whereNull('expires_at')
-                        ->orWhereDate('expires_at', '>=', $today);
-                })
-                ->exists();
+            $hasFreelancerDoc = $this->hasApprovedTrackDocument(
+                $vendor,
+                ['diploma', 'certificate', 'portfolio_accreditation'],
+                $today
+            );
 
             if (! $hasFreelancerDoc) {
                 return TrustLevel::LEVEL_1;
@@ -122,18 +115,25 @@ class TrustBadgeService
      */
     public function recalculateAndSave(Vendor $vendor): int
     {
-        $oldLevel = (int) $vendor->trust_level;
+        $oldLevel = (int) ($vendor->trust_level ?? 0);
         $newLevel = $this->calculateTrustLevel($vendor);
 
-        $updates = ['trust_level' => $newLevel];
-
-        if ($newLevel >= TrustLevel::LEVEL_2 && $vendor->verification_status !== 'verified') {
-            $updates['verification_status'] = 'verified';
-        } elseif ($newLevel < TrustLevel::LEVEL_2 && $vendor->verification_status === 'verified') {
-            $updates['verification_status'] = 'pending';
+        $updates = [];
+        if (Schema::hasColumn('vendors', 'trust_level')) {
+            $updates['trust_level'] = $newLevel;
         }
 
-        $vendor->updateQuietly($updates);
+        if (Schema::hasColumn('vendors', 'verification_status')) {
+            if ($newLevel >= TrustLevel::LEVEL_2 && $vendor->verification_status !== 'verified') {
+                $updates['verification_status'] = 'verified';
+            } elseif ($newLevel < TrustLevel::LEVEL_2 && $vendor->verification_status === 'verified') {
+                $updates['verification_status'] = 'pending';
+            }
+        }
+
+        if ($updates !== []) {
+            $vendor->updateQuietly($updates);
+        }
 
         if ($oldLevel !== $newLevel) {
             Log::info("Vendor #{$vendor->id} trust level transitioned from {$oldLevel} to {$newLevel}.", [
@@ -164,21 +164,11 @@ class TrustBadgeService
         $hasFreelancer = $vendor->hasFreelancerTrack();
 
         $physicalDocApproved = $hasPhysical
-            ? $vendor->documents()
-                ->whereIn('document_type', ['tax_plate', 'company_registration'])
-                ->where('status', 'approved')
-                ->where(function ($q) use ($today) {
-                    $q->whereNull('expires_at')->orWhereDate('expires_at', '>=', $today);
-                })->exists()
+            ? $this->hasApprovedTrackDocument($vendor, ['tax_plate', 'company_registration'], $today)
             : null;
 
         $freelancerDocApproved = $hasFreelancer
-            ? $vendor->documents()
-                ->whereIn('document_type', ['diploma', 'certificate', 'portfolio_accreditation'])
-                ->where('status', 'approved')
-                ->where(function ($q) use ($today) {
-                    $q->whereNull('expires_at')->orWhereDate('expires_at', '>=', $today);
-                })->exists()
+            ? $this->hasApprovedTrackDocument($vendor, ['diploma', 'certificate', 'portfolio_accreditation'], $today)
             : null;
 
         $level2Passed = $level1Passed
@@ -231,5 +221,34 @@ class TrustBadgeService
                 'no_sanctions' => ! $vendor->is_suspended && $vendor->contract_suspended_at === null,
             ],
         ];
+    }
+
+    /**
+     * @param  list<string>  $types
+     */
+    private function hasApprovedTrackDocument(Vendor $vendor, array $types, Carbon $today): bool
+    {
+        if (! Schema::hasTable('vendor_documents')) {
+            return false;
+        }
+
+        $query = $vendor->documents()
+            ->whereIn('document_type', $types)
+            ->where('status', 'approved');
+
+        $this->constrainNotExpired($query, $today);
+
+        return $query->exists();
+    }
+
+    private function constrainNotExpired(Builder $query, Carbon $today): void
+    {
+        if (! Schema::hasColumn('vendor_documents', 'expires_at')) {
+            return;
+        }
+
+        $query->where(function ($q) use ($today) {
+            $q->whereNull('expires_at')->orWhereDate('expires_at', '>=', $today);
+        });
     }
 }

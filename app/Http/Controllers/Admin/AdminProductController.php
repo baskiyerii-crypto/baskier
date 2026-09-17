@@ -51,13 +51,17 @@ class AdminProductController extends Controller
             'description' => ['nullable', 'string'],
             'description_en' => ['nullable', 'string'],
             'main_image' => ['nullable', 'image', 'max:2048'],
+            'gallery' => ['nullable', 'array', 'max:8'],
+            'gallery.*' => ['image', 'max:2048'],
             'product_type' => ['nullable', 'in:physical,digital'],
             'digital_link' => ['nullable', 'url', 'max:500'],
             'is_active' => ['boolean'],
+            'is_featured' => ['boolean'],
         ]);
+        unset($validated['gallery']);
         $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']) . '-' . time();
         $validated['is_active'] = $request->boolean('is_active');
-        $validated['is_featured'] = false;
+        $validated['is_featured'] = $request->boolean('is_featured');
         $validated['product_type'] = $validated['product_type'] ?? 'physical';
         if (\Illuminate\Support\Facades\Schema::hasColumn('products', 'moderation_status')) {
             $validated['moderation_status'] = Product::MODERATION_APPROVED;
@@ -65,12 +69,16 @@ class AdminProductController extends Controller
         if ($request->hasFile('main_image')) {
             $validated['main_image'] = $request->file('main_image')->store('products', 'public');
         }
-        Product::create($validated);
+        $product = Product::create($validated);
+        if ($request->hasFile('gallery')) {
+            $product->attachGallery($request->file('gallery', []));
+        }
         return redirect()->route('admin.products.index')->with('success', 'Ürün eklendi.');
     }
 
     public function edit(Product $product)
     {
+        $product->load('images');
         $categories = Category::orderBy('name')->get();
         $vendors = Vendor::orderBy('name')->get();
         return view('admin.products.edit', compact('product', 'categories', 'vendors'));
@@ -91,11 +99,15 @@ class AdminProductController extends Controller
             'description' => ['nullable', 'string'],
             'description_en' => ['nullable', 'string'],
             'main_image' => ['nullable', 'image', 'max:2048'],
+            'gallery' => ['nullable', 'array', 'max:8'],
+            'gallery.*' => ['image', 'max:2048'],
             'is_active' => ['boolean'],
+            'is_featured' => ['boolean'],
         ]);
+        unset($validated['gallery']);
         $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']) . '-' . $product->id;
         $validated['is_active'] = $request->boolean('is_active');
-        $validated['is_featured'] = false;
+        $validated['is_featured'] = $request->boolean('is_featured');
         if ($request->hasFile('main_image')) {
             if ($product->main_image) {
                 Storage::disk('public')->delete($product->main_image);
@@ -103,6 +115,9 @@ class AdminProductController extends Controller
             $validated['main_image'] = $request->file('main_image')->store('products', 'public');
         }
         $product->update($validated);
+        if ($request->hasFile('gallery')) {
+            $product->attachGallery($request->file('gallery', []));
+        }
         return redirect()->route('admin.products.index')->with('success', 'Ürün güncellendi.');
     }
 

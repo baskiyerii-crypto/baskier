@@ -34,11 +34,12 @@ class VendorProfileController extends Controller
             'map_lat' => ['nullable', 'numeric'],
             'map_lng' => ['nullable', 'numeric'],
             'logo' => ['nullable', 'image', 'max:2048'],
+            'cover_image' => ['nullable', 'image', 'max:4096'],
             'social_instagram' => ['nullable', 'string', 'max:255'],
             'social_website' => ['nullable', 'url', 'max:255'],
         ]);
 
-        $payload = collect($validated)->except(['logo', 'social_instagram', 'social_website'])->all();
+        $payload = collect($validated)->except(['logo', 'cover_image', 'social_instagram', 'social_website'])->all();
         $payload['social_links'] = array_filter([
             'instagram' => $validated['social_instagram'] ?? null,
             'website' => $validated['social_website'] ?? null,
@@ -46,6 +47,9 @@ class VendorProfileController extends Controller
 
         if ($request->hasFile('logo')) {
             $payload['logo'] = $request->file('logo')->store('vendor-logos/'.$vendor->id, 'public');
+        }
+        if ($request->hasFile('cover_image')) {
+            $payload['cover_image'] = $request->file('cover_image')->store('vendor-covers/'.$vendor->id, 'public');
         }
 
         $vendor->update(['profile_pending_payload' => $payload]);

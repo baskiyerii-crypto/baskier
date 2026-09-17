@@ -55,6 +55,10 @@
             @error('main_image')<div class="text-danger small">{{ $message }}</div>@enderror
         </div>
         <div class="mb-3">
+            <label class="form-label fw-semibold">Galeri</label>
+            <input type="file" name="gallery[]" class="form-control" accept="image/*" multiple>
+        </div>
+        <div class="mb-3">
             <label class="form-label fw-semibold">Dijital urun linki</label>
             <input type="url" name="digital_link" class="form-control" value="{{ old('digital_link') }}">
         </div>
@@ -70,6 +74,10 @@
             <div class="form-check">
                 <input type="checkbox" name="is_active" value="1" class="form-check-input" @checked(old('is_active', true))>
                 <label class="form-check-label">Aktif</label>
+            </div>
+            <div class="form-check mt-2">
+                <input type="checkbox" name="is_featured" value="1" class="form-check-input" @checked(old('is_featured'))>
+                <label class="form-check-label">Öne çıkan ürün (anasayfa)</label>
             </div>
         </div>
         <button type="submit" class="btn btn-primary">Urun ekle</button>

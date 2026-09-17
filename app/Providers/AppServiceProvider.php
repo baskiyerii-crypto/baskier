@@ -24,26 +24,86 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        View::composer('layouts.app', function ($view): void {
-            $headerCategories = Category::query()
-                ->whereNull('parent_id')
-                ->where('is_active', true)
-                ->where(function ($query): void {
-                    $query->whereHas('products')
-                        ->orWhereHas('children.products');
-                })
-                ->with([
-                    'children' => function ($query): void {
-                        $query->where('is_active', true)
-                            ->whereHas('products')
-                            ->orderBy('name');
-                    },
-                ])
-                ->orderBy('name')
-                ->get(['id', 'name', 'slug', 'parent_id']);
-
-            $view->with('headerCategories', $headerCategories);
+        View::composer(['layouts.admin', 'layouts.vendor', 'layouts.account', 'notifications.index'], function ($view): void {
+            $user = auth()->user();
+            $unread = 0;
+            $recent = collect();
+            $pendingProducts = 0;
+            $pendingCategories = 0;
+            $pendingDocs = 0;
+            if ($user) {
+                try {
+                    $unread = $user->unreadNotifications()->count();
+                    $recent = $user->notifications()->latest()->limit(8)->get();
+                } catch (\Throwable) {
+                }
+            }
+            if ($user?->isAdmin()) {
+                try {
+                    if (\Illuminate\Support\Facades\Schema::hasColumn('products', 'moderation_status')) {
+                        $pendingProducts = \App\Models\Product::where('moderation_status', 'pending')->count();
+                    }
+                    if (\Illuminate\Support\Facades\Schema::hasTable('vendor_category_requests')) {
+                        $pendingCategories = \App\Models\VendorCategoryRequest::where('status', 'pending')->count();
+                    }
+                    if (\Illuminate\Support\Facades\Schema::hasTable('vendor_documents')) {
+                        $pendingDocs = \App\Models\VendorDocument::where('status', 'pending')->count();
+                    }
+                } catch (\Throwable) {
+                }
+            }
+            $view->with([
+                'unreadNotificationsCount' => $unread,
+                'recentNotifications' => $recent,
+                'pendingProductApprovals' => $pendingProducts,
+                'pendingCategoryRequests' => $pendingCategories,
+                'pendingDocumentApprovals' => $pendingDocs,
+            ]);
         });
+
+        View::composer('layouts.app', function ($view): void {
+            try {
+                $headerCategories = Category::query()
+                    ->whereNull('parent_id')
+                    ->when(\Illuminate\Support\Facades\Schema::hasColumn('categories', 'is_active'), fn ($q) => $q->where('is_active', true))
+                    ->where(function ($query): void {
+                        $query->whereHas('products')
+                            ->orWhereHas('children.products');
+                    })
+                    ->with([
+                        'children' => function ($query): void {
+                            $query->when(\Illuminate\Support\Facades\Schema::hasColumn('categories', 'is_active'), fn ($q) => $q->where('is_active', true))
+                                ->whereHas('products')
+                                ->orderBy('name');
+                        },
+                    ])
+                    ->orderBy('name')
+                    ->get(['id', 'name', 'slug', 'parent_id']);
+            } catch (\Throwable) {
+                $headerCategories = collect();
+            }
+
+            $footerBrands = collect();
+            try {
+                if (\Illuminate\Support\Facades\Schema::hasTable('platform_brands')) {
+                    $footerBrands = \App\Models\PlatformBrand::query()
+                        ->where('is_active', true)
+                        ->orderBy('sort_order')
+                        ->get();
+                }
+            } catch (\Throwable) {
+            }
+
+            $view->with([
+                'headerCategories' => $headerCategories,
+                'footerBrands' => $footerBrands,
+            ]);
+        });
+
+        try {
+            \App\Support\PlatformBranding::generatePwaIcons();
+        } catch (\Throwable) {
+        }
 
         $this->configureRateLimiting();
     }

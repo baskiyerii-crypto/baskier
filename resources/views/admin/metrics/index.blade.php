@@ -57,9 +57,7 @@
                 </div>
                 <div class="small mt-2">
                     @if($metrics['queue']['failed_jobs'] > 0)
-                        <a href="{{ route('admin.failed-jobs.index') }}" class="text-danger fw-semibold text-decoration-none">
-                            ⚠ {{ $metrics['queue']['failed_jobs'] }} Başarısız İş (İncele →)
-                        </a>
+                        <span class="text-danger fw-semibold">{{ $metrics['queue']['failed_jobs'] }} başarısız kuyruk işi</span>
                     @else
                         <span class="text-success">✓ 0 Hata / Sağlıklı</span>
                     @endif

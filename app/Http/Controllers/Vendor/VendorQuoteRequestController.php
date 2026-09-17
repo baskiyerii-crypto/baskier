@@ -44,6 +44,10 @@ class VendorQuoteRequestController extends Controller
         }
         $query = QuoteRequest::with(['category', 'user', 'items.category', 'items.product'])
             ->where('status', 'open')
+            ->when(
+                \Illuminate\Support\Facades\Schema::hasColumn('quote_requests', 'request_type'),
+                fn ($q) => $q->where('request_type', 'physical_quote')
+            )
             ->where(function ($q) use ($categoryIds) {
                 $ids = $categoryIds->isEmpty() ? [0] : $categoryIds->values();
                 $q->whereIn('category_id', $ids)
@@ -133,10 +137,16 @@ class VendorQuoteRequestController extends Controller
             'delivery_days' => ['nullable', 'integer', 'min:1', 'max:365'],
             'note' => ['nullable', 'string', 'max:1000'],
         ]);
-        Quote::updateOrCreate(
+        $quote = Quote::updateOrCreate(
             ['quote_request_id' => $quoteRequest->id, 'vendor_id' => $vendor->id],
             array_merge($validated, ['status' => 'pending'])
         );
+        if ($quoteRequest->user) {
+            try {
+                $quoteRequest->user->notify(new \App\Notifications\QuoteOfferReceivedNotification($quote));
+            } catch (\Throwable) {
+            }
+        }
         return back()->with('success', 'Teklifiniz gonderildi.');
     }
 }

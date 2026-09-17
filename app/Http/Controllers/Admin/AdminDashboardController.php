@@ -38,6 +38,27 @@ class AdminDashboardController extends Controller
                 ->get();
         }
 
-        return view('admin.dashboard', compact('stats', 'metrics', 'trend', 'statusBreakdown', 'recentProducts', 'recentOrders', 'riskyVendors'));
+        $pendingProductApprovals = Schema::hasColumn('products', 'moderation_status')
+            ? Product::where('moderation_status', 'pending')->count()
+            : 0;
+        $pendingCategoryRequests = Schema::hasTable('vendor_category_requests')
+            ? \App\Models\VendorCategoryRequest::where('status', 'pending')->count()
+            : 0;
+        $pendingDocumentApprovals = Schema::hasTable('vendor_documents')
+            ? \App\Models\VendorDocument::where('status', 'pending')->count()
+            : 0;
+
+        return view('admin.dashboard', compact(
+            'stats',
+            'metrics',
+            'trend',
+            'statusBreakdown',
+            'recentProducts',
+            'recentOrders',
+            'riskyVendors',
+            'pendingProductApprovals',
+            'pendingCategoryRequests',
+            'pendingDocumentApprovals'
+        ));
     }
 }

@@ -9,6 +9,9 @@
 <div class="by-container py-6 sm:py-8">
     <section class="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm">
         <div class="relative h-36 sm:h-44 bg-gradient-to-br from-slate-900 via-slate-800 to-orange-900">
+            @if($vendor->coverUrl())
+                <img src="{{ $vendor->coverUrl() }}" alt="" class="absolute inset-0 h-full w-full object-cover">
+            @endif
             <div class="absolute inset-0 opacity-40" style="background-image:radial-gradient(circle at 18% 40%, rgba(255,255,255,.18), transparent 42%), radial-gradient(circle at 82% 18%, rgba(251,146,60,.35), transparent 38%);"></div>
         </div>
         <div class="px-5 pb-6 sm:px-8 sm:pb-8">
@@ -78,8 +81,8 @@
                 @foreach($products as $product)
                     <a href="{{ route('products.show', $product->slug) }}" class="group overflow-hidden rounded-2xl border border-slate-200/80 bg-white transition hover:border-orange-200 hover:shadow-md">
                         <div class="aspect-[4/3] bg-slate-100">
-                            @if($product->main_image)
-                                <img src="{{ asset('storage/'.$product->main_image) }}" alt="{{ $product->localizedName() }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]" loading="lazy">
+                            @if($product->displayImageUrl())
+                                <img src="{{ $product->displayImageUrl() }}" alt="{{ $product->localizedName() }}" class="h-full w-full object-cover transition group-hover:scale-[1.02]" loading="lazy">
                             @else
                                 <div class="flex h-full w-full items-center justify-center text-sm text-slate-400">{{ __('ui.no_image') }}</div>
                             @endif

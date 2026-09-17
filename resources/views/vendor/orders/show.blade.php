@@ -306,4 +306,16 @@
         </div>
     </div>
 </div>
+
+<div class="card p-4 mt-3">
+    <h2 class="h6">Sipariş sorusu</h2>
+    <p class="small text-muted">Müşteriyle sipariş özelinde yazışın. Platform dışı iletişim yasaktır.</p>
+    <form method="POST" action="{{ route('vendor.orders.questions.store', $order) }}" class="mb-3">
+        @csrf
+        <input type="text" name="subject" class="form-control form-control-sm mb-2" placeholder="Konu (opsiyonel)" maxlength="180">
+        <textarea name="body" class="form-control form-control-sm" rows="3" required maxlength="2000" placeholder="Sorunuz"></textarea>
+        <button class="btn btn-sm btn-primary mt-2">Gönder</button>
+    </form>
+    <a href="{{ route('vendor.order-questions.index') }}" class="btn btn-sm btn-outline-primary">Sipariş soruları paneli</a>
+</div>
 @endsection

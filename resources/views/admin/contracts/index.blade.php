@@ -9,6 +9,7 @@
             <div class="text-muted small">Kayıt/checkout gibi akışlarda kullanılan metinler.</div>
         </div>
         <a href="{{ route('admin.contracts.create') }}" class="btn btn-primary">+ Yeni sözleşme</a>
+        <form method="POST" action="{{ route('admin.contracts.generate') }}">@csrf<button class="btn btn-outline-primary">Şablonları oluştur / güncelle</button></form>
     </div>
 
     <div class="card">
@@ -55,6 +56,37 @@
 
     <div class="mt-3">
         {{ $contracts->links() }}
+    </div>
+
+    <div class="card mt-4">
+        <div class="p-3 border-bottom d-flex flex-wrap gap-2 align-items-center justify-content-between">
+            <span class="fw-semibold">Satıcı sözleşme durumları</span>
+            <div class="btn-group btn-group-sm">
+                <a class="btn btn-outline-secondary {{ request('status') === null ? 'active' : '' }}" href="{{ route('admin.contracts.index') }}">Tümü</a>
+                <a class="btn btn-outline-secondary {{ request('status') === 'accepted' ? 'active' : '' }}" href="{{ route('admin.contracts.index', ['status' => 'accepted']) }}">Onaylı</a>
+                <a class="btn btn-outline-secondary {{ request('status') === 'pending' ? 'active' : '' }}" href="{{ route('admin.contracts.index', ['status' => 'pending']) }}">Bekleyen</a>
+                <a class="btn btn-outline-secondary {{ request('status') === 'missing' ? 'active' : '' }}" href="{{ route('admin.contracts.index', ['status' => 'missing']) }}">Eksik</a>
+                <a class="btn btn-outline-secondary {{ request('status') === 'suspended' ? 'active' : '' }}" href="{{ route('admin.contracts.index', ['status' => 'suspended']) }}">Askı</a>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <thead><tr><th>Satıcı</th><th>Onaylı</th><th>Bekleyen</th><th>Eksik</th><th>Askı</th></tr></thead>
+                <tbody>
+                @forelse($vendorStatuses ?? [] as $row)
+                    <tr>
+                        <td>{{ $row['vendor']->name }} <code>#{{ $row['vendor']->id }}</code></td>
+                        <td>{{ $row['accepted'] }}</td>
+                        <td>{{ $row['pending'] }}</td>
+                        <td>{{ !empty($row['missing']) ? 'Evet' : 'Hayır' }}</td>
+                        <td>{{ $row['suspended'] ? 'Evet' : 'Hayır' }}</td>
+                    </tr>
+                @empty
+                    <tr><td colspan="4" class="text-muted px-3 py-3">Kayıt yok.</td></tr>
+                @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 @endsection
 

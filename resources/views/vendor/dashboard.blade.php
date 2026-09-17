@@ -8,6 +8,13 @@
     use App\Domain\OrderStatus;
 @endphp
 
+@if(($pendingContractsCount ?? 0) > 0)
+<div class="alert alert-warning small mb-4">
+    Onay bekleyen sözleşme: <strong>{{ $pendingContractsCount }}</strong>
+    <a href="{{ route('vendor.contracts.index') }}" class="alert-link">Sözleşmelere git</a>
+</div>
+@endif
+
 <div class="row g-3 mb-4">
     <div class="col-6 col-md-3">
         <div class="card p-3 h-100 shadow-sm border-0" style="background: linear-gradient(135deg, #ecfdf5, #ffffff);">

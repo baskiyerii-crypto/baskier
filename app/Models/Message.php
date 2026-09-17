@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Message extends Model
 {
-    protected $fillable = ['conversation_id', 'user_id', 'is_from_vendor', 'body', 'blocked'];
+    protected $fillable = ['conversation_id', 'user_id', 'is_from_vendor', 'body', 'display_body', 'blocked', 'moderation_flags'];
 
     protected $casts = [
         'blocked' => 'boolean',
+        'moderation_flags' => 'array',
     ];
 
     public function conversation(): BelongsTo
@@ -26,17 +27,6 @@ class Message extends Model
     /** Yönlendirme (link, telefon, whatsapp vb.) tespiti */
     public static function containsRedirect(string $body): bool
     {
-        $patterns = [
-            '/https?:\/\//i',
-            '/www\./i',
-            '/\d{10,}/', // telefon
-            '/whatsapp|wa\.me|telegram|@\w+/i',
-        ];
-        foreach ($patterns as $p) {
-            if (preg_match($p, $body)) {
-                return true;
-            }
-        }
-        return false;
+        return app(\App\Services\ModerationService::class)->isHardBlocked($body);
     }
 }

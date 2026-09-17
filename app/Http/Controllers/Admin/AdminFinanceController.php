@@ -9,6 +9,7 @@ use App\Models\Setting;
 use App\Models\VendorBalanceTransaction;
 use App\Services\AdminDashboardService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AdminFinanceController extends Controller
@@ -16,9 +17,15 @@ class AdminFinanceController extends Controller
     public function index(Request $request, AdminDashboardService $dashboard)
     {
         $metrics = $dashboard->metrics();
-        $payments = Payment::query()->with('order')->latest()->paginate(20, ['*'], 'payments_page');
-        $transactions = VendorBalanceTransaction::query()->with('vendor')->latest()->paginate(20, ['*'], 'tx_page');
-        $orders = Order::query()->with(['user', 'vendor'])->latest()->paginate(20, ['*'], 'orders_page');
+        $payments = Schema::hasTable('payments')
+            ? Payment::query()->with('order')->latest()->paginate(20, ['*'], 'payments_page')
+            : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20, 1, ['pageName' => 'payments_page']);
+        $transactions = Schema::hasTable('vendor_balance_transactions')
+            ? VendorBalanceTransaction::query()->with('vendor')->latest()->paginate(20, ['*'], 'tx_page')
+            : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20, 1, ['pageName' => 'tx_page']);
+        $orders = Schema::hasTable('orders')
+            ? Order::query()->with(['user', 'vendor'])->latest()->paginate(20, ['*'], 'orders_page')
+            : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20, 1, ['pageName' => 'orders_page']);
 
         return view('admin.finance.index', compact('metrics', 'payments', 'transactions', 'orders'));
     }
