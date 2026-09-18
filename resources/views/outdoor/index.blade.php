@@ -50,7 +50,7 @@
                 @auth
                     <form method="POST" action="{{ auth()->user()->isVendor() ? route('outdoor-panel.plans.store') : route('customer.outdoor.plans.store') }}">
                         @csrf
-                        <button class="by-btn-cta">Plan talebi gönder</button>
+                        <button class="by-btn-cta">{{ auth()->user()->isVendor() ? 'Karşı satıcıya plan talebi' : 'Plan talebi gönder' }}</button>
                     </form>
                 @else
                     <a class="by-btn-cta" href="{{ route('login') }}">Giriş yapıp gönder</a>

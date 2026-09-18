@@ -987,4 +987,91 @@ class OutdoorVerticalTest extends TestCase
         $this->assertEquals(10.0, (float) $vendor->fresh()->balance);
         $this->assertSame(0, $req2->quotes()->count());
     }
+
+    public function test_vendor_planner_accepts_counterparty_quote_and_exports_excel_with_osm(): void
+    {
+        [$aUser, $aVendor] = $this->outdoorVendor('Sahip A');
+        [$bUser, $bVendor] = $this->outdoorVendor('Sahip B');
+        $cat = $this->outdoorCategory();
+        $faceA = $this->publishFace($aVendor, $cat, 'Karşı Pano', 41.0123, 29.0456);
+        $start = now()->addDays(12)->toDateString();
+        $end = now()->addDays(22)->toDateString();
+
+        $this->actingAs($bUser)->get(route('outdoor-panel.dashboard'))
+            ->assertOk()
+            ->assertSee('Pano seç')
+            ->assertSee('Planlarım');
+
+        $plan = app(OutdoorPlanService::class)->submit(
+            $bUser,
+            [['inventory_id' => $faceA->id, 'starts_on' => $start, 'ends_on' => $end]],
+            OohPlan::PLANNER_VENDOR,
+            $bVendor,
+            'B2B plan'
+        );
+        $req = $plan->vendorRequests()->where('vendor_id', $aVendor->id)->firstOrFail();
+        $quote = app(OutdoorPlanService::class)->quote($req, $aUser, 1800, 'b2b', true);
+
+        $this->actingAs($bUser)->get(route('outdoor-panel.plans.show', $plan))
+            ->assertOk()
+            ->assertSee('1.800,00')
+            ->assertSee('Bu satıcıyı onayla');
+
+        $this->actingAs($bUser)->post(route('outdoor-panel.plans.accept', [$plan, $req, $quote]), [
+            'share_my_contact' => '1',
+            'accept_vendor_contact' => '1',
+            'accept_consent' => '1',
+            'accept_consent_scrolled_at' => now()->toIso8601String(),
+        ])->assertRedirect(route('outdoor-panel.plans.show', $plan));
+
+        $order = Order::query()->where('type', 'outdoor')->first();
+        $this->assertNotNull($order);
+        $this->assertSame($bUser->id, (int) $order->user_id);
+        $this->assertSame($aVendor->id, (int) $order->vendor_id);
+        $this->assertSame(0.0, (float) $order->commission_amount);
+
+        $plansXls = $this->actingAs($bUser)->get(route('outdoor-panel.plans.export'));
+        $plansXls->assertOk();
+        $plansText = $this->xlsxPlainText($plansXls);
+        $this->assertStringContainsString('openstreetmap.org', $plansText);
+        $this->assertStringContainsString('mlat=', $plansText);
+        $this->assertStringNotContainsString((string) $aVendor->phone, $plansText);
+        $this->assertStringNotContainsString((string) $bVendor->phone, $plansText);
+
+        $reqXls = $this->actingAs($aUser)->get(route('outdoor-panel.requests.export', ['status' => 'accepted']));
+        $reqXls->assertOk();
+        $reqText = $this->xlsxPlainText($reqXls);
+        $this->assertStringContainsString('openstreetmap.org', $reqText);
+
+        $field = User::factory()->create(['role' => 'vendor', 'vendor_id' => $bVendor->id]);
+        VendorMember::create([
+            'vendor_id' => $bVendor->id,
+            'user_id' => $field->id,
+            'staff_role' => VendorMember::ROLE_FIELD,
+        ]);
+        $this->actingAs($field)->get(route('outdoor-panel.plans.export'))->assertForbidden();
+        $this->actingAs($field)->get(route('outdoor-panel.dashboard'))
+            ->assertOk()
+            ->assertDontSee('Pano seç');
+    }
+
+    private function xlsxPlainText(\Illuminate\Testing\TestResponse $response): string
+    {
+        $binary = method_exists($response, 'streamedContent') ? $response->streamedContent() : $response->getContent();
+        $tmp = tempnam(sys_get_temp_dir(), 'oohxls');
+        file_put_contents($tmp, $binary);
+        $zip = new \ZipArchive;
+        $this->assertTrue($zip->open($tmp) === true);
+        $chunks = [];
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $name = $zip->getNameIndex($i);
+            if (is_string($name) && str_ends_with($name, '.xml')) {
+                $chunks[] = (string) $zip->getFromIndex($i);
+            }
+        }
+        $zip->close();
+        @unlink($tmp);
+
+        return implode("\n", $chunks);
+    }
 }

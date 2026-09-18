@@ -2,7 +2,19 @@
 @section('title', 'Açık hava talepleri')
 @section('content')
 @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
-<h1 class="h5 mb-3">Gelen plan talepleri</h1>
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h1 class="h5 mb-0">Gelen plan talepleri</h1>
+    <a class="btn btn-outline-secondary btn-sm" href="{{ route('outdoor-panel.requests.export', array_filter(['status' => $status ?? null])) }}">Excel indir</a>
+</div>
+<form method="GET" class="d-flex gap-2 mb-3">
+    <select name="status" class="form-select form-select-sm" style="max-width:12rem">
+        <option value="">Tüm durumlar</option>
+        @foreach(['pending' => 'Bekleyen', 'quoted' => 'Teklifli', 'accepted' => 'Kabul'] as $value => $label)
+            <option value="{{ $value }}" @selected(($status ?? '') === $value)>{{ $label }}</option>
+        @endforeach
+    </select>
+    <button class="btn btn-sm btn-outline-primary">Filtrele</button>
+</form>
 @if($requests->isEmpty())
     <div class="card p-4 text-muted">Talep yok.</div>
 @else

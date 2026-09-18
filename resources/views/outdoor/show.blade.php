@@ -75,7 +75,7 @@
                 @csrf
                 <label class="text-xs font-semibold">Başlangıç<input type="date" name="starts_on" class="by-input mt-1" required min="{{ now()->toDateString() }}"></label>
                 <label class="text-xs font-semibold">Bitiş<input type="date" name="ends_on" class="by-input mt-1" required min="{{ now()->toDateString() }}"></label>
-                <button class="by-btn-cta w-full">Plan talebine ekle</button>
+                <button class="by-btn-cta w-full">{{ auth()->user()?->isVendor() ? 'Karşı satıcıya plan talebi' : 'Plan talebine ekle' }}</button>
             </form>
         </div>
     </div>

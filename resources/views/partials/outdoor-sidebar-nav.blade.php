@@ -38,6 +38,8 @@
 @endif
 
 @if(! $isField)
+    <a href="{{ route('outdoor.index') }}" class="nav-link {{ request()->routeIs('outdoor.index','outdoor.show') ? 'active' : '' }}"><span>Pano seç</span></a>
+    <a href="{{ route('outdoor-panel.plans.index') }}" class="nav-link {{ request()->routeIs('outdoor-panel.plans.*') ? 'active' : '' }}"><span>Planlarım</span></a>
     <a href="{{ route('outdoor-panel.requests.index') }}" class="nav-link {{ request()->routeIs('outdoor-panel.requests.*') ? 'active' : '' }}"><span>Talepler @include('partials.nav-count-badge', ['count' => $nav['outdoor_requests'] ?? 0])</span></a>
     <a href="{{ route('outdoor-panel.representations.index') }}" class="nav-link {{ request()->routeIs('outdoor-panel.representations.*') ? 'active' : '' }}"><span>{{ $isAgency ? 'Bağlı sahipler' : 'Ajanslarım' }} @include('partials.nav-count-badge', ['count' => $nav['outdoor_invites'] ?? 0])</span></a>
 @endif

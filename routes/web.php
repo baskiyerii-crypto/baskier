@@ -301,12 +301,15 @@ Route::middleware(['auth', 'role:vendor', 'vendor.not_suspended'])->prefix('acik
     Route::delete('envanter/{inventory}', [VendorOutdoorInventoryController::class, 'destroy'])->name('inventories.destroy');
     Route::get('panolar', [VendorOutdoorInventoryController::class, 'pool'])->name('pool');
     Route::get('talepler', [VendorOutdoorRequestController::class, 'index'])->name('requests.index');
+    Route::get('talepler/export', [VendorOutdoorRequestController::class, 'exportRequests'])->name('requests.export');
     Route::get('talepler/{vendorRequest}', [VendorOutdoorRequestController::class, 'show'])->name('requests.show');
     Route::post('talepler/{vendorRequest}/teklif', [VendorOutdoorRequestController::class, 'quote'])->name('requests.quote');
     Route::post('talepler/{vendorRequest}/red', [VendorOutdoorRequestController::class, 'decline'])->name('requests.decline');
     Route::get('planlar', [VendorOutdoorRequestController::class, 'myPlans'])->name('plans.index');
     Route::post('planlar', [VendorOutdoorRequestController::class, 'storePlan'])->name('plans.store');
+    Route::get('planlar/export', [VendorOutdoorRequestController::class, 'exportPlans'])->name('plans.export');
     Route::get('planlar/{plan}', [VendorOutdoorRequestController::class, 'showPlan'])->name('plans.show');
+    Route::post('planlar/{plan}/talep/{vendorRequest}/teklif/{quote}/sec', [VendorOutdoorRequestController::class, 'acceptPlan'])->name('plans.accept');
     Route::get('ekip', [VendorOutdoorOpsController::class, 'staffIndex'])->name('staff');
     Route::post('ekip', [VendorOutdoorOpsController::class, 'staffInvite'])->name('staff.invite');
     Route::post('ekip/olustur', [VendorOutdoorOpsController::class, 'storeCrew'])->name('staff.crews.store');
