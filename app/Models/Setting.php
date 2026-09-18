@@ -115,6 +115,23 @@ class Setting extends Model
         return (float) self::get('outdoor_monthly_fee', 249);
     }
 
+    public static function outdoorQuotingEnabled(): bool
+    {
+        $v = self::get('outdoor_quoting_enabled', '1');
+
+        return $v === '1' || $v === 'true' || $v === 'on' || $v === true;
+    }
+
+    public static function outdoorQuoteFeeThreshold(): float
+    {
+        return (float) self::get('outdoor_quote_fee_threshold', 0);
+    }
+
+    public static function outdoorQuoteFee(): float
+    {
+        return (float) self::get('outdoor_quote_fee', 0);
+    }
+
     public static function platformExpenses(): float
     {
         return (float) self::get('platform_expenses', 0);

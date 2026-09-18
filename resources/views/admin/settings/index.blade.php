@@ -139,6 +139,20 @@
                     <label class="form-label fw-semibold">Açık hava (OOH) aylık ücreti (₺)</label>
                     <input type="number" name="outdoor_monthly_fee" class="form-control" value="{{ old('outdoor_monthly_fee', $outdoor_monthly_fee ?? 249) }}" min="0" max="100000" step="0.01">
                 </div>
+                <div class="form-check form-switch mb-3">
+                    <input type="checkbox" class="form-check-input" role="switch" name="outdoor_quoting_enabled" value="1" id="outdoor_quoting_enabled" @checked(old('outdoor_quoting_enabled', $outdoor_quoting_enabled ?? '1') == '1')>
+                    <label class="form-check-label" for="outdoor_quoting_enabled">Açık hava teklifi açık</label>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Teklif başı eşik (₺)</label>
+                    <input type="number" name="outdoor_quote_fee_threshold" class="form-control" value="{{ old('outdoor_quote_fee_threshold', $outdoor_quote_fee_threshold ?? 0) }}" min="0" max="10000000" step="0.01">
+                    <div class="form-text">Bu tutarın üzerindeki tekliflerden teklif başı ücret alınır.</div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Teklif başı ücret (₺)</label>
+                    <input type="number" name="outdoor_quote_fee" class="form-control" value="{{ old('outdoor_quote_fee', $outdoor_quote_fee ?? 0) }}" min="0" max="100000" step="0.01">
+                    <div class="form-text">0 ise kesinti yoktur. Satıcı bakiyesinden düşülür.</div>
+                </div>
 
                 <hr class="my-4">
                 <h2 class="h6 fw-bold mb-3">Yasal kimlik (sözleşme şablonları)</h2>

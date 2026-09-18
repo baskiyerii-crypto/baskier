@@ -24,6 +24,9 @@ class AdminSettingsController extends Controller
             'quotes_monthly_fee' => Setting::get('quotes_monthly_fee', 199),
             'ozalit_monthly_fee' => Setting::get('ozalit_monthly_fee', 199),
             'outdoor_monthly_fee' => Setting::get('outdoor_monthly_fee', 249),
+            'outdoor_quoting_enabled' => Setting::get('outdoor_quoting_enabled', '1'),
+            'outdoor_quote_fee_threshold' => Setting::get('outdoor_quote_fee_threshold', 0),
+            'outdoor_quote_fee' => Setting::get('outdoor_quote_fee', 0),
             'legal_company_title' => Setting::get('legal_company_title'),
             'legal_address' => Setting::get('legal_address'),
             'legal_tax_office' => Setting::get('legal_tax_office'),
@@ -65,6 +68,9 @@ class AdminSettingsController extends Controller
             'quotes_monthly_fee' => ['required', 'numeric', 'min:0', 'max:100000'],
             'ozalit_monthly_fee' => ['nullable', 'numeric', 'min:0', 'max:100000'],
             'outdoor_monthly_fee' => ['nullable', 'numeric', 'min:0', 'max:100000'],
+            'outdoor_quoting_enabled' => ['nullable', 'boolean'],
+            'outdoor_quote_fee_threshold' => ['nullable', 'numeric', 'min:0', 'max:10000000'],
+            'outdoor_quote_fee' => ['nullable', 'numeric', 'min:0', 'max:100000'],
             'legal_company_title' => ['nullable', 'string', 'max:255'],
             'legal_address' => ['nullable', 'string', 'max:500'],
             'legal_tax_office' => ['nullable', 'string', 'max:120'],
@@ -95,9 +101,10 @@ class AdminSettingsController extends Controller
 
         Setting::set('float_whatsapp_enabled', $request->boolean('float_whatsapp_enabled') ? '1' : '0');
         Setting::set('float_call_enabled', $request->boolean('float_call_enabled') ? '1' : '0');
+        Setting::set('outdoor_quoting_enabled', $request->boolean('outdoor_quoting_enabled') ? '1' : '0');
 
         foreach ($validated as $key => $value) {
-            if (in_array($key, ['platform_logo', 'float_whatsapp_enabled', 'float_call_enabled'], true)) {
+            if (in_array($key, ['platform_logo', 'float_whatsapp_enabled', 'float_call_enabled', 'outdoor_quoting_enabled'], true)) {
                 continue;
             }
             if ($key === 'payout_weekdays') {

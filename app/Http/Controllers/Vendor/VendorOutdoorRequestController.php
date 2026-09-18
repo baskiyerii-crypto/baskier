@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Vendor;
 use App\Http\Controllers\Controller;
 use App\Models\OohPlan;
 use App\Models\OohVendorRequest;
+use App\Models\Setting;
 use App\Services\OutdoorPlanBasket;
 use App\Services\OutdoorPlanService;
 use App\Services\OutdoorStaffService;
@@ -55,8 +56,18 @@ class VendorOutdoorRequestController extends Controller
         $this->staff->assertCanOperate($request->user(), $vendor);
         $vendorRequest->load(['plan.items.inventory.images', 'plan.planner', 'quotes']);
         $quotedItems = $this->plans->itemsCoveredByRequest($vendorRequest);
+        $quotingEnabled = Setting::outdoorQuotingEnabled();
+        $quoteFee = Setting::outdoorQuoteFee();
+        $quoteFeeThreshold = Setting::outdoorQuoteFeeThreshold();
 
-        return view('vendor.outdoor.request-show', compact('vendor', 'vendorRequest', 'quotedItems'));
+        return view('vendor.outdoor.request-show', compact(
+            'vendor',
+            'vendorRequest',
+            'quotedItems',
+            'quotingEnabled',
+            'quoteFee',
+            'quoteFeeThreshold'
+        ));
     }
 
     public function quote(Request $request, OohVendorRequest $vendorRequest)

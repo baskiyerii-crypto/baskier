@@ -69,7 +69,7 @@ class AdminDashboardService
         $subscriptionFees = 0;
         if (Schema::hasTable('vendor_balance_transactions')) {
             $subscriptionFees = abs((float) VendorBalanceTransaction::query()
-                ->where('type', 'subscription_fee')
+                ->whereIn('type', ['subscription_fee', 'outdoor_quote_fee'])
                 ->sum('amount'));
         }
 

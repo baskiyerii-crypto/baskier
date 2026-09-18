@@ -13,6 +13,7 @@ use App\Models\Order;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Models\VendorMember;
+use App\Models\Setting;
 use App\Services\OutdoorPlanService;
 use App\Services\OutdoorProofService;
 use App\Services\OutdoorStaffService;
@@ -933,5 +934,57 @@ class OutdoorVerticalTest extends TestCase
         $this->post('/acik-hava-giris', ['phone' => '05557776655', 'password' => 'password'])
             ->assertRedirect(route('saha.login'));
         $this->assertGuest();
+    }
+
+    public function test_outdoor_quote_fee_respects_switch_threshold_and_once_per_request(): void
+    {
+        [$user, $vendor] = $this->outdoorVendor();
+        $cat = $this->outdoorCategory();
+        $face = $this->publishFace($vendor, $cat, 'Ücret Pano');
+        $customer = User::factory()->create(['role' => 'customer']);
+        $start = now()->addDays(10)->toDateString();
+        $end = now()->addDays(20)->toDateString();
+        $plans = app(OutdoorPlanService::class);
+        $plan = $plans->submit($customer, [
+            ['inventory_id' => $face->id, 'starts_on' => $start, 'ends_on' => $end],
+        ]);
+        $req = $plan->vendorRequests()->firstOrFail();
+
+        Setting::set('outdoor_quoting_enabled', '0');
+        try {
+            $plans->quote($req, $user, 2000, 'kapali', true);
+            $this->fail('Kapalı teklif istisna fırlatmalı.');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('kapalı', $e->getMessage());
+        }
+
+        Setting::set('outdoor_quoting_enabled', '1');
+        Setting::set('outdoor_quote_fee_threshold', '1000');
+        Setting::set('outdoor_quote_fee', '50');
+        $vendor->update(['balance' => 200]);
+
+        $plans->quote($req, $user, 500, 'alt', true);
+        $this->assertEquals(200.0, (float) $vendor->fresh()->balance);
+
+        $plans->quote($req, $user, 2000, 'ust', true);
+        $this->assertEquals(150.0, (float) $vendor->fresh()->balance);
+
+        $plans->quote($req, $user, 2500, 'tekrar', true);
+        $this->assertEquals(150.0, (float) $vendor->fresh()->balance);
+
+        $face2 = $this->publishFace($vendor, $cat, 'İkinci Pano', 41.1, 29.1);
+        $plan2 = $plans->submit($customer, [
+            ['inventory_id' => $face2->id, 'starts_on' => $start, 'ends_on' => $end],
+        ]);
+        $req2 = $plan2->vendorRequests()->firstOrFail();
+        $vendor->update(['balance' => 10]);
+        try {
+            $plans->quote($req2, $user, 2000, 'yetersiz', true);
+            $this->fail('Yetersiz bakiye istisna fırlatmalı.');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('yetersiz', $e->getMessage());
+        }
+        $this->assertEquals(10.0, (float) $vendor->fresh()->balance);
+        $this->assertSame(0, $req2->quotes()->count());
     }
 }

@@ -102,6 +102,9 @@ class OutdoorPlanService
     public function quote(OohVendorRequest $request, User $actor, float $amount, ?string $note, bool $vendorConsented): OohQuote
     {
         $this->staff->assertCanOperate($actor, $request->vendor);
+        if (! Setting::outdoorQuotingEnabled()) {
+            throw new RuntimeException('Açık hava teklifi şu an kapalı.');
+        }
         if (! in_array($request->status, [OohVendorRequest::STATUS_PENDING, OohVendorRequest::STATUS_QUOTED], true)) {
             throw new RuntimeException('Bu talebe teklif verilemez.');
         }
@@ -110,6 +113,8 @@ class OutdoorPlanService
         }
 
         return DB::transaction(function () use ($request, $amount, $note, $vendorConsented) {
+            $this->chargeQuoteFeeIfNeeded($request, $amount);
+
             $quote = OohQuote::create([
                 'ooh_vendor_request_id' => $request->id,
                 'vendor_id' => $request->vendor_id,
@@ -137,6 +142,43 @@ class OutdoorPlanService
 
             return $quote;
         });
+    }
+
+    private function chargeQuoteFeeIfNeeded(OohVendorRequest $request, float $amount): void
+    {
+        $fee = Setting::outdoorQuoteFee();
+        $threshold = Setting::outdoorQuoteFeeThreshold();
+        if ($fee <= 0 || $amount < $threshold) {
+            return;
+        }
+
+        $vendor = Vendor::query()->whereKey($request->vendor_id)->lockForUpdate()->first();
+        if (! $vendor) {
+            throw new RuntimeException('Satıcı bulunamadı.');
+        }
+
+        $already = $vendor->balanceTransactions()
+            ->where('type', 'outdoor_quote_fee')
+            ->where('reference_type', 'ooh_vendor_request')
+            ->where('reference_id', $request->id)
+            ->exists();
+        if ($already) {
+            return;
+        }
+
+        if ((float) $vendor->balance < $fee) {
+            throw new RuntimeException('Teklif ücreti için bakiye yetersiz. Önce bakiye yükleyin.');
+        }
+
+        $vendor->decrement('balance', $fee);
+        $vendor->balanceTransactions()->create([
+            'amount' => -$fee,
+            'type' => 'outdoor_quote_fee',
+            'reference_type' => 'ooh_vendor_request',
+            'reference_id' => $request->id,
+            'description' => 'Açık hava teklif ücreti',
+            'balance_after' => (float) $vendor->fresh()->balance,
+        ]);
     }
 
     public function decline(OohVendorRequest $request, User $actor): void

@@ -12,13 +12,20 @@
     @endforeach
 </ul>
 @if(in_array($vendorRequest->status, ['pending','quoted']))
+@if(empty($quotingEnabled))
+    <div class="alert alert-warning">Teklif şu an kapalı.</div>
+@else
 <form method="POST" action="{{ route('outdoor-panel.requests.quote', $vendorRequest) }}" class="card p-3 mb-3">
     @csrf
+    @if(($quoteFee ?? 0) > 0)
+        <p class="small text-muted">₺{{ number_format($quoteFeeThreshold ?? 0, 2, ',', '.') }} ve üzeri teklifte bakiyeden ₺{{ number_format($quoteFee, 2, ',', '.') }} düşer (talep başına bir kez).</p>
+    @endif
     <div class="mb-2"><label class="form-label">Tutar (₺)</label><input type="number" step="0.01" min="1" name="amount" class="form-control" required></div>
     <div class="mb-2"><label class="form-label">Not</label><textarea name="note" class="form-control" rows="2"></textarea></div>
     <label class="small d-flex gap-2 mb-2"><input type="checkbox" name="share_my_contact" value="1" required> {{ __('panel.consent_share_vendor_to_customer') }}</label>
     <button class="btn btn-primary btn-sm">Teklif gönder</button>
 </form>
+@endif
 <form method="POST" action="{{ route('outdoor-panel.requests.decline', $vendorRequest) }}" onsubmit="return confirm('Reddedilsin mi?');">@csrf<button class="btn btn-outline-danger btn-sm">Reddet</button></form>
 @endif
 @if($vendorRequest->status === 'accepted')
