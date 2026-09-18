@@ -104,7 +104,14 @@
                 <h1 class="page-title mb-0">@yield('title', 'Panel')</h1>
             </div>
             <div class="user-menu">
-                @if($sidebarVendor && ! $sidebarVendor->prefersOutdoorPanel())
+            @php
+                $hybridLink = false;
+                try {
+                    $hybridLink = $sidebarVendor && ! $sidebarVendor->prefersOutdoorPanel();
+                } catch (\Throwable) {
+                }
+            @endphp
+            @if($hybridLink)
                     <a href="{{ route('vendor.dashboard') }}">Satıcı paneli</a>
                 @endif
                 <span class="badge bg-light text-dark border">{{ auth()->user()?->publicCode() }}</span>
@@ -115,7 +122,14 @@
             </div>
         </header>
         <div class="vendor-content">
-            @if($sidebarVendor && ! $sidebarVendor->hasActiveOutdoorModule())
+            @php
+                $moduleInactive = false;
+                try {
+                    $moduleInactive = $sidebarVendor && ! $sidebarVendor->hasActiveOutdoorModule();
+                } catch (\Throwable) {
+                }
+            @endphp
+            @if($moduleInactive)
                 <div class="alert alert-warning">Açık hava modülü henüz aktif değil. Hesap → Modüller üzerinden açabilirsiniz.</div>
             @endif
             @if(session('success'))<div class="alert alert-success alert-dismissible fade show small mb-3">{{ session('success') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>@endif

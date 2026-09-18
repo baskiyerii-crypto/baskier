@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class OohRepresentation extends Model
 {
+    protected $table = 'ooh_representations';
+
     public const STATUS_PENDING = 'pending';
 
     public const STATUS_ACTIVE = 'active';

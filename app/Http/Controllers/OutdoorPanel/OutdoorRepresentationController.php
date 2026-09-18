@@ -15,8 +15,12 @@ class OutdoorRepresentationController extends Controller
     public function index(Request $request)
     {
         $vendor = $this->vendor($request);
-        $asOwner = $vendor->outdoorRepresentationsAsOwner()->with('agency.user')->latest()->get();
-        $asAgency = $vendor->outdoorRepresentationsAsAgency()->with('owner.user')->latest()->get();
+        $asOwner = collect();
+        $asAgency = collect();
+        if ($this->representations->tablesReady()) {
+            $asOwner = $vendor->outdoorRepresentationsAsOwner()->with('agency.user')->latest()->get();
+            $asAgency = $vendor->outdoorRepresentationsAsAgency()->with('owner.user')->latest()->get();
+        }
 
         return view('outdoor-panel.representations', compact('vendor', 'asOwner', 'asAgency'));
     }

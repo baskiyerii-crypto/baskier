@@ -262,12 +262,12 @@ Route::middleware(['auth', 'role:vendor', 'vendor.not_suspended'])->prefix('sati
 
 Route::permanentRedirect('/satici-panel/outdoor', '/acik-hava-panel/envanter');
 Route::permanentRedirect('/satici-panel/outdoor/yeni', '/acik-hava-panel/envanter/yeni');
-Route::get('/satici-panel/outdoor/{inventory}/duzenle', fn (string $inventory) => redirect('/acik-hava-panel/envanter/'.$inventory.'/duzenle', 301));
+Route::permanentRedirect('/satici-panel/outdoor/{inventory}/duzenle', '/acik-hava-panel/envanter/{inventory}/duzenle');
 Route::permanentRedirect('/satici-panel/outdoor-havuz', '/acik-hava-panel/panolar');
 Route::permanentRedirect('/satici-panel/outdoor-talepler', '/acik-hava-panel/talepler');
-Route::get('/satici-panel/outdoor-talepler/{vendorRequest}', fn (string $vendorRequest) => redirect('/acik-hava-panel/talepler/'.$vendorRequest, 301));
+Route::permanentRedirect('/satici-panel/outdoor-talepler/{vendorRequest}', '/acik-hava-panel/talepler/{vendorRequest}');
 Route::permanentRedirect('/satici-panel/outdoor-planlar', '/acik-hava-panel/planlar');
-Route::get('/satici-panel/outdoor-planlar/{plan}', fn (string $plan) => redirect('/acik-hava-panel/planlar/'.$plan, 301));
+Route::permanentRedirect('/satici-panel/outdoor-planlar/{plan}', '/acik-hava-panel/planlar/{plan}');
 Route::permanentRedirect('/satici-panel/outdoor-ekip', '/acik-hava-panel/ekip');
 Route::permanentRedirect('/satici-panel/outdoor-isler', '/acik-hava-panel/isler');
 Route::permanentRedirect('/satici-panel/outdoor-raporlar', '/acik-hava-panel/raporlar');
