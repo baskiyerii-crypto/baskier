@@ -61,6 +61,108 @@
         wrap.classList.remove('d-none');
     };
 
+    const fillGeoFromReverse = (gpsRoot, lat, lng) => {
+        const form = gpsRoot.closest('form');
+        if (!form) return;
+        const geoRoot = form.querySelector('[data-geo-root]');
+        if (!geoRoot) return;
+        fetch('/api/v1/geography/reverse?lat=' + encodeURIComponent(lat) + '&lng=' + encodeURIComponent(lng))
+            .then((r) => r.json())
+            .then((json) => {
+                const data = json.data || {};
+                const country = geoRoot.querySelector('[data-geo-country]');
+                const city = geoRoot.querySelector('[data-geo-city]');
+                const district = geoRoot.querySelector('[data-geo-district]');
+                const il = geoRoot.querySelector('[data-geo-il]');
+                const ilce = geoRoot.querySelector('[data-geo-ilce]');
+                if (!data.country_code || !country) return;
+                const applyPlaces = () => {
+                    const keepCity = data.city || '';
+                    const keepDistrict = data.district || '';
+                    const keepIl = data.turkiye_il_id ? String(data.turkiye_il_id) : '';
+                    const keepIlce = data.turkiye_ilce_id ? String(data.turkiye_ilce_id) : '';
+                    return fetch('/api/v1/geography/places?country=' + encodeURIComponent(data.country_code))
+                        .then((r) => r.json())
+                        .then((placeJson) => {
+                            const cities = placeJson.data?.cities || [];
+                            if (city) {
+                                city.innerHTML = '';
+                                const first = document.createElement('option');
+                                first.value = '';
+                                first.textContent = geoRoot.getAttribute('data-empty-country') === '1' ? 'Tüm şehirler' : 'Şehir seçin';
+                                city.appendChild(first);
+                                let matched = false;
+                                cities.forEach((row) => {
+                                    const name = row.name || row;
+                                    const id = row.id || '';
+                                    const opt = document.createElement('option');
+                                    opt.value = name;
+                                    opt.textContent = name;
+                                    if (id) opt.dataset.id = id;
+                                    if ((keepCity && name === keepCity) || (keepIl && String(id) === keepIl)) {
+                                        opt.selected = true;
+                                        matched = true;
+                                    }
+                                    city.appendChild(opt);
+                                });
+                                if (!matched && keepCity) {
+                                    const opt = document.createElement('option');
+                                    opt.value = keepCity;
+                                    opt.textContent = keepCity;
+                                    if (keepIl) opt.dataset.id = keepIl;
+                                    opt.selected = true;
+                                    city.appendChild(opt);
+                                }
+                                city.disabled = false;
+                            }
+                            if (il) il.value = keepIl || (city?.options[city.selectedIndex]?.dataset?.id || '');
+                            const cityName = city ? city.value : keepCity;
+                            if (!cityName) return;
+                            const params = new URLSearchParams({ country: data.country_code, city: cityName });
+                            if (il && il.value) params.set('province_id', il.value);
+                            return fetch('/api/v1/geography/places?' + params.toString())
+                                .then((r) => r.json())
+                                .then((distJson) => {
+                                    const districts = distJson.data?.districts || [];
+                                    if (!district) return;
+                                    district.innerHTML = '';
+                                    const first = document.createElement('option');
+                                    first.value = '';
+                                    first.textContent = geoRoot.getAttribute('data-empty-country') === '1' ? 'Tüm ilçeler' : 'İlçe seçin';
+                                    district.appendChild(first);
+                                    let matched = false;
+                                    districts.forEach((row) => {
+                                        const name = row.name || row;
+                                        const id = row.id || '';
+                                        const opt = document.createElement('option');
+                                        opt.value = name;
+                                        opt.textContent = name;
+                                        if (id) opt.dataset.id = id;
+                                        if ((keepDistrict && name === keepDistrict) || (keepIlce && String(id) === keepIlce)) {
+                                            opt.selected = true;
+                                            matched = true;
+                                        }
+                                        district.appendChild(opt);
+                                    });
+                                    if (!matched && keepDistrict) {
+                                        const opt = document.createElement('option');
+                                        opt.value = keepDistrict;
+                                        opt.textContent = keepDistrict;
+                                        if (keepIlce) opt.dataset.id = keepIlce;
+                                        opt.selected = true;
+                                        district.appendChild(opt);
+                                    }
+                                    district.disabled = false;
+                                    if (ilce) ilce.value = keepIlce || (district.options[district.selectedIndex]?.dataset?.id || '');
+                                });
+                        });
+                };
+                country.value = data.country_code;
+                applyPlaces();
+            })
+            .catch(() => {});
+    };
+
     const capture = (root) => new Promise((resolve, reject) => {
         const latInput = root.querySelector('[data-gps-lat]');
         const lngInput = root.querySelector('[data-gps-lng]');
@@ -92,6 +194,7 @@
                 setStatus('Konum alındı' + (acc ? ' (±' + acc + ' m)' : '') + '.', true);
                 showMap(root.querySelector('[data-gps-map-wrap]'), root.querySelector('[data-gps-map]'), lat, lng);
                 if (btn) btn.disabled = false;
+                fillGeoFromReverse(root, lat, lng);
                 resolve({ lat, lng });
             },
             (err) => {

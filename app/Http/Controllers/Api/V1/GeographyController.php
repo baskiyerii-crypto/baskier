@@ -6,11 +6,22 @@ use App\Models\Address;
 use App\Models\TurkiyeIl;
 use App\Models\TurkiyeIlce;
 use App\Models\TurkiyeMahalle;
+use App\Services\OutdoorReverseGeocodeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 
 class GeographyController extends ApiController
 {
+    public function reverse(Request $request, OutdoorReverseGeocodeService $geocode)
+    {
+        $validated = $request->validate([
+            'lat' => ['required', 'numeric', 'between:-90,90'],
+            'lng' => ['required', 'numeric', 'between:-180,180'],
+        ]);
+
+        return $this->ok($geocode->lookup((float) $validated['lat'], (float) $validated['lng']));
+    }
+
     public function countries()
     {
         $rows = \App\Models\Country::catalog()->map(fn ($c) => [

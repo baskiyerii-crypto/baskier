@@ -18,7 +18,7 @@
     $emptyCountry = $emptyCountry ?? false;
     $selectClass = $selectClass ?? 'form-select';
     $isTr = strtoupper((string) $countryValue) === 'TR';
-    $hasCountry = $countryValue !== '';
+    $hasCountry = $countryValue !== '' && strtoupper((string) $countryValue) !== 'ALL';
     $cityEmptyLabel = $emptyCountry ? __('panel.all_cities') : __('panel.select_city');
     $districtEmptyLabel = $emptyCountry ? __('panel.all_districts') : __('panel.select_district');
     $cityRows = [];
@@ -48,7 +48,7 @@
             <label class="form-label" for="{{ $idPrefix }}-country">{{ __('panel.country') }}</label>
             <select name="{{ $nameCountry }}" id="{{ $idPrefix }}-country" class="{{ $selectClass }}" data-geo-country>
                 @if($emptyCountry)
-                    <option value="">{{ __('panel.all_countries') }}</option>
+                    <option value="all" @selected($countryValue === '' || strtoupper((string) $countryValue) === 'ALL')>{{ __('panel.all_countries') }}</option>
                 @endif
                 @foreach($countries as $c)
                     <option value="{{ $c->code }}" @selected(strtoupper((string) $countryValue) === $c->code)>{{ $c->localizedName() }}</option>
@@ -127,7 +127,7 @@
             if (ilce) ilce.value = country && country.value === 'TR' ? selectedId(district) : '';
         };
         const setEnabled = () => {
-            const on = !!(country && country.value);
+            const on = !!(country && country.value && country.value !== 'all');
             if (city) city.disabled = !on;
             if (district) district.disabled = !on;
         };
@@ -136,7 +136,7 @@
             const keepIl = il ? il.value : '';
             fillSelect(city, [], emptyCity(root), '', '');
             fillSelect(district, [], emptyDistrict(root), '', '');
-            if (!country || !country.value) {
+            if (!country || !country.value || country.value === 'all') {
                 syncHidden();
                 setEnabled();
                 return;

@@ -19,6 +19,7 @@ class OutdoorInventoryService
         private OutdoorStaffService $staff,
         private WorldPlaceService $places,
         private OutdoorLocationInsightService $insights,
+        private OutdoorReverseGeocodeService $reverseGeocode,
     ) {}
 
     /**
@@ -31,6 +32,7 @@ class OutdoorInventoryService
         $this->assertOutdoorCategory((int) $payload['category_id']);
 
         return DB::transaction(function () use ($vendor, $actor, $payload, $images) {
+            $payload = $this->fillGeoFromGpsIfNeeded($payload);
             $geo = $this->geoFromPayload($payload);
             $row = [
                 'vendor_id' => $vendor->id,
@@ -94,6 +96,7 @@ class OutdoorInventoryService
             $this->assertOutdoorCategory((int) $payload['category_id']);
         }
 
+        $payload = $this->fillGeoFromGpsIfNeeded($payload);
         $geo = $this->geoFromPayload($payload);
         unset($payload['images']);
         $inventory->fill($payload);
@@ -256,6 +259,60 @@ class OutdoorInventoryService
                 'sort_order' => $order,
             ]);
         }
+    }
+
+    /**
+     * Replace all images for an inventory (used by bulk ZIP import).
+     *
+     * @param  list<UploadedFile>  $images
+     */
+    public function replaceImages(OohInventory $inventory, User $actor, array $images): void
+    {
+        $this->staff->assertCanEditInventory($actor, $inventory);
+        foreach ($inventory->images as $img) {
+            if ($img->path) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($img->path);
+            }
+            $img->delete();
+        }
+        $this->storeImages($inventory, $images);
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     * @return array<string, mixed>
+     */
+    private function fillGeoFromGpsIfNeeded(array $payload): array
+    {
+        $hasCity = trim((string) ($payload['city'] ?? '')) !== ''
+            || ! empty($payload['turkiye_il_id']);
+        $hasCountry = trim((string) ($payload['country_code'] ?? '')) !== '';
+        if ($hasCity && $hasCountry) {
+            return $payload;
+        }
+        $lat = isset($payload['lat']) ? (float) $payload['lat'] : null;
+        $lng = isset($payload['lng']) ? (float) $payload['lng'] : null;
+        if ($lat === null || $lng === null) {
+            return $payload;
+        }
+        $geo = $this->reverseGeocode->lookup($lat, $lng);
+        if (! $hasCountry && $geo['country_code']) {
+            $payload['country_code'] = $geo['country_code'];
+        }
+        if (! $hasCity && $geo['city']) {
+            $payload['city'] = $geo['city'];
+        }
+        if (trim((string) ($payload['district'] ?? '')) === '' && $geo['district']) {
+            $payload['district'] = $geo['district'];
+        }
+        if (empty($payload['turkiye_il_id']) && $geo['turkiye_il_id']) {
+            $payload['turkiye_il_id'] = $geo['turkiye_il_id'];
+        }
+        if (empty($payload['turkiye_ilce_id']) && $geo['turkiye_ilce_id']) {
+            $payload['turkiye_ilce_id'] = $geo['turkiye_ilce_id'];
+        }
+
+        return $payload;
     }
 
     /**

@@ -16,9 +16,12 @@ use App\Models\VendorMember;
 use App\Models\Setting;
 use App\Services\OutdoorPlanService;
 use App\Services\OutdoorProofService;
+use App\Services\OutdoorReverseGeocodeService;
 use App\Services\OutdoorStaffService;
+use Database\Seeders\WorldPlacesIso3166Seeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -1053,6 +1056,178 @@ class OutdoorVerticalTest extends TestCase
         $this->actingAs($field)->get(route('outdoor-panel.dashboard'))
             ->assertOk()
             ->assertDontSee('Pano seç');
+    }
+
+    public function test_catalog_defaults_to_turkey_and_all_clears_filter(): void
+    {
+        [$user, $vendor] = $this->outdoorVendor();
+        $cat = $this->outdoorCategory();
+        $tr = $this->publishFace($vendor, $cat, 'TR Varsayilan Pano');
+        OohInventory::create([
+            'vendor_id' => $vendor->id,
+            'category_id' => $cat->id,
+            'title' => 'Berlin Face',
+            'lat' => 52.5,
+            'lng' => 13.4,
+            'country_code' => 'DE',
+            'city' => 'Berlin',
+            'list_price' => 800,
+            'price_unit' => OohInventory::UNIT_MONTH,
+            'status' => OohInventory::STATUS_PUBLISHED,
+        ]);
+
+        $this->get(route('outdoor.index'))
+            ->assertOk()
+            ->assertSee('TR Varsayilan Pano')
+            ->assertDontSee('Berlin Face')
+            ->assertSee('value="TR"', false);
+
+        $this->get(route('outdoor.index', ['ulke' => 'all']))
+            ->assertOk()
+            ->assertSee('TR Varsayilan Pano')
+            ->assertSee('Berlin Face');
+
+        $this->assertTrue($tr->isPublished());
+    }
+
+    public function test_reverse_geocode_fills_turkey_il_ilce(): void
+    {
+        $this->seedLocationFacts();
+        Http::fake([
+            'nominatim.openstreetmap.org/*' => Http::response([
+                'address' => [
+                    'country_code' => 'tr',
+                    'province' => 'İstanbul',
+                    'town' => 'Kadıköy',
+                ],
+            ], 200),
+        ]);
+
+        $geo = app(OutdoorReverseGeocodeService::class)->lookup(41.0, 29.0);
+        $this->assertSame('TR', $geo['country_code']);
+        $this->assertSame('İstanbul', $geo['city']);
+        $this->assertSame('Kadıköy', $geo['district']);
+        $this->assertSame(34, $geo['turkiye_il_id']);
+        $this->assertSame(1103, $geo['turkiye_ilce_id']);
+
+        $this->getJson('/api/v1/geography/reverse?lat=41&lng=29')
+            ->assertOk()
+            ->assertJsonPath('data.country_code', 'TR')
+            ->assertJsonPath('data.city', 'İstanbul');
+    }
+
+    public function test_world_places_iso_seed_exposes_foreign_states(): void
+    {
+        $this->seed(WorldPlacesIso3166Seeder::class);
+        $this->assertDatabaseHas('world_places', [
+            'country_code' => 'DE',
+            'city' => 'Bayern',
+            'district' => '',
+        ]);
+        $this->getJson('/api/v1/geography/places?country=DE')
+            ->assertOk()
+            ->assertJsonFragment(['name' => 'Bayern']);
+    }
+
+    public function test_inventory_bulk_excel_import_export_and_zip_images(): void
+    {
+        Storage::fake('public');
+        [$user, $vendor] = $this->outdoorVendor();
+        $cat = $this->outdoorCategory();
+        $existing = $this->publishFace($vendor, $cat, 'Eski Pano', 41.01, 29.01);
+
+        $this->actingAs($user)->get(route('outdoor-panel.inventories.export'))->assertOk();
+
+        $rows = [
+            [
+                null,
+                'Yeni Toplu Pano',
+                $cat->id,
+                'aciklama',
+                'TR',
+                'İstanbul',
+                'Kadıköy',
+                'Adr',
+                41.02,
+                29.02,
+                'PRM-NEW',
+                1200,
+                'month',
+                3,
+                2,
+                'N',
+                1,
+                'pano.jpg',
+                null,
+            ],
+            [
+                $existing->id,
+                'Eski Pano Guncel',
+                $cat->id,
+                null,
+                'TR',
+                'İstanbul',
+                'Kadıköy',
+                null,
+                41.01,
+                29.01,
+                'PRM-'.$vendor->id,
+                1500,
+                'month',
+                null,
+                null,
+                null,
+                0,
+                null,
+                'published',
+            ],
+        ];
+        $tmpXlsx = 'tmp/ooh-bulk-test-'.$vendor->id.'.xlsx';
+        \Illuminate\Support\Facades\Storage::disk('local')->makeDirectory('tmp');
+        \Maatwebsite\Excel\Facades\Excel::store(new \App\Exports\OutdoorInventoryExport($rows), $tmpXlsx, 'local');
+        $fullPath = \Illuminate\Support\Facades\Storage::disk('local')->path($tmpXlsx);
+        $this->assertFileExists($fullPath);
+        $xlsx = new UploadedFile($fullPath, 'envanter.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', null, true);
+
+        $img = UploadedFile::fake()->image('pano.jpg', 40, 40);
+        $zipPath = tempnam(sys_get_temp_dir(), 'oohzip').'.zip';
+        $zip = new \ZipArchive;
+        $this->assertTrue($zip->open($zipPath, \ZipArchive::CREATE) === true);
+        $zip->addFile($img->getRealPath(), 'pano.jpg');
+        $zip->close();
+        $zipUpload = new UploadedFile($zipPath, 'images.zip', 'application/zip', null, true);
+
+        Http::fake();
+
+        $this->actingAs($user)->post(route('outdoor-panel.inventories.import'), [
+            'file' => $xlsx,
+            'images_zip' => $zipUpload,
+        ])->assertRedirect()->assertSessionHas('success');
+
+        $this->assertDatabaseHas('ooh_inventories', [
+            'vendor_id' => $vendor->id,
+            'title' => 'Yeni Toplu Pano',
+            'status' => OohInventory::STATUS_DRAFT,
+        ]);
+        $this->assertDatabaseHas('ooh_inventories', [
+            'id' => $existing->id,
+            'title' => 'Eski Pano Guncel',
+            'list_price' => 1500,
+        ]);
+        $new = OohInventory::query()->where('title', 'Yeni Toplu Pano')->first();
+        $this->assertNotNull($new);
+        $this->assertGreaterThan(0, $new->images()->count());
+
+        $field = User::factory()->create(['role' => 'vendor', 'vendor_id' => $vendor->id]);
+        VendorMember::create([
+            'vendor_id' => $vendor->id,
+            'user_id' => $field->id,
+            'staff_role' => VendorMember::ROLE_FIELD,
+        ]);
+        $this->actingAs($field)->get(route('outdoor-panel.inventories.export'))->assertForbidden();
+
+        @unlink($zipPath);
+        @unlink($fullPath);
     }
 
     private function xlsxPlainText(\Illuminate\Testing\TestResponse $response): string

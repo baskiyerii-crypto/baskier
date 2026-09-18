@@ -39,7 +39,7 @@
                 @endforeach
             </select>
             <button class="by-btn-primary">Filtrele</button>
-            <a href="{{ route('outdoor.index') }}" class="by-btn-secondary text-center">Sıfırla</a>
+            <a href="{{ route('outdoor.index', ['ulke' => 'TR']) }}" class="by-btn-secondary text-center">Sıfırla</a>
         </div>
     </form>
 

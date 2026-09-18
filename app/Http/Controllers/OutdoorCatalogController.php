@@ -20,7 +20,15 @@ class OutdoorCatalogController extends Controller
 {
     public function index(Request $request, OutdoorInventoryService $inventories, WorldPlaceService $places)
     {
-        $countryCode = strtoupper(trim((string) $request->query('ulke', '')));
+        $rawUlke = $request->query('ulke');
+        if ($rawUlke === null) {
+            $countryCode = 'TR';
+        } else {
+            $countryCode = strtoupper(trim((string) $rawUlke));
+            if ($countryCode === '' || $countryCode === 'ALL') {
+                $countryCode = '';
+            }
+        }
         $city = trim((string) $request->query('sehir', ''));
         $districtName = trim((string) $request->query('ilce_adi', ''));
         $provinceId = $request->integer('il') ?: null;

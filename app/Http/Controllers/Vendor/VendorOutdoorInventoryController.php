@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Vendor;
 
+use App\Exports\OutdoorInventoryExport;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Country;
 use App\Models\OohInventory;
 use App\Models\TurkiyeIl;
 use App\Models\TurkiyeIlce;
+use App\Services\OutdoorInventoryBulkService;
 use App\Services\OutdoorInventoryService;
 use App\Services\OutdoorOccupancyService;
 use App\Services\OutdoorRepresentationService;
@@ -16,6 +18,7 @@ use App\Services\WorldPlaceService;
 use App\Support\IsoCountries;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
+use Maatwebsite\Excel\Facades\Excel;
 use RuntimeException;
 
 class VendorOutdoorInventoryController extends Controller
@@ -26,6 +29,7 @@ class VendorOutdoorInventoryController extends Controller
         private OutdoorOccupancyService $occupancy,
         private WorldPlaceService $places,
         private OutdoorRepresentationService $representations,
+        private OutdoorInventoryBulkService $bulk,
     ) {}
 
     private function vendor(Request $request)
@@ -66,6 +70,61 @@ class VendorOutdoorInventoryController extends Controller
         $canMutate = true;
 
         return view('vendor.outdoor.inventories-index', compact('vendor', 'items', 'role', 'canMutate'));
+    }
+
+    public function export(Request $request)
+    {
+        $vendor = $this->vendor($request);
+        $this->assertOwner($vendor);
+        $user = $request->user();
+        $this->staff->assertCanManageInventory($user, $vendor);
+        if ($this->staff->isFieldOperator($user, $vendor)) {
+            abort(403, 'Saha personeli Excel indiremez.');
+        }
+
+        return Excel::download(
+            new OutdoorInventoryExport($this->bulk->exportRows($vendor, $user)),
+            'acik-hava-envanter.xlsx'
+        );
+    }
+
+    public function downloadTemplate(Request $request)
+    {
+        $vendor = $this->vendor($request);
+        $this->assertOwner($vendor);
+        $this->staff->assertCanManageInventory($request->user(), $vendor);
+
+        return Excel::download(
+            new OutdoorInventoryExport([]),
+            'acik-hava-envanter-sablon.xlsx'
+        );
+    }
+
+    public function import(Request $request)
+    {
+        $vendor = $this->vendor($request);
+        $this->assertOwner($vendor);
+        $this->staff->assertCanManageInventory($request->user(), $vendor);
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:xlsx,xls,csv', 'max:10240'],
+            'images_zip' => ['nullable', 'file', 'mimes:zip', 'max:51200'],
+        ]);
+        try {
+            $result = $this->bulk->import(
+                $vendor,
+                $request->user(),
+                $request->file('file'),
+                $request->file('images_zip')
+            );
+        } catch (RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+        $msg = 'İçe aktarma: '.$result['created'].' yeni, '.$result['updated'].' güncellendi.';
+        if ($result['errors'] !== []) {
+            return back()->with('success', $msg)->with('error', implode(' ', array_slice($result['errors'], 0, 5)));
+        }
+
+        return back()->with('success', $msg);
     }
 
     public function create(Request $request)

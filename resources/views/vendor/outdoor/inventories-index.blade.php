@@ -3,12 +3,27 @@
 @section('content')
 @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
 @if(session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
     <h1 class="h5 mb-0">Envanter</h1>
     @if($canMutate ?? ($role === 'owner'))
-        <a href="{{ route('outdoor-panel.inventories.create') }}" class="btn btn-primary btn-sm">Yeni pano</a>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ route('outdoor-panel.inventories.export') }}" class="btn btn-outline-secondary btn-sm">Excel indir</a>
+            <a href="{{ route('outdoor-panel.inventories.template') }}" class="btn btn-outline-secondary btn-sm">Şablon</a>
+            <a href="{{ route('outdoor-panel.inventories.create') }}" class="btn btn-primary btn-sm">Yeni pano</a>
+        </div>
     @endif
 </div>
+@if($canMutate ?? ($role === 'owner'))
+    <form method="POST" action="{{ route('outdoor-panel.inventories.import') }}" enctype="multipart/form-data" class="card p-3 mb-3">
+        @csrf
+        <p class="small text-muted mb-2">Toplu yükleme: Excel (id boş = yeni) + isteğe bağlı görsel ZIP. <code>image_files</code> doluysa o panonun görselleri değişir.</p>
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+            <input type="file" name="file" accept=".xlsx,.xls,.csv" class="form-control form-control-sm" style="max-width:220px" required>
+            <input type="file" name="images_zip" accept=".zip" class="form-control form-control-sm" style="max-width:220px">
+            <button class="btn btn-outline-primary btn-sm">Yükle</button>
+        </div>
+    </form>
+@endif
 @if($items->isEmpty())
     <div class="card p-4 text-muted">Henüz pano yok.</div>
 @else

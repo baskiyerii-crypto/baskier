@@ -291,6 +291,9 @@ Route::permanentRedirect('/satici-panel/outdoor-raporlar', '/acik-hava-panel/rap
 Route::middleware(['auth', 'role:vendor', 'vendor.not_suspended'])->prefix('acik-hava-panel')->name('outdoor-panel.')->group(function () {
     Route::get('/', [OutdoorDashboardController::class, 'index'])->name('dashboard');
     Route::get('envanter', [VendorOutdoorInventoryController::class, 'index'])->name('inventories.index');
+    Route::get('envanter/export', [VendorOutdoorInventoryController::class, 'export'])->name('inventories.export');
+    Route::get('envanter/sablon', [VendorOutdoorInventoryController::class, 'downloadTemplate'])->name('inventories.template');
+    Route::post('envanter/import', [VendorOutdoorInventoryController::class, 'import'])->name('inventories.import');
     Route::get('envanter/yeni', [VendorOutdoorInventoryController::class, 'create'])->name('inventories.create');
     Route::post('envanter', [VendorOutdoorInventoryController::class, 'store'])->name('inventories.store');
     Route::get('envanter/{inventory}/duzenle', [VendorOutdoorInventoryController::class, 'edit'])->name('inventories.edit');
