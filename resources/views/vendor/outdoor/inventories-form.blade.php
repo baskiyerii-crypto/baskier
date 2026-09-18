@@ -45,16 +45,15 @@
             'emptyCountry' => false,
         ])
         <div class="mb-3 mt-3"><label class="form-label fw-semibold small">Adres</label><input name="address" class="form-control" value="{{ old('address', $inventory->address ?? '') }}"></div>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label class="form-label fw-semibold small">Enlem (Lat) <span class="text-danger">*</span></label>
-                <input type="number" step="any" inputmode="decimal" name="lat" class="form-control number-only-input" value="{{ old('lat', $inventory->lat ?? '') }}" required placeholder="Örn: 41.0082">
-            </div>
-            <div class="col-md-6 mb-3">
-                <label class="form-label fw-semibold small">Boylam (Lng) <span class="text-danger">*</span></label>
-                <input type="number" step="any" inputmode="decimal" name="lng" class="form-control number-only-input" value="{{ old('lng', $inventory->lng ?? '') }}" required placeholder="Örn: 28.9784">
-            </div>
-        </div>
+        @include('partials.gps-capture', [
+            'gpsMode' => 'button',
+            'gpsLat' => $inventory->lat ?? '',
+            'gpsLng' => $inventory->lng ?? '',
+            'gpsButton' => isset($inventory) ? 'Konum değişti' : 'Konumu al',
+            'gpsHint' => isset($inventory)
+                ? 'Pano yerinden oynadıysa telefonda bu butona basın; konum otomatik yenilenir.'
+                : 'Panonun yanında durup butona basın. Enlem/boylam elle girilmez.',
+        ])
         <div class="mb-3"><label class="form-label fw-semibold small">Ruhsat no</label><input name="permit_no" class="form-control" value="{{ old('permit_no', $inventory->permit_no ?? '') }}"></div>
         <div class="row">
             <div class="col-md-6 mb-3">

@@ -20,12 +20,16 @@
             @endif
             <form method="POST" action="{{ route('vendor.outdoor.jobs.proof', $job) }}" enctype="multipart/form-data" class="mt-2">
                 @csrf
-                <input type="file" name="photo" accept="image/*" required class="form-control form-control-sm mb-1">
-                <div class="d-flex gap-2">
-                    <input name="lat" class="form-control form-control-sm" placeholder="lat" required>
-                    <input name="lng" class="form-control form-control-sm" placeholder="lng" required>
-                    <button class="btn btn-primary btn-sm">Kanıt yükle</button>
-                </div>
+                <input type="file" name="photo" accept="image/*" capture="environment" required class="form-control form-control-sm mb-1">
+                @include('partials.gps-capture', [
+                    'gpsMode' => 'submit',
+                    'gpsUseOld' => false,
+                    'gpsLat' => '',
+                    'gpsLng' => '',
+                    'gpsButton' => 'Konumu al',
+                    'gpsHint' => 'Fotoğrafı panonun yanında çekin. Kanıt yükleyince GPS otomatik alınır.',
+                ])
+                <button class="btn btn-primary btn-sm">Kanıt yükle</button>
             </form>
             @foreach($job->proofs as $p)
                 <div class="small mt-1">Kanıt #{{ $p->id }} · {{ $p->distance_m }} m · {{ $p->is_valid ? 'geçerli' : 'yarıçap dışı' }}</div>
