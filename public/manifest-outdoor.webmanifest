@@ -1,7 +1,7 @@
 {
   "name": "Outdoor BaskıYeri",
   "short_name": "Outdoor",
-  "start_url": "/acik-hava-giris",
+  "start_url": "/giris",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#059669",

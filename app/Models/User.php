@@ -103,6 +103,10 @@ class User extends Authenticatable
     public function vendorHomeRoute(): string
     {
         $vendor = $this->relationLoaded('vendor') ? $this->vendor : $this->vendor()->first();
+        if ($vendor && app(\App\Services\OutdoorStaffService::class)->isFieldOperator($this, $vendor)
+            && \Illuminate\Support\Facades\Route::has('outdoor-panel.jobs')) {
+            return 'outdoor-panel.jobs';
+        }
         if ($vendor && $vendor->prefersOutdoorPanel() && \Illuminate\Support\Facades\Route::has('outdoor-panel.dashboard')) {
             return 'outdoor-panel.dashboard';
         }

@@ -8,7 +8,7 @@
         <div class="mb-6 text-center">
             <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Hesabın</p>
             <h1 class="mt-1 text-3xl font-extrabold tracking-tight text-slate-900">Giriş yap</h1>
-            <p class="mt-2 text-sm text-slate-600">Tekliflerin, siparişlerin ve mesajların için.</p>
+            <p class="mt-2 text-sm text-slate-600">Müşteri, satıcı, açık hava ve saha — hepsi e-posta ve şifre ile.</p>
         </div>
 
         <div class="by-card p-6 md:p-8">

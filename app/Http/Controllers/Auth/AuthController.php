@@ -41,12 +41,6 @@ class AuthController extends Controller
                 return back()->withErrors(['email' => __('panel.account_disabled')])->onlyInput('email');
             }
 
-            if (app(OutdoorStaffService::class)->isFieldOperator($user)) {
-                Auth::logout();
-
-                return redirect()->route('saha.login')->with('info', 'Saha BaskıYeri uygulamasından telefon ile giriş yapın.');
-            }
-
             if (session()->has('pending_quote_request')) {
                 $data = session('pending_quote_request');
                 DB::transaction(function () use ($data, $user) {

@@ -1,7 +1,7 @@
 {
   "name": "Saha BaskıYeri",
   "short_name": "Saha",
-  "start_url": "/saha-giris",
+  "start_url": "/giris",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#1e3a5f",

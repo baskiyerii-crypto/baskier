@@ -21,7 +21,6 @@ use App\Http\Controllers\Admin\AdminVendorController;
 use App\Http\Controllers\Admin\AdminVendorPayoutRequestController;
 use App\Http\Controllers\Admin\AdminVerificationQueueController;
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\Auth\OutdoorAuthController;
 use App\Http\Controllers\Auth\OtpVerificationController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
@@ -133,10 +132,11 @@ Route::middleware('guest')->group(function () {
     Route::post('/giris', [AuthController::class, 'login'])->middleware('throttle:login');
     Route::get('/kayit', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/kayit', [AuthController::class, 'register'])->middleware('throttle:register');
-    Route::get('/acik-hava-giris', [OutdoorAuthController::class, 'showOutdoorForm'])->name('outdoor.login');
-    Route::post('/acik-hava-giris', [OutdoorAuthController::class, 'loginOutdoor'])->middleware('throttle:login');
-    Route::get('/saha-giris', [OutdoorAuthController::class, 'showSahaForm'])->name('saha.login');
-    Route::post('/saha-giris', [OutdoorAuthController::class, 'loginSaha'])->middleware('throttle:login');
+    // Eski PWA telefon kapıları → tek giriş /giris (e-posta + şifre)
+    Route::get('/acik-hava-giris', fn () => redirect()->route('login'))->name('outdoor.login');
+    Route::post('/acik-hava-giris', fn () => redirect()->route('login'));
+    Route::get('/saha-giris', fn () => redirect()->route('login'))->name('saha.login');
+    Route::post('/saha-giris', fn () => redirect()->route('login'));
 });
 Route::post('/cikis', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 

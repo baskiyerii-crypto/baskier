@@ -1,7 +1,7 @@
 {
   "name": "Satıcı BaskıYeri",
   "short_name": "Satıcı",
-  "start_url": "/satici-panel",
+  "start_url": "/giris",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ea580c",
