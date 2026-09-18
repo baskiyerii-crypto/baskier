@@ -95,25 +95,27 @@ class VendorOutdoorOpsController extends Controller
         $this->assertOwner($vendor);
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'max:32'],
+            'email' => ['required', 'email', 'max:255'],
             'password' => ['required', 'string', 'min:8'],
+            'phone' => ['nullable', 'string', 'max:32'],
             'crew_id' => ['nullable', 'integer'],
         ]);
         try {
             $this->staff->invite(
                 $vendor,
                 $request->user(),
-                $validated['phone'],
+                $validated['email'],
                 $validated['name'],
                 \App\Models\VendorMember::ROLE_FIELD,
                 $validated['password'],
-                ! empty($validated['crew_id']) ? (int) $validated['crew_id'] : null
+                ! empty($validated['crew_id']) ? (int) $validated['crew_id'] : null,
+                $validated['phone'] ?? null
             );
         } catch (RuntimeException $e) {
             return back()->with('error', $e->getMessage());
         }
 
-        return back()->with('success', 'Ekip üyesi eklendi.');
+        return back()->with('success', 'Ekip üyesi eklendi. /giris üzerinden e-posta ve şifre ile girer.');
     }
 
     public function storeGrant(Request $request)

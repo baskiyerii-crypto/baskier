@@ -880,14 +880,14 @@ class OutdoorVerticalTest extends TestCase
         $member = app(OutdoorStaffService::class)->invite(
             $owner,
             $ownerUser,
-            '05559998877',
+            'ali.saha@example.com',
             'Ali Saha',
             VendorMember::ROLE_FIELD,
             'password'
         );
         $member->load('user');
 
-        $this->post('/giris', ['email' => $member->user->email, 'password' => 'password'])
+        $this->post('/giris', ['email' => 'ali.saha@example.com', 'password' => 'password'])
             ->assertRedirect(route('outdoor-panel.jobs'));
         $this->assertAuthenticatedAs($member->user);
     }
@@ -910,6 +910,26 @@ class OutdoorVerticalTest extends TestCase
         $this->post('/giris', ['email' => 'saha-mail@example.com', 'password' => 'password'])
             ->assertRedirect(route('outdoor-panel.jobs'));
         $this->assertAuthenticatedAs($field);
+    }
+
+    public function test_owner_invites_field_with_email_and_password(): void
+    {
+        [$ownerUser, $owner] = $this->outdoorVendor();
+        $this->actingAs($ownerUser)->post(route('outdoor-panel.staff.invite'), [
+            'name' => 'Mehmet Saha',
+            'email' => 'mehmet.saha@example.com',
+            'password' => 'secret123',
+            'phone' => '05551234567',
+        ])->assertRedirect();
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'mehmet.saha@example.com',
+            'vendor_id' => $owner->id,
+            'role' => 'vendor',
+        ]);
+        auth()->logout();
+        $this->post('/giris', ['email' => 'mehmet.saha@example.com', 'password' => 'secret123'])
+            ->assertRedirect(route('outdoor-panel.jobs'));
     }
 
     public function test_outdoor_quote_fee_respects_switch_threshold_and_once_per_request(): void

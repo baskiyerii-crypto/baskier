@@ -26,10 +26,12 @@
         <form method="POST" action="{{ route('outdoor-panel.staff.invite') }}" class="card p-3 h-100">
             @csrf
             <h2 class="h6">Kişi ekle</h2>
+            <p class="small text-muted mb-2">Saha personeli <strong>/giris</strong> sayfasından e-posta ve şifre ile girer.</p>
             <div class="row g-2">
-                <div class="col-md-6"><input name="name" class="form-control" placeholder="Ad" required></div>
-                <div class="col-md-6"><input name="phone" type="tel" class="form-control" placeholder="Telefon (05xx)" required></div>
+                <div class="col-md-6"><input name="name" class="form-control" placeholder="Ad" value="{{ old('name') }}" required></div>
+                <div class="col-md-6"><input name="email" type="email" class="form-control" placeholder="E-posta" value="{{ old('email') }}" required></div>
                 <div class="col-md-6"><input name="password" type="password" class="form-control" placeholder="Şifre (en az 8 karakter)" required></div>
+                <div class="col-md-6"><input name="phone" type="tel" class="form-control" placeholder="Telefon (opsiyonel)" value="{{ old('phone') }}"></div>
                 <div class="col-md-6">
                     <select name="crew_id" class="form-select">
                         <option value="">Ekipsiz saha</option>
@@ -50,7 +52,7 @@
         <tbody>
         @forelse($members as $m)
             <tr>
-                <td>{{ $m->user?->name }} ({{ $m->user?->phone ?: $m->user?->email }})</td>
+                <td>{{ $m->user?->name }} <span class="small text-muted">({{ $m->user?->email }})</span></td>
                 <td>{{ $m->crew?->name ?: '—' }}</td>
                 <td>{{ $m->staff_role === 'owner' ? 'Sahip' : 'Saha' }}</td>
             </tr>

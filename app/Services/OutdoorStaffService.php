@@ -12,7 +12,6 @@ use App\Models\VendorMember;
 use App\Support\Phone;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
 use RuntimeException;
 
 class OutdoorStaffService
@@ -278,12 +277,27 @@ class OutdoorStaffService
         $grant->update(['revoked_at' => now()]);
     }
 
-    public function invite(Vendor $vendor, User $actor, string $phone, string $name, string $staffRole = VendorMember::ROLE_FIELD, ?string $password = null, ?int $crewId = null): VendorMember
-    {
+    public function invite(
+        Vendor $vendor,
+        User $actor,
+        string $email,
+        string $name,
+        string $staffRole = VendorMember::ROLE_FIELD,
+        ?string $password = null,
+        ?int $crewId = null,
+        ?string $phone = null,
+    ): VendorMember {
         $this->assertAccountOwner($actor, $vendor);
         $staffRole = VendorMember::ROLE_FIELD;
-        $normalized = Phone::normalize($phone);
-        if (! $normalized) {
+        $email = mb_strtolower(trim($email));
+        if ($email === '' || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw new RuntimeException('Geçerli bir e-posta girin.');
+        }
+        if (! $password || strlen($password) < 8) {
+            throw new RuntimeException('Şifre en az 8 karakter olmalı.');
+        }
+        $normalizedPhone = $phone ? Phone::normalize($phone) : null;
+        if ($phone && ! $normalizedPhone) {
             throw new RuntimeException('Geçerli bir telefon numarası girin.');
         }
         if ($crewId) {
@@ -293,30 +307,31 @@ class OutdoorStaffService
             }
         }
 
-        return DB::transaction(function () use ($vendor, $normalized, $name, $staffRole, $password, $crewId) {
-            $user = User::query()->whereIn('phone', Phone::lookupKeys($normalized))->first();
+        return DB::transaction(function () use ($vendor, $email, $name, $staffRole, $password, $crewId, $normalizedPhone) {
+            $user = User::query()->where('email', $email)->first();
             if ($user) {
                 if ($user->vendor_id && (int) $user->vendor_id !== (int) $vendor->id) {
-                    throw new RuntimeException('Bu telefon başka bir satıcıya bağlı.');
+                    throw new RuntimeException('Bu e-posta başka bir satıcıya bağlı.');
                 }
                 if ($user->role === 'customer' || $user->role === 'admin') {
-                    throw new RuntimeException('Bu telefon müşteri veya yönetici hesabına ait.');
+                    throw new RuntimeException('Bu e-posta müşteri veya yönetici hesabına ait.');
                 }
-                $user->update([
+                $payload = [
                     'name' => $name ?: $user->name,
-                    'phone' => $normalized,
                     'vendor_id' => $vendor->id,
                     'role' => 'vendor',
-                ]);
-                if ($password) {
-                    $user->update(['password' => $password]);
+                    'password' => $password,
+                ];
+                if ($normalizedPhone) {
+                    $payload['phone'] = $normalizedPhone;
                 }
+                $user->update($payload);
             } else {
                 $user = User::create([
                     'name' => $name,
-                    'email' => Phone::syntheticEmail($normalized),
-                    'phone' => $normalized,
-                    'password' => $password ?: Str::password(12),
+                    'email' => $email,
+                    'phone' => $normalizedPhone,
+                    'password' => $password,
                     'role' => 'vendor',
                     'vendor_id' => $vendor->id,
                     'is_active' => true,
