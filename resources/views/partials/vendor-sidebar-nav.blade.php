@@ -2,8 +2,7 @@
     $v = $v ?? auth()->user()?->vendor;
     $oohRole = $oohRole ?? null;
     $isField = $oohRole === 'field';
-    $tracksEmpty = ! $v || empty($v->registration_tracks);
-    $showProducts = ! $isField && ($tracksEmpty || $v->hasTrack('physical_products'));
+    $showProducts = ! $isField;
     $showQuotes = ! $isField && $v?->hasActiveQuotesModule();
     $showFreelancer = ! $isField && $v?->hasActiveFreelancerModule() && Route::has('vendor.freelancer.index');
     $showTabela = ! $isField && $v?->hasActiveTabelaModule() && Route::has('vendor.tabela.index');

@@ -23,11 +23,17 @@ class VendorProductController extends Controller
         return $vendor;
     }
 
-    private function assertPhysicalProductsTrack($vendor): void
+    private function ensurePhysicalProductsTrack($vendor): void
     {
-        if (! empty($vendor->registration_tracks) && ! $vendor->hasTrack('physical_products')) {
-            abort(403, __('panel.track_physical_products').' kolu gerekli.');
+        $tracks = $vendor->registration_tracks ?? [];
+        if ($tracks === [] || $vendor->hasTrack('physical_products')) {
+            return;
         }
+
+        $tracks[] = 'physical_products';
+        $vendor->forceFill([
+            'registration_tracks' => array_values(array_unique($tracks)),
+        ])->save();
     }
 
     public function index(Request $request)
@@ -55,7 +61,7 @@ class VendorProductController extends Controller
     public function create(Request $request)
     {
         $vendor = $this->getVendor($request);
-        $this->assertPhysicalProductsTrack($vendor);
+        $this->ensurePhysicalProductsTrack($vendor);
         if (! $vendor->hasApprovedTaxPlate()) {
             return redirect()->route('vendor.documents.index')
                 ->with('error', 'Fiziksel ürün eklemek için onaylı vergi levhası yüklemelisiniz.');
@@ -72,7 +78,7 @@ class VendorProductController extends Controller
     public function store(Request $request)
     {
         $vendor = $this->getVendor($request);
-        $this->assertPhysicalProductsTrack($vendor);
+        $this->ensurePhysicalProductsTrack($vendor);
         if (! $vendor->hasApprovedTaxPlate()) {
             return redirect()->route('vendor.documents.index')
                 ->with('error', 'Fiziksel ürün eklemek için onaylı vergi levhası yüklemelisiniz.');
