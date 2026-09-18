@@ -7,12 +7,19 @@ use App\Models\Order;
 use App\Models\Shipment;
 use App\Models\User;
 use App\Models\Vendor;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class VendorOrderWorkflowTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+        parent::tearDown();
+    }
 
     private function createVendorUser(): array
     {
@@ -313,6 +320,7 @@ class VendorOrderWorkflowTest extends TestCase
 
     public function test_vendor_payout_request_flow_and_overdraft_prevention(): void
     {
+        Carbon::setTestNow(Carbon::parse('2026-09-18 12:00:00'));
         [$user, $vendor] = $this->createVendorUser();
         $vendor->update(['balance' => 500.00]);
 

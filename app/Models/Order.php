@@ -13,7 +13,7 @@ class Order extends Model
         'order_number', 'user_id', 'vendor_id', 'contractor_user_id', 'type', 'quote_id', 'freelancer_job_id', 'ooh_vendor_request_id',
         'status', 'payment_status', 'subtotal', 'commission_rate', 'commission_amount', 'vendor_amount', 'payment_method',
         'paid_at', 'delivered_at', 'shipped_at', 'termin_due_at', 'tracking_number', 'shipping_label_path', 'carrier_code',
-        'commission_ready_at', 'payout_approved', 'payout_at',
+        'commission_ready_at', 'payout_approved', 'payout_at', 'balance_credited_at',
         'shipping_address', 'billing_address_id', 'shipping_address_id',
         'invoice_type', 'invoice_full_name', 'invoice_company_name', 'invoice_tax_number',
         'invoice_identity_number', 'invoice_tax_office', 'invoice_email', 'invoice_phone',
@@ -32,6 +32,7 @@ class Order extends Model
         'commission_ready_at' => 'datetime',
         'payout_approved' => 'boolean',
         'payout_at' => 'datetime',
+        'balance_credited_at' => 'datetime',
     ];
 
     public static function generateOrderNumber(): string

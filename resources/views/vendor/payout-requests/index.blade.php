@@ -1,9 +1,20 @@
-@extends('layouts.vendor')
+@extends($layout ?? 'layouts.vendor')
 
 @section('title', 'Hakediş & Para Çekme')
 
 @section('content')
-@php use App\Support\UiLabels; @endphp
+@php
+    use App\Support\UiLabels;
+    $isOutdoorPanel = $isOutdoorPanel ?? false;
+    $storeRoute = $isOutdoorPanel ? 'outdoor-panel.payout-requests.store' : 'vendor.payout-requests.store';
+    $minAmount = $minAmount ?? 10;
+    $defaultIban = old('iban', $vendor->payout_iban ?: 'TR');
+@endphp
+
+<div class="alert alert-light border small mb-4">
+    <strong>Hakediş kuralları</strong>
+    <p class="mb-0 mt-1">{{ $rulesText ?? '' }}</p>
+</div>
 
 <div class="row g-4">
     <!-- Sol Sütun: Yeni Ödeme / Para Çekme Talebi -->
@@ -26,31 +37,34 @@
 
         <div class="card border shadow-sm rounded-4 p-4">
             <h2 class="h6 fw-bold mb-2">Para Çekme Talebi Oluştur</h2>
-            <p class="small text-muted mb-3">Hakediş tutarınız onaylandıktan sonra belirttiğiniz IBAN hesabınıza havale/EFT ile transfer edilir.</p>
+            <p class="small text-muted mb-3">Hakediş cüzdanınıza düştükten sonra IBAN’ınıza havale yönetici onayından sonra yapılır.</p>
+            @if(! ($isPayoutDay ?? true))
+                <div class="alert alert-warning small">Bugün çekim günü değil. Talebinizi izin verilen günlerde gönderebilirsiniz.</div>
+            @endif
 
-            <form method="post" action="{{ route('vendor.payout-requests.store') }}">
+            <form method="post" action="{{ route($storeRoute) }}">
                 @csrf
                 <div class="mb-3">
                     <label class="form-label small fw-semibold">Çekilecek Tutar (₺)</label>
-                    <input type="number" id="payout-amount" name="amount" step="0.01" min="10" max="{{ $availableBalance }}" class="form-control rounded-3 number-only-input" required placeholder="ör. 500" value="{{ old('amount') }}">
-                    <div class="form-text">Minimum çekim tutarı ₺10,00'dir.</div>
+                    <input type="number" id="payout-amount" name="amount" step="0.01" min="{{ $minAmount }}" max="{{ $availableBalance }}" class="form-control rounded-3 number-only-input" required placeholder="ör. 500" value="{{ old('amount') }}">
+                    <div class="form-text">Minimum çekim tutarı ₺{{ number_format($minAmount, 2, ',', '.') }}'dir.</div>
                     @error('amount')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label small fw-semibold">Banka IBAN Numarası</label>
-                    <input type="text" id="iban-input" name="iban" class="form-control rounded-3 font-monospace text-uppercase" required placeholder="TR000000000000000000000000" maxlength="26" value="{{ old('iban', 'TR') }}">
+                    <input type="text" id="iban-input" name="iban" class="form-control rounded-3 font-monospace text-uppercase" required placeholder="TR000000000000000000000000" maxlength="26" value="{{ $defaultIban }}">
                     <div class="form-text">TR ile başlayan 26 haneli IBAN (sadece rakam giriniz).</div>
                     @error('iban')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label small fw-semibold">Banka Hesap Sahibi (Ad Soyad / Şirket)</label>
-                    <input type="text" name="account_holder" class="form-control rounded-3" required placeholder="Hesap sahibinin tam adı" value="{{ old('account_holder', $vendor->name) }}">
+                    <input type="text" name="account_holder" class="form-control rounded-3" required placeholder="Hesap sahibinin tam adı" value="{{ old('account_holder', $vendor->payout_account_holder ?: $vendor->name) }}">
                     @error('account_holder')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
                 </div>
 
-                <button type="submit" class="btn btn-success fw-semibold w-100 py-2" @disabled($availableBalance < 10)>
+                <button type="submit" class="btn btn-success fw-semibold w-100 py-2" @disabled($availableBalance < $minAmount || !($isPayoutDay ?? true))>
                     Ödeme Talebini Gönder
                 </button>
             </form>
@@ -70,7 +84,8 @@
                             <th>Tutar</th>
                             <th>Durum</th>
                             <th>Açıklama / Hesap</th>
-                            <th>Tarih</th>
+                            <th>Talep tarihi</th>
+                            <th>Onay / red tarihi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -84,15 +99,32 @@
                                         @else bg-warning text-dark @endif">
                                         {{ UiLabels::payoutRequestStatus($r->status) }}
                                     </span>
+                                    @if(($r->source ?? 'manual') === 'auto')
+                                        <div class="small text-muted">Otomatik</div>
+                                    @endif
                                 </td>
                                 <td class="text-muted small">
-                                    {{ $r->admin_note ? Str::limit($r->admin_note, 45) : '—' }}
+                                    {{ $r->iban ?: '' }} {{ $r->account_holder ? '· '.$r->account_holder : '' }}
+                                    @if($r->admin_note && $r->status !== 'pending')
+                                        <div>{{ Str::limit($r->admin_note, 45) }}</div>
+                                    @endif
                                 </td>
-                                <td class="text-muted">{{ $r->created_at->format('d.m.Y H:i') }}</td>
+                                <td class="text-muted">{{ optional($r->requested_at ?? $r->created_at)->format('d.m.Y H:i') }}</td>
+                                <td class="text-muted">
+                                    @if($r->approved_at)
+                                        {{ $r->approved_at->format('d.m.Y H:i') }}
+                                    @elseif($r->rejected_at)
+                                        {{ $r->rejected_at->format('d.m.Y H:i') }}
+                                    @elseif($r->processed_at)
+                                        {{ $r->processed_at->format('d.m.Y H:i') }}
+                                    @else
+                                        —
+                                    @endif
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="text-center text-muted py-5">
+                                <td colspan="5" class="text-center text-muted py-5">
                                     Henüz para çekme talebiniz bulunmuyor.
                                 </td>
                             </tr>

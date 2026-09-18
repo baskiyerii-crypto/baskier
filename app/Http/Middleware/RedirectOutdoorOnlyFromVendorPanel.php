@@ -25,6 +25,9 @@ class RedirectOutdoorOnlyFromVendorPanel
         if ($request->routeIs('vendor.balance.*') && Route::has('outdoor-panel.balance.index')) {
             return redirect()->route('outdoor-panel.balance.index');
         }
+        if ($request->routeIs('vendor.payout-requests.*') && Route::has('outdoor-panel.payout-requests.index')) {
+            return redirect()->route('outdoor-panel.payout-requests.index');
+        }
 
         return redirect()->route('outdoor-panel.dashboard');
     }

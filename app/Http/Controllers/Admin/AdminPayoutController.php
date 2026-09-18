@@ -29,17 +29,21 @@ class AdminPayoutController extends Controller
         return view('admin.payouts.index', compact('grouped', 'recentlyApproved'));
     }
 
-    public function approve(Request $request)
+    public function approve(Request $request, \App\Services\EarningsCreditService $credits)
     {
         $validated = $request->validate([
             'order_ids' => ['required', 'array'],
             'order_ids.*' => ['exists:orders,id'],
         ]);
-        Order::whereIn('id', $validated['order_ids'])
+        $orders = Order::whereIn('id', $validated['order_ids'])
             ->where('payout_approved', false)
             ->whereNotNull('commission_ready_at')
             ->where('commission_ready_at', '<=', now())
-            ->update(['payout_approved' => true, 'payout_at' => now()]);
-        return back()->with('success', count($validated['order_ids']) . ' siparis hakedis onaylandi.');
+            ->get();
+        foreach ($orders as $order) {
+            $credits->creditOrder($order);
+        }
+
+        return back()->with('success', $orders->count().' sipariş hakedişi cüzdana işlendi.');
     }
 }

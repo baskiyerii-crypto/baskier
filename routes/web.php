@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AdminBrandController;
 use App\Http\Controllers\Admin\AdminBusinessTypeController;
 use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminContractController;
+use App\Http\Controllers\Admin\AdminDocumentRequirementController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminFinanceController;
 use App\Http\Controllers\Admin\AdminMenuController;
@@ -24,6 +25,7 @@ use App\Http\Controllers\Auth\OtpVerificationController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\IyzicoCallbackController;
+use App\Http\Controllers\ShopierCallbackController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\Customer\CustomerAddressController;
 use App\Http\Controllers\Customer\CustomerDashboardController;
@@ -53,6 +55,7 @@ use App\Http\Controllers\Vendor\VendorFreelancerController;
 use App\Http\Controllers\Vendor\VendorMessageController;
 use App\Http\Controllers\Vendor\VendorOzalitController;
 use App\Http\Controllers\OutdoorPanel\OutdoorDashboardController;
+use App\Http\Controllers\OutdoorPanel\OutdoorDirectoryController;
 use App\Http\Controllers\OutdoorPanel\OutdoorRepresentationController;
 use App\Http\Controllers\Vendor\VendorOutdoorInventoryController;
 use App\Http\Controllers\Vendor\VendorOutdoorOpsController;
@@ -144,6 +147,7 @@ Route::middleware('auth')->prefix('teklif-talepleri')->name('quote-requests.')->
 // Ödeme callback ve webhook (harici çağrı)
 Route::post('/odeme/iyzico/callback', [IyzicoCallbackController::class, 'callback'])->name('payment.iyzico.callback')->middleware('throttle:webhook');
 Route::post('/odeme/iyzico/webhook', [IyzicoCallbackController::class, 'webhook'])->name('payment.iyzico.webhook')->middleware('throttle:webhook');
+Route::match(['get', 'post'], '/odeme/shopier/callback', [ShopierCallbackController::class, 'callback'])->name('payment.shopier.callback')->middleware('throttle:webhook');
 
 Route::middleware('auth')->group(function () {
     Route::get('/sepet', [CartController::class, 'index'])->name('cart.index');
@@ -296,6 +300,8 @@ Route::middleware(['auth', 'role:vendor', 'vendor.not_suspended'])->prefix('acik
     Route::post('isler/{occupancy}/kanit', [VendorOutdoorOpsController::class, 'proof'])->name('jobs.proof');
     Route::get('raporlar', [VendorOutdoorOpsController::class, 'claims'])->name('claims');
     Route::post('raporlar', [VendorOutdoorOpsController::class, 'storeClaim'])->name('claims.store');
+    Route::get('dizin', [OutdoorDirectoryController::class, 'index'])->name('directory');
+    Route::post('dizin/baglan', [OutdoorDirectoryController::class, 'connect'])->name('directory.connect');
     Route::get('temsil', [OutdoorRepresentationController::class, 'index'])->name('representations.index');
     Route::post('temsil', [OutdoorRepresentationController::class, 'invite'])->name('representations.invite');
     Route::post('temsil/{representation}/onayla', [OutdoorRepresentationController::class, 'accept'])->name('representations.accept');
@@ -306,6 +312,8 @@ Route::middleware(['auth', 'role:vendor', 'vendor.not_suspended'])->prefix('acik
     Route::post('moduller/aktiflestir', [VendorSubscriptionController::class, 'activate'])->name('subscriptions.activate');
     Route::get('bakiye', [VendorBalanceController::class, 'index'])->name('balance.index');
     Route::post('bakiye', [VendorBalanceController::class, 'topUp'])->name('balance.topup');
+    Route::get('odeme-talepleri', [VendorPayoutRequestWebController::class, 'index'])->name('payout-requests.index');
+    Route::post('odeme-talepleri', [VendorPayoutRequestWebController::class, 'store'])->name('payout-requests.store');
 });
 
 // Yönetici paneli
@@ -327,6 +335,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('urun-onaylari/{product}/reddet', [AdminProductModerationController::class, 'reject'])->name('product-approvals.reject');
     Route::get('settings', [AdminSettingsController::class, 'index'])->name('settings.index');
     Route::post('settings', [AdminSettingsController::class, 'update'])->name('settings.update');
+    Route::get('belge-sablonlari', [AdminDocumentRequirementController::class, 'index'])->name('document-requirements.index');
+    Route::post('belge-sablonlari', [AdminDocumentRequirementController::class, 'store'])->name('document-requirements.store');
+    Route::put('belge-sablonlari/{document_requirement_template}', [AdminDocumentRequirementController::class, 'update'])->name('document-requirements.update');
+    Route::delete('belge-sablonlari/{document_requirement_template}', [AdminDocumentRequirementController::class, 'destroy'])->name('document-requirements.destroy');
     Route::get('menu', [AdminMenuController::class, 'index'])->name('menu.index');
     Route::post('menu', [AdminMenuController::class, 'update'])->name('menu.update');
     Route::post('menu/reset', [AdminMenuController::class, 'reset'])->name('menu.reset');
@@ -344,6 +356,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('api-yonetimi', [AdminApiManagementController::class, 'index'])->name('api-management.index');
     Route::post('api-yonetimi', [AdminApiManagementController::class, 'update'])->name('api-management.update');
     Route::post('api-yonetimi/test-iyzico', [AdminApiManagementController::class, 'testIyzico'])->name('api-management.test-iyzico');
+    Route::post('api-yonetimi/test-shopier', [AdminApiManagementController::class, 'testShopier'])->name('api-management.test-shopier');
     Route::get('payouts', [AdminPayoutController::class, 'index'])->name('payouts.index');
     Route::post('payouts/approve', [AdminPayoutController::class, 'approve'])->name('payouts.approve');
     Route::get('destek-talepleri', [AdminSupportTicketWebController::class, 'index'])->name('support-tickets.index');

@@ -229,42 +229,42 @@
                 <span>{{ __('panel.nav_dashboard') }}</span>
             </a>
             <details class="nav-acc" @if(request()->routeIs('admin.product-approvals.*','admin.vendor-category-requests.*','admin.verifications.*')) open @endif>
-                <summary>Onaylar <span>▾</span></summary>
+                <summary>Onaylar @include('partials.nav-count-badge', ['count' => $navBadges['admin_group_approvals'] ?? 0]) <span>▾</span></summary>
                 <div class="nav-acc-body">
-                    <a href="{{ route('admin.product-approvals.index') }}" class="nav-link {{ request()->routeIs('admin.product-approvals.*') ? 'active' : '' }}"><span>{{ __('panel.nav_product_approvals') }} @if(($pendingProductApprovals ?? 0) > 0)<span class="badge bg-warning text-dark">{{ $pendingProductApprovals }}</span>@endif</span></a>
+                    <a href="{{ route('admin.product-approvals.index') }}" class="nav-link {{ request()->routeIs('admin.product-approvals.*') ? 'active' : '' }}"><span>{{ __('panel.nav_product_approvals') }} @include('partials.nav-count-badge', ['count' => $navBadges['admin_products'] ?? 0])</span></a>
                     @if(Route::has('admin.vendor-category-requests.index'))
-                    <a href="{{ route('admin.vendor-category-requests.index') }}" class="nav-link {{ request()->routeIs('admin.vendor-category-requests.*') ? 'active' : '' }}"><span>{{ __('panel.nav_category_requests') }} @if(($pendingCategoryRequests ?? 0) > 0)<span class="badge bg-warning text-dark">{{ $pendingCategoryRequests }}</span>@endif</span></a>
+                    <a href="{{ route('admin.vendor-category-requests.index') }}" class="nav-link {{ request()->routeIs('admin.vendor-category-requests.*') ? 'active' : '' }}"><span>{{ __('panel.nav_category_requests') }} @include('partials.nav-count-badge', ['count' => $navBadges['admin_categories'] ?? 0])</span></a>
                     @endif
-                    <a href="{{ route('admin.verifications.index') }}" class="nav-link {{ request()->routeIs('admin.verifications.*') ? 'active' : '' }}"><span>Belgeler @if(($pendingDocumentApprovals ?? 0) > 0)<span class="badge bg-warning text-dark">{{ $pendingDocumentApprovals }}</span>@endif</span></a>
+                    <a href="{{ route('admin.verifications.index') }}" class="nav-link {{ request()->routeIs('admin.verifications.*') ? 'active' : '' }}"><span>Belgeler @include('partials.nav-count-badge', ['count' => $navBadges['admin_documents'] ?? 0])</span></a>
                 </div>
             </details>
             <details class="nav-acc" @if(request()->routeIs('admin.vendors.*','admin.verifications.*','admin.customers.*','admin.vendor-updates.*','admin.vendor-category-requests.*')) open @endif>
-                <summary>{{ __('panel.nav_people') }} <span>▾</span></summary>
+                <summary>{{ __('panel.nav_people') }} @include('partials.nav-count-badge', ['count' => $navBadges['admin_group_people'] ?? 0]) <span>▾</span></summary>
                 <div class="nav-acc-body">
                     <a href="{{ route('admin.vendors.index') }}" class="nav-link {{ request()->routeIs('admin.vendors.*') ? 'active' : '' }}"><span>{{ __('panel.nav_vendors') }}</span></a>
-                    <a href="{{ route('admin.verifications.index') }}" class="nav-link {{ request()->routeIs('admin.verifications.*') ? 'active' : '' }}"><span>Doğrulamalar</span></a>
+                    <a href="{{ route('admin.verifications.index') }}" class="nav-link {{ request()->routeIs('admin.verifications.*') ? 'active' : '' }}"><span>Doğrulamalar @include('partials.nav-count-badge', ['count' => $navBadges['admin_documents'] ?? 0])</span></a>
                     <a href="{{ route('admin.customers.index') }}" class="nav-link {{ request()->routeIs('admin.customers.*') ? 'active' : '' }}"><span>{{ __('panel.nav_customers') }}</span></a>
-                    <a href="{{ route('admin.vendor-updates.index') }}" class="nav-link {{ request()->routeIs('admin.vendor-updates.*') ? 'active' : '' }}"><span>{{ __('panel.nav_vendor_updates') }}</span></a>
+                    <a href="{{ route('admin.vendor-updates.index') }}" class="nav-link {{ request()->routeIs('admin.vendor-updates.*') ? 'active' : '' }}"><span>{{ __('panel.nav_vendor_updates') }} @include('partials.nav-count-badge', ['count' => $navBadges['admin_vendor_updates'] ?? 0])</span></a>
                     @if(Route::has('admin.vendor-category-requests.index'))
-                    <a href="{{ route('admin.vendor-category-requests.index') }}" class="nav-link {{ request()->routeIs('admin.vendor-category-requests.*') ? 'active' : '' }}"><span>{{ __('panel.nav_category_requests') }}</span></a>
+                    <a href="{{ route('admin.vendor-category-requests.index') }}" class="nav-link {{ request()->routeIs('admin.vendor-category-requests.*') ? 'active' : '' }}"><span>{{ __('panel.nav_category_requests') }} @include('partials.nav-count-badge', ['count' => $navBadges['admin_categories'] ?? 0])</span></a>
                     @endif
                 </div>
             </details>
-            <details class="nav-acc" @if(request()->routeIs('admin.categories.*','admin.business-types.*','admin.products.*','admin.blog.*','admin.product-approvals.*')) open @endif>
-                <summary>{{ __('panel.nav_catalog') }} <span>▾</span></summary>
+            <details class="nav-acc" @if(request()->routeIs('admin.categories.*','admin.business-types.*','admin.products.*','admin.blog.*','admin.product-approvals.*','admin.outdoor.*')) open @endif>
+                <summary>{{ __('panel.nav_catalog') }} @include('partials.nav-count-badge', ['count' => $navBadges['admin_group_catalog'] ?? 0]) <span>▾</span></summary>
                 <div class="nav-acc-body">
                     <a href="{{ route('admin.categories.index') }}" class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}"><span>{{ __('panel.nav_categories') }}</span></a>
-                    <a href="{{ route('admin.outdoor.inventories') }}" class="nav-link {{ request()->routeIs('admin.outdoor.*') ? 'active' : '' }}"><span>Açık hava</span></a>
+                    <a href="{{ route('admin.outdoor.inventories') }}" class="nav-link {{ request()->routeIs('admin.outdoor.*') ? 'active' : '' }}"><span>Açık hava @include('partials.nav-count-badge', ['count' => $navBadges['admin_outdoor_review'] ?? 0])</span></a>
                     <a href="{{ route('admin.business-types.index') }}" class="nav-link {{ request()->routeIs('admin.business-types.*') ? 'active' : '' }}"><span>{{ __('panel.nav_business_types') }}</span></a>
                     <a href="{{ route('admin.products.index') }}" class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}"><span>{{ __('panel.nav_products') }}</span></a>
-                    <a href="{{ route('admin.product-approvals.index') }}" class="nav-link {{ request()->routeIs('admin.product-approvals.*') ? 'active' : '' }}"><span>{{ __('panel.nav_product_approvals') }}</span></a>
+                    <a href="{{ route('admin.product-approvals.index') }}" class="nav-link {{ request()->routeIs('admin.product-approvals.*') ? 'active' : '' }}"><span>{{ __('panel.nav_product_approvals') }} @include('partials.nav-count-badge', ['count' => $navBadges['admin_products'] ?? 0])</span></a>
                     @if(Route::has('admin.blog.index'))
                     <a href="{{ route('admin.blog.index') }}" class="nav-link {{ request()->routeIs('admin.blog.*') ? 'active' : '' }}"><span>{{ __('panel.nav_blog') }}</span></a>
                     @endif
                 </div>
             </details>
             <details class="nav-acc" @if(request()->routeIs('admin.finance.*','admin.payouts.*','admin.contracts.*','admin.settings.*','admin.menu.*','admin.api-management.*','admin.support-tickets.*','admin.vendor-payout-requests.*','admin.metrics.*')) open @endif>
-                <summary>{{ __('panel.nav_ops') }} <span>▾</span></summary>
+                <summary>{{ __('panel.nav_ops') }} @include('partials.nav-count-badge', ['count' => $navBadges['admin_group_ops'] ?? 0]) <span>▾</span></summary>
                 <div class="nav-acc-body">
                     @if(Route::has('admin.finance.index'))
                     <a href="{{ route('admin.finance.index') }}" class="nav-link {{ request()->routeIs('admin.finance.*') ? 'active' : '' }}"><span>{{ __('panel.nav_finance') }}</span></a>
@@ -272,6 +272,9 @@
                     <a href="{{ route('admin.payouts.index') }}" class="nav-link {{ request()->routeIs('admin.payouts.*') ? 'active' : '' }}"><span>{{ __('panel.nav_payouts') }}</span></a>
                     <a href="{{ route('admin.contracts.index') }}" class="nav-link {{ request()->routeIs('admin.contracts.*') ? 'active' : '' }}"><span>{{ __('panel.nav_contracts') }}</span></a>
                     <a href="{{ route('admin.settings.index') }}" class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}"><span>{{ __('panel.nav_settings') }}</span></a>
+                    @if(Route::has('admin.document-requirements.index'))
+                    <a href="{{ route('admin.document-requirements.index') }}" class="nav-link {{ request()->routeIs('admin.document-requirements.*') ? 'active' : '' }}"><span>Belge şablonları</span></a>
+                    @endif
                     @if(Route::has('admin.menu.index'))
                     <a href="{{ route('admin.menu.index') }}" class="nav-link {{ request()->routeIs('admin.menu.*') ? 'active' : '' }}"><span>{{ __('panel.nav_menu') }}</span></a>
                     @endif
@@ -279,10 +282,10 @@
                     <a href="{{ route('admin.api-management.index') }}" class="nav-link {{ request()->routeIs('admin.api-management.*') ? 'active' : '' }}"><span>{{ __('panel.nav_api') }}</span></a>
                     @endif
                     @if(Route::has('admin.support-tickets.index'))
-                    <a href="{{ route('admin.support-tickets.index') }}" class="nav-link {{ request()->routeIs('admin.support-tickets.*') ? 'active' : '' }}"><span>Destek Talepleri</span></a>
+                    <a href="{{ route('admin.support-tickets.index') }}" class="nav-link {{ request()->routeIs('admin.support-tickets.*') ? 'active' : '' }}"><span>Destek Talepleri @include('partials.nav-count-badge', ['count' => $navBadges['admin_support'] ?? 0])</span></a>
                     @endif
                     @if(Route::has('admin.vendor-payout-requests.index'))
-                    <a href="{{ route('admin.vendor-payout-requests.index') }}" class="nav-link {{ request()->routeIs('admin.vendor-payout-requests.*') ? 'active' : '' }}"><span>Ödeme Talepleri</span></a>
+                    <a href="{{ route('admin.vendor-payout-requests.index') }}" class="nav-link {{ request()->routeIs('admin.vendor-payout-requests.*') ? 'active' : '' }}"><span>Ödeme Talepleri @include('partials.nav-count-badge', ['count' => $navBadges['admin_payouts'] ?? 0])</span></a>
                     @endif
                     @if(Route::has('admin.metrics.index'))
                     <a href="{{ route('admin.metrics.index') }}" class="nav-link {{ request()->routeIs('admin.metrics.*') ? 'active' : '' }}"><span>Sistem Metrikleri</span></a>

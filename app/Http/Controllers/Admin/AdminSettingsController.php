@@ -14,6 +14,9 @@ class AdminSettingsController extends Controller
         return view('admin.settings.index', [
             'commission_rate' => Setting::get('commission_rate', 10),
             'payout_day_of_month' => Setting::get('payout_day_of_month', 5),
+            'payout_weekdays' => Setting::payoutWeekdays(),
+            'payout_min_amount' => Setting::payoutMinAmount(),
+            'payout_auto_after_days' => Setting::payoutAutoAfterDays(),
             'commission_wait_days' => Setting::get('commission_wait_days', 15),
             'contract_acceptance_days' => Setting::get('contract_acceptance_days', 15),
             'meeting_fee' => Setting::get('meeting_fee', 50),
@@ -51,6 +54,10 @@ class AdminSettingsController extends Controller
         $validated = $request->validate([
             'commission_rate' => ['required', 'numeric', 'min:0', 'max:100'],
             'payout_day_of_month' => ['required', 'integer', 'min:1', 'max:28'],
+            'payout_weekdays' => ['required', 'array', 'min:1'],
+            'payout_weekdays.*' => ['integer', 'min:1', 'max:7'],
+            'payout_min_amount' => ['required', 'numeric', 'min:1', 'max:100000'],
+            'payout_auto_after_days' => ['required', 'integer', 'min:1', 'max:90'],
             'commission_wait_days' => ['required', 'integer', 'min:0', 'max:90'],
             'contract_acceptance_days' => ['required', 'integer', 'min:1', 'max:90'],
             'meeting_fee' => ['required', 'numeric', 'min:0', 'max:1000'],
@@ -91,6 +98,10 @@ class AdminSettingsController extends Controller
 
         foreach ($validated as $key => $value) {
             if (in_array($key, ['platform_logo', 'float_whatsapp_enabled', 'float_call_enabled'], true)) {
+                continue;
+            }
+            if ($key === 'payout_weekdays') {
+                Setting::set('payout_weekdays', implode(',', array_map('intval', $value)));
                 continue;
             }
             Setting::set($key, $value ?? '');

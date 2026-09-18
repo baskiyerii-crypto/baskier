@@ -2,7 +2,8 @@
 @section('title', $vendor->isOutdoorAgency() ? 'Bağlı sahipler' : 'Ajanslarım')
 @section('content')
 <h1 class="h5 mb-3">{{ $vendor->isOutdoorAgency() ? 'Bağlı mecra sahipleri' : 'Ajanslarım' }}</h1>
-<p class="small text-muted">Ajans birden fazla sahip ile çalışabilir. Münhasır bağda yalnız o ajans teklif verir.</p>
+<p class="small text-muted">Ajans birden fazla sahip ile çalışabilir. Münhasır bağda yalnız o ajans teklif verir. Varsayılan yol dizinden bağlanmaktır; e-posta daveti isteğe bağlıdır.</p>
+<p class="small mb-3"><a href="{{ route('outdoor-panel.directory') }}">Dizinden bağlan (telefon/e-posta görünmez)</a></p>
 
 <form method="POST" action="{{ route('outdoor-panel.representations.invite') }}" class="card p-3 mb-4" style="max-width:520px;">
     @csrf
@@ -28,7 +29,7 @@
             @foreach($rows as $row)
                 @php $other = $vendor->isOutdoorAgency() ? $row->owner : $row->agency; @endphp
                 <tr>
-                    <td>{{ $other?->name }} <div class="small text-muted">{{ $other?->email }}</div></td>
+                    <td>{{ $other?->name }} <div class="small text-muted">{{ $other?->city }}</div></td>
                     <td>{{ $row->status }}</td>
                     <td>{{ $row->exclusive ? 'Evet' : 'Hayır' }}</td>
                     <td class="text-end">

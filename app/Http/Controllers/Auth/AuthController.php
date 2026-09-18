@@ -179,6 +179,13 @@ class AuthController extends Controller
             if (BusinessType::query()->exists()) {
                 $rules['business_type_ids'] = ['required', 'array', 'min:1'];
             }
+
+            $rules = app(\App\Services\DocumentRequirementService::class)->applyRegistrationFileRules(
+                $rules,
+                $tracks,
+                is_string($outdoorRole) ? $outdoorRole : null,
+                is_string($ownerKind) ? $ownerKind : null
+            );
         }
 
         $validated = $request->validate($rules);

@@ -17,6 +17,27 @@
                     <input type="number" name="payout_day_of_month" class="form-control" value="{{ old('payout_day_of_month', $payout_day_of_month) }}" min="1" max="28" required>
                 </div>
                 <div class="mb-3">
+                    <label class="form-label fw-semibold">Para çekme günleri</label>
+                    @php $selectedDays = old('payout_weekdays', $payout_weekdays ?? [1,2,3,4,5]); @endphp
+                    <div class="d-flex flex-wrap gap-3 small">
+                        @foreach([1=>'Pzt',2=>'Sal',3=>'Çar',4=>'Per',5=>'Cum',6=>'Cmt',7=>'Paz'] as $num => $label)
+                            <label class="form-check mb-0">
+                                <input type="checkbox" class="form-check-input" name="payout_weekdays[]" value="{{ $num }}" @checked(in_array($num, (array) $selectedDays, false) || in_array((string)$num, (array) $selectedDays, true))>
+                                {{ $label }}
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Asgari çekim tutarı (₺)</label>
+                    <input type="number" name="payout_min_amount" class="form-control" value="{{ old('payout_min_amount', $payout_min_amount) }}" min="1" step="0.01" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Unutulan bakiyenin otomatik talebe dönmesi (gün)</label>
+                    <input type="number" name="payout_auto_after_days" class="form-control" value="{{ old('payout_auto_after_days', $payout_auto_after_days) }}" min="1" max="90" required>
+                    <div class="form-text">Kayıtlı IBAN varsa, çekilmeyen bakiye bu süre sonunda yönetici kuyruğuna düşer.</div>
+                </div>
+                <div class="mb-3">
                     <label class="form-label fw-semibold">Komisyon bekleme süresi (gün)</label>
                     <input type="number" name="commission_wait_days" class="form-control" value="{{ old('commission_wait_days', $commission_wait_days) }}" min="0" max="90" required>
                 </div>

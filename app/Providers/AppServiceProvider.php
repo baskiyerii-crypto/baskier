@@ -28,36 +28,26 @@ class AppServiceProvider extends ServiceProvider
             $user = auth()->user();
             $unread = 0;
             $recent = collect();
-            $pendingProducts = 0;
-            $pendingCategories = 0;
-            $pendingDocs = 0;
+            $navBadges = [];
             if ($user) {
                 try {
                     $unread = $user->unreadNotifications()->count();
                     $recent = $user->notifications()->latest()->limit(8)->get();
                 } catch (\Throwable) {
                 }
-            }
-            if ($user?->isAdmin()) {
                 try {
-                    if (\Illuminate\Support\Facades\Schema::hasColumn('products', 'moderation_status')) {
-                        $pendingProducts = \App\Models\Product::where('moderation_status', 'pending')->count();
-                    }
-                    if (\Illuminate\Support\Facades\Schema::hasTable('vendor_category_requests')) {
-                        $pendingCategories = \App\Models\VendorCategoryRequest::where('status', 'pending')->count();
-                    }
-                    if (\Illuminate\Support\Facades\Schema::hasTable('vendor_documents')) {
-                        $pendingDocs = \App\Models\VendorDocument::where('status', 'pending')->count();
-                    }
+                    $navBadges = app(\App\Services\PanelNavBadgeService::class)->forUser($user);
                 } catch (\Throwable) {
+                    $navBadges = [];
                 }
             }
             $view->with([
                 'unreadNotificationsCount' => $unread,
                 'recentNotifications' => $recent,
-                'pendingProductApprovals' => $pendingProducts,
-                'pendingCategoryRequests' => $pendingCategories,
-                'pendingDocumentApprovals' => $pendingDocs,
+                'navBadges' => $navBadges,
+                'pendingProductApprovals' => (int) ($navBadges['admin_products'] ?? 0),
+                'pendingCategoryRequests' => (int) ($navBadges['admin_categories'] ?? 0),
+                'pendingDocumentApprovals' => (int) ($navBadges['admin_documents'] ?? 0),
             ]);
         });
 

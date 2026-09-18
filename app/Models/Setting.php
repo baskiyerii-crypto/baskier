@@ -54,6 +54,27 @@ class Setting extends Model
         return (int) self::get('payout_day_of_month', 5);
     }
 
+    public static function payoutMinAmount(): float
+    {
+        return max(1, (float) self::get('payout_min_amount', 10));
+    }
+
+    public static function payoutAutoAfterDays(): int
+    {
+        return max(1, (int) self::get('payout_auto_after_days', 14));
+    }
+
+    /**
+     * @return list<int>
+     */
+    public static function payoutWeekdays(): array
+    {
+        $raw = (string) self::get('payout_weekdays', '1,2,3,4,5');
+        $days = array_values(array_filter(array_map('intval', explode(',', $raw)), fn ($d) => $d >= 1 && $d <= 7));
+
+        return $days !== [] ? $days : [1, 2, 3, 4, 5];
+    }
+
     public static function commissionWaitDays(): int
     {
         return (int) self::get('commission_wait_days', 15);

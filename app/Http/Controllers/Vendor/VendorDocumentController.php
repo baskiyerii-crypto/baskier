@@ -46,8 +46,10 @@ class VendorDocumentController extends Controller
 
         $isOutdoorPanel = $request->routeIs('outdoor-panel.*');
         $layout = $isOutdoorPanel ? 'layouts.outdoor' : 'layouts.vendor';
+        $kycStatus = app(\App\Services\DocumentRequirementService::class)->statusFor($vendor);
+        $docTemplates = app(\App\Services\DocumentRequirementService::class)->templatesFor($vendor);
 
-        return view('vendor.documents.index', compact('vendor', 'documents', 'criteria', 'isOutdoorPanel', 'layout'));
+        return view('vendor.documents.index', compact('vendor', 'documents', 'criteria', 'isOutdoorPanel', 'layout', 'kycStatus', 'docTemplates'));
     }
 
     public function store(Request $request)
@@ -57,8 +59,9 @@ class VendorDocumentController extends Controller
             abort(403);
         }
 
+        $allowed = app(\App\Services\DocumentRequirementService::class)->allowedTypesFor($vendor);
         $validated = $request->validate([
-            'document_type' => ['required', 'string', 'in:tax_plate,company_registration,certificate,diploma,portfolio_accreditation,course,outdoor_permit,municipality_authority,trade_registry,other'],
+            'document_type' => ['required', 'string', 'in:'.implode(',', $allowed)],
             'issuing_institution' => ['nullable', 'string', 'max:255'],
             'document_number' => ['nullable', 'string', 'max:128'],
             'issued_at' => ['nullable', 'date'],

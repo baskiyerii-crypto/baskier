@@ -37,6 +37,30 @@
 
         <div class="by-surface-indigo">
             <div class="by-accent-bar mb-3"></div>
+            <div class="text-xs font-bold uppercase tracking-wider text-slate-600">Açık sipariş</div>
+            <div class="mt-2 flex items-end justify-between gap-3">
+                <div class="text-3xl font-extrabold tracking-tight text-slate-900">{{ $openOrdersCount ?? 0 }}</div>
+                <a href="{{ route('account.orders.index') }}" class="text-sm font-semibold text-slate-700 hover:underline">Takip</a>
+            </div>
+        </div>
+        <div class="by-surface-amber">
+            <div class="by-accent-bar mb-3"></div>
+            <div class="text-xs font-bold uppercase tracking-wider text-slate-600">Açık teklif</div>
+            <div class="mt-2 flex items-end justify-between gap-3">
+                <div class="text-3xl font-extrabold tracking-tight text-slate-900">{{ $openQuotesCount ?? 0 }}</div>
+                <a href="{{ route('quote-requests.index') }}" class="text-sm font-semibold text-slate-700 hover:underline">Talepler</a>
+            </div>
+        </div>
+        <div class="by-surface-cyan">
+            <div class="by-accent-bar mb-3"></div>
+            <div class="text-xs font-bold uppercase tracking-wider text-slate-600">Mesaj</div>
+            <div class="mt-2 flex items-end justify-between gap-3">
+                <div class="text-3xl font-extrabold tracking-tight text-slate-900">{{ $unreadMessages ?? 0 }}</div>
+                <a href="{{ route('customer.messages.index') }}" class="text-sm font-semibold text-slate-700 hover:underline">Gelen kutusu</a>
+            </div>
+        </div>
+        <div class="by-surface-indigo">
+            <div class="by-accent-bar mb-3"></div>
             <div class="text-xs font-bold uppercase tracking-wider text-slate-600">Favori</div>
             <div class="mt-2 flex items-end justify-between gap-3">
                 <div class="text-3xl font-extrabold tracking-tight text-slate-900">{{ $favoritesCount }}</div>

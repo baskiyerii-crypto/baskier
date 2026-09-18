@@ -15,6 +15,8 @@
 </div>
 @endif
 
+@include('partials.kyc-cta')
+
 <div class="row g-3 mb-4">
     <div class="col-6 col-md-3">
         <div class="card p-3 h-100 shadow-sm border-0" style="background: linear-gradient(135deg, #ecfdf5, #ffffff);">
@@ -44,6 +46,31 @@
             <div class="small text-muted mt-2">Kargolanacak: {{ $readyToShipCount }}</div>
         </div>
     </div>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card p-3 h-100 shadow-sm border-0">
+            <div class="small text-muted">Bu ay net hakediş</div>
+            <div class="h5 mb-0">₺{{ number_format($monthRevenue ?? 0, 2, ',', '.') }}</div>
+            <div class="small text-muted">Komisyon ₺{{ number_format($monthCommission ?? 0, 2, ',', '.') }}</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card p-3 h-100 shadow-sm border-0">
+            <div class="small text-muted">Cüzdan</div>
+            <div class="h5 mb-0">₺{{ number_format($vendor->balance, 2, ',', '.') }}</div>
+            <div class="small text-muted">Çekilebilir ₺{{ number_format($availableBalance ?? 0, 2, ',', '.') }}</div>
+        </div>
+    </div>
+    @if($vendor->hasActiveFreelancerModule())
+    <div class="col-6 col-md-3">
+        <div class="card p-3 h-100 shadow-sm border-0">
+            <div class="small text-muted">Açık freelancer işi</div>
+            <div class="h5 mb-0">{{ $freelancerOpenCount ?? 0 }}</div>
+            <a href="{{ route('vendor.freelancer.index') }}" class="small">Taleplere git →</a>
+        </div>
+    </div>
+    @endif
 </div>
 
 @if(($moduleEnds ?? collect())->isNotEmpty())

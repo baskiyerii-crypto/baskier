@@ -52,18 +52,18 @@
                     <nav class="p-2 account-nav" data-account-nav>
                         @php
                             $items = [
-                                ['label' => 'Özet', 'route' => auth()->user()->isAdmin() ? 'admin.dashboard' : (auth()->user()->isVendor() ? 'vendor.dashboard' : 'customer.dashboard'), 'match' => '*.dashboard'],
-                                ['label' => 'Siparişlerim', 'route' => 'account.orders.index', 'match' => 'account.orders.*'],
-                                ['label' => 'Sepet', 'route' => 'cart.index', 'match' => 'cart.*'],
-                                ['label' => 'Favorilerim', 'route' => 'favorites.index', 'match' => 'favorites.*'],
-                                ['label' => 'Adreslerim', 'route' => 'account.adresler.index', 'match' => 'account.adresler.*'],
-                                ['label' => 'Teklif taleplerim', 'route' => 'quote-requests.index', 'match' => 'quote-requests.*'],
-                                ['label' => 'Planlarım', 'route' => 'customer.outdoor.plans.index', 'match' => 'customer.outdoor.plans.*'],
-                                ['label' => 'Mesajlar', 'route' => 'customer.messages.index', 'match' => 'customer.messages.*'],
-                                ['label' => 'Ürün sorularım', 'route' => 'customer.product-questions.index', 'match' => 'customer.product-questions.*'],
-                                ['label' => 'Sipariş sorularım', 'route' => 'customer.order-questions.index', 'match' => 'customer.order-questions.*'],
-                                ['label' => __('panel.direct_quotes'), 'route' => 'customer.direct-quotes.index', 'match' => 'customer.direct-quotes.*'],
-                                ['label' => 'Destek talepleri', 'route' => 'account.support.index', 'match' => 'account.support.*'],
+                                ['label' => 'Özet', 'route' => auth()->user()->isAdmin() ? 'admin.dashboard' : (auth()->user()->isVendor() ? 'vendor.dashboard' : 'customer.dashboard'), 'match' => '*.dashboard', 'badge' => 0],
+                                ['label' => 'Siparişlerim', 'route' => 'account.orders.index', 'match' => 'account.orders.*', 'badge' => $navBadges['customer_orders'] ?? 0],
+                                ['label' => 'Sepet', 'route' => 'cart.index', 'match' => 'cart.*', 'badge' => 0],
+                                ['label' => 'Favorilerim', 'route' => 'favorites.index', 'match' => 'favorites.*', 'badge' => 0],
+                                ['label' => 'Adreslerim', 'route' => 'account.adresler.index', 'match' => 'account.adresler.*', 'badge' => 0],
+                                ['label' => 'Teklif taleplerim', 'route' => 'quote-requests.index', 'match' => 'quote-requests.*', 'badge' => $navBadges['customer_quotes'] ?? 0],
+                                ['label' => 'Planlarım', 'route' => 'customer.outdoor.plans.index', 'match' => 'customer.outdoor.plans.*', 'badge' => 0],
+                                ['label' => 'Mesajlar', 'route' => 'customer.messages.index', 'match' => 'customer.messages.*', 'badge' => $navBadges['customer_messages'] ?? 0],
+                                ['label' => 'Ürün sorularım', 'route' => 'customer.product-questions.index', 'match' => 'customer.product-questions.*', 'badge' => 0],
+                                ['label' => 'Sipariş sorularım', 'route' => 'customer.order-questions.index', 'match' => 'customer.order-questions.*', 'badge' => $navBadges['customer_questions'] ?? 0],
+                                ['label' => __('panel.direct_quotes'), 'route' => 'customer.direct-quotes.index', 'match' => 'customer.direct-quotes.*', 'badge' => 0],
+                                ['label' => 'Destek talepleri', 'route' => 'account.support.index', 'match' => 'account.support.*', 'badge' => 0],
                             ];
 
                             if (auth()->user()->isCustomer()) {
@@ -84,6 +84,7 @@
                             <a href="{{ route($it['route']) }}"
                                class="mt-1 block rounded-2xl px-4 py-3 text-sm font-semibold {{ request()->routeIs($it['match']) ? 'bg-indigo-50 text-indigo-900 border border-indigo-200' : 'text-slate-700 hover:bg-slate-50' }}">
                                 {{ $it['label'] }}
+                                @include('partials.nav-count-badge', ['count' => $it['badge'] ?? 0, 'variant' => 'tailwind'])
                             </a>
                         @endforeach
                     </nav>

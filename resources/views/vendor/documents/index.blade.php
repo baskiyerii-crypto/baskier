@@ -3,6 +3,7 @@
 
 @section('content')
 @php $isOutdoorPanel = $isOutdoorPanel ?? false; @endphp
+@include('partials.kyc-cta')
 <div class="container-fluid px-0">
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -144,7 +145,13 @@
                 <div class="col-md-4">
                     <label class="form-label small fw-semibold">Belge Türü <span class="text-danger">*</span></label>
                     <select name="document_type" class="form-select" required>
-                        @if($isOutdoorPanel)
+                        @if(($docTemplates ?? collect())->isNotEmpty())
+                            <optgroup label="İstenen belgeler">
+                                @foreach($docTemplates as $t)
+                                    <option value="{{ $t->document_type }}">{{ $t->label }}{{ $t->required ? ' *' : '' }}{{ $t->requires_file ? '' : ' (dosyasız)' }}</option>
+                                @endforeach
+                            </optgroup>
+                        @elseif($isOutdoorPanel)
                             @if($vendor->isMunicipalityOwner())
                                 <optgroup label="Belediye">
                                     <option value="municipality_authority">{{ __('panel.doc_municipality_authority') }}</option>

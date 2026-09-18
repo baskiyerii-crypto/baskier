@@ -178,6 +178,11 @@ class PaymentService
 
         $detail = $this->iyzicoClient->getCheckoutFormDetail($token, $attempt->conversation_id);
 
+        $purpose = $attempt->purpose ?? ($attempt->metadata['purpose'] ?? 'order');
+        if ($purpose === 'balance_topup') {
+            return app(BalanceTopUpService::class)->finalizeIyzico($attempt, $detail);
+        }
+
         $status = $detail['status'] ?? 'failure';
         $paymentStatus = $detail['paymentStatus'] ?? 'FAILURE';
 

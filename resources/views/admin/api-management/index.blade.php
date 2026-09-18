@@ -81,6 +81,49 @@
                     <label class="form-label">Secret Key</label>
                     <input type="password" name="iyzico_secret_key" class="form-control" value="{{ $iyzico_secret_key }}" placeholder="Değiştirmek için yeni anahtar girin">
                 </div>
+                <div class="col-12">
+                    <button form="api-mgmt-form" formaction="{{ route('admin.api-management.test-iyzico') }}" class="btn btn-outline-secondary btn-sm">iyzico bağlantısını dene</button>
+                    @if(!empty($iyzico_last_test))<span class="small text-muted ms-2">Son test: {{ $iyzico_last_test }}</span>@endif
+                </div>
+            </div>
+        </div>
+
+        <div class="api-card" data-api="shopier">
+            <div class="api-card-head">
+                <div class="d-flex align-items-center gap-2">
+                    <h2 class="m-0">Shopier</h2>
+                    <span class="badge bg-{{ ($shopier_mode ?? 'test') === 'live' ? 'danger' : 'warning text-dark' }}">{{ strtoupper($shopier_mode ?? 'test') }}</span>
+                </div>
+                <div class="form-check form-switch m-0">
+                    <input class="form-check-input api-toggle" type="checkbox" role="switch" name="api_shopier_enabled" value="1" id="api_shopier" @checked($shopier_enabled ?? false)>
+                    <label class="form-check-label" for="api_shopier">{{ ($shopier_enabled ?? false) ? 'Açık' : 'Kapalı' }}</label>
+                </div>
+            </div>
+            <p class="small text-muted">Bakiye yüklemede iyzico alternatifi. Sipariş checkout’u iyzico olarak kalır.</p>
+            <div class="api-fields row g-3" data-disabled="{{ ($shopier_enabled ?? false) ? '0' : '1' }}">
+                <div class="col-md-4">
+                    <label class="form-label">Mod</label>
+                    <select name="shopier_mode" class="form-select">
+                        <option value="test" @selected(($shopier_mode ?? 'test')==='test')>Test</option>
+                        <option value="live" @selected(($shopier_mode ?? '')==='live')>Canlı</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Website index</label>
+                    <input type="number" name="shopier_website_index" class="form-control" value="{{ $shopier_website_index ?? 1 }}" min="1">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">API Key</label>
+                    <input type="text" name="shopier_api_key" class="form-control" value="{{ $shopier_api_key ?? '' }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">API Secret</label>
+                    <input type="password" name="shopier_api_secret" class="form-control" value="{{ $shopier_api_secret ?? '' }}" placeholder="Değiştirmek için yeni anahtar girin">
+                </div>
+                <div class="col-12">
+                    <button form="api-mgmt-form" formaction="{{ route('admin.api-management.test-shopier') }}" class="btn btn-outline-secondary btn-sm">Shopier bağlantısını dene</button>
+                    @if(!empty($shopier_last_test))<span class="small text-muted ms-2">Son test: {{ $shopier_last_test }}</span>@endif
+                </div>
             </div>
         </div>
 

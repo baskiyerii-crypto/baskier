@@ -78,6 +78,7 @@ class VendorDashboardController extends Controller
             'quotes' => $vendor->quotes_expires_at,
             'tabela' => $vendor->tabela_expires_at,
             'ozalit' => $vendor->ozalit_expires_at,
+            'outdoor' => $vendor->outdoor_expires_at,
         ])->filter(fn ($d) => $d && $d->isFuture() && $d->lte(now()->addDays(14)));
 
         $pendingContractsCount = 0;
@@ -103,6 +104,28 @@ class VendorDashboardController extends Controller
             ->groupBy('status')
             ->pluck('c', 'status');
 
+        $monthRevenue = (float) Order::where('vendor_id', $vendor->id)
+            ->where('created_at', '>=', now()->startOfMonth())
+            ->whereNotIn('status', [OrderStatus::CANCELLED, OrderStatus::PENDING, OrderStatus::PENDING_PAYMENT])
+            ->sum('vendor_amount');
+        $monthCommission = (float) Order::where('vendor_id', $vendor->id)
+            ->where('created_at', '>=', now()->startOfMonth())
+            ->whereNotIn('status', [OrderStatus::CANCELLED, OrderStatus::PENDING, OrderStatus::PENDING_PAYMENT])
+            ->sum('commission_amount');
+        $kycStatus = app(\App\Services\DocumentRequirementService::class)->statusFor($vendor);
+        $availableBalance = app(\App\Services\PayoutService::class)->availableBalance($vendor);
+        $freelancerOpenCount = 0;
+        if ($vendor->hasActiveFreelancerModule()) {
+            $freelancerOpenCount = QuoteRequest::query()
+                ->when(
+                    \Illuminate\Support\Facades\Schema::hasColumn('quote_requests', 'request_type'),
+                    fn ($q) => $q->where('request_type', 'freelancer')
+                )
+                ->where('status', 'open')
+                ->count();
+        }
+        $isOutdoorPanel = false;
+
         return view('vendor.dashboard', compact(
             'vendor',
             'productsCount',
@@ -118,7 +141,13 @@ class VendorDashboardController extends Controller
             'moduleEnds',
             'pendingContractsCount',
             'revenueTrend',
-            'statusBreakdown'
+            'statusBreakdown',
+            'monthRevenue',
+            'monthCommission',
+            'kycStatus',
+            'availableBalance',
+            'freelancerOpenCount',
+            'isOutdoorPanel'
         ));
     }
 }

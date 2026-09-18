@@ -82,6 +82,28 @@ class AdminDashboardService
             $riskRisky = Vendor::where('risk_band', 'risky')->count();
         }
 
+        $modulesExpiring = 0;
+        if (Schema::hasColumn('vendors', 'outdoor_expires_at')) {
+            $modulesExpiring = Vendor::query()
+                ->where(function ($q) {
+                    foreach (['freelancer_expires_at', 'quotes_expires_at', 'tabela_expires_at', 'ozalit_expires_at', 'outdoor_expires_at'] as $col) {
+                        if (Schema::hasColumn('vendors', $col)) {
+                            $q->orWhere(function ($inner) use ($col) {
+                                $inner->whereNotNull($col)->where($col, '>', now())->where($col, '<=', now()->addDays(7));
+                            });
+                        }
+                    }
+                })
+                ->count();
+        }
+        $outdoorPending = 0;
+        if (Schema::hasTable('ooh_inventories')) {
+            $outdoorPending = \App\Models\OohInventory::query()->where('status', \App\Models\OohInventory::STATUS_PENDING_REVIEW)->count();
+        }
+        $kycPending = Schema::hasTable('vendor_documents')
+            ? \App\Models\VendorDocument::query()->where('status', 'pending')->count()
+            : 0;
+
         return [
             'vendors' => Vendor::count(),
             'active_vendors' => Vendor::where('is_active', true)->count(),
@@ -100,6 +122,9 @@ class AdminDashboardService
             'risk_safe' => $riskSafe,
             'risk_medium' => $riskMedium,
             'risk_risky' => $riskRisky,
+            'modules_expiring' => $modulesExpiring,
+            'outdoor_pending_review' => $outdoorPending,
+            'kyc_pending' => $kycPending,
         ];
     }
 

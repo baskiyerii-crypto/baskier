@@ -23,15 +23,17 @@
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
-                    <tr><th>Satıcı</th><th>Tutar</th><th>Durum</th><th>Tarih</th><th>İşlem</th></tr>
+                    <tr><th>Satıcı</th><th>Tutar</th><th>IBAN</th><th>Durum</th><th>Talep tarihi</th><th>Onay / red</th><th>İşlem</th></tr>
                 </thead>
                 <tbody>
                     @forelse($requests as $r)
                         <tr>
                             <td class="fw-medium">{{ $r->vendor?->name }}</td>
                             <td>₺{{ number_format($r->amount, 2, ',', '.') }}</td>
-                            <td><span class="badge rounded-pill bg-light text-dark border">{{ UiLabels::payoutRequestStatus($r->status) }}</span></td>
-                            <td class="small text-muted">{{ $r->created_at->format('d.m.Y H:i') }}</td>
+                            <td class="small font-monospace">{{ $r->iban ?: '—' }}<div class="text-muted">{{ $r->account_holder }}</div></td>
+                            <td><span class="badge rounded-pill bg-light text-dark border">{{ UiLabels::payoutRequestStatus($r->status) }}</span>@if(($r->source ?? '')==='auto')<div class="small text-muted">Otomatik</div>@endif</td>
+                            <td class="small text-muted">{{ optional($r->requested_at ?? $r->created_at)->format('d.m.Y H:i') }}</td>
+                            <td class="small text-muted">{{ optional($r->approved_at ?: $r->rejected_at ?: $r->processed_at)->format('d.m.Y H:i') ?: '—' }}</td>
                             <td>
                                 @if($r->status === 'pending')
                                     <div class="d-flex flex-wrap gap-2">
@@ -51,7 +53,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="5" class="text-center text-muted py-5">Kayıt yok.</td></tr>
+                        <tr><td colspan="7" class="text-center text-muted py-5">Kayıt yok.</td></tr>
                     @endforelse
                 </tbody>
             </table>

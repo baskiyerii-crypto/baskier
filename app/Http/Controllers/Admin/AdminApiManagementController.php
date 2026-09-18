@@ -10,10 +10,11 @@ use Illuminate\Support\Facades\Http;
 
 class AdminApiManagementController extends Controller
 {
-    private const API_KEYS = ['shopify', 'iyzico', 'basitkargo', 'openai', 'evolution'];
+    private const API_KEYS = ['shopify', 'iyzico', 'shopier', 'basitkargo', 'openai', 'evolution'];
 
     private const SECRET_KEYS = [
         'iyzico_secret_key',
+        'shopier_api_secret',
         'shopify_admin_token',
         'basitkargo_api_key',
         'openai_api_key',
@@ -34,6 +35,12 @@ class AdminApiManagementController extends Controller
             'iyzico_secret_key' => $this->mask(Setting::get('iyzico_secret_key', '')),
             'iyzico_base_url' => Setting::get('iyzico_base_url', 'https://sandbox-api.iyzipay.com'),
             'iyzico_last_test' => Setting::get('iyzico_last_test_result'),
+            'shopier_enabled' => Setting::apiEnabled('shopier', false),
+            'shopier_mode' => Setting::get('shopier_mode', 'test'),
+            'shopier_api_key' => Setting::get('shopier_api_key', ''),
+            'shopier_api_secret' => $this->mask(Setting::get('shopier_api_secret', '')),
+            'shopier_website_index' => Setting::get('shopier_website_index', '1'),
+            'shopier_last_test' => Setting::get('shopier_last_test_result'),
             'basitkargo_enabled' => Setting::apiEnabled('basitkargo'),
             'basitkargo_api_key' => $this->mask(Setting::get('basitkargo_api_key', '')),
             'basitkargo_base_url' => Setting::get('basitkargo_base_url', ''),
@@ -58,6 +65,10 @@ class AdminApiManagementController extends Controller
             'iyzico_api_key' => ['nullable', 'string', 'max:255'],
             'iyzico_secret_key' => ['nullable', 'string', 'max:255'],
             'iyzico_base_url' => ['nullable', 'url', 'max:255'],
+            'shopier_mode' => ['nullable', 'in:test,live'],
+            'shopier_api_key' => ['nullable', 'string', 'max:255'],
+            'shopier_api_secret' => ['nullable', 'string', 'max:255'],
+            'shopier_website_index' => ['nullable', 'integer', 'min:1', 'max:20'],
             'basitkargo_api_key' => ['nullable', 'string', 'max:255'],
             'basitkargo_base_url' => ['nullable', 'url', 'max:255'],
             'openai_api_key' => ['nullable', 'string', 'max:255'],
@@ -115,6 +126,23 @@ class AdminApiManagementController extends Controller
         } catch (\Throwable $e) {
             return back()->with('error', 'iyzico sunucusuna erişilemedi: ' . $e->getMessage());
         }
+    }
+
+    public function testShopier(\App\Services\ShopierClient $client)
+    {
+        if (! $client->isConfigured()) {
+            return back()->with('error', 'Shopier API anahtarları henüz girilmemiş.');
+        }
+        $ok = $client->ping();
+        Setting::set('shopier_last_test_result', json_encode([
+            'timestamp' => now()->toIso8601String(),
+            'status' => $ok ? 'success' : 'failed',
+            'mode' => $client->mode(),
+        ]));
+
+        return $ok
+            ? back()->with('success', 'Shopier '.$client->mode().' uç noktasına erişildi.')
+            : back()->with('error', 'Shopier uç noktasına ulaşılamadı.');
     }
 
     private function mask(?string $val): string

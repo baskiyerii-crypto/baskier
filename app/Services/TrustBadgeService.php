@@ -7,6 +7,7 @@ use App\Domain\TrustLevel;
 use App\Models\Vendor;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 
@@ -243,7 +244,7 @@ class TrustBadgeService
         return $query->exists();
     }
 
-    private function constrainNotExpired(Builder $query, Carbon $today): void
+    private function constrainNotExpired(Builder|Relation $query, Carbon $today): void
     {
         if (! Schema::hasColumn('vendor_documents', 'expires_at')) {
             return;

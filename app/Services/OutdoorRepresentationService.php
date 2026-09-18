@@ -88,15 +88,25 @@ class OutdoorRepresentationService
 
     public function invite(Vendor $from, string $counterpartyEmail, bool $exclusive = false, ?string $notes = null): OohRepresentation
     {
+        $user = User::query()->where('email', $counterpartyEmail)->first();
+        $other = $user?->vendor;
+        if (! $other) {
+            throw new RuntimeException('Bu e-posta ile açık hava hesabı bulunamadı.');
+        }
+
+        return $this->inviteByVendorId($from, (int) $other->id, $exclusive, $notes);
+    }
+
+    public function inviteByVendorId(Vendor $from, int $otherVendorId, bool $exclusive = false, ?string $notes = null): OohRepresentation
+    {
         if (! $this->tablesReady()) {
             throw new RuntimeException('Temsil tablosu henüz kurulmadı.');
         }
 
         $from->refresh();
-        $user = User::query()->where('email', $counterpartyEmail)->first();
-        $other = $user?->vendor;
-        if (! $other) {
-            throw new RuntimeException('Bu e-posta ile açık hava hesabı bulunamadı.');
+        $other = Vendor::query()->find($otherVendorId);
+        if (! $other || ! $other->hasOutdoorTrack()) {
+            throw new RuntimeException('Karşı açık hava hesabı bulunamadı.');
         }
         if ((int) $other->id === (int) $from->id) {
             throw new RuntimeException('Kendinizi temsilci olarak ekleyemezsiniz.');
@@ -151,8 +161,24 @@ class OutdoorRepresentationService
             'revoked_at' => null,
         ]);
         $row->save();
+        $fresh = $row->fresh(['owner', 'agency']);
+        $this->notifyInvite($fresh, $from, $other);
 
-        return $row->fresh(['owner', 'agency']);
+        return $fresh;
+    }
+
+    private function notifyInvite(OohRepresentation $row, Vendor $from, Vendor $other): void
+    {
+        if (! $other->user) {
+            return;
+        }
+        app(NotificationService::class)->notify(
+            $other->user,
+            'Açık hava temsil daveti',
+            $from->name.' sizinle bağ kurmak istiyor. İletişim bilgisi paylaşılmadan onaylayabilirsiniz.',
+            ['type' => 'ooh_representation', 'representation_id' => $row->id],
+            route('outdoor-panel.representations.index')
+        );
     }
 
     public function accept(OohRepresentation $representation, Vendor $actor): OohRepresentation
@@ -188,7 +214,19 @@ class OutdoorRepresentationService
             'revoked_at' => null,
         ]);
 
-        return $representation->fresh();
+        $fresh = $representation->fresh(['owner.user', 'agency.user']);
+        $inviter = Vendor::query()->find($fresh->invited_by_vendor_id);
+        if ($inviter?->user) {
+            app(NotificationService::class)->notify(
+                $inviter->user,
+                'Temsil daveti onaylandı',
+                'Açık hava bağınız aktif. Mecralar artık paylaşılıyor.',
+                ['type' => 'ooh_representation', 'representation_id' => $fresh->id],
+                route('outdoor-panel.representations.index')
+            );
+        }
+
+        return $fresh;
     }
 
     public function revoke(OohRepresentation $representation, Vendor $actor): void

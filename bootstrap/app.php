@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'odeme/iyzico/callback',
             'odeme/iyzico/webhook',
+            'odeme/shopier/callback',
         ]);
 
         $middleware->alias([
@@ -34,6 +35,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule): void {
         $schedule->command('contracts:suspend-overdue')->hourly();
         $schedule->command('ooh:notify-upcoming')->dailyAt('08:00');
+        $schedule->command('earnings:credit-ready')->dailyAt('06:30');
+        $schedule->command('payouts:auto-request')->dailyAt('07:00');
+        $schedule->command('subscriptions:remind')->dailyAt('08:15');
         $schedule->command('platform:backup')->dailyAt('03:00');
     })
     ->withExceptions(function (Exceptions $exceptions): void {

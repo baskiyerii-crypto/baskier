@@ -3,57 +3,28 @@
 namespace App\Http\Controllers\OutdoorPanel;
 
 use App\Http\Controllers\Controller;
-use App\Models\OohRepresentation;
-use App\Models\OohVendorRequest;
-use App\Support\OutdoorSchema;
+use App\Services\DocumentRequirementService;
+use App\Services\OutdoorDashboardService;
+use App\Services\PayoutService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Schema;
 
 class OutdoorDashboardController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, OutdoorDashboardService $dashboard, DocumentRequirementService $kyc, PayoutService $payouts)
     {
         $vendor = $request->user()->vendor;
         abort_unless($vendor && $vendor->hasOutdoorTrack(), 403, 'Açık hava hesabı değil.');
 
-        $pendingRequests = 0;
-        $inventoryCount = 0;
-        $representationCount = 0;
+        $metrics = $dashboard->metrics($vendor);
+        $kycStatus = $kyc->statusFor($vendor);
+        $availableBalance = $payouts->availableBalance($vendor);
+        $isOutdoorPanel = true;
 
-        try {
-            if (Schema::hasTable('ooh_vendor_requests')) {
-                $pendingRequests = OohVendorRequest::query()
-                    ->where('vendor_id', $vendor->id)
-                    ->whereIn('status', [OohVendorRequest::STATUS_PENDING, OohVendorRequest::STATUS_QUOTED])
-                    ->count();
-            }
-        } catch (\Throwable) {
-        }
-
-        try {
-            if (! $vendor->isOutdoorAgency() && OutdoorSchema::inventoriesReady()) {
-                $inventoryCount = $vendor->oohInventories()->count();
-            }
-        } catch (\Throwable) {
-        }
-
-        try {
-            if (Schema::hasTable('ooh_representations')) {
-                $representationCount = OohRepresentation::query()
-                    ->where(function ($q) use ($vendor) {
-                        $q->where('owner_vendor_id', $vendor->id)->orWhere('agency_vendor_id', $vendor->id);
-                    })
-                    ->where('status', OohRepresentation::STATUS_ACTIVE)
-                    ->count();
-            }
-        } catch (\Throwable) {
-        }
-
-        return view('outdoor-panel.dashboard', compact(
+        return view('outdoor-panel.dashboard', array_merge($metrics, compact(
             'vendor',
-            'pendingRequests',
-            'inventoryCount',
-            'representationCount'
-        ));
+            'kycStatus',
+            'availableBalance',
+            'isOutdoorPanel'
+        )));
     }
 }

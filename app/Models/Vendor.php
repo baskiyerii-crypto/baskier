@@ -68,6 +68,8 @@ class Vendor extends Model
         'map_lat',
         'map_lng',
         'social_links',
+        'payout_iban',
+        'payout_account_holder',
     ];
 
     protected $casts = [

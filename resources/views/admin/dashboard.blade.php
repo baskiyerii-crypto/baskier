@@ -52,6 +52,35 @@
             </div>
         </a>
     </div>
+    <div class="col-md-3">
+        <a href="{{ route('admin.vendor-payout-requests.index') }}" class="text-decoration-none">
+            <div class="card p-3 border-0 shadow-sm h-100">
+                <div class="small text-muted">Çekim talepleri</div>
+                <div class="h4 mb-0">{{ $metrics['early_payout_requests'] ?? 0 }}</div>
+                <div class="small text-muted">Onaylanana kadar durur</div>
+            </div>
+        </a>
+    </div>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card p-3 border-0 shadow-sm h-100">
+            <div class="small text-muted">7 gün içinde biten modül</div>
+            <div class="h4 mb-0">{{ $metrics['modules_expiring'] ?? 0 }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3 border-0 shadow-sm h-100">
+            <div class="small text-muted">Açık hava inceleme</div>
+            <div class="h4 mb-0">{{ $metrics['outdoor_pending_review'] ?? 0 }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3 border-0 shadow-sm h-100">
+            <div class="small text-muted">KYC evrak kuyruğu</div>
+            <div class="h4 mb-0">{{ $metrics['kyc_pending'] ?? 0 }}</div>
+        </div>
+    </div>
 </div>
 
 <div class="row g-3 mb-4">

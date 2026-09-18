@@ -114,6 +114,7 @@
             @if($hybridLink)
                     <a href="{{ route('vendor.dashboard') }}">Satıcı paneli</a>
                 @endif
+                @include('partials.notification-bell', ['variant' => 'bootstrap'])
                 <span class="badge bg-light text-dark border">{{ auth()->user()?->publicCode() }}</span>
                 <a href="{{ route('home') }}" target="_blank">Site ↗</a>
                 <form method="POST" action="{{ route('logout') }}" class="d-inline">@csrf

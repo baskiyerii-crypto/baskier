@@ -30,6 +30,16 @@ class IyzicoCallbackController extends Controller
         try {
             $result = $this->paymentService->verifyAndProcessIyzicoCallback($token);
 
+            $attempt = $result['attempt'] ?? null;
+            if ($attempt && ($attempt->purpose ?? '') === 'balance_topup') {
+                $route = app(\App\Services\BalanceTopUpService::class)->returnRoute($attempt);
+                if ($result['success']) {
+                    return redirect()->route($route)->with('success', 'Bakiye yüklemeniz hesabınıza işlendi.');
+                }
+
+                return redirect()->route($route)->with('error', 'Bakiye yükleme onaylanmadı: '.($result['errorMessage'] ?? 'İşlem reddedildi.'));
+            }
+
             if ($result['success']) {
                 $count = count($result['orders'] ?? []);
                 $firstOrder = $result['orders'][0]->order_number ?? '';
