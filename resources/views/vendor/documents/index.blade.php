@@ -30,10 +30,15 @@
                     BaskıYeri pazarında güven seviyeniz; iletişim bilgileriniz, resmi belgeleriniz ve sipariş performansınız doğrultusunda sistem tarafından tarafsız ve otomatik hesaplanır.
                 </p>
             </div>
-            <div class="text-md-end">
+            <div class="text-md-end d-flex flex-column align-items-md-end gap-2">
                 <span class="badge bg-light text-dark border px-3 py-2 fs-6">
                     Mevcut Seviye: <strong>{{ \App\Domain\TrustLevel::label($vendor->trust_level) }}</strong>
                 </span>
+                @if(($kycStatus['cta'] ?? 'none') !== 'none')
+                    <a href="#kyc-upload" class="btn btn-warning text-dark fw-semibold">
+                        {{ ($kycStatus['cta'] ?? '') === 'complete' ? 'Eksikleri tamamla' : 'Doğrulamaya başla' }}
+                    </a>
+                @endif
             </div>
         </div>
 
@@ -133,7 +138,7 @@
     </div>
 
     {{-- 2. Birleştirilmiş Belge Yükleme Formu --}}
-    <div class="card p-4 mb-4 border-0 shadow-sm">
+    <div id="kyc-upload" class="card p-4 mb-4 border-0 shadow-sm">
         <h2 class="h6 fw-bold mb-3">Yeni Belge Yükle</h2>
         <p class="small text-muted mb-3">
             Tüm belgeleriniz güvenli özel depolamada saklanır ve yalnızca yetkili yönetici incelemesi için kullanılır. Yüklenen dosyalar gerçek dosya içerik kontrolünden ve güvenlik taramasından geçirilir.

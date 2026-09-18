@@ -46,8 +46,24 @@ class VendorDocumentController extends Controller
 
         $isOutdoorPanel = $request->routeIs('outdoor-panel.*');
         $layout = $isOutdoorPanel ? 'layouts.outdoor' : 'layouts.vendor';
-        $kycStatus = app(\App\Services\DocumentRequirementService::class)->statusFor($vendor);
-        $docTemplates = app(\App\Services\DocumentRequirementService::class)->templatesFor($vendor);
+        try {
+            $kycStatus = app(\App\Services\DocumentRequirementService::class)->statusFor($vendor);
+            $docTemplates = app(\App\Services\DocumentRequirementService::class)->templatesFor($vendor);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('vendor_kyc_status_failed', [
+                'vendor_id' => $vendor->id,
+                'error' => $e->getMessage(),
+            ]);
+            $kycStatus = [
+                'audience' => 'physical',
+                'missing' => [['type' => 'tax_plate', 'label' => 'Vergi levhası / yetki belgesi']],
+                'uploaded' => 0,
+                'required' => 1,
+                'cta' => 'start',
+                'complete' => false,
+            ];
+            $docTemplates = collect();
+        }
 
         return view('vendor.documents.index', compact('vendor', 'documents', 'criteria', 'isOutdoorPanel', 'layout', 'kycStatus', 'docTemplates'));
     }

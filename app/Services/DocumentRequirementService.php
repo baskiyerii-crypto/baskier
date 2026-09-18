@@ -106,15 +106,16 @@ class DocumentRequirementService
      */
     public function templatesForAudience(string $audience): Collection
     {
-        if (! Schema::hasTable('document_requirement_templates')) {
-            return collect();
+        $rows = collect();
+        if (Schema::hasTable('document_requirement_templates')) {
+            $rows = DocumentRequirementTemplate::query()
+                ->where('audience', $audience)
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->get();
         }
 
-        return DocumentRequirementTemplate::query()
-            ->where('audience', $audience)
-            ->where('is_active', true)
-            ->orderBy('sort_order')
-            ->get();
+        return $rows->isNotEmpty() ? $rows : $this->fallbackTemplates($audience);
     }
 
     /**
@@ -124,8 +125,13 @@ class DocumentRequirementService
     {
         $audience = $this->audienceFor($vendor);
         $templates = $this->templatesForAudience($audience);
-        $required = $templates->where('required', true);
-        $uploadedTypes = $vendor->documents()->pluck('document_type')->unique()->all();
+        $required = $templates->filter(fn ($row) => (bool) $row->required);
+        $uploadedCount = 0;
+        $uploadedTypes = [];
+        if (Schema::hasTable('vendor_documents')) {
+            $uploadedCount = $vendor->documents()->count();
+            $uploadedTypes = $vendor->documents()->pluck('document_type')->unique()->all();
+        }
         $missing = [];
         foreach ($required as $row) {
             if (! in_array($row->document_type, $uploadedTypes, true)) {
@@ -136,8 +142,11 @@ class DocumentRequirementService
             }
         }
         $cta = 'none';
-        if ($required->isNotEmpty() && $vendor->documents()->count() === 0) {
+        if ($uploadedCount === 0) {
             $cta = 'start';
+            if ($missing === []) {
+                $missing[] = ['type' => 'tax_plate', 'label' => 'Vergi levhası / yetki belgesi'];
+            }
         } elseif ($missing !== []) {
             $cta = 'complete';
         }
@@ -146,9 +155,56 @@ class DocumentRequirementService
             'audience' => $audience,
             'missing' => $missing,
             'uploaded' => count($uploadedTypes),
-            'required' => $required->count(),
+            'required' => max($required->count(), $cta === 'start' ? 1 : $required->count()),
             'cta' => $cta,
-            'complete' => $missing === [],
+            'complete' => $cta === 'none',
         ];
+    }
+
+    /**
+     * @return Collection<int, DocumentRequirementTemplate>
+     */
+    private function fallbackTemplates(string $audience): Collection
+    {
+        $map = [
+            'physical' => [
+                ['tax_plate', 'Vergi levhası', true, 10],
+                ['company_registration', 'Ticaret sicil / oda kaydı', false, 20],
+            ],
+            'freelancer' => [
+                ['diploma', 'Diploma', false, 10],
+                ['certificate', 'Sertifika', false, 20],
+                ['portfolio_accreditation', 'Portföy / akreditasyon', false, 30],
+            ],
+            'outdoor_owner' => [
+                ['tax_plate', 'Vergi levhası', true, 10],
+                ['trade_registry', 'Ticaret sicili', false, 20],
+                ['outdoor_permit', 'Açık hava ruhsatı', false, 30],
+            ],
+            'outdoor_agency' => [
+                ['tax_plate', 'Vergi levhası', true, 10],
+                ['trade_registry', 'Ticaret sicili', false, 20],
+            ],
+            'municipality' => [
+                ['municipality_authority', 'Belediye yetki belgesi', true, 10],
+                ['outdoor_permit', 'Açık hava ruhsatı', false, 20],
+            ],
+        ];
+        $rows = $map[$audience] ?? $map['physical'];
+
+        return collect($rows)->map(function (array $row) use ($audience) {
+            $tpl = new DocumentRequirementTemplate([
+                'audience' => $audience,
+                'document_type' => $row[0],
+                'label' => $row[1],
+                'required' => $row[2],
+                'requires_file' => true,
+                'sort_order' => $row[3],
+                'is_active' => true,
+            ]);
+            $tpl->exists = false;
+
+            return $tpl;
+        });
     }
 }

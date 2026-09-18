@@ -307,6 +307,7 @@ class OutdoorVerticalTest extends TestCase
 
         $this->actingAs($user)->get(route('outdoor-panel.documents.index'))
             ->assertOk()
+            ->assertSee('Doğrulamaya başla')
             ->assertSee('value="outdoor_permit"', false)
             ->assertSee('value="tax_plate"', false)
             ->assertDontSee('Ürünlerim', false);

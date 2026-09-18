@@ -392,7 +392,13 @@ class PanelOpsFlowTest extends TestCase
         $this->actingAs($ownerUser)->get(route('outdoor-panel.dashboard'))
             ->assertOk()
             ->assertViewHas('representationCount', 1)
-            ->assertViewHas('monthRevenue');
+            ->assertViewHas('monthRevenue')
+            ->assertSee('Doğrulamaya başla');
+
+        $this->actingAs($ownerUser)->get(route('outdoor-panel.documents.index'))
+            ->assertOk()
+            ->assertSee('Doğrulamaya başla')
+            ->assertSee('Yeni Belge Yükle');
 
         $this->actingAs($ownerUser)->get(route('outdoor-panel.payout-requests.index'))
             ->assertOk()
