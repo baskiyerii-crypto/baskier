@@ -7,6 +7,7 @@ use App\Models\BusinessType;
 use App\Models\QuoteRequest;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Services\OutdoorStaffService;
 use App\Models\VendorDocument;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -38,6 +39,12 @@ class AuthController extends Controller
                 Auth::logout();
 
                 return back()->withErrors(['email' => __('panel.account_disabled')])->onlyInput('email');
+            }
+
+            if (app(OutdoorStaffService::class)->isFieldOperator($user)) {
+                Auth::logout();
+
+                return redirect()->route('saha.login')->with('info', 'Saha BaskıYeri uygulamasından telefon ile giriş yapın.');
             }
 
             if (session()->has('pending_quote_request')) {

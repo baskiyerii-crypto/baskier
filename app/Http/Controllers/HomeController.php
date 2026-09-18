@@ -4,12 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Services\OutdoorStaffService;
 use App\Support\FreelancerCategories;
 
 class HomeController extends Controller
 {
     public function index()
     {
+        $user = auth()->user();
+        if ($user && app(OutdoorStaffService::class)->isFieldOperator($user)) {
+            return redirect()->route('outdoor-panel.jobs');
+        }
+
         $featuredCategories = Category::query()
             ->where('is_active', true)
             ->whereNull('parent_id')

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\OutdoorStaffService;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -11,7 +12,12 @@ class RedirectOutdoorOnlyFromVendorPanel
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $vendor = $request->user()?->vendor;
+        $user = $request->user();
+        $vendor = $user?->vendor;
+        if ($user && $vendor && app(OutdoorStaffService::class)->isFieldOperator($user, $vendor) && Route::has('outdoor-panel.jobs')) {
+            return redirect()->route('outdoor-panel.jobs');
+        }
+
         if (! $vendor || ! $vendor->prefersOutdoorPanel() || ! Route::has('outdoor-panel.dashboard')) {
             return $next($request);
         }

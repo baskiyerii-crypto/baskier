@@ -27,11 +27,13 @@ class OutdoorVerticalTest extends TestCase
      */
     private function outdoorVendor(string $name = 'Outdoor Co'): array
     {
-        $user = User::factory()->create(['role' => 'vendor', 'phone' => '05550001111']);
+        $user = User::factory()->create(['role' => 'vendor']);
+        $phone = '90555'.str_pad((string) $user->id, 7, '0', STR_PAD_LEFT);
+        $user->update(['phone' => $phone]);
         $vendor = Vendor::factory()->create([
             'user_id' => $user->id,
             'name' => $name,
-            'phone' => '02120001111',
+            'phone' => $phone,
             'is_active' => true,
             'outdoor_enabled' => true,
             'outdoor_expires_at' => now()->addMonth(),
@@ -740,5 +742,110 @@ class OutdoorVerticalTest extends TestCase
             ->assertOk()
             ->assertSee('Adana')
             ->assertSee('Pano ekleme yetkisi');
+    }
+
+    public function test_customer_cannot_use_outdoor_or_saha_phone_login(): void
+    {
+        $this->get('/acik-hava-giris')->assertOk()->assertSee('Outdoor BaskıYeri');
+        $this->get('/saha-giris')->assertOk()->assertSee('Saha BaskıYeri');
+
+        User::factory()->create([
+            'role' => 'customer',
+            'phone' => '905551112233',
+        ]);
+
+        $this->post('/acik-hava-giris', ['phone' => '05551112233', 'password' => 'password'])
+            ->assertRedirect(route('login'));
+        $this->post('/saha-giris', ['phone' => '05551112233', 'password' => 'password'])
+            ->assertRedirect(route('login'));
+        $this->assertGuest();
+    }
+
+    public function test_print_vendor_cannot_use_outdoor_phone_login(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'vendor',
+            'phone' => '905554443322',
+        ]);
+        $vendor = Vendor::factory()->create([
+            'user_id' => $user->id,
+            'registration_tracks' => ['physical_products'],
+            'outdoor_role' => null,
+            'outdoor_enabled' => false,
+        ]);
+        $user->update(['vendor_id' => $vendor->id]);
+
+        $this->post('/acik-hava-giris', ['phone' => '05554443322', 'password' => 'password'])
+            ->assertRedirect(route('login'));
+        $this->assertGuest();
+    }
+
+    public function test_owner_phone_login_reaches_outdoor_dashboard(): void
+    {
+        [$ownerUser] = $this->outdoorVendor();
+
+        $this->post('/acik-hava-giris', ['phone' => $ownerUser->phone, 'password' => 'password'])
+            ->assertRedirect(route('outdoor-panel.dashboard'));
+        $this->assertAuthenticatedAs($ownerUser);
+    }
+
+    public function test_field_phone_login_reaches_jobs(): void
+    {
+        [$ownerUser, $owner] = $this->outdoorVendor();
+        $member = app(OutdoorStaffService::class)->invite(
+            $owner,
+            $ownerUser,
+            '05559998877',
+            'Ali Saha',
+            VendorMember::ROLE_FIELD,
+            'password'
+        );
+        $member->load('user');
+        $this->assertSame('905559998877@saha.invalid', $member->user->email);
+
+        $this->post('/saha-giris', ['phone' => '05559998877', 'password' => 'password'])
+            ->assertRedirect(route('outdoor-panel.jobs'));
+        $this->assertAuthenticatedAs($member->user);
+    }
+
+    public function test_field_email_login_redirects_to_saha(): void
+    {
+        [, $owner] = $this->outdoorVendor();
+        $field = User::factory()->create([
+            'role' => 'vendor',
+            'vendor_id' => $owner->id,
+            'email' => 'saha-mail@example.com',
+            'phone' => '905558887766',
+        ]);
+        VendorMember::create([
+            'vendor_id' => $owner->id,
+            'user_id' => $field->id,
+            'staff_role' => VendorMember::ROLE_FIELD,
+        ]);
+
+        $this->post('/giris', ['email' => 'saha-mail@example.com', 'password' => 'password'])
+            ->assertRedirect(route('saha.login'));
+        $this->assertGuest();
+    }
+
+    public function test_wrong_shell_phone_login_is_rejected(): void
+    {
+        [$ownerUser, $owner] = $this->outdoorVendor();
+        app(OutdoorStaffService::class)->invite(
+            $owner,
+            $ownerUser,
+            '05557776655',
+            'Saha',
+            VendorMember::ROLE_FIELD,
+            'password'
+        );
+
+        $this->post('/saha-giris', ['phone' => $ownerUser->phone, 'password' => 'password'])
+            ->assertRedirect(route('outdoor.login'));
+        $this->assertGuest();
+
+        $this->post('/acik-hava-giris', ['phone' => '05557776655', 'password' => 'password'])
+            ->assertRedirect(route('saha.login'));
+        $this->assertGuest();
     }
 }

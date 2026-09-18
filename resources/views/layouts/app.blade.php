@@ -6,8 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>@yield('title', __('ui.default_title'))</title>
-    <link rel="manifest" href="/manifest.webmanifest">
-    <meta name="theme-color" content="#ea580c">
+    <link rel="manifest" href="@yield('manifest', '/manifest.webmanifest')">
+    <meta name="theme-color" content="@yield('theme_color', '#ea580c')">
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">

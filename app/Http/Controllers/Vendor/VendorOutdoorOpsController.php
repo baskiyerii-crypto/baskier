@@ -95,18 +95,18 @@ class VendorOutdoorOpsController extends Controller
         $this->assertOwner($vendor);
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email'],
-            'password' => ['nullable', 'string', 'min:8'],
+            'phone' => ['required', 'string', 'max:32'],
+            'password' => ['required', 'string', 'min:8'],
             'crew_id' => ['nullable', 'integer'],
         ]);
         try {
             $this->staff->invite(
                 $vendor,
                 $request->user(),
-                $validated['email'],
+                $validated['phone'],
                 $validated['name'],
                 \App\Models\VendorMember::ROLE_FIELD,
-                $validated['password'] ?? null,
+                $validated['password'],
                 ! empty($validated['crew_id']) ? (int) $validated['crew_id'] : null
             );
         } catch (RuntimeException $e) {

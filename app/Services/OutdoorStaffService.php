@@ -9,8 +9,8 @@ use App\Models\OutdoorCrew;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Models\VendorMember;
+use App\Support\Phone;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use RuntimeException;
@@ -28,6 +28,8 @@ class OutdoorStaffService
             ->where('staff_role', VendorMember::ROLE_OWNER)
             ->first();
         if ($existing) {
+            $this->syncOwnerPhone($vendor);
+
             return $existing;
         }
 
@@ -36,10 +38,47 @@ class OutdoorStaffService
             throw new RuntimeException('Satıcı sahibi bulunamadı.');
         }
 
-        return VendorMember::firstOrCreate(
+        $member = VendorMember::firstOrCreate(
             ['vendor_id' => $vendor->id, 'user_id' => $userId],
             ['staff_role' => VendorMember::ROLE_OWNER]
         );
+        $this->syncOwnerPhone($vendor);
+
+        return $member;
+    }
+
+    public function syncOwnerPhone(Vendor $vendor): void
+    {
+        $user = $vendor->user;
+        if (! $user) {
+            return;
+        }
+        $phone = Phone::normalize($vendor->phone);
+        if (! $phone || $user->phone) {
+            return;
+        }
+        $user->update(['phone' => $phone]);
+    }
+
+    public function isFieldOperator(User $user, ?Vendor $vendor = null): bool
+    {
+        $vendor = $vendor ?: $user->vendor;
+        if (! $vendor) {
+            return false;
+        }
+        $role = $this->roleFor($user, $vendor);
+
+        return in_array($role, [VendorMember::ROLE_FIELD, VendorMember::ROLE_OPS], true);
+    }
+
+    public function isOutdoorOperator(User $user): bool
+    {
+        $vendor = $user->vendor;
+        if (! $vendor) {
+            return false;
+        }
+
+        return $vendor->hasOutdoorTrack() || $vendor->outdoor_role !== null;
     }
 
     public function roleFor(User $user, Vendor $vendor): ?string
@@ -239,10 +278,14 @@ class OutdoorStaffService
         $grant->update(['revoked_at' => now()]);
     }
 
-    public function invite(Vendor $vendor, User $actor, string $email, string $name, string $staffRole = VendorMember::ROLE_FIELD, ?string $password = null, ?int $crewId = null): VendorMember
+    public function invite(Vendor $vendor, User $actor, string $phone, string $name, string $staffRole = VendorMember::ROLE_FIELD, ?string $password = null, ?int $crewId = null): VendorMember
     {
         $this->assertAccountOwner($actor, $vendor);
         $staffRole = VendorMember::ROLE_FIELD;
+        $normalized = Phone::normalize($phone);
+        if (! $normalized) {
+            throw new RuntimeException('Geçerli bir telefon numarası girin.');
+        }
         if ($crewId) {
             $ok = OutdoorCrew::query()->where('vendor_id', $vendor->id)->whereKey($crewId)->exists();
             if (! $ok) {
@@ -250,29 +293,35 @@ class OutdoorStaffService
             }
         }
 
-        return DB::transaction(function () use ($vendor, $email, $name, $staffRole, $password, $crewId) {
-            $user = User::query()->where('email', $email)->first();
+        return DB::transaction(function () use ($vendor, $normalized, $name, $staffRole, $password, $crewId) {
+            $user = User::query()->whereIn('phone', Phone::lookupKeys($normalized))->first();
             if ($user) {
                 if ($user->vendor_id && (int) $user->vendor_id !== (int) $vendor->id) {
-                    throw new RuntimeException('Bu e-posta başka bir satıcıya bağlı.');
+                    throw new RuntimeException('Bu telefon başka bir satıcıya bağlı.');
                 }
                 if ($user->role === 'customer' || $user->role === 'admin') {
-                    throw new RuntimeException('Bu e-posta müşteri veya yönetici hesabına ait.');
+                    throw new RuntimeException('Bu telefon müşteri veya yönetici hesabına ait.');
+                }
+                $user->update([
+                    'name' => $name ?: $user->name,
+                    'phone' => $normalized,
+                    'vendor_id' => $vendor->id,
+                    'role' => 'vendor',
+                ]);
+                if ($password) {
+                    $user->update(['password' => $password]);
                 }
             } else {
                 $user = User::create([
                     'name' => $name,
-                    'email' => $email,
-                    'password' => Hash::make($password ?: Str::password(12)),
+                    'email' => Phone::syntheticEmail($normalized),
+                    'phone' => $normalized,
+                    'password' => $password ?: Str::password(12),
                     'role' => 'vendor',
+                    'vendor_id' => $vendor->id,
                     'is_active' => true,
                 ]);
             }
-
-            $user->update([
-                'vendor_id' => $vendor->id,
-                'role' => 'vendor',
-            ]);
 
             $payload = ['staff_role' => $staffRole];
             if (Schema::hasColumn('vendor_members', 'crew_id')) {

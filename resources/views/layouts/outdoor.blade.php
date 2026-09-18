@@ -1,13 +1,18 @@
+@php
+    $outdoorUser = auth()->user();
+    $isSahaShell = $outdoorUser && $outdoorUser->vendor
+        && app(\App\Services\OutdoorStaffService::class)->isFieldOperator($outdoorUser, $outdoorUser->vendor);
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex,nofollow">
-    <title>@yield('title', 'Panel') – BaskıYeri Açık Hava</title>
-    <link rel="manifest" href="/manifest.webmanifest">
-    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-    <meta name="theme-color" content="#059669">
+    <title>@yield('title', 'Panel') – {{ $isSahaShell ? 'Saha BaskıYeri' : 'Outdoor BaskıYeri' }}</title>
+    <link rel="manifest" href="{{ $isSahaShell ? '/manifest-saha.webmanifest' : '/manifest-outdoor.webmanifest' }}">
+    <link rel="apple-touch-icon" href="{{ $isSahaShell ? '/icons/saha-192.png' : '/icons/outdoor-192.png' }}">
+    <meta name="theme-color" content="{{ $isSahaShell ? '#1e3a5f' : '#059669' }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
