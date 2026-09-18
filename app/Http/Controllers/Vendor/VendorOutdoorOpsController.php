@@ -48,10 +48,32 @@ class VendorOutdoorOpsController extends Controller
     {
         $vendor = $this->vendor($request);
         $this->assertOwner($vendor);
-        $this->staff->assertCanManageInventory($request->user(), $vendor);
-        $members = $vendor->members()->with('user')->get();
+        $this->staff->assertAccountOwner($request->user(), $vendor);
+        $members = $vendor->members()->with(['user', 'crew'])->get();
+        $crews = $vendor->outdoorCrews()->orderBy('name')->get();
+        $grants = \App\Models\OohInventoryGrant::query()
+            ->with(['crew', 'user'])
+            ->where('vendor_id', $vendor->id)
+            ->latest()
+            ->get();
 
-        return view('vendor.outdoor.staff', compact('vendor', 'members'));
+        return view('vendor.outdoor.staff', compact('vendor', 'members', 'crews', 'grants'));
+    }
+
+    public function storeCrew(Request $request)
+    {
+        $vendor = $this->vendor($request);
+        $this->assertOwner($vendor);
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:80'],
+        ]);
+        try {
+            $this->staff->createCrew($vendor, $request->user(), $validated['name']);
+        } catch (RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', 'Ekip oluşturuldu.');
     }
 
     public function staffInvite(Request $request)
@@ -61,8 +83,8 @@ class VendorOutdoorOpsController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email'],
-            'staff_role' => ['required', 'in:ops,field'],
             'password' => ['nullable', 'string', 'min:8'],
+            'crew_id' => ['nullable', 'integer'],
         ]);
         try {
             $this->staff->invite(
@@ -70,14 +92,55 @@ class VendorOutdoorOpsController extends Controller
                 $request->user(),
                 $validated['email'],
                 $validated['name'],
-                $validated['staff_role'],
-                $validated['password'] ?? null
+                \App\Models\VendorMember::ROLE_FIELD,
+                $validated['password'] ?? null,
+                ! empty($validated['crew_id']) ? (int) $validated['crew_id'] : null
             );
         } catch (RuntimeException $e) {
             return back()->with('error', $e->getMessage());
         }
 
         return back()->with('success', 'Ekip üyesi eklendi.');
+    }
+
+    public function storeGrant(Request $request)
+    {
+        $vendor = $this->vendor($request);
+        $this->assertOwner($vendor);
+        $validated = $request->validate([
+            'target' => ['required', 'in:crew,user'],
+            'crew_id' => ['nullable', 'integer'],
+            'user_id' => ['nullable', 'integer'],
+            'starts_at' => ['required', 'date'],
+            'ends_at' => ['nullable', 'date', 'after_or_equal:starts_at'],
+        ]);
+        try {
+            $this->staff->grantInventory(
+                $vendor,
+                $request->user(),
+                $validated['target'] === 'crew' && ! empty($validated['crew_id']) ? (int) $validated['crew_id'] : null,
+                $validated['target'] === 'user' && ! empty($validated['user_id']) ? (int) $validated['user_id'] : null,
+                \Carbon\Carbon::parse($validated['starts_at']),
+                ! empty($validated['ends_at']) ? \Carbon\Carbon::parse($validated['ends_at']) : null
+            );
+        } catch (RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', 'Pano ekleme yetkisi verildi.');
+    }
+
+    public function revokeGrant(Request $request, \App\Models\OohInventoryGrant $grant)
+    {
+        $vendor = $this->vendor($request);
+        $this->assertOwner($vendor);
+        try {
+            $this->staff->revokeGrant($vendor, $request->user(), $grant);
+        } catch (RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', 'Yetki kaldırıldı.');
     }
 
     public function jobs(Request $request)
@@ -90,7 +153,7 @@ class VendorOutdoorOpsController extends Controller
             ->with(['inventory', 'proofs', 'assignedUser'])
             ->where('kind', OohOccupancy::KIND_BOOKED)
             ->whereHas('inventory', fn ($q) => $q->where('vendor_id', $vendor->id));
-        if ($role === VendorMember::ROLE_FIELD) {
+        if (! $this->staff->isAccountOwner($user, $vendor)) {
             $query->where('assigned_user_id', $user->id);
         }
         $jobs = $query->orderBy('starts_on')->paginate(20);
@@ -155,7 +218,7 @@ class VendorOutdoorOpsController extends Controller
     {
         $vendor = $this->vendor($request);
         $this->assertOwner($vendor);
-        $this->staff->assertCanManageInventory($request->user(), $vendor);
+        $this->staff->assertAccountOwner($request->user(), $vendor);
         $claims = OohInventoryClaim::query()
             ->with('inventory')
             ->where('reporter_vendor_id', $vendor->id)

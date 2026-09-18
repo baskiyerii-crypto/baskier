@@ -5,7 +5,7 @@
 @if(session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="h5 mb-0">Envanter</h1>
-    @if($role === 'owner')
+    @if($canMutate ?? ($role === 'owner'))
         <a href="{{ route('outdoor-panel.inventories.create') }}" class="btn btn-primary btn-sm">Yeni pano</a>
     @endif
 </div>
@@ -22,8 +22,13 @@
                 <td>{{ $inv->status }}</td>
                 <td>{{ $inv->list_price ? '₺'.number_format($inv->list_price,2,',','.') : '—' }}</td>
                 <td class="text-end">
-                    @if($role === 'owner')
+                    @if($canMutate ?? ($role === 'owner'))
                         <a class="btn btn-outline-secondary btn-sm" href="{{ route('outdoor-panel.inventories.edit', $inv) }}">Düzenle</a>
+                        <form method="POST" action="{{ route('outdoor-panel.inventories.destroy', $inv) }}" class="d-inline" onsubmit="return confirm('Bu pano silinsin mi?');">
+                            @csrf
+                            @method('DELETE')
+                            <button class="btn btn-outline-danger btn-sm">Sil</button>
+                        </form>
                     @endif
                 </td>
             </tr>

@@ -13,7 +13,7 @@ class VendorMember extends Model
 
     public const ROLE_FIELD = 'field';
 
-    protected $fillable = ['vendor_id', 'user_id', 'staff_role'];
+    protected $fillable = ['vendor_id', 'user_id', 'staff_role', 'crew_id'];
 
     public function vendor(): BelongsTo
     {
@@ -23,6 +23,11 @@ class VendorMember extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function crew(): BelongsTo
+    {
+        return $this->belongsTo(OutdoorCrew::class, 'crew_id');
     }
 
     public function isOwner(): bool

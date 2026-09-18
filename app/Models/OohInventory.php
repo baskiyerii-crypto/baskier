@@ -27,7 +27,7 @@ class OohInventory extends Model
     public const UNIT_MONTH = 'month';
 
     protected $fillable = [
-        'vendor_id', 'category_id', 'title', 'slug', 'description',
+        'vendor_id', 'created_by_user_id', 'category_id', 'title', 'slug', 'description',
         'turkiye_il_id', 'turkiye_ilce_id', 'city', 'district', 'address',
         'country_code', 'lat', 'lng', 'permit_no', 'geo_fingerprint', 'list_price', 'price_unit',
         'proof_radius_m', 'status', 'rejection_reason',
@@ -83,6 +83,11 @@ class OohInventory extends Model
     public function vendor(): BelongsTo
     {
         return $this->belongsTo(Vendor::class);
+    }
+
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by_user_id');
     }
 
     public function category(): BelongsTo

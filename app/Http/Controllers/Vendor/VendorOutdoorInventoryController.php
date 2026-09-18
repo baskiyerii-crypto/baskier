@@ -55,11 +55,17 @@ class VendorOutdoorInventoryController extends Controller
     {
         $vendor = $this->vendor($request);
         $this->assertOwner($vendor);
-        $this->staff->assertCanOperate($request->user(), $vendor);
-        $items = $vendor->oohInventories()->with('images', 'category')->latest()->paginate(20);
-        $role = $this->staff->roleFor($request->user(), $vendor);
+        $user = $request->user();
+        $this->staff->assertCanManageInventory($user, $vendor);
+        $query = $vendor->oohInventories()->with('images', 'category')->latest();
+        if (! $this->staff->isAccountOwner($user, $vendor)) {
+            $query->where('created_by_user_id', $user->id);
+        }
+        $items = $query->paginate(20);
+        $role = $this->staff->roleFor($user, $vendor);
+        $canMutate = true;
 
-        return view('vendor.outdoor.inventories-index', compact('vendor', 'items', 'role'));
+        return view('vendor.outdoor.inventories-index', compact('vendor', 'items', 'role', 'canMutate'));
     }
 
     public function create(Request $request)
@@ -107,7 +113,7 @@ class VendorOutdoorInventoryController extends Controller
         $this->assertOwner($vendor);
         abort_unless((int) $inventory->vendor_id === (int) $vendor->id, 403);
         $this->authorize('update', $inventory);
-        $this->staff->assertCanManageInventory($request->user(), $vendor);
+        $this->staff->assertCanEditInventory($request->user(), $inventory);
         $inventory->load('images');
         $categories = Category::query()->where('channel', Category::CHANNEL_OUTDOOR)->where('is_active', true)->orderBy('name')->get();
         $countries = Country::catalog();
@@ -150,6 +156,21 @@ class VendorOutdoorInventoryController extends Controller
         }
 
         return $this->afterSaveRedirect($inventory->fresh(), 'Envanter güncellendi.');
+    }
+
+    public function destroy(Request $request, OohInventory $inventory)
+    {
+        $vendor = $this->vendor($request);
+        $this->assertOwner($vendor);
+        abort_unless((int) $inventory->vendor_id === (int) $vendor->id, 403);
+        $this->authorize('delete', $inventory);
+        try {
+            $this->inventories->delete($inventory, $request->user());
+        } catch (RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return redirect()->route('outdoor-panel.inventories.index')->with('success', 'Pano silindi.');
     }
 
     public function submit(Request $request, OohInventory $inventory)

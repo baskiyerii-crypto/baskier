@@ -2,12 +2,16 @@
 
 namespace App\Services;
 
+use App\Models\OohInventory;
+use App\Models\OohInventoryGrant;
 use App\Models\OohOccupancy;
+use App\Models\OutdoorCrew;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Models\VendorMember;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use RuntimeException;
 
@@ -15,7 +19,7 @@ class OutdoorStaffService
 {
     public function ensureOwner(Vendor $vendor): VendorMember
     {
-        if (! \Illuminate\Support\Facades\Schema::hasTable('vendor_members')) {
+        if (! Schema::hasTable('vendor_members')) {
             throw new RuntimeException('Açık hava ekip tablosu henüz kurulmadı.');
         }
 
@@ -40,7 +44,7 @@ class OutdoorStaffService
 
     public function roleFor(User $user, Vendor $vendor): ?string
     {
-        if (! \Illuminate\Support\Facades\Schema::hasTable('vendor_members')) {
+        if (! Schema::hasTable('vendor_members')) {
             return (int) $vendor->user_id === (int) $user->id ? VendorMember::ROLE_OWNER : null;
         }
 
@@ -52,14 +56,74 @@ class OutdoorStaffService
             ->value('staff_role');
     }
 
-    public function canManageInventory(User $user, Vendor $vendor): bool
+    public function isAccountOwner(User $user, Vendor $vendor): bool
     {
         return $this->roleFor($user, $vendor) === VendorMember::ROLE_OWNER;
     }
 
+    public function hasActiveInventoryGrant(User $user, Vendor $vendor): bool
+    {
+        if (! Schema::hasTable('ooh_inventory_grants')) {
+            return false;
+        }
+
+        $now = now();
+        $personal = OohInventoryGrant::query()
+            ->where('vendor_id', $vendor->id)
+            ->where('user_id', $user->id)
+            ->whereNull('revoked_at')
+            ->where('starts_at', '<=', $now)
+            ->where(function ($q) use ($now) {
+                $q->whereNull('ends_at')->orWhere('ends_at', '>=', $now);
+            })
+            ->exists();
+        if ($personal) {
+            return true;
+        }
+
+        $crewId = VendorMember::query()
+            ->where('vendor_id', $vendor->id)
+            ->where('user_id', $user->id)
+            ->value('crew_id');
+        if (! $crewId) {
+            return false;
+        }
+
+        return OohInventoryGrant::query()
+            ->where('vendor_id', $vendor->id)
+            ->where('crew_id', $crewId)
+            ->whereNull('revoked_at')
+            ->where('starts_at', '<=', $now)
+            ->where(function ($q) use ($now) {
+                $q->whereNull('ends_at')->orWhere('ends_at', '>=', $now);
+            })
+            ->exists();
+    }
+
+    public function canManageInventory(User $user, Vendor $vendor): bool
+    {
+        return $this->isAccountOwner($user, $vendor) || $this->hasActiveInventoryGrant($user, $vendor);
+    }
+
+    public function canEditInventory(User $user, OohInventory $inventory): bool
+    {
+        $vendor = $inventory->vendor;
+        if (! $vendor) {
+            return false;
+        }
+        if ($this->isAccountOwner($user, $vendor)) {
+            return true;
+        }
+        if (! $this->hasActiveInventoryGrant($user, $vendor)) {
+            return false;
+        }
+
+        return (int) $inventory->created_by_user_id === (int) $user->id;
+    }
+
     public function canOperate(User $user, Vendor $vendor): bool
     {
-        return in_array($this->roleFor($user, $vendor), [VendorMember::ROLE_OWNER, VendorMember::ROLE_OPS], true);
+        return $this->isAccountOwner($user, $vendor);
     }
 
     public function canProof(User $user, OohOccupancy $occupancy): bool
@@ -68,19 +132,36 @@ class OutdoorStaffService
         if (! $vendor) {
             return false;
         }
-        $role = $this->roleFor($user, $vendor);
-        if (in_array($role, [VendorMember::ROLE_OWNER, VendorMember::ROLE_OPS], true)) {
+        if ($this->isAccountOwner($user, $vendor)) {
             return true;
         }
 
-        return $role === VendorMember::ROLE_FIELD
-            && (int) $occupancy->assigned_user_id === (int) $user->id;
+        $role = $this->roleFor($user, $vendor);
+        if (! $role) {
+            return false;
+        }
+
+        return (int) $occupancy->assigned_user_id === (int) $user->id;
+    }
+
+    public function assertAccountOwner(User $user, Vendor $vendor): void
+    {
+        if (! $this->isAccountOwner($user, $vendor)) {
+            abort(403, 'Bu işlem yalnızca mecra sahibi içindir.');
+        }
     }
 
     public function assertCanManageInventory(User $user, Vendor $vendor): void
     {
         if (! $this->canManageInventory($user, $vendor)) {
-            abort(403, 'Envanter yalnızca işletme sahibi tarafından yönetilir.');
+            abort(403, 'Envanter ekleme yetkiniz yok veya süresi doldu.');
+        }
+    }
+
+    public function assertCanEditInventory(User $user, OohInventory $inventory): void
+    {
+        if (! $this->canEditInventory($user, $inventory)) {
+            abort(403, 'Bu panoyu düzenleme yetkiniz yok.');
         }
     }
 
@@ -91,14 +172,85 @@ class OutdoorStaffService
         }
     }
 
-    public function invite(Vendor $vendor, User $actor, string $email, string $name, string $staffRole, ?string $password = null): VendorMember
+    public function createCrew(Vendor $vendor, User $actor, string $name): OutdoorCrew
     {
-        $this->assertCanManageInventory($actor, $vendor);
-        if (! in_array($staffRole, [VendorMember::ROLE_OPS, VendorMember::ROLE_FIELD], true)) {
-            throw new RuntimeException('Geçersiz ekip rolü.');
+        $this->assertAccountOwner($actor, $vendor);
+        $name = trim($name);
+        if ($name === '') {
+            throw new RuntimeException('Ekip adı gerekli.');
         }
 
-        return DB::transaction(function () use ($vendor, $email, $name, $staffRole, $password) {
+        $exists = OutdoorCrew::query()->where('vendor_id', $vendor->id)->where('name', $name)->exists();
+        if ($exists) {
+            throw new RuntimeException('Bu isimde bir ekip zaten var.');
+        }
+
+        return OutdoorCrew::create([
+            'vendor_id' => $vendor->id,
+            'name' => $name,
+        ]);
+    }
+
+    public function grantInventory(
+        Vendor $vendor,
+        User $actor,
+        ?int $crewId,
+        ?int $userId,
+        \DateTimeInterface $startsAt,
+        ?\DateTimeInterface $endsAt
+    ): OohInventoryGrant {
+        $this->assertAccountOwner($actor, $vendor);
+        if (($crewId && $userId) || (! $crewId && ! $userId)) {
+            throw new RuntimeException('Yetki ya bir ekibe ya da bir kişiye verilmeli.');
+        }
+        if ($crewId) {
+            $crew = OutdoorCrew::query()->where('vendor_id', $vendor->id)->whereKey($crewId)->first();
+            if (! $crew) {
+                throw new RuntimeException('Ekip bu satıcıya ait değil.');
+            }
+        }
+        if ($userId) {
+            $member = VendorMember::query()->where('vendor_id', $vendor->id)->where('user_id', $userId)->first();
+            if (! $member || $member->staff_role === VendorMember::ROLE_OWNER) {
+                throw new RuntimeException('Yetki verilecek kişi ekipte olmalı.');
+            }
+        }
+        if ($endsAt && \Carbon\Carbon::parse($endsAt)->lt($startsAt)) {
+            throw new RuntimeException('Bitiş tarihi başlangıçtan önce olamaz.');
+        }
+
+        return OohInventoryGrant::create([
+            'vendor_id' => $vendor->id,
+            'crew_id' => $crewId,
+            'user_id' => $userId,
+            'starts_at' => $startsAt,
+            'ends_at' => $endsAt,
+            'granted_by_user_id' => $actor->id,
+        ]);
+    }
+
+    public function revokeGrant(Vendor $vendor, User $actor, OohInventoryGrant $grant): void
+    {
+        $this->assertAccountOwner($actor, $vendor);
+        abort_unless((int) $grant->vendor_id === (int) $vendor->id, 403);
+        if ($grant->revoked_at) {
+            return;
+        }
+        $grant->update(['revoked_at' => now()]);
+    }
+
+    public function invite(Vendor $vendor, User $actor, string $email, string $name, string $staffRole = VendorMember::ROLE_FIELD, ?string $password = null, ?int $crewId = null): VendorMember
+    {
+        $this->assertAccountOwner($actor, $vendor);
+        $staffRole = VendorMember::ROLE_FIELD;
+        if ($crewId) {
+            $ok = OutdoorCrew::query()->where('vendor_id', $vendor->id)->whereKey($crewId)->exists();
+            if (! $ok) {
+                throw new RuntimeException('Seçilen ekip bulunamadı.');
+            }
+        }
+
+        return DB::transaction(function () use ($vendor, $email, $name, $staffRole, $password, $crewId) {
             $user = User::query()->where('email', $email)->first();
             if ($user) {
                 if ($user->vendor_id && (int) $user->vendor_id !== (int) $vendor->id) {
@@ -122,9 +274,14 @@ class OutdoorStaffService
                 'role' => 'vendor',
             ]);
 
+            $payload = ['staff_role' => $staffRole];
+            if (Schema::hasColumn('vendor_members', 'crew_id')) {
+                $payload['crew_id'] = $crewId;
+            }
+
             return VendorMember::updateOrCreate(
                 ['vendor_id' => $vendor->id, 'user_id' => $user->id],
-                ['staff_role' => $staffRole]
+                $payload
             );
         });
     }

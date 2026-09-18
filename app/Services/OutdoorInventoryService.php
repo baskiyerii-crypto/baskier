@@ -29,7 +29,7 @@ class OutdoorInventoryService
         $this->staff->assertCanManageInventory($actor, $vendor);
         $this->assertOutdoorCategory((int) $payload['category_id']);
 
-        return DB::transaction(function () use ($vendor, $payload, $images) {
+        return DB::transaction(function () use ($vendor, $actor, $payload, $images) {
             $geo = $this->geoFromPayload($payload);
             $row = [
                 'vendor_id' => $vendor->id,
@@ -50,6 +50,9 @@ class OutdoorInventoryService
                 'proof_radius_m' => $payload['proof_radius_m'] ?? 75,
                 'status' => OohInventory::STATUS_DRAFT,
             ];
+            if (Schema::hasColumn('ooh_inventories', 'created_by_user_id')) {
+                $row['created_by_user_id'] = $actor->id;
+            }
             if (OutdoorSchema::hasCountryCode()) {
                 $row['country_code'] = $geo['country_code'];
             }
@@ -79,7 +82,7 @@ class OutdoorInventoryService
      */
     public function update(OohInventory $inventory, User $actor, array $payload, array $images = []): OohInventory
     {
-        $this->staff->assertCanManageInventory($actor, $inventory->vendor);
+        $this->staff->assertCanEditInventory($actor, $inventory);
         if (isset($payload['category_id'])) {
             $this->assertOutdoorCategory((int) $payload['category_id']);
         }
@@ -105,9 +108,15 @@ class OutdoorInventoryService
         return $inventory->fresh('images');
     }
 
+    public function delete(OohInventory $inventory, User $actor): void
+    {
+        $this->staff->assertCanEditInventory($actor, $inventory);
+        $inventory->delete();
+    }
+
     public function submitForReview(OohInventory $inventory, User $actor): OohInventory
     {
-        $this->staff->assertCanManageInventory($actor, $inventory->vendor);
+        $this->staff->assertCanEditInventory($actor, $inventory);
         if (! in_array($inventory->status, [OohInventory::STATUS_DRAFT, OohInventory::STATUS_REJECTED], true)) {
             throw new RuntimeException('Bu envanter incelenmeye gönderilemez.');
         }

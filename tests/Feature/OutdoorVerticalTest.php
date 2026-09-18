@@ -608,4 +608,137 @@ class OutdoorVerticalTest extends TestCase
         $this->actingAs($agencyUser)->get(route('outdoor-panel.inventories.create'))->assertForbidden();
         $this->actingAs($agencyUser)->get(route('outdoor-panel.pool'))->assertOk();
     }
+
+    public function test_personal_inventory_grant_sees_only_own_faces_and_revokes_to_field(): void
+    {
+        Storage::fake('public');
+        [$ownerUser, $owner] = $this->outdoorVendor('Sahip Firma');
+        $cat = $this->outdoorCategory();
+        $ownerFace = $this->publishFace($owner, $cat, 'Sahip Panosu');
+
+        $field = User::factory()->create(['role' => 'vendor', 'vendor_id' => $owner->id]);
+        VendorMember::create([
+            'vendor_id' => $owner->id,
+            'user_id' => $field->id,
+            'staff_role' => VendorMember::ROLE_FIELD,
+        ]);
+
+        $this->actingAs($field)->get(route('outdoor-panel.inventories.create'))->assertForbidden();
+
+        $staff = app(OutdoorStaffService::class);
+        $grant = $staff->grantInventory(
+            $owner,
+            $ownerUser,
+            null,
+            $field->id,
+            now()->subHour(),
+            now()->addDays(10)
+        );
+
+        $this->actingAs($field)->get(route('outdoor-panel.inventories.index'))
+            ->assertOk()
+            ->assertDontSee('Sahip Panosu');
+
+        $this->actingAs($field)->post(route('outdoor-panel.inventories.store'), [
+            'title' => 'Saha Ekstra',
+            'category_id' => $cat->id,
+            'lat' => 38.4,
+            'lng' => 27.1,
+            'price_unit' => 'month',
+            'permit_no' => 'SAHA-1',
+        ])->assertRedirect();
+
+        $extra = OohInventory::query()->where('title', 'Saha Ekstra')->first();
+        $this->assertNotNull($extra);
+        $this->assertSame($field->id, (int) $extra->created_by_user_id);
+        $this->assertSame($owner->id, (int) $extra->vendor_id);
+
+        $this->actingAs($field)->get(route('outdoor-panel.inventories.index'))
+            ->assertOk()
+            ->assertSee('Saha Ekstra')
+            ->assertDontSee('Sahip Panosu');
+
+        $this->actingAs($field)->get(route('outdoor-panel.inventories.edit', $ownerFace))->assertForbidden();
+        $this->actingAs($field)->put(route('outdoor-panel.inventories.update', $ownerFace), [
+            'title' => 'Hack',
+            'category_id' => $cat->id,
+            'lat' => 38.4,
+            'lng' => 27.1,
+            'price_unit' => 'month',
+        ])->assertForbidden();
+
+        $this->actingAs($field)->put(route('outdoor-panel.inventories.update', $extra), [
+            'title' => 'Saha Ekstra 2',
+            'category_id' => $cat->id,
+            'lat' => 38.4,
+            'lng' => 27.1,
+            'price_unit' => 'month',
+        ])->assertRedirect();
+        $this->assertSame('Saha Ekstra 2', $extra->fresh()->title);
+
+        $this->actingAs($field)->delete(route('outdoor-panel.inventories.destroy', $extra))->assertRedirect();
+        $this->assertSoftDeleted('ooh_inventories', ['id' => $extra->id]);
+
+        $staff->revokeGrant($owner, $ownerUser, $grant);
+        $this->actingAs($field)->get(route('outdoor-panel.inventories.create'))->assertForbidden();
+
+        $occ = OohOccupancy::create([
+            'ooh_inventory_id' => $ownerFace->id,
+            'starts_on' => now()->addDay()->toDateString(),
+            'ends_on' => now()->addDays(3)->toDateString(),
+            'kind' => OohOccupancy::KIND_BOOKED,
+            'assigned_user_id' => $field->id,
+        ]);
+        $proof = app(\App\Services\OutdoorProofService::class)->submit(
+            $occ,
+            $field,
+            UploadedFile::fake()->image('asim.jpg'),
+            41.0,
+            29.0
+        );
+        $this->assertNotNull($proof);
+    }
+
+    public function test_crew_grant_allows_member_not_other_crew(): void
+    {
+        [$ownerUser, $owner] = $this->outdoorVendor('Crew Co');
+        $cat = $this->outdoorCategory();
+        $staff = app(OutdoorStaffService::class);
+        $adana = $staff->createCrew($owner, $ownerUser, 'Adana');
+        $ankara = $staff->createCrew($owner, $ownerUser, 'Ankara');
+
+        $adanaUser = User::factory()->create(['role' => 'vendor', 'vendor_id' => $owner->id]);
+        $ankaraUser = User::factory()->create(['role' => 'vendor', 'vendor_id' => $owner->id]);
+        VendorMember::create([
+            'vendor_id' => $owner->id,
+            'user_id' => $adanaUser->id,
+            'staff_role' => VendorMember::ROLE_FIELD,
+            'crew_id' => $adana->id,
+        ]);
+        VendorMember::create([
+            'vendor_id' => $owner->id,
+            'user_id' => $ankaraUser->id,
+            'staff_role' => VendorMember::ROLE_FIELD,
+            'crew_id' => $ankara->id,
+        ]);
+
+        $staff->grantInventory($owner, $ownerUser, $adana->id, null, now()->subHour(), now()->addWeek());
+
+        $this->actingAs($adanaUser)->post(route('outdoor-panel.inventories.store'), [
+            'title' => 'Adana Pano',
+            'category_id' => $cat->id,
+            'lat' => 37.0,
+            'lng' => 35.3,
+            'price_unit' => 'month',
+        ])->assertRedirect();
+        $this->actingAs($ankaraUser)->get(route('outdoor-panel.inventories.create'))->assertForbidden();
+
+        $staff->grantInventory($owner, $ownerUser, $ankara->id, null, now()->subWeek(), now()->subHour());
+        $this->actingAs($ankaraUser)->get(route('outdoor-panel.inventories.create'))->assertForbidden();
+
+        $this->actingAs($ownerUser)->get(route('outdoor-panel.staff'))
+            ->assertOk()
+            ->assertSee('Adana')
+            ->assertSee('Pano ekleme yetkisi');
+    }
 }

@@ -11,11 +11,19 @@
     } catch (\Throwable) {
         $oohStaff = null;
     }
-    $isField = $oohStaff === 'field';
+    $isField = $oohStaff === 'field' || $oohStaff === 'ops';
+    $canInventory = false;
+    try {
+        if ($v && auth()->user()) {
+            $canInventory = $oohStaff === 'owner' || app(\App\Services\OutdoorStaffService::class)->hasActiveInventoryGrant(auth()->user(), $v);
+        }
+    } catch (\Throwable) {
+        $canInventory = $oohStaff === 'owner';
+    }
 @endphp
 <a href="{{ route('outdoor-panel.dashboard') }}" class="nav-link {{ request()->routeIs('outdoor-panel.dashboard') ? 'active' : '' }}"><span>Özet</span></a>
 
-@if($isOwner && ! $isField)
+@if($isOwner && $canInventory)
     <a href="{{ route('outdoor-panel.inventories.index') }}" class="nav-link {{ request()->routeIs('outdoor-panel.inventories.index','outdoor-panel.inventories.edit') ? 'active' : '' }}"><span>Envanter</span></a>
     <a href="{{ route('outdoor-panel.inventories.create') }}" class="nav-link {{ request()->routeIs('outdoor-panel.inventories.create') ? 'active' : '' }}"><span>Yeni pano</span></a>
 @endif

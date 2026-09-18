@@ -285,6 +285,7 @@ Route::middleware(['auth', 'role:vendor', 'vendor.not_suspended'])->prefix('acik
     Route::put('envanter/{inventory}', [VendorOutdoorInventoryController::class, 'update'])->name('inventories.update');
     Route::post('envanter/{inventory}/inceleme', [VendorOutdoorInventoryController::class, 'submit'])->name('inventories.submit');
     Route::post('envanter/{inventory}/bloke', [VendorOutdoorInventoryController::class, 'block'])->name('inventories.block');
+    Route::delete('envanter/{inventory}', [VendorOutdoorInventoryController::class, 'destroy'])->name('inventories.destroy');
     Route::get('panolar', [VendorOutdoorInventoryController::class, 'pool'])->name('pool');
     Route::get('talepler', [VendorOutdoorRequestController::class, 'index'])->name('requests.index');
     Route::get('talepler/{vendorRequest}', [VendorOutdoorRequestController::class, 'show'])->name('requests.show');
@@ -295,6 +296,9 @@ Route::middleware(['auth', 'role:vendor', 'vendor.not_suspended'])->prefix('acik
     Route::get('planlar/{plan}', [VendorOutdoorRequestController::class, 'showPlan'])->name('plans.show');
     Route::get('ekip', [VendorOutdoorOpsController::class, 'staffIndex'])->name('staff');
     Route::post('ekip', [VendorOutdoorOpsController::class, 'staffInvite'])->name('staff.invite');
+    Route::post('ekip/olustur', [VendorOutdoorOpsController::class, 'storeCrew'])->name('staff.crews.store');
+    Route::post('ekip/yetki', [VendorOutdoorOpsController::class, 'storeGrant'])->name('staff.grants.store');
+    Route::post('ekip/yetki/{grant}/kaldir', [VendorOutdoorOpsController::class, 'revokeGrant'])->name('staff.grants.revoke');
     Route::get('isler', [VendorOutdoorOpsController::class, 'jobs'])->name('jobs');
     Route::post('isler/{occupancy}/ata', [VendorOutdoorOpsController::class, 'assign'])->name('jobs.assign');
     Route::post('isler/{occupancy}/kanit', [VendorOutdoorOpsController::class, 'proof'])->name('jobs.proof');

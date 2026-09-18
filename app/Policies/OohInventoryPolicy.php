@@ -20,7 +20,7 @@ class OohInventoryPolicy
             return true;
         }
 
-        return $user->vendor_id && (int) $user->vendor_id === (int) $inventory->vendor_id;
+        return app(OutdoorStaffService::class)->canEditInventory($user, $inventory);
     }
 
     public function create(User $user): bool
@@ -43,6 +43,11 @@ class OohInventoryPolicy
             return false;
         }
 
-        return app(OutdoorStaffService::class)->canManageInventory($user, $vendor);
+        return app(OutdoorStaffService::class)->canEditInventory($user, $inventory);
+    }
+
+    public function delete(User $user, OohInventory $inventory): bool
+    {
+        return $this->update($user, $inventory);
     }
 }

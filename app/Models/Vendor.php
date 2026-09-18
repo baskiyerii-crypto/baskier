@@ -327,6 +327,11 @@ class Vendor extends Model
         return $this->hasMany(VendorMember::class);
     }
 
+    public function outdoorCrews(): HasMany
+    {
+        return $this->hasMany(OutdoorCrew::class);
+    }
+
     public function oohInventories(): HasMany
     {
         return $this->hasMany(OohInventory::class);
