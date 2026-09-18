@@ -45,6 +45,13 @@ class VendorProfileController extends Controller
         $vendor = $request->user()->vendor;
         abort_unless($vendor, 403);
 
+        if ($website = $request->input('social_website')) {
+            $website = trim((string) $website);
+            if ($website !== '' && ! preg_match('~^https?://~i', $website)) {
+                $request->merge(['social_website' => 'https://'.$website]);
+            }
+        }
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:5000'],
@@ -63,6 +70,12 @@ class VendorProfileController extends Controller
             'cover_image' => ['nullable', 'image', 'max:4096'],
             'social_instagram' => ['nullable', 'string', 'max:255'],
             'social_website' => ['nullable', 'url', 'max:255'],
+        ], [
+            'social_website.url' => 'Web sitesi adresi geçerli bir URL olmalıdır (örn: https://siteniz.com).',
+            'map_lat.numeric' => 'Harita enlem (Lat) sadece rakam/ondalık sayı olabilir.',
+            'map_lng.numeric' => 'Harita boylam (Lng) sadece rakam/ondalık sayı olabilir.',
+            'name.required' => 'Mağaza / satıcı adı zorunludur.',
+            'email.email' => 'Geçerli bir e-posta adresi giriniz.',
         ]);
 
         $payload = collect($validated)->except(['logo', 'cover_image', 'social_instagram', 'social_website', 'turkiye_il_id', 'turkiye_ilce_id'])->all();

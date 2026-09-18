@@ -8,6 +8,7 @@
     use App\Domain\OrderStatus;
 
     $statusBadgeClass = match($order->status) {
+        OrderStatus::PENDING_PAYMENT => 'bg-warning text-dark border border-warning',
         OrderStatus::CONFIRMED, OrderStatus::PENDING => 'bg-primary text-white',
         OrderStatus::DESIGN_REVIEW => 'bg-warning text-dark',
         OrderStatus::IN_PRODUCTION => 'bg-info text-dark',
@@ -168,6 +169,25 @@
         <!-- 1. Durum Geçişleri ve Kargo Paneli -->
         <div class="card p-3 mb-3 shadow-sm">
             <h2 class="h6 fw-bold mb-3 border-bottom pb-2">Sipariş Durumunu Yönet</h2>
+
+            <!-- Havale / EFT Ödeme Bekleyen Sipariş İçin Onay Kartı -->
+            @if($order->status === OrderStatus::PENDING_PAYMENT)
+                <div class="alert alert-warning border border-warning-subtle shadow-sm mb-3">
+                    <div class="fw-bold mb-1 d-flex align-items-center gap-1">
+                        <span>⚠️</span>
+                        <span>Havale/EFT Ödemesi Bekleniyor</span>
+                    </div>
+                    <p class="small text-muted mb-2">
+                        Müşteri bu sipariş için banka havalesi / EFT ile ödeme seçmiştir. Banka hesabınızı kontrol edip tutarı teyit ettikten sonra aşağıdaki butona basarak siparişi onaylayabilirsiniz.
+                    </p>
+                    <form method="POST" action="{{ route('vendor.orders.confirm-payment', $order) }}" onsubmit="return confirm('Müşterinin havale/EFT ödemesi banka hesabınıza geçtiyse onaylamak istediğinize emin misiniz?');">
+                        @csrf
+                        <button type="submit" class="btn btn-success w-100 py-2 fw-bold shadow-sm">
+                            ✓ Havale Ödemesini Onayla ve Siparişi Başlat
+                        </button>
+                    </form>
+                </div>
+            @endif
 
             <!-- Mevcut Kargo Bilgisi (Varsa) -->
             @if($order->latestShipment)

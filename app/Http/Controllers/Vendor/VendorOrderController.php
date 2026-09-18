@@ -137,4 +137,34 @@ class VendorOrderController extends Controller
 
         return back()->with('success', 'Sipariş durumu güncellendi: '.$label);
     }
+
+    public function confirmPayment(Request $request, Order $order)
+    {
+        $vendor = $this->getVendor($request);
+        if ((int) $order->vendor_id !== (int) $vendor->id) {
+            abort(403, 'Bu sipariş mağazanıza ait değil.');
+        }
+
+        if ($order->status !== OrderStatus::PENDING_PAYMENT && $order->status !== OrderStatus::PENDING) {
+            return back()->with('error', 'Bu sipariş ödeme onaylama durumunda değil.');
+        }
+
+        try {
+            $this->orderService->transition($order, OrderStatus::CONFIRMED, $request->user());
+        } catch (\InvalidArgumentException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        if ($order->user) {
+            app(\App\Services\NotificationService::class)->notify(
+                $order->user,
+                'Ödemeniz Onaylandı',
+                "#{$order->order_number} numaralı siparişinizin ödemesi satıcı tarafından onaylandı ve üretime hazırlık sürecine alındı.",
+                ['type' => 'payment_confirmed', 'order_id' => $order->id],
+                route('customer.orders.show', $order)
+            );
+        }
+
+        return back()->with('success', "#{$order->order_number} numaralı siparişin ödemesi başarıyla onaylandı ve sipariş 'Yeni Onaylanan' durumuna alındı.");
+    }
 }

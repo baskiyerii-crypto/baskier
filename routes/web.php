@@ -223,6 +223,7 @@ Route::middleware(['auth', 'role:vendor', 'vendor.not_suspended'])->prefix('sati
     Route::get('siparisler/{order}', [VendorOrderController::class, 'show'])->name('orders.show');
     Route::post('siparisler/{order}/tasarim', [VendorOrderDesignController::class, 'store'])->name('orders.design.store');
     Route::put('siparisler/{order}/durum', [VendorOrderController::class, 'updateStatus'])->name('orders.update-status');
+    Route::post('siparisler/{order}/odeme-onayla', [VendorOrderController::class, 'confirmPayment'])->name('orders.confirm-payment');
     Route::get('odeme-talepleri', [VendorPayoutRequestWebController::class, 'index'])->name('payout-requests.index');
     Route::post('odeme-talepleri', [VendorPayoutRequestWebController::class, 'store'])->name('payout-requests.store');
     Route::get('bakiye', [VendorBalanceController::class, 'index'])->name('balance.index');

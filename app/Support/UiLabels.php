@@ -8,6 +8,7 @@ final class UiLabels
     {
         return [
             'pending' => __('panel.status_pending'),
+            'pending_payment' => __('panel.status_pending_payment'),
             'paid' => __('panel.status_paid'),
             'confirmed' => __('panel.status_confirmed'),
             'design_review' => __('panel.status_design_review'),

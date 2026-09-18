@@ -32,6 +32,11 @@
         <a class="nav-link py-1 px-3 {{ $currentStatus === '' ? 'active' : '' }}" href="{{ route('vendor.orders.index', array_filter(['q' => request('q')])) }}">Tümü</a>
     </li>
     <li class="nav-item">
+        <a class="nav-link py-1 px-3 {{ $currentStatus === OrderStatus::PENDING_PAYMENT ? 'active' : '' }}" href="{{ route('vendor.orders.index', array_filter(['status' => OrderStatus::PENDING_PAYMENT, 'q' => request('q')])) }}">
+            Ödeme Bekleyen
+        </a>
+    </li>
+    <li class="nav-item">
         <a class="nav-link py-1 px-3 {{ $currentStatus === OrderStatus::CONFIRMED ? 'active' : '' }}" href="{{ route('vendor.orders.index', array_filter(['status' => OrderStatus::CONFIRMED, 'q' => request('q')])) }}">Yeni Onaylanan</a>
     </li>
     <li class="nav-item">
@@ -79,7 +84,8 @@
                         <td class="fw-bold text-success">₺{{ number_format($order->vendor_amount ?? $order->subtotal, 2, ',', '.') }}</td>
                         <td>
                             <span class="badge rounded-pill
-                                @if(in_array($order->status, [OrderStatus::CONFIRMED, OrderStatus::PENDING])) bg-primary
+                                @if($order->status === OrderStatus::PENDING_PAYMENT) bg-warning text-dark border border-warning
+                                @elseif(in_array($order->status, [OrderStatus::CONFIRMED, OrderStatus::PENDING])) bg-primary
                                 @elseif($order->status === OrderStatus::DESIGN_REVIEW) bg-warning text-dark
                                 @elseif($order->status === OrderStatus::IN_PRODUCTION) bg-info text-dark
                                 @elseif($order->status === OrderStatus::READY_TO_SHIP) bg-secondary
@@ -91,7 +97,17 @@
                             </span>
                         </td>
                         <td class="text-end">
-                            <a href="{{ route('vendor.orders.show', $order) }}" class="btn btn-outline-primary btn-sm">İncele & Yönet →</a>
+                            <div class="d-flex justify-content-end align-items-center gap-1">
+                                @if($order->status === OrderStatus::PENDING_PAYMENT)
+                                    <form method="POST" action="{{ route('vendor.orders.confirm-payment', $order) }}" onsubmit="return confirm('Müşterinin havale/EFT ödemesi banka hesabınıza geçtiyse onaylamak istediğinize emin misiniz?');">
+                                        @csrf
+                                        <button type="submit" class="btn btn-success btn-sm fw-semibold" title="Havale Ödemesini Onayla">
+                                            ✓ Ödemeyi Onayla
+                                        </button>
+                                    </form>
+                                @endif
+                                <a href="{{ route('vendor.orders.show', $order) }}" class="btn btn-outline-primary btn-sm">İncele & Yönet →</a>
+                            </div>
                         </td>
                     </tr>
                 @empty

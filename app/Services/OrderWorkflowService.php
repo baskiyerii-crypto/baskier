@@ -15,6 +15,7 @@ class OrderWorkflowService
     {
         return [
             OrderStatus::PENDING => [OrderStatus::CONFIRMED, OrderStatus::CANCELLED],
+            OrderStatus::PENDING_PAYMENT => [OrderStatus::CONFIRMED, OrderStatus::CANCELLED],
             OrderStatus::CONFIRMED => [
                 OrderStatus::DESIGN_REVIEW,
                 OrderStatus::IN_PRODUCTION,

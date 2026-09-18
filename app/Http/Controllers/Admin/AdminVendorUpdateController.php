@@ -44,6 +44,16 @@ class AdminVendorUpdateController extends Controller
         $vendor = $document->vendor;
         if ($vendor) {
             app(\App\Services\TrustBadgeService::class)->recalculateAndSave($vendor);
+            if ($vendor->user) {
+                $docLabel = class_exists(\App\Support\UiLabels::class) ? \App\Support\UiLabels::documentType($document->document_type) : $document->document_type;
+                app(\App\Services\NotificationService::class)->notify(
+                    $vendor->user,
+                    'Belgeniz Onaylandı',
+                    "Yüklemiş olduğunuz '{$docLabel}' belgesi yönetici tarafından onaylandı.",
+                    ['type' => 'document_approved', 'document_id' => $document->id],
+                    route('vendor.documents.index')
+                );
+            }
         }
 
         return back()->with('success', __('panel.document_approved'));
@@ -51,15 +61,26 @@ class AdminVendorUpdateController extends Controller
 
     public function rejectDocument(Request $request, VendorDocument $document)
     {
+        $reason = $request->input('rejection_reason', 'Yönetici tarafından onaylanmadı.');
         $document->update([
             'status' => 'rejected',
             'reviewed_by' => $request->user()?->id,
             'reviewed_at' => now(),
-            'rejection_reason' => $request->input('rejection_reason', 'Yönetici tarafından onaylanmadı.'),
+            'rejection_reason' => $reason,
         ]);
         $vendor = $document->vendor;
         if ($vendor) {
             app(\App\Services\TrustBadgeService::class)->recalculateAndSave($vendor);
+            if ($vendor->user) {
+                $docLabel = class_exists(\App\Support\UiLabels::class) ? \App\Support\UiLabels::documentType($document->document_type) : $document->document_type;
+                app(\App\Services\NotificationService::class)->notify(
+                    $vendor->user,
+                    'Belgeniz Onaylanmadı',
+                    "Yüklemiş olduğunuz '{$docLabel}' belgesi onaylanmadı. Gerekçe: {$reason}",
+                    ['type' => 'document_rejected', 'document_id' => $document->id, 'reason' => $reason],
+                    route('vendor.documents.index')
+                );
+            }
         }
 
         return back()->with('success', __('panel.document_rejected'));
@@ -82,17 +103,40 @@ class AdminVendorUpdateController extends Controller
             'reviewed_at' => now(),
         ]);
 
+        if ($vendor->user) {
+            app(\App\Services\NotificationService::class)->notify(
+                $vendor->user,
+                'Profil Değişikliği Onaylandı',
+                'Mağaza profil bilgileriniz yönetici tarafından onaylandı ve vitrininizde güncellendi.',
+                ['type' => 'profile_approved'],
+                route('vendor.profile.edit')
+            );
+        }
+
         return back()->with('success', __('panel.profile_change_approved'));
     }
 
     public function rejectProfile(Request $request, VendorProfileChangeRequest $vendorProfileChangeRequest)
     {
+        $adminNote = $request->input('admin_note');
         $vendorProfileChangeRequest->update([
             'status' => 'rejected',
-            'admin_note' => $request->input('admin_note'),
+            'admin_note' => $adminNote,
             'reviewed_at' => now(),
         ]);
-        $vendorProfileChangeRequest->vendor->update(['profile_pending_payload' => null]);
+        $vendor = $vendorProfileChangeRequest->vendor;
+        $vendor->update(['profile_pending_payload' => null]);
+
+        if ($vendor->user) {
+            $reasonText = $adminNote ? " Not: {$adminNote}" : '';
+            app(\App\Services\NotificationService::class)->notify(
+                $vendor->user,
+                'Profil Değişikliği Onaylanmadı',
+                'Gönderdiğiniz profil değişiklik talebi yönetici tarafından onaylanmadı.' . $reasonText,
+                ['type' => 'profile_rejected', 'admin_note' => $adminNote],
+                route('vendor.profile.edit')
+            );
+        }
 
         return back()->with('success', __('panel.profile_change_rejected'));
     }

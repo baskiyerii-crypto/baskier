@@ -292,6 +292,19 @@
             shell.classList.toggle('nav-collapsed');
         }
     }
+
+    // Global: Sayısal ve ölçü/birim alanlarına harf girişini engelleme
+    document.addEventListener('keydown', function(e) {
+        const target = e.target;
+        if (target && (target.classList.contains('number-only-input') || target.type === 'number')) {
+            const allowedKeys = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', '.', ',', '-', 'Enter'];
+            if (allowedKeys.includes(e.key)) return;
+            if (e.ctrlKey || e.metaKey) return;
+            if (!/^[0-9]$/.test(e.key)) {
+                e.preventDefault();
+            }
+        }
+    });
 </script>
 @stack('scripts')
 @include('partials.pwa-install')

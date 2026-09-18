@@ -110,6 +110,16 @@ class AdminVerificationQueueController extends Controller
         $vendor = $document->vendor;
         if ($vendor) {
             $this->trustBadgeService->recalculateAndSave($vendor);
+            if ($vendor->user) {
+                $docLabel = class_exists(\App\Support\UiLabels::class) ? \App\Support\UiLabels::documentType($document->document_type) : $document->document_type;
+                app(\App\Services\NotificationService::class)->notify(
+                    $vendor->user,
+                    'Belgeniz Onaylandı',
+                    "Yüklemiş olduğunuz '{$docLabel}' belgesi yönetici tarafından onaylandı ve güven seviyeniz güncellendi.",
+                    ['type' => 'document_approved', 'document_id' => $document->id],
+                    route('vendor.documents.index')
+                );
+            }
         }
 
         return back()->with('success', 'Belge onaylandı. Satıcının güven seviyesi kurallara göre otomatik güncellendi.');
@@ -134,6 +144,16 @@ class AdminVerificationQueueController extends Controller
         $vendor = $document->vendor;
         if ($vendor) {
             $this->trustBadgeService->recalculateAndSave($vendor);
+            if ($vendor->user) {
+                $docLabel = class_exists(\App\Support\UiLabels::class) ? \App\Support\UiLabels::documentType($document->document_type) : $document->document_type;
+                app(\App\Services\NotificationService::class)->notify(
+                    $vendor->user,
+                    'Belgeniz Onaylanmadı',
+                    "Yüklemiş olduğunuz '{$docLabel}' belgesi reddedildi. Gerekçe: {$validated['rejection_reason']}",
+                    ['type' => 'document_rejected', 'document_id' => $document->id, 'reason' => $validated['rejection_reason']],
+                    route('vendor.documents.index')
+                );
+            }
         }
 
         return back()->with('success', 'Belge reddedildi ve gerekçeli denetim kaydı oluşturuldu.');

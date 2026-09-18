@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
             ProductSeeder::class,
             FreelancerJobListingSeeder::class,
             TurkiyeGeographySeeder::class,
+            OutdoorCategorySeeder::class,
         ]);
     }
 }

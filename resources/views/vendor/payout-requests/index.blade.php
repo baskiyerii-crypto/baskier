@@ -32,15 +32,15 @@
                 @csrf
                 <div class="mb-3">
                     <label class="form-label small fw-semibold">Çekilecek Tutar (₺)</label>
-                    <input type="number" name="amount" step="0.01" min="10" max="{{ $availableBalance }}" class="form-control rounded-3" required placeholder="ör. 500" value="{{ old('amount') }}">
+                    <input type="number" id="payout-amount" name="amount" step="0.01" min="10" max="{{ $availableBalance }}" class="form-control rounded-3 number-only-input" required placeholder="ör. 500" value="{{ old('amount') }}">
                     <div class="form-text">Minimum çekim tutarı ₺10,00'dir.</div>
                     @error('amount')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label small fw-semibold">Banka IBAN Numarası</label>
-                    <input type="text" name="iban" class="form-control rounded-3 font-monospace" required placeholder="TR000000000000000000000000" maxlength="26" value="{{ old('iban') }}">
-                    <div class="form-text">TR ile başlayan 26 haneli IBAN.</div>
+                    <input type="text" id="iban-input" name="iban" class="form-control rounded-3 font-monospace text-uppercase" required placeholder="TR000000000000000000000000" maxlength="26" value="{{ old('iban', 'TR') }}">
+                    <div class="form-text">TR ile başlayan 26 haneli IBAN (sadece rakam giriniz).</div>
                     @error('iban')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
                 </div>
 
@@ -104,4 +104,53 @@
         <div class="mt-3">{{ $requests->links() }}</div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ibanInput = document.getElementById('iban-input');
+    if (ibanInput) {
+        function formatIban() {
+            let val = ibanInput.value.toUpperCase().replace(/\s+/g, '');
+            if (!val.startsWith('TR')) {
+                // TR ile başlamıyorsa ve rakam içeriyorsa başa TR koy
+                val = 'TR' + val.replace(/^TR/i, '').replace(/[^0-9]/g, '');
+            } else {
+                val = 'TR' + val.substring(2).replace(/[^0-9]/g, '');
+            }
+            if (val.length > 26) {
+                val = val.substring(0, 26);
+            }
+            ibanInput.value = val;
+        }
+
+        ibanInput.addEventListener('focus', function() {
+            if (!ibanInput.value || ibanInput.value.trim() === '') {
+                ibanInput.value = 'TR';
+            }
+        });
+
+        ibanInput.addEventListener('input', formatIban);
+
+        ibanInput.addEventListener('keydown', function(e) {
+            // İlk iki karakter TR ise ve imleç oradaysa backspace ile silinmesini engelle
+            if ((e.key === 'Backspace' || e.key === 'Delete') && ibanInput.selectionStart <= 2 && ibanInput.selectionEnd <= 2) {
+                e.preventDefault();
+            }
+        });
+    }
+
+    // Tutar alanı harf girişini engelleme
+    const amountInput = document.getElementById('payout-amount');
+    if (amountInput) {
+        amountInput.addEventListener('keydown', function(e) {
+            const allowed = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', '.', ',', 'Enter'];
+            if (allowed.includes(e.key)) return;
+            if (e.ctrlKey || e.metaKey) return;
+            if (!/^[0-9]$/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+    }
+});
+</script>
 @endsection

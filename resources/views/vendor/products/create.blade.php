@@ -26,12 +26,13 @@
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label small fw-semibold">Fiyat (₺)</label>
-                    <input type="number" name="price" step="0.01" min="0" class="form-control rounded-3" value="{{ old('price') }}" required>
+                    <input type="number" name="price" step="0.01" min="0" inputmode="decimal" class="form-control rounded-3 number-only-input" value="{{ old('price') }}" required>
                     @error('price')<div class="text-danger small">{{ $message }}</div>@enderror
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label small fw-semibold">Stok</label>
-                    <input type="number" name="stock" min="0" class="form-control rounded-3" value="{{ old('stock', 0) }}" required>
+                    <input type="number" name="stock" min="0" inputmode="numeric" class="form-control rounded-3 number-only-input" value="{{ old('stock', 0) }}" required>
+                    @error('stock')<div class="text-danger small">{{ $message }}</div>@enderror
                 </div>
             </div>
             <div class="mb-3">
@@ -69,4 +70,19 @@
             <a href="{{ route('vendor.products.index') }}" class="btn btn-outline-secondary">İptal</a>
         </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.number-only-input').forEach(function(input) {
+        input.addEventListener('keydown', function(e) {
+            const allowed = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', '.', ',', '-', 'Enter'];
+            if (allowed.includes(e.key)) return;
+            if (e.ctrlKey || e.metaKey) return;
+            if (!/^[0-9]$/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+    });
+});
+</script>
 @endsection

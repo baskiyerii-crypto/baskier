@@ -179,13 +179,13 @@
                 </div>
 
                 <div class="col-md-3">
-                    <label class="form-label small fw-semibold">Düzenlenme Tarihi</label>
-                    <input type="date" name="issued_at" class="form-control">
+                    <label for="issued_at" class="form-label small fw-semibold" style="cursor: pointer;">Düzenlenme Tarihi 📅</label>
+                    <input type="date" id="issued_at" name="issued_at" class="form-control date-picker-input" style="cursor: pointer;">
                 </div>
 
                 <div class="col-md-3">
-                    <label class="form-label small fw-semibold">Geçerlilik Bitiş Tarihi</label>
-                    <input type="date" name="expires_at" class="form-control">
+                    <label for="expires_at" class="form-label small fw-semibold" style="cursor: pointer;">Geçerlilik Bitiş Tarihi 📅</label>
+                    <input type="date" id="expires_at" name="expires_at" class="form-control date-picker-input" style="cursor: pointer;">
                     <span class="text-muted" style="font-size: 0.72rem;">Süresiz ise boş bırakabilirsiniz.</span>
                 </div>
 
@@ -279,4 +279,44 @@
         @endif
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Tarih alanlarına veya label'larına tıklandığında takvim açıcıyı tetikle
+    document.querySelectorAll('.date-picker-input').forEach(function(input) {
+        input.addEventListener('click', function() {
+            try {
+                if (typeof input.showPicker === 'function') {
+                    input.showPicker();
+                }
+            } catch (err) {
+                // Desteklenmeyen tarayıcılar için varsayılan davranış
+            }
+        });
+        input.addEventListener('focus', function() {
+            try {
+                if (typeof input.showPicker === 'function') {
+                    input.showPicker();
+                }
+            } catch (err) {}
+        });
+    });
+
+    ['issued_at', 'expires_at'].forEach(function(id) {
+        const lbl = document.querySelector('label[for="' + id + '"]');
+        const inp = document.getElementById(id);
+        if (lbl && inp) {
+            lbl.addEventListener('click', function(e) {
+                e.preventDefault();
+                inp.focus();
+                try {
+                    if (typeof inp.showPicker === 'function') {
+                        inp.showPicker();
+                    }
+                } catch (err) {}
+            });
+        }
+    });
+});
+</script>
 @endsection

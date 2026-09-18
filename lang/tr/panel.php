@@ -195,6 +195,7 @@ return [
     'tier_standard' => 'Standart',
     'tier_medium' => 'Orta',
     'tier_professional' => 'Profesyonel',
+    'status_pending_payment' => 'Ödeme Bekliyor (Havale)',
     'status_pending' => 'Beklemede',
     'status_paid' => 'Ödendi',
     'status_confirmed' => 'Onaylandı',

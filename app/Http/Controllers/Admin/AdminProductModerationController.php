@@ -39,6 +39,16 @@ class AdminProductModerationController extends Controller
             'is_active' => true,
         ]);
 
+        if ($product->vendor && $product->vendor->user) {
+            app(\App\Services\NotificationService::class)->notify(
+                $product->vendor->user,
+                'Ürününüz Onaylandı',
+                "'{$product->name}' adlı ürününüz incelendi, onaylandı ve mağazanızda yayına alındı.",
+                ['type' => 'product_approved', 'product_id' => $product->id],
+                route('vendor.products.index')
+            );
+        }
+
         return back()->with('success', 'Ürün onaylandı ve yayınlandı.');
     }
 
@@ -53,6 +63,17 @@ class AdminProductModerationController extends Controller
             'moderation_note' => $validated['moderation_note'] ?? null,
             'is_active' => false,
         ]);
+
+        if ($product->vendor && $product->vendor->user) {
+            $noteText = !empty($validated['moderation_note']) ? " Gerekçe: " . $validated['moderation_note'] : '';
+            app(\App\Services\NotificationService::class)->notify(
+                $product->vendor->user,
+                'Ürününüz Onaylanmadı',
+                "'{$product->name}' adlı ürününüz onaylanmadı." . $noteText,
+                ['type' => 'product_rejected', 'product_id' => $product->id, 'note' => $validated['moderation_note'] ?? null],
+                route('vendor.products.index')
+            );
+        }
 
         return back()->with('success', 'Ürün reddedildi.');
     }
