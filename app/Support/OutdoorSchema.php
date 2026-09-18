@@ -22,6 +22,17 @@ final class OutdoorSchema
         return Schema::hasTable('vendor_members');
     }
 
+    public static function crewsReady(): bool
+    {
+        return Schema::hasTable('outdoor_crews')
+            && Schema::hasColumn('vendor_members', 'crew_id');
+    }
+
+    public static function inventoryGrantsReady(): bool
+    {
+        return Schema::hasTable('ooh_inventory_grants');
+    }
+
     public static function occupanciesReady(): bool
     {
         return Schema::hasTable('ooh_occupancies');

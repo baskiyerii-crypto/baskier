@@ -108,22 +108,26 @@
                                     </div>
                                 @endif
                                 <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
-                                    <div class="w-full sm:w-28 shrink-0">
+                                    <div class="shrink-0">
                                         <label class="text-xs font-semibold text-slate-600" for="product-qty">Adet</label>
-                                        <input id="product-qty" type="number" name="quantity" value="1" min="1" max="{{ $product->variants->first()?->stock ?? $product->stock }}"
-                                               class="by-input mt-1 w-full min-h-12">
+                                        <div class="cart-quantity mt-1">
+                                            <button type="button" class="by-btn-secondary px-3 py-1.5" data-qty-step="-1" aria-label="Azalt">−</button>
+                                            <input id="product-qty" type="number" name="quantity" value="1" min="1" max="{{ $product->variants->first()?->stock ?? $product->stock }}"
+                                                   class="by-input w-16 py-1.5 text-center text-sm" inputmode="numeric">
+                                            <button type="button" class="by-btn-secondary px-3 py-1.5" data-qty-step="1" aria-label="Artır">+</button>
+                                        </div>
                                     </div>
                                     <div class="flex-1">
-                                        <button type="submit" class="w-full by-btn-primary min-h-12" onclick="document.getElementById('buy_now_flag').value='0'">Sepete ekle</button>
+                                        <button type="submit" class="w-full by-btn-primary min-h-10" onclick="document.getElementById('buy_now_flag').value='0'">Sepete ekle</button>
                                     </div>
                                 </div>
                             </form>
                         @endif
 
                         <div class="mt-4 flex flex-wrap gap-2">
-                            <form action="{{ route('favorites.toggle', $product) }}" method="post">
+                            <form action="{{ route('favorites.toggle', $product) }}" method="post" id="favorite-toggle-form">
                                 @csrf
-                                <button type="submit" class="by-btn-secondary">
+                                <button type="submit" class="by-btn-secondary" id="favorite-toggle-btn">
                                     {{ $isFavorited ? '♥ Favoride' : '♡ Favorilere ekle' }}
                                 </button>
                             </form>
@@ -304,6 +308,35 @@
                 variantSelect.addEventListener('change', updateVariant);
                 updateVariant();
             }
+
+            document.querySelectorAll('[data-qty-step]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    if (!qtyInput) return;
+                    const step = parseInt(btn.getAttribute('data-qty-step'), 10) || 0;
+                    const min = parseInt(qtyInput.min || '1', 10);
+                    const max = parseInt(qtyInput.max || '999', 10);
+                    const next = Math.min(max, Math.max(min, (parseInt(qtyInput.value || '1', 10) || 1) + step));
+                    qtyInput.value = next;
+                });
+            });
+
+            const favForm = document.getElementById('favorite-toggle-form');
+            const favBtn = document.getElementById('favorite-toggle-btn');
+            favForm?.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
+                fetch(favForm.action, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': token,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: new FormData(favForm)
+                }).then(function (r) { return r.json(); }).then(function (data) {
+                    if (favBtn) favBtn.textContent = data.favorited ? '♥ Favoride' : '♡ Favorilere ekle';
+                }).catch(function () { favForm.submit(); });
+            });
         });
     </script>
 @endsection

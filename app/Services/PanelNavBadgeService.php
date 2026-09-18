@@ -91,6 +91,10 @@ class PanelNavBadgeService
             'customer_quotes' => 0,
             'customer_messages' => 0,
             'customer_questions' => 0,
+            'customer_product_questions' => 0,
+            'customer_cart' => 0,
+            'customer_favorites' => 0,
+            'unread_notifications' => 0,
         ];
     }
 
@@ -292,12 +296,32 @@ class PanelNavBadgeService
                 ->where('status', OrderQuestion::STATUS_OPEN)
                 ->count()
             : 0;
+        $productQuestions = Schema::hasTable('product_questions')
+            ? ProductQuestion::query()
+                ->where('customer_id', $user->id)
+                ->where('status', ProductQuestion::STATUS_OPEN)
+                ->count()
+            : 0;
+        $cart = Schema::hasTable('cart_items')
+            ? (int) $user->cartItems()->sum('quantity')
+            : 0;
+        $favorites = method_exists($user, 'favorites') ? $user->favorites()->count() : 0;
+        $unread = 0;
+        try {
+            $unread = $user->unreadNotifications()->count();
+        } catch (\Throwable) {
+            $unread = 0;
+        }
 
         return [
             'customer_orders' => $orders,
             'customer_quotes' => $quotes,
             'customer_messages' => $messages,
             'customer_questions' => $questions,
+            'customer_product_questions' => $productQuestions,
+            'customer_cart' => $cart,
+            'customer_favorites' => $favorites,
+            'unread_notifications' => $unread,
         ];
     }
 

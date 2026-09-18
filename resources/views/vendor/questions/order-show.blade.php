@@ -4,6 +4,7 @@
 <div class="card p-4" style="max-width:720px;">
     <a href="{{ route('vendor.order-questions.index') }}" class="small">← Liste</a>
     <h1 class="h5 mt-2">#{{ $question->order?->order_number }}</h1>
+    <p class="fw-semibold mb-1">{{ $question->subject }}</p>
     @foreach($question->replies as $r)
         <div class="border rounded p-2 mb-2 small {{ $r->is_from_vendor ? 'bg-light' : '' }}">{{ $r->body }}</div>
     @endforeach

@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>@yield('title', __('ui.default_title'))</title>
     <link rel="manifest" href="/manifest.webmanifest">
@@ -284,6 +285,7 @@
                     </label>
 
                     @auth
+                        @include('partials.notification-bell', ['variant' => 'tailwind'])
                         @if(auth()->user()->isAdmin())
                             <a href="{{ route('admin.dashboard') }}" class="by-btn-secondary">{{ __('ui.management') }}</a>
                         @elseif(auth()->user()->isVendor())
@@ -350,7 +352,12 @@
             {{ __('ui.menu') }}
         </label>
         <a href="{{ auth()->check() ? route('cart.index') : route('login') }}" class="by-dock-item {{ request()->routeIs('cart.*') ? 'is-active' : '' }}">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            <span class="relative">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                @auth
+                    <span class="cart-count-badge absolute -right-2 -top-1 min-w-[1rem] rounded-full bg-amber-400 px-1 text-[10px] font-bold text-slate-900">{{ auth()->user()->cartItems()->sum('quantity') }}</span>
+                @endauth
+            </span>
             {{ __('ui.cart') }}
         </a>
         <a href="{{ auth()->check() ? (auth()->user()->isVendor() ? route('vendor.dashboard') : (auth()->user()->isAdmin() ? route('admin.dashboard') : route('customer.dashboard'))) : route('login') }}" class="by-dock-item {{ request()->routeIs('customer.*','account.*','vendor.*','admin.*') ? 'is-active' : '' }}">

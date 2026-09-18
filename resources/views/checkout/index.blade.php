@@ -22,7 +22,34 @@
     @if($items->isEmpty())
         <p><a href="{{ route('cart.index') }}">Sepete dön</a></p>
     @elseif($addresses->isEmpty())
-        <div class="alert alert-warning">Önce <a href="{{ route('account.adresler.create') }}">bir teslimat adresi ekleyin</a>.</div>
+        <div class="bg-white rounded-4 shadow-sm p-4" style="max-width:640px;">
+            <h2 class="h6 mb-2">Teslimat adresi ekleyin</h2>
+            <p class="small text-muted mb-3">Ödemeye devam etmek için önce bir adres kaydedin. Kaydettikten sonra bu ödeme ekranına dönersiniz.</p>
+            <form action="{{ route('account.adresler.store') }}" method="post">
+                @csrf
+                <input type="hidden" name="redirect" value="checkout">
+                <div class="mb-3">
+                    <label class="form-label">Adres adı</label>
+                    <input type="text" name="label" class="form-control" value="{{ old('label', 'Ev') }}" placeholder="Ev, İş, Ofis...">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Ad Soyad</label>
+                    <input type="text" name="full_name" class="form-control" value="{{ old('full_name') }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Telefon</label>
+                    <input type="text" name="phone" class="form-control" value="{{ old('phone') }}" required>
+                </div>
+                @include('customer.addresses._geo_fields', ['address' => null])
+                <div class="mb-3">
+                    <label class="form-label">Adres tarifi (isteğe bağlı)</label>
+                    <input type="text" name="line1" class="form-control" value="{{ old('line1') }}">
+                </div>
+                <input type="hidden" name="is_default" value="1">
+                <input type="hidden" name="is_billing_default" value="1">
+                <button class="btn btn-warning rounded-pill">Adresi kaydet ve ödemeye dön</button>
+            </form>
+        </div>
     @else
         <div class="row g-4">
             <div class="col-lg-7">
@@ -43,7 +70,7 @@
                             </label>
                         </div>
                     @endforeach
-                    <a href="{{ route('account.adresler.create') }}" class="small">+ Yeni adres</a>
+                    <a href="{{ route('account.adresler.create', ['redirect' => 'checkout']) }}" class="small">+ Yeni adres</a>
                     <hr>
                     <h2 class="h6 mb-3">Fatura adresi</h2>
                     <div class="form-check mb-2">
@@ -85,8 +112,17 @@
                                 Banka Havalesi / EFT
                             </label>
                             <div class="payment-method-box payment-bank-transfer mt-2 {{ old('payment_method') === 'bank_transfer' ? '' : 'd-none' }}">
+                                @php $ibanTr = app()->getLocale() === 'tr'; $oldIban = strtoupper(preg_replace('/\s+/', '', (string) old('bank_iban', ''))); @endphp
                                 <label class="form-label small">Gönderim yapacağınız IBAN</label>
-                                <input type="text" name="bank_iban" class="form-control form-control-sm mb-1" value="{{ old('bank_iban') }}" placeholder="TR..">
+                                @if($ibanTr)
+                                    <div class="input-group input-group-sm mb-1">
+                                        <span class="input-group-text font-monospace">TR</span>
+                                        <input type="text" id="bank-iban-digits" class="form-control font-monospace" inputmode="numeric" pattern="[0-9]*" maxlength="24" autocomplete="off" value="{{ str_starts_with($oldIban, 'TR') ? substr($oldIban, 2) : $oldIban }}" placeholder="24 hane rakam">
+                                    </div>
+                                    <input type="hidden" name="bank_iban" id="bank-iban-full" value="{{ $oldIban }}">
+                                @else
+                                    <input type="text" name="bank_iban" class="form-control form-control-sm mb-1 font-monospace text-uppercase" maxlength="34" value="{{ $oldIban }}" placeholder="IBAN (max 34)">
+                                @endif
                                 <p class="small text-muted mb-0">Havale/EFT ile ödemelerde siparişiniz kaydedilir ve yönetici onayı sonrasında üretime alınır.</p>
                             </div>
                         </div>
@@ -155,33 +191,33 @@
                             <input class="form-check-input" type="checkbox" id="accept-distance-sales" name="accept_distance_sales" value="1" disabled>
                             <label class="form-check-label" for="accept-distance-sales">
                                 <strong>Mesafeli Satış Sözleşmesi</strong>'ni okudum ve kabul ediyorum.
-                                <button type="button" class="btn btn-link btn-sm p-0 align-baseline" id="open-distance-sales">Sözleşmeyi aç</button>
                             </label>
                         </div>
                         <input type="hidden" name="contract_scrolled_at" id="contract_scrolled_at" value="">
-                        <div class="form-text">Onay kutusu, sözleşmeyi sonuna kadar okuduktan sonra aktif olur.</div>
                         <div class="form-check mt-2">
-                            <input class="form-check-input" type="checkbox" id="accept-kvkk" name="accept_kvkk" value="1" required>
+                            <input class="form-check-input" type="checkbox" id="accept-kvkk" name="accept_kvkk" value="1" disabled>
                             <label class="form-check-label" for="accept-kvkk">
                                 <strong>KVKK Aydınlatma Metni</strong>'ni okudum.
-                                <a href="{{ route('contracts.show', 'kvkk') }}" target="_blank">Metni aç</a>
                             </label>
                         </div>
+                        <input type="hidden" name="kvkk_scrolled_at" id="kvkk_scrolled_at" value="">
+                        <div class="form-text">Kutuya tıklayınca metin açılır. Sonuna kadar kaydırmadan onaylanamaz.</div>
                     </div>
                     <button type="submit" class="btn btn-warning rounded-pill px-5" id="checkout-submit" disabled>Siparişi tamamla</button>
                 </form>
 
-                <div id="distanceSalesModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 p-4">
+                <div id="legalModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 p-4">
                     <div class="flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl">
                         <div class="flex items-center justify-between border-b px-4 py-3">
-                            <h5 class="m-0 text-base font-semibold">Mesafeli Satış Sözleşmesi</h5>
-                            <button type="button" id="close-distance-sales" class="btn btn-sm btn-outline-secondary">Kapat</button>
+                            <h5 class="m-0 text-base font-semibold" id="legal-modal-title">Sözleşme</h5>
+                            <button type="button" id="close-legal-modal" class="btn btn-sm btn-outline-secondary">Kapat</button>
                         </div>
-                        <div class="flex-1 overflow-auto p-4" id="distance-sales-body" style="max-height:55vh;">
-                            {!! $distanceSalesContract?->content_html ?? '<p>Sözleşme metni henüz tanımlanmadı. Lütfen yönetici panelinden ekleyin.</p>' !!}
+                        <div class="flex-1 overflow-auto p-4" id="legal-modal-body" style="max-height:55vh;">
+                            <div id="legal-mss-content" class="d-none">{!! $distanceSalesContract?->content_html ?? '<p>Sözleşme metni henüz tanımlanmadı.</p>' !!}</div>
+                            <div id="legal-kvkk-content" class="d-none">{!! $kvkkContract?->content_html ?? '<p>KVKK metni henüz tanımlanmadı.</p>' !!}</div>
                         </div>
                         <div class="flex justify-end gap-2 border-t px-4 py-3">
-                            <button type="button" class="btn btn-primary" id="confirm-distance-sales" disabled>Okudum, onayla</button>
+                            <button type="button" class="btn btn-primary" id="confirm-legal" disabled>Okudum, onayla</button>
                         </div>
                     </div>
                 </div>
@@ -285,58 +321,88 @@
         togglePaymentMethod();
 
         const distanceCheckbox = document.getElementById('accept-distance-sales');
-        const openDistanceBtn = document.getElementById('open-distance-sales');
-        const confirmDistanceBtn = document.getElementById('confirm-distance-sales');
-        const distanceBody = document.getElementById('distance-sales-body');
+        const kvkkCheckbox = document.getElementById('accept-kvkk');
         const checkoutSubmit = document.getElementById('checkout-submit');
         const scrolledAtInput = document.getElementById('contract_scrolled_at');
-        const modalEl = document.getElementById('distanceSalesModal');
-        const closeDistanceBtn = document.getElementById('close-distance-sales');
-        let scrolledToEnd = false;
+        const kvkkScrolledAtInput = document.getElementById('kvkk_scrolled_at');
+        const modalEl = document.getElementById('legalModal');
+        const modalTitle = document.getElementById('legal-modal-title');
+        const modalBody = document.getElementById('legal-modal-body');
+        const mssContent = document.getElementById('legal-mss-content');
+        const kvkkContent = document.getElementById('legal-kvkk-content');
+        const confirmLegalBtn = document.getElementById('confirm-legal');
+        const closeLegalBtn = document.getElementById('close-legal-modal');
+        const ibanDigits = document.getElementById('bank-iban-digits');
+        const ibanFull = document.getElementById('bank-iban-full');
+        let legalKind = null;
+        const scrolled = { mss: false, kvkk: false };
 
-        function openModal() {
-            if (!modalEl) return;
-            modalEl.classList.remove('hidden');
-            modalEl.classList.add('flex');
-            checkContractScroll();
+        function syncIban() {
+            if (!ibanDigits || !ibanFull) return;
+            ibanDigits.value = ibanDigits.value.replace(/\D/g, '').slice(0, 24);
+            ibanFull.value = 'TR' + ibanDigits.value;
         }
-        function closeModal() {
+        ibanDigits?.addEventListener('input', syncIban);
+        ibanDigits?.addEventListener('keydown', function (e) {
+            if (e.ctrlKey || e.metaKey || e.altKey) return;
+            if (e.key.length === 1 && !/[0-9]/.test(e.key)) e.preventDefault();
+        });
+        syncIban();
+
+        function openLegal(kind) {
+            legalKind = kind;
+            if (mssContent) mssContent.classList.toggle('d-none', kind !== 'mss');
+            if (kvkkContent) kvkkContent.classList.toggle('d-none', kind !== 'kvkk');
+            if (modalTitle) modalTitle.textContent = kind === 'kvkk' ? 'KVKK Aydınlatma Metni' : 'Mesafeli Satış Sözleşmesi';
+            if (confirmLegalBtn) confirmLegalBtn.disabled = !scrolled[kind];
+            if (modalEl) {
+                modalEl.classList.remove('hidden');
+                modalEl.classList.add('flex');
+            }
+            if (modalBody) modalBody.scrollTop = 0;
+            checkLegalScroll();
+        }
+        function closeLegal() {
             if (!modalEl) return;
             modalEl.classList.add('hidden');
             modalEl.classList.remove('flex');
         }
         function syncCheckoutSubmit() {
-            if (checkoutSubmit) checkoutSubmit.disabled = !(distanceCheckbox && distanceCheckbox.checked);
+            if (checkoutSubmit) {
+                checkoutSubmit.disabled = !(distanceCheckbox && distanceCheckbox.checked && kvkkCheckbox && kvkkCheckbox.checked);
+            }
         }
-
-        function checkContractScroll() {
-            if (distanceBody) {
-                if (distanceBody.scrollTop + distanceBody.clientHeight >= distanceBody.scrollHeight - 8) {
-                    scrolledToEnd = true;
-                    if (confirmDistanceBtn) confirmDistanceBtn.disabled = false;
-                    if (scrolledAtInput && !scrolledAtInput.value) scrolledAtInput.value = new Date().toISOString();
+        function checkLegalScroll() {
+            if (!modalBody || !legalKind) return;
+            if (modalBody.scrollTop + modalBody.clientHeight >= modalBody.scrollHeight - 8) {
+                scrolled[legalKind] = true;
+                if (confirmLegalBtn) confirmLegalBtn.disabled = false;
+                const stamp = new Date().toISOString();
+                if (legalKind === 'mss' && scrolledAtInput && !scrolledAtInput.value) scrolledAtInput.value = stamp;
+                if (legalKind === 'kvkk' && kvkkScrolledAtInput && !kvkkScrolledAtInput.value) kvkkScrolledAtInput.value = stamp;
+            }
+        }
+        modalBody?.addEventListener('scroll', checkLegalScroll);
+        closeLegalBtn?.addEventListener('click', closeLegal);
+        [distanceCheckbox, kvkkCheckbox].forEach(function (box) {
+            box?.addEventListener('click', function (e) {
+                const kind = box.id === 'accept-kvkk' ? 'kvkk' : 'mss';
+                if (!box.checked && !scrolled[kind]) {
+                    e.preventDefault();
+                    openLegal(kind);
                 }
-            }
-        }
-        distanceBody?.addEventListener('scroll', checkContractScroll);
-        openDistanceBtn?.addEventListener('click', function (e) {
-            e.preventDefault();
-            openModal();
+                syncCheckoutSubmit();
+            });
         });
-        closeDistanceBtn?.addEventListener('click', closeModal);
-        distanceCheckbox?.addEventListener('click', function (e) {
-            if (!distanceCheckbox.checked && !scrolledToEnd) {
-                e.preventDefault();
-                openModal();
+        confirmLegalBtn?.addEventListener('click', function () {
+            if (!legalKind || !scrolled[legalKind]) return;
+            const box = legalKind === 'kvkk' ? kvkkCheckbox : distanceCheckbox;
+            if (box) {
+                box.disabled = false;
+                box.checked = true;
             }
             syncCheckoutSubmit();
-        });
-        confirmDistanceBtn?.addEventListener('click', function () {
-            if (!scrolledToEnd) return;
-            distanceCheckbox.disabled = false;
-            distanceCheckbox.checked = true;
-            syncCheckoutSubmit();
-            closeModal();
+            closeLegal();
         });
         syncCheckoutSubmit();
 

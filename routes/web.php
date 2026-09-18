@@ -168,6 +168,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/siparisler/{order}/degerlendirme', [CustomerReviewController::class, 'store'])->name('orders.review');
         Route::post('/siparisler/{order}/tasarim/{designApproval}/onay', [CustomerOrderDesignController::class, 'approve'])->name('orders.design.approve');
         Route::post('/siparisler/{order}/tasarim/{designApproval}/revizyon', [CustomerOrderDesignController::class, 'revision'])->name('orders.design.revision');
+        Route::get('/siparisler/{order}/tasarim/{designApproval}/dosya', [CustomerOrderDesignController::class, 'file'])->name('orders.design.file');
         Route::prefix('destek')->name('support.')->group(function () {
             Route::get('/', [CustomerSupportTicketController::class, 'index'])->name('index');
             Route::get('/yeni', [CustomerSupportTicketController::class, 'create'])->name('create');
@@ -188,6 +189,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/urunler/{product}/soru', [CustomerQuestionController::class, 'storeProduct'])->name('products.questions.store');
 });
 
+Route::middleware(['auth'])->prefix('hesabim')->name('customer.')->group(function () {
+    Route::get('/urun-sorularim', [CustomerQuestionController::class, 'products'])->name('product-questions.index');
+    Route::get('/siparis-sorularim', [CustomerQuestionController::class, 'orders'])->name('order-questions.index');
+    Route::post('/siparis-sorularim/{question}', [CustomerQuestionController::class, 'replyOrder'])->name('order-questions.reply');
+});
+
 // Müşteri paneli (giriş yapmış, rol fark etmez ama dashboard müşteri için)
 Route::middleware(['auth', 'role:customer'])->prefix('hesabim')->name('customer.')->group(function () {
     Route::get('/', [CustomerDashboardController::class, 'index'])->name('dashboard');
@@ -200,9 +207,6 @@ Route::middleware(['auth', 'role:customer'])->prefix('hesabim')->name('customer.
     Route::get('/mesajlar', [CustomerMessageController::class, 'index'])->name('messages.index');
     Route::get('/mesajlar/{conversation}', [CustomerMessageController::class, 'show'])->name('messages.show');
     Route::post('/mesajlar/{conversation}', [CustomerMessageController::class, 'store'])->name('messages.store');
-    Route::get('/urun-sorularim', [CustomerQuestionController::class, 'products'])->name('product-questions.index');
-    Route::get('/siparis-sorularim', [CustomerQuestionController::class, 'orders'])->name('order-questions.index');
-    Route::post('/siparis-sorularim/{question}', [CustomerQuestionController::class, 'replyOrder'])->name('order-questions.reply');
     Route::post('/siparisler/{order}/soru', [CustomerQuestionController::class, 'storeOrder'])->name('orders.questions.store');
     Route::get('/planlarim', [CustomerOutdoorPlanController::class, 'index'])->name('outdoor.plans.index');
     Route::post('/planlarim', [CustomerOutdoorPlanController::class, 'store'])->name('outdoor.plans.store');
@@ -228,6 +232,7 @@ Route::middleware(['auth', 'role:vendor', 'vendor.not_suspended', 'vendor.outdoo
     Route::get('siparisler', [VendorOrderController::class, 'index'])->name('orders.index');
     Route::get('siparisler/{order}', [VendorOrderController::class, 'show'])->name('orders.show');
     Route::post('siparisler/{order}/tasarim', [VendorOrderDesignController::class, 'store'])->name('orders.design.store');
+    Route::get('siparisler/{order}/tasarim/{designApproval}/dosya', [VendorOrderDesignController::class, 'file'])->name('orders.design.file');
     Route::put('siparisler/{order}/durum', [VendorOrderController::class, 'updateStatus'])->name('orders.update-status');
     Route::post('siparisler/{order}/odeme-onayla', [VendorOrderController::class, 'confirmPayment'])->name('orders.confirm-payment');
     Route::get('odeme-talepleri', [VendorPayoutRequestWebController::class, 'index'])->name('payout-requests.index');
@@ -307,7 +312,6 @@ Route::middleware(['auth', 'role:vendor', 'vendor.not_suspended'])->prefix('acik
     Route::get('dizin', [OutdoorDirectoryController::class, 'index'])->name('directory');
     Route::post('dizin/baglan', [OutdoorDirectoryController::class, 'connect'])->name('directory.connect');
     Route::get('temsil', [OutdoorRepresentationController::class, 'index'])->name('representations.index');
-    Route::post('temsil', [OutdoorRepresentationController::class, 'invite'])->name('representations.invite');
     Route::post('temsil/{representation}/onayla', [OutdoorRepresentationController::class, 'accept'])->name('representations.accept');
     Route::post('temsil/{representation}/iptal', [OutdoorRepresentationController::class, 'revoke'])->name('representations.revoke');
     Route::get('belgeler', [VendorDocumentController::class, 'index'])->name('documents.index');
@@ -326,6 +330,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('categories', AdminCategoryController::class)->except('show');
     Route::resource('business-types', AdminBusinessTypeController::class)->except(['show']);
     Route::resource('vendors', AdminVendorController::class);
+    Route::post('vendors/{vendor}/hediye-bakiye', [AdminVendorController::class, 'giftBalance'])->name('vendors.gift-balance');
     Route::post('vendors/{vendor}/verify/approve', [AdminVendorController::class, 'approveVerification'])->name('vendors.verify.approve');
     Route::post('vendors/{vendor}/verify/reject', [AdminVendorController::class, 'rejectVerification'])->name('vendors.verify.reject');
     Route::get('products', [AdminProductController::class, 'index'])->name('products.index');

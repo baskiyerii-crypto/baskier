@@ -7,6 +7,7 @@ use App\Http\Requests\Api\V1\DesignApprovalRevisionRequest;
 use App\Http\Requests\Api\V1\DesignApprovalStoreRequest;
 use App\Models\DesignApproval;
 use App\Models\Order;
+use App\Services\NotificationService;
 use App\Services\OrderWorkflowService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -43,7 +44,18 @@ class DesignApprovalController extends ApiController
             }
         });
 
-        return $this->ok($order->fresh()->load('designApprovals'), 'Tasarım yüklendi.', null, 201);
+        $order = $order->fresh()->load('designApprovals');
+        if ($order->user) {
+            app(NotificationService::class)->notify(
+                $order->user,
+                'Dijital prova yüklendi',
+                "#{$order->order_number} siparişiniz için prova yüklendi. İnceleyip onaylayabilirsiniz.",
+                ['type' => 'design_proof', 'order_id' => $order->id],
+                route('account.orders.show', $order)
+            );
+        }
+
+        return $this->ok($order, 'Tasarım yüklendi.', null, 201);
     }
 
     public function approve(Request $request, DesignApproval $designApproval, OrderWorkflowService $workflow)

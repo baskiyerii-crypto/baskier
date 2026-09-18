@@ -98,6 +98,8 @@ class CheckoutController extends Controller
             'accept_kvkk' => ['accepted'],
             'idempotency_key' => ['nullable', 'string', 'max:100'],
             'bank_iban' => ['nullable', 'string', 'max:34'],
+            'contract_scrolled_at' => ['required', 'string', 'max:40'],
+            'kvkk_scrolled_at' => ['required', 'string', 'max:40'],
             'invoice_type' => ['required', Rule::in(['individual', 'corporate'])],
             'invoice_full_name' => ['required', 'string', 'max:255'],
             'invoice_email' => ['required', 'email', 'max:190'],
@@ -107,6 +109,13 @@ class CheckoutController extends Controller
             'invoice_tax_number' => ['nullable', 'string', 'max:16'],
             'invoice_tax_office' => ['nullable', 'string', 'max:120'],
         ]);
+
+        if (($validated['payment_method'] ?? '') === 'bank_transfer') {
+            $ibanRule = app()->getLocale() === 'tr'
+                ? ['required', 'regex:/^TR[0-9]{24}$/i']
+                : ['required', 'regex:/^[A-Z]{2}[0-9A-Z]{13,32}$/i', 'max:34'];
+            $request->validate(['bank_iban' => $ibanRule]);
+        }
 
         if ($validated['invoice_type'] === 'corporate') {
             $request->validate([

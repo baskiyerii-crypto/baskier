@@ -122,7 +122,7 @@
 
                         @if($approval->design_file_path)
                             <div class="my-2">
-                                <a href="{{ asset('storage/' . $approval->design_file_path) }}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">
+                                <a href="{{ route('account.orders.design.file', [$order, $approval]) }}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">
                                     👁️ Yüklenen Prova Dosyasını İncele / İndir
                                 </a>
                             </div>
@@ -315,7 +315,7 @@
     <div class="bg-white rounded-4 shadow-sm p-4 mb-4">
         <h2 class="h6 fw-bold mb-2">Sipariş sorusu</h2>
         <p class="small text-muted">Siparişle ilgili sorularınız burada kalır; telefon veya sosyal medya paylaşmayın.</p>
-        <form method="POST" action="{{ route('orders.questions.store', $order) }}" class="mt-2">
+        <form method="POST" action="{{ route('customer.orders.questions.store', $order) }}" class="mt-2">
             @csrf
             <input type="text" name="subject" class="form-control mb-2" placeholder="Konu (opsiyonel)" maxlength="180">
             <textarea name="body" class="form-control" rows="3" required maxlength="2000" placeholder="Sorunuz"></textarea>

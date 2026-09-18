@@ -6,9 +6,11 @@ use App\Domain\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\DesignApproval;
 use App\Models\Order;
+use App\Services\NotificationService;
 use App\Services\OrderWorkflowService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class VendorOrderDesignController extends Controller
 {
@@ -45,6 +47,32 @@ class VendorOrderDesignController extends Controller
             }
         });
 
+        if ($order->user) {
+            app(NotificationService::class)->notify(
+                $order->user,
+                'Dijital prova yüklendi',
+                "#{$order->order_number} siparişiniz için prova yüklendi. İnceleyip onaylayabilirsiniz.",
+                ['type' => 'design_proof', 'order_id' => $order->id],
+                route('account.orders.show', $order)
+            );
+        }
+
         return back()->with('success', 'Tasarım dosyası yüklendi; müşteri onayına gönderildi.');
+    }
+
+    public function file(Request $request, Order $order, DesignApproval $designApproval)
+    {
+        $vendor = $request->user()->vendor;
+        if (! $vendor || (int) $order->vendor_id !== (int) $vendor->id) {
+            abort(403);
+        }
+        if ((int) $designApproval->order_id !== (int) $order->id) {
+            abort(404);
+        }
+        if (! $designApproval->design_file_path || ! Storage::disk('public')->exists($designApproval->design_file_path)) {
+            abort(404, 'Prova dosyası bulunamadı.');
+        }
+
+        return Storage::disk('public')->response($designApproval->design_file_path);
     }
 }

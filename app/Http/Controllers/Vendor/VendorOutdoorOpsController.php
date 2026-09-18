@@ -7,9 +7,11 @@ use App\Models\OohInventory;
 use App\Models\OohInventoryClaim;
 use App\Models\OohOccupancy;
 use App\Models\VendorMember;
+use App\Models\OohInventoryGrant;
 use App\Services\OutdoorClaimService;
 use App\Services\OutdoorProofService;
 use App\Services\OutdoorStaffService;
+use App\Support\OutdoorSchema;
 use Illuminate\Http\Request;
 use RuntimeException;
 
@@ -49,13 +51,21 @@ class VendorOutdoorOpsController extends Controller
         $vendor = $this->vendor($request);
         $this->assertOwner($vendor);
         $this->staff->assertAccountOwner($request->user(), $vendor);
-        $members = $vendor->members()->with(['user', 'crew'])->get();
-        $crews = $vendor->outdoorCrews()->orderBy('name')->get();
-        $grants = \App\Models\OohInventoryGrant::query()
-            ->with(['crew', 'user'])
-            ->where('vendor_id', $vendor->id)
-            ->latest()
-            ->get();
+        $memberWith = ['user'];
+        if (OutdoorSchema::crewsReady()) {
+            $memberWith[] = 'crew';
+        }
+        $members = $vendor->members()->with($memberWith)->get();
+        $crews = OutdoorSchema::crewsReady()
+            ? $vendor->outdoorCrews()->orderBy('name')->get()
+            : collect();
+        $grants = OutdoorSchema::inventoryGrantsReady()
+            ? OohInventoryGrant::query()
+                ->with(['crew', 'user'])
+                ->where('vendor_id', $vendor->id)
+                ->latest()
+                ->get()
+            : collect();
 
         return view('vendor.outdoor.staff', compact('vendor', 'members', 'crews', 'grants'));
     }
@@ -64,6 +74,9 @@ class VendorOutdoorOpsController extends Controller
     {
         $vendor = $this->vendor($request);
         $this->assertOwner($vendor);
+        if (! OutdoorSchema::crewsReady()) {
+            return back()->with('error', 'Ekip tabloları henüz kurulmadı.');
+        }
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:80'],
         ]);
@@ -107,6 +120,9 @@ class VendorOutdoorOpsController extends Controller
     {
         $vendor = $this->vendor($request);
         $this->assertOwner($vendor);
+        if (! OutdoorSchema::inventoryGrantsReady() || ! OutdoorSchema::crewsReady()) {
+            return back()->with('error', 'Yetki tabloları henüz kurulmadı.');
+        }
         $validated = $request->validate([
             'target' => ['required', 'in:crew,user'],
             'crew_id' => ['nullable', 'integer'],

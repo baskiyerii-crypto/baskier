@@ -2,12 +2,17 @@
 @section('title', 'Sipariş sorularım')
 @section('content')
 <div class="by-card p-5">
-    <h1 class="text-xl font-bold mb-4">Sipariş sorularım</h1>
+    <h1 class="mb-4 text-xl font-bold">Sipariş sorularım</h1>
+    @if(session('success'))<p class="mb-3 text-sm text-emerald-700">{{ session('success') }}</p>@endif
     @forelse($questions as $q)
-        <div class="rounded-2xl border border-slate-200 p-4 mb-3">
+        @php $first = $q->order?->items?->first(); @endphp
+        <div class="mb-3 rounded-2xl border border-slate-200 p-4">
             <div class="text-sm font-semibold">#{{ $q->order?->order_number }} · {{ $q->subject }}</div>
+            @if($first)
+                <div class="mt-1 text-xs text-slate-500">{{ $first->name }}</div>
+            @endif
             @foreach($q->replies as $r)
-                <p class="text-sm mt-2 {{ $r->is_from_vendor ? 'bg-slate-50' : 'bg-orange-50' }} rounded-xl p-3">{{ $r->body }}</p>
+                <p class="mt-2 rounded-xl p-3 text-sm {{ $r->is_from_vendor ? 'bg-slate-50' : 'bg-orange-50' }}">{{ $r->body }}</p>
             @endforeach
             <form method="POST" action="{{ route('customer.order-questions.reply', $q) }}" class="mt-3">
                 @csrf

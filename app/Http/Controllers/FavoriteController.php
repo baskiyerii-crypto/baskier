@@ -25,6 +25,18 @@ class FavoriteController extends Controller
             $msg = 'Favorilere eklendi.';
         }
 
+        $favorited = $user->favorites()->where('product_id', $product->id)->exists();
+        $count = $user->favorites()->count();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $msg,
+                'favorited' => $favorited,
+                'count' => $count,
+            ]);
+        }
+
         return back()->with('success', $msg);
     }
 }

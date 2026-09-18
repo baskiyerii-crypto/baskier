@@ -25,7 +25,7 @@ class VendorQuestionController extends Controller
         $vendor = $this->vendor($request);
         $questions = ProductQuestion::query()
             ->where('vendor_id', $vendor->id)
-            ->with(['product', 'customer'])
+            ->with(['product.images', 'customer'])
             ->latest()
             ->paginate(20);
 
@@ -35,7 +35,7 @@ class VendorQuestionController extends Controller
     public function showProduct(Request $request, ProductQuestion $question)
     {
         abort_unless($question->vendor_id === $this->vendor($request)->id, 403);
-        $question->load(['product', 'customer']);
+        $question->load(['product.images', 'customer']);
 
         return view('vendor.questions.product-show', compact('question'));
     }
@@ -59,13 +59,13 @@ class VendorQuestionController extends Controller
             $notifications->notify(
                 $question->customer,
                 'Ürün sorunuz yanıtlandı',
-                $question->product?->name ?? 'Ürün',
+                \Illuminate\Support\Str::limit($validated['answer'], 120),
                 ['type' => 'product_question'],
                 route('customer.product-questions.index')
             );
         }
 
-        return back()->with('success', 'Yanıt kaydedildi.');
+        return redirect()->route('vendor.product-questions.show', $question)->with('success', 'Yanıt kaydedildi.');
     }
 
     public function orders(Request $request)
@@ -73,7 +73,7 @@ class VendorQuestionController extends Controller
         $vendor = $this->vendor($request);
         $questions = OrderQuestion::query()
             ->where('vendor_id', $vendor->id)
-            ->with(['order', 'customer'])
+            ->with(['order.items', 'customer', 'replies'])
             ->latest()
             ->paginate(20);
 
@@ -108,13 +108,13 @@ class VendorQuestionController extends Controller
             $notifications->notify(
                 $question->customer,
                 'Sipariş sorunuz yanıtlandı',
-                '#'.($question->order?->order_number ?? ''),
+                \Illuminate\Support\Str::limit($validated['body'], 120),
                 ['type' => 'order_question'],
                 route('customer.order-questions.index')
             );
         }
 
-        return back()->with('success', 'Yanıt gönderildi.');
+        return redirect()->route('vendor.order-questions.show', $question)->with('success', 'Yanıt gönderildi.');
     }
 
     public function storeOrder(Request $request, Order $order, ModerationService $moderation, NotificationService $notifications)
@@ -148,12 +148,12 @@ class VendorQuestionController extends Controller
             $notifications->notify(
                 $order->user,
                 'Satıcı sipariş sorusu sordu',
-                '#'.$order->order_number,
+                ($validated['subject'] ?: 'Sipariş sorusu').': '.\Illuminate\Support\Str::limit($validated['body'], 80),
                 ['type' => 'order_question'],
                 route('customer.order-questions.index')
             );
         }
 
-        return back()->with('success', 'Sipariş sorusu iletildi.');
+        return redirect()->route('vendor.order-questions.show', $question)->with('success', 'Sipariş sorusu iletildi.');
     }
 }

@@ -112,6 +112,23 @@
             </div>
             {{ $orders->links() }}
         </div>
+        <div class="card p-4 mb-4">
+            <h3 class="h6">Hediye bakiye</h3>
+            <form method="POST" action="{{ route('admin.vendors.gift-balance', $vendor) }}" class="row g-2 align-items-end">
+                @csrf
+                <div class="col-sm-4">
+                    <label class="form-label small">Tutar (₺)</label>
+                    <input type="number" name="amount" class="form-control" min="1" step="0.01" required>
+                </div>
+                <div class="col-sm-6">
+                    <label class="form-label small">Açıklama</label>
+                    <input type="text" name="description" class="form-control" maxlength="255" placeholder="Kampanya, jest...">
+                </div>
+                <div class="col-sm-2">
+                    <button class="btn btn-warning w-100">Yükle</button>
+                </div>
+            </form>
+        </div>
         <div class="card p-4">
             <h3 class="h6">Bakiye hareketleri</h3>
             @forelse($transactions as $tx)

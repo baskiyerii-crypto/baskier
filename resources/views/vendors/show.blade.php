@@ -15,7 +15,7 @@
             <div class="absolute inset-0 opacity-40" style="background-image:radial-gradient(circle at 18% 40%, rgba(255,255,255,.18), transparent 42%), radial-gradient(circle at 82% 18%, rgba(251,146,60,.35), transparent 38%);"></div>
         </div>
         <div class="px-5 pb-6 sm:px-8 sm:pb-8">
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:-mt-14 relative z-10">
+            <div class="relative z-10 mt-4 flex flex-col gap-4 sm:mt-5 sm:flex-row sm:items-end">
                 <div class="h-24 w-24 sm:h-28 sm:w-28 shrink-0 overflow-hidden rounded-2xl border-[3px] border-white bg-white shadow-md ring-1 ring-slate-200/60">
                     @if($logoUrl)
                         <img src="{{ $logoUrl }}" alt="{{ $vendor->name }}" class="h-full w-full object-contain p-2.5" loading="lazy">

@@ -7,7 +7,9 @@ use App\Models\BusinessType;
 use App\Models\Vendor;
 use App\Models\VendorDocument;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
@@ -180,6 +182,42 @@ class AdminVendorController extends Controller
         ]);
         $vendor->documents()->where('document_type', 'tax_plate')->where('status', 'pending')->update(['status' => 'rejected']);
         return back()->with('success', 'Satıcı reddedildi (pasif).');
+    }
+
+    public function giftBalance(Request $request, Vendor $vendor)
+    {
+        $validated = $request->validate([
+            'amount' => ['required', 'numeric', 'min:1', 'max:100000'],
+            'description' => ['nullable', 'string', 'max:255'],
+        ]);
+        $amount = round((float) $validated['amount'], 2);
+        $note = $validated['description'] ?: 'Yönetici hediye bakiyesi';
+
+        DB::transaction(function () use ($vendor, $amount, $note) {
+            $locked = Vendor::query()->whereKey($vendor->id)->lockForUpdate()->firstOrFail();
+            $locked->increment('balance', $amount);
+            $locked->refresh();
+            $locked->balanceTransactions()->create([
+                'amount' => $amount,
+                'type' => 'gift',
+                'reference_type' => 'admin',
+                'reference_id' => auth()->id(),
+                'description' => $note,
+                'balance_after' => $locked->balance,
+            ]);
+        });
+
+        if ($vendor->user) {
+            app(NotificationService::class)->notify(
+                $vendor->user,
+                'Hediye bakiye',
+                'Hesabınıza ₺'.number_format($amount, 2, ',', '.').' hediye bakiye yüklendi.',
+                ['type' => 'gift_balance'],
+                route('vendor.balance.index')
+            );
+        }
+
+        return back()->with('success', 'Hediye bakiye yüklendi.');
     }
 
     public function destroy(Vendor $vendor)

@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Services\OrderWorkflowService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class CustomerOrderDesignController extends Controller
 {
@@ -63,5 +64,20 @@ class CustomerOrderDesignController extends Controller
         ]);
 
         return back()->with('success', 'Revizyon talebiniz satıcıya iletildi.');
+    }
+
+    public function file(Request $request, Order $order, DesignApproval $designApproval)
+    {
+        if ($order->user_id !== $request->user()->id) {
+            abort(403);
+        }
+        if ((int) $designApproval->order_id !== (int) $order->id) {
+            abort(404);
+        }
+        if (! $designApproval->design_file_path || ! Storage::disk('public')->exists($designApproval->design_file_path)) {
+            abort(404, 'Prova dosyası bulunamadı.');
+        }
+
+        return Storage::disk('public')->response($designApproval->design_file_path);
     }
 }

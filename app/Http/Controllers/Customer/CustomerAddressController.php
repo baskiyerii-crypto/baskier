@@ -44,7 +44,7 @@ class CustomerAddressController extends Controller
         Address::capturePlaceHint($validated);
         $this->syncBillingProfileFromAddressForm($request);
 
-        return redirect()->route('account.adresler.index')->with('success', 'Adres kaydedildi.');
+        return $this->afterAddressSave($request, 'Adres kaydedildi.');
     }
 
     public function edit(Request $request, Address $address)
@@ -72,7 +72,7 @@ class CustomerAddressController extends Controller
         Address::capturePlaceHint($validated);
         $this->syncBillingProfileFromAddressForm($request);
 
-        return redirect()->route('account.adresler.index')->with('success', 'Adres güncellendi.');
+        return $this->afterAddressSave($request, 'Adres güncellendi.');
     }
 
     public function destroy(Request $request, Address $address)
@@ -99,6 +99,15 @@ class CustomerAddressController extends Controller
         $address->update(['is_billing_default' => true]);
 
         return redirect()->route('account.adresler.index', ['tab' => 'fatura'])->with('success', 'Varsayılan fatura adresi güncellendi.');
+    }
+
+    private function afterAddressSave(Request $request, string $message)
+    {
+        if ($request->input('redirect') === 'checkout') {
+            return redirect()->route('checkout.index')->with('success', $message);
+        }
+
+        return redirect()->route('account.adresler.index')->with('success', $message);
     }
 
     private function authorizeAddress(Request $request, Address $address): void

@@ -16,6 +16,9 @@
     <div class="col-lg-7">
         <form action="{{ route('account.adresler.store') }}" method="post" class="bg-white rounded-4 shadow-sm p-4">
             @csrf
+            @if(request('redirect') === 'checkout')
+                <input type="hidden" name="redirect" value="checkout">
+            @endif
             <div class="mb-3">
                 <label class="form-label">Adres adı</label>
                 <input type="text" name="label" class="form-control" value="{{ old('label', 'Ev') }}" placeholder="Ev, İş, Ofis...">

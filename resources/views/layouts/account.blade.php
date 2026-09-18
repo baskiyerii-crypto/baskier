@@ -27,7 +27,10 @@
                         <span class="hidden sm:inline text-xs font-mono rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-slate-700">{{ auth()->user()?->publicCode() }}</span>
                         <a href="{{ route('products.index') }}" class="hidden sm:inline-flex by-btn-secondary">Alışveriş</a>
                         <a href="{{ route('otp.show') }}" class="hidden sm:inline-flex by-btn-secondary">{{ __('panel.verify_account') }}</a>
-                        <a href="{{ route('cart.index') }}" class="by-btn-primary px-4 py-2.5">Sepet</a>
+                        <a href="{{ route('cart.index') }}" class="by-btn-primary px-4 py-2.5">
+                            Sepet
+                            <span class="cart-count-badge ml-1 rounded-full bg-white/20 px-2 py-0.5 text-xs font-bold">{{ $navBadges['customer_cart'] ?? 0 }}</span>
+                        </a>
                         <form method="POST" action="{{ route('logout') }}">@csrf
                             <button type="submit" class="by-btn-secondary">{{ __('panel.logout') }}</button>
                         </form>
@@ -54,13 +57,13 @@
                             $items = [
                                 ['label' => 'Özet', 'route' => auth()->user()->isAdmin() ? 'admin.dashboard' : (auth()->user()->isVendor() ? 'vendor.dashboard' : 'customer.dashboard'), 'match' => '*.dashboard', 'badge' => 0],
                                 ['label' => 'Siparişlerim', 'route' => 'account.orders.index', 'match' => 'account.orders.*', 'badge' => $navBadges['customer_orders'] ?? 0],
-                                ['label' => 'Sepet', 'route' => 'cart.index', 'match' => 'cart.*', 'badge' => 0],
-                                ['label' => 'Favorilerim', 'route' => 'favorites.index', 'match' => 'favorites.*', 'badge' => 0],
+                                ['label' => 'Sepet', 'route' => 'cart.index', 'match' => 'cart.*', 'badge' => $navBadges['customer_cart'] ?? 0],
+                                ['label' => 'Favorilerim', 'route' => 'favorites.index', 'match' => 'favorites.*', 'badge' => $navBadges['customer_favorites'] ?? 0],
                                 ['label' => 'Adreslerim', 'route' => 'account.adresler.index', 'match' => 'account.adresler.*', 'badge' => 0],
                                 ['label' => 'Teklif taleplerim', 'route' => 'quote-requests.index', 'match' => 'quote-requests.*', 'badge' => $navBadges['customer_quotes'] ?? 0],
                                 ['label' => 'Planlarım', 'route' => 'customer.outdoor.plans.index', 'match' => 'customer.outdoor.plans.*', 'badge' => 0],
                                 ['label' => 'Mesajlar', 'route' => 'customer.messages.index', 'match' => 'customer.messages.*', 'badge' => $navBadges['customer_messages'] ?? 0],
-                                ['label' => 'Ürün sorularım', 'route' => 'customer.product-questions.index', 'match' => 'customer.product-questions.*', 'badge' => 0],
+                                ['label' => 'Ürün sorularım', 'route' => 'customer.product-questions.index', 'match' => 'customer.product-questions.*', 'badge' => $navBadges['customer_product_questions'] ?? 0],
                                 ['label' => 'Sipariş sorularım', 'route' => 'customer.order-questions.index', 'match' => 'customer.order-questions.*', 'badge' => $navBadges['customer_questions'] ?? 0],
                                 ['label' => __('panel.direct_quotes'), 'route' => 'customer.direct-quotes.index', 'match' => 'customer.direct-quotes.*', 'badge' => 0],
                                 ['label' => 'Destek talepleri', 'route' => 'account.support.index', 'match' => 'account.support.*', 'badge' => 0],

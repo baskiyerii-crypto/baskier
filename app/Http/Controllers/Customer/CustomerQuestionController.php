@@ -15,9 +15,14 @@ class CustomerQuestionController extends Controller
 {
     public function products(Request $request)
     {
+        if ($request->user()->isVendor()) {
+            return redirect()->route('vendor.product-questions.index');
+        }
+        abort_unless($request->user()->isCustomer(), 403);
+
         $questions = ProductQuestion::query()
             ->where('customer_id', $request->user()->id)
-            ->with(['product', 'vendor'])
+            ->with(['product.images', 'vendor'])
             ->latest()
             ->paginate(20);
 
@@ -26,9 +31,14 @@ class CustomerQuestionController extends Controller
 
     public function orders(Request $request)
     {
+        if ($request->user()->isVendor()) {
+            return redirect()->route('vendor.order-questions.index');
+        }
+        abort_unless($request->user()->isCustomer(), 403);
+
         $questions = OrderQuestion::query()
             ->where('customer_id', $request->user()->id)
-            ->with(['order', 'vendor', 'replies'])
+            ->with(['order.items', 'vendor', 'replies'])
             ->latest()
             ->paginate(20);
 
@@ -62,7 +72,7 @@ class CustomerQuestionController extends Controller
             );
         }
 
-        return back()->with('success', 'Sorunuz satıcıya iletildi.');
+        return redirect()->route('products.show', $product)->with('success', 'Sorunuz satıcıya iletildi.');
     }
 
     public function storeOrder(Request $request, Order $order, ModerationService $moderation, NotificationService $notifications)
@@ -95,13 +105,13 @@ class CustomerQuestionController extends Controller
             $notifications->notify(
                 $order->vendor->user,
                 'Sipariş sorusu',
-                '#'.$order->order_number,
+                ($validated['subject'] ?: 'Sipariş sorusu').': '.\Illuminate\Support\Str::limit($validated['body'], 80),
                 ['type' => 'order_question'],
                 route('vendor.order-questions.show', $question)
             );
         }
 
-        return back()->with('success', 'Sipariş sorunuz iletildi.');
+        return redirect()->route('account.orders.show', $order)->with('success', 'Sipariş sorunuz iletildi.');
     }
 
     public function replyOrder(Request $request, OrderQuestion $question, ModerationService $moderation)
@@ -120,6 +130,6 @@ class CustomerQuestionController extends Controller
         ]);
         $question->update(['status' => OrderQuestion::STATUS_OPEN]);
 
-        return back()->with('success', 'Yanıt gönderildi.');
+        return redirect()->route('customer.order-questions.index')->with('success', 'Yanıt gönderildi.');
     }
 }

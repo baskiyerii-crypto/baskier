@@ -2,12 +2,19 @@
 @section('title', 'Ürün soruları')
 @section('content')
 <div class="card table-responsive">
-    <table class="table mb-0">
+    <table class="table mb-0 align-middle">
         <thead><tr><th>Ürün</th><th>Müşteri</th><th>Soru</th><th>Durum</th><th></th></tr></thead>
         <tbody>
         @forelse($questions as $q)
             <tr>
-                <td>{{ $q->product?->name }}</td>
+                <td>
+                    <div class="d-flex align-items-center gap-2">
+                        @if($q->product?->displayImageUrl())
+                            <img src="{{ $q->product->displayImageUrl() }}" alt="" width="40" height="40" class="rounded object-fit-cover">
+                        @endif
+                        <span>{{ $q->product?->name }}</span>
+                    </div>
+                </td>
                 <td>{{ $q->customer?->publicCode() }}</td>
                 <td class="small">{{ \Illuminate\Support\Str::limit($q->question, 80) }}</td>
                 <td>{{ $q->status === 'answered' ? 'Yanıtlandı' : 'Açık' }}</td>

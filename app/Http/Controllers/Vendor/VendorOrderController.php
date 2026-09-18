@@ -161,7 +161,7 @@ class VendorOrderController extends Controller
                 'Ödemeniz Onaylandı',
                 "#{$order->order_number} numaralı siparişinizin ödemesi satıcı tarafından onaylandı ve üretime hazırlık sürecine alındı.",
                 ['type' => 'payment_confirmed', 'order_id' => $order->id],
-                route('customer.orders.show', $order)
+                route('account.orders.show', $order)
             );
         }
 

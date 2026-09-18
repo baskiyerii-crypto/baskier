@@ -124,7 +124,7 @@
                             </div>
                             @if($approval->design_file_path)
                                 <div class="mt-2">
-                                    <a href="{{ asset('storage/' . $approval->design_file_path) }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                    <a href="{{ route('vendor.orders.design.file', [$order, $approval]) }}" target="_blank" class="btn btn-outline-primary btn-sm">
                                         📄 Yüklenen Prova Dosyasını İndir / Görüntüle
                                     </a>
                                 </div>

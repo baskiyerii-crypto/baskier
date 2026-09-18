@@ -25,28 +25,6 @@ class OutdoorRepresentationController extends Controller
         return view('outdoor-panel.representations', compact('vendor', 'asOwner', 'asAgency'));
     }
 
-    public function invite(Request $request)
-    {
-        $vendor = $this->vendor($request);
-        $validated = $request->validate([
-            'email' => ['required', 'email'],
-            'exclusive' => ['sometimes', 'boolean'],
-            'notes' => ['nullable', 'string', 'max:2000'],
-        ]);
-        try {
-            $this->representations->invite(
-                $vendor,
-                $validated['email'],
-                (bool) ($validated['exclusive'] ?? false),
-                $validated['notes'] ?? null
-            );
-        } catch (RuntimeException $e) {
-            return back()->with('error', $e->getMessage());
-        }
-
-        return back()->with('success', 'Davet gönderildi. Karşı tarafın onaylaması gerekir.');
-    }
-
     public function accept(Request $request, OohRepresentation $representation)
     {
         $vendor = $this->vendor($request);

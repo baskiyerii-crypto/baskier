@@ -2,21 +2,8 @@
 @section('title', $vendor->isOutdoorAgency() ? 'Bağlı sahipler' : 'Ajanslarım')
 @section('content')
 <h1 class="h5 mb-3">{{ $vendor->isOutdoorAgency() ? 'Bağlı mecra sahipleri' : 'Ajanslarım' }}</h1>
-<p class="small text-muted">Ajans birden fazla sahip ile çalışabilir. Münhasır bağda yalnız o ajans teklif verir. Varsayılan yol dizinden bağlanmaktır; e-posta daveti isteğe bağlıdır.</p>
-<p class="small mb-3"><a href="{{ route('outdoor-panel.directory') }}">Dizinden bağlan (telefon/e-posta görünmez)</a></p>
-
-<form method="POST" action="{{ route('outdoor-panel.representations.invite') }}" class="card p-3 mb-4" style="max-width:520px;">
-    @csrf
-    <label class="form-label small">Karşı taraf e-posta</label>
-    <input type="email" name="email" class="form-control mb-2" required>
-    @if($vendor->isOutdoorOwner())
-        <label class="form-check small mb-2">
-            <input type="checkbox" name="exclusive" value="1" class="form-check-input"> Münhasır temsil
-        </label>
-    @endif
-    <textarea name="notes" class="form-control mb-2" rows="2" placeholder="Not (isteğe bağlı)"></textarea>
-    <button class="btn btn-primary btn-sm">Davet gönder</button>
-</form>
+<p class="small text-muted">Ajans birden fazla sahip ile çalışabilir. Münhasır bağda yalnız o ajans teklif verir. Bağlantı dizinden kurulur; e-posta ile davet yoktur.</p>
+<p class="small mb-3"><a href="{{ route('outdoor-panel.directory') }}">Dizinden bağlan</a></p>
 
 @php $rows = $vendor->isOutdoorAgency() ? $asAgency : $asOwner; @endphp
 @if($rows->isEmpty())

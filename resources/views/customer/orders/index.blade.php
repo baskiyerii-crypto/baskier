@@ -8,79 +8,58 @@
     use App\Domain\OrderStatus;
 @endphp
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h5 mb-0 fw-bold">Siparişlerim</h1>
-        <a href="{{ route('products.index') }}" class="btn btn-warning btn-sm rounded-pill">+ Alışverişe Başla</a>
+    <div class="mb-4 flex items-center justify-between gap-3">
+        <h1 class="mb-0 text-lg font-bold">Siparişlerim</h1>
+        <a href="{{ route('products.index') }}" class="rounded-full bg-amber-400 px-3 py-1.5 text-sm font-semibold text-slate-900">+ Alışverişe Başla</a>
     </div>
 
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show small mb-3" role="alert">
-            {{ session('success') }}
-        </div>
+        <div class="mb-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800">{{ session('success') }}</div>
     @endif
 
-    <div class="bg-white rounded-4 shadow-sm border overflow-hidden">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0 small">
-                <thead class="table-light">
-                    <tr>
-                        <th>Sipariş No</th>
-                        <th>Tarih</th>
-                        <th>Tür</th>
-                        <th>Satıcı / Mağaza</th>
-                        <th>Tutar</th>
-                        <th>Durum</th>
-                        <th class="text-end">İşlem</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($orders as $o)
-                        @php
-                            $typeLabel = match($o->type) {
-                                'product' => 'Pazaryeri',
-                                'quote' => 'Özel Teklif',
-                                'freelancer' => 'Freelancer',
-                                default => ucfirst($o->type ?? 'Sipariş'),
-                            };
-                            $badgeClass = match($o->status) {
-                                OrderStatus::CONFIRMED, OrderStatus::PENDING, 'paid' => 'bg-primary text-white',
-                                OrderStatus::DESIGN_REVIEW => 'bg-warning text-dark',
-                                OrderStatus::IN_PRODUCTION => 'bg-info text-dark',
-                                OrderStatus::READY_TO_SHIP => 'bg-secondary text-white',
-                                OrderStatus::SHIPPED => 'bg-primary-subtle text-primary border border-primary',
-                                OrderStatus::DELIVERED, OrderStatus::COMPLETED => 'bg-success text-white',
-                                OrderStatus::CANCELLED => 'bg-danger text-white',
-                                default => 'bg-secondary text-white',
-                            };
-                        @endphp
-                        <tr>
-                            <td class="fw-bold">#{{ $o->order_number }}</td>
-                            <td class="text-muted">{{ $o->created_at->format('d.m.Y H:i') }}</td>
-                            <td>
-                                <span class="badge bg-light text-dark border">{{ $typeLabel }}</span>
-                            </td>
-                            <td>{{ $o->vendor?->name ?? 'BaskıYeri' }}</td>
-                            <td class="fw-bold text-success">₺{{ number_format($o->subtotal, 2, ',', '.') }}</td>
-                            <td>
-                                <span class="badge rounded-pill px-2.5 py-1 {{ $badgeClass }}">
-                                    {{ UiLabels::orderStatus($o->status) }}
-                                </span>
-                            </td>
-                            <td class="text-end">
-                                <a href="{{ route('account.orders.show', $o) }}" class="btn btn-sm btn-outline-dark rounded-pill px-3">Detay →</a>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="text-muted text-center p-5">
-                                <div class="mb-2">📦</div>
-                                Henüz verilmiş bir siparişiniz bulunmuyor.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+    <div class="space-y-3">
+        @forelse($orders as $o)
+            @php
+                $typeLabel = match($o->type) {
+                    'product' => 'Pazaryeri',
+                    'quote' => 'Özel Teklif',
+                    'freelancer' => 'Freelancer',
+                    default => ucfirst($o->type ?? 'Sipariş'),
+                };
+                $badgeClass = match($o->status) {
+                    OrderStatus::CONFIRMED, 'paid' => 'bg-blue-600 text-white',
+                    OrderStatus::PENDING, OrderStatus::PENDING_PAYMENT => 'bg-slate-700 text-white',
+                    OrderStatus::DESIGN_REVIEW => 'bg-amber-200 text-amber-950',
+                    OrderStatus::IN_PRODUCTION => 'bg-sky-200 text-sky-950',
+                    OrderStatus::READY_TO_SHIP => 'bg-slate-200 text-slate-800',
+                    OrderStatus::SHIPPED => 'bg-indigo-100 text-indigo-800',
+                    OrderStatus::DELIVERED, OrderStatus::COMPLETED => 'bg-emerald-600 text-white',
+                    OrderStatus::CANCELLED => 'bg-red-600 text-white',
+                    default => 'bg-slate-600 text-white',
+                };
+                $firstItem = $o->items->first();
+            @endphp
+            <a href="{{ route('account.orders.show', $o) }}" class="block rounded-2xl border border-slate-200 bg-white p-4 shadow-sm no-underline text-inherit hover:border-slate-300">
+                <div class="flex flex-wrap items-start justify-between gap-2">
+                    <div>
+                        <div class="font-semibold text-slate-900">#{{ $o->order_number }}</div>
+                        <div class="text-xs text-slate-500">{{ $o->created_at->format('d.m.Y H:i') }} · {{ $o->vendor?->name ?? 'BaskıYeri' }}</div>
+                        @if($firstItem)
+                            <div class="mt-1 text-sm text-slate-700">{{ $firstItem->name ?? 'Ürün' }}@if($o->items->count() > 1) <span class="text-slate-500">+{{ $o->items->count() - 1 }}</span>@endif</div>
+                        @endif
+                    </div>
+                    <div class="text-right">
+                        <span class="inline-block rounded-full px-2.5 py-1 text-xs font-semibold {{ $badgeClass }}">{{ UiLabels::orderStatus($o->status) }}</span>
+                        <div class="mt-1 text-xs text-slate-500">{{ $typeLabel }}</div>
+                        <div class="mt-1 font-semibold text-emerald-700">₺{{ number_format($o->subtotal, 2, ',', '.') }}</div>
+                    </div>
+                </div>
+            </a>
+        @empty
+            <div class="rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-500">
+                Henüz verilmiş bir siparişiniz bulunmuyor.
+            </div>
+        @endforelse
     </div>
     <div class="mt-3">{{ $orders->links() }}</div>
 @endsection
