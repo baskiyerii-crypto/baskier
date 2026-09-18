@@ -12,7 +12,7 @@ class OutdoorProofService
 {
     public function __construct(private OutdoorStaffService $staff) {}
 
-    public function submit(OohOccupancy $occupancy, User $actor, UploadedFile $photo, float $lat, float $lng): OohProof
+    public function submit(OohOccupancy $occupancy, User $actor, UploadedFile $photo, float $lat, float $lng, ?string $qrToken = null): OohProof
     {
         if ($occupancy->kind !== OohOccupancy::KIND_BOOKED) {
             throw new RuntimeException('Kanıt yalnızca rezerve işler için yüklenir.');
@@ -31,6 +31,7 @@ class OutdoorProofService
         ));
         $radius = (int) ($inventory->proof_radius_m ?: 75);
         $path = $photo->store('ooh/proofs/'.$occupancy->id, 'public');
+        $qrOk = $this->qrMatches($inventory, $qrToken);
 
         return OohProof::create([
             'ooh_occupancy_id' => $occupancy->id,
@@ -39,9 +40,19 @@ class OutdoorProofService
             'lat' => $lat,
             'lng' => $lng,
             'distance_m' => $distance,
-            'is_valid' => $distance <= $radius,
+            'is_valid' => $distance <= $radius && $qrOk,
             'captured_at' => now(),
         ]);
+    }
+
+    private function qrMatches($inventory, ?string $qrToken): bool
+    {
+        $expected = strtoupper((string) ($inventory->qr_token ?? ''));
+        if ($expected === '') {
+            return true;
+        }
+
+        return hash_equals($expected, strtoupper(trim((string) $qrToken)));
     }
 
     public function haversineMeters(float $lat1, float $lng1, float $lat2, float $lng2): float

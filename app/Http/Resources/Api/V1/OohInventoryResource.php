@@ -44,6 +44,20 @@ class OohInventoryResource extends JsonResource
                 'id' => $this->category?->id,
                 'name' => $this->category?->name,
             ]),
+            'insight' => $this->whenLoaded('insight', fn () => $this->insight ? [
+                'population_province' => $this->insight->population_province,
+                'population_district' => $this->insight->population_district,
+                'population_year' => $this->insight->population_year,
+                'road_class' => $this->insight->road_class,
+                'road_name' => $this->insight->road_name,
+                'road_ref' => $this->insight->road_ref,
+                'vehicle_aadt' => $this->insight->vehicle_aadt,
+                'vehicle_aadt_year' => $this->insight->vehicle_aadt_year,
+                'vehicle_source' => $this->insight->vehicle_source,
+                'pedestrian_kind' => $this->insight->pedestrian_kind,
+                'visibility_band' => $this->insight->visibility_band,
+                'street_view_available' => $this->insight->street_view_available,
+            ] : null),
         ];
     }
 }

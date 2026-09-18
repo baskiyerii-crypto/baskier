@@ -60,6 +60,7 @@ use App\Http\Controllers\OutdoorPanel\OutdoorDirectoryController;
 use App\Http\Controllers\OutdoorPanel\OutdoorRepresentationController;
 use App\Http\Controllers\Vendor\VendorOutdoorInventoryController;
 use App\Http\Controllers\Vendor\VendorOutdoorOpsController;
+use App\Http\Controllers\Vendor\VendorOutdoorQrController;
 use App\Http\Controllers\Vendor\VendorOutdoorRequestController;
 use App\Http\Controllers\Vendor\VendorOrderController;
 use App\Http\Controllers\Vendor\VendorOrderDesignController;
@@ -90,6 +91,7 @@ Route::get('/urun/{slug}', [ProductController::class, 'show'])->name('products.s
 Route::get('/saticilar', [VendorController::class, 'index'])->name('vendors.index');
 Route::get('/satici/{slug}', [VendorController::class, 'show'])->name('vendors.show');
 Route::get('/acik-hava', [OutdoorCatalogController::class, 'index'])->name('outdoor.index');
+Route::get('/acik-hava/dogrula/{token}', [OutdoorCatalogController::class, 'verify'])->name('outdoor.verify');
 Route::get('/acik-hava/{slug}', [OutdoorCatalogController::class, 'show'])->name('outdoor.show');
 Route::post('/acik-hava/{slug}/plan', [OutdoorCatalogController::class, 'addToPlan'])->name('outdoor.plan.add');
 Route::post('/acik-hava-sepet/kaldir', [OutdoorCatalogController::class, 'removeFromPlan'])->name('outdoor.basket.remove');
@@ -292,6 +294,7 @@ Route::middleware(['auth', 'role:vendor', 'vendor.not_suspended'])->prefix('acik
     Route::get('envanter/yeni', [VendorOutdoorInventoryController::class, 'create'])->name('inventories.create');
     Route::post('envanter', [VendorOutdoorInventoryController::class, 'store'])->name('inventories.store');
     Route::get('envanter/{inventory}/duzenle', [VendorOutdoorInventoryController::class, 'edit'])->name('inventories.edit');
+    Route::get('envanter/{inventory}/qr', [VendorOutdoorQrController::class, 'show'])->name('inventories.qr');
     Route::put('envanter/{inventory}', [VendorOutdoorInventoryController::class, 'update'])->name('inventories.update');
     Route::post('envanter/{inventory}/inceleme', [VendorOutdoorInventoryController::class, 'submit'])->name('inventories.submit');
     Route::post('envanter/{inventory}/bloke', [VendorOutdoorInventoryController::class, 'block'])->name('inventories.block');
@@ -371,6 +374,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('api-yonetimi', [AdminApiManagementController::class, 'update'])->name('api-management.update');
     Route::post('api-yonetimi/test-iyzico', [AdminApiManagementController::class, 'testIyzico'])->name('api-management.test-iyzico');
     Route::post('api-yonetimi/test-shopier', [AdminApiManagementController::class, 'testShopier'])->name('api-management.test-shopier');
+    Route::post('api-yonetimi/test-google', [AdminApiManagementController::class, 'testGoogle'])->name('api-management.test-google');
     Route::get('payouts', [AdminPayoutController::class, 'index'])->name('payouts.index');
     Route::post('payouts/approve', [AdminPayoutController::class, 'approve'])->name('payouts.approve');
     Route::get('destek-talepleri', [AdminSupportTicketWebController::class, 'index'])->name('support-tickets.index');

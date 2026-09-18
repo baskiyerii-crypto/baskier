@@ -33,6 +33,11 @@ final class OutdoorSchema
         return Schema::hasTable('ooh_inventory_grants');
     }
 
+    public static function insightsReady(): bool
+    {
+        return Schema::hasTable('ooh_location_insights');
+    }
+
     public static function occupanciesReady(): bool
     {
         return Schema::hasTable('ooh_occupancies');

@@ -240,7 +240,7 @@ class VendorOutdoorInventoryController extends Controller
      */
     private function rules(Request $request): array
     {
-        return $request->validate([
+        $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'category_id' => ['required', 'exists:categories,id'],
             'description' => ['nullable', 'string', 'max:5000'],
@@ -256,8 +256,15 @@ class VendorOutdoorInventoryController extends Controller
             'list_price' => ['nullable', 'numeric', 'min:0'],
             'price_unit' => ['required', 'in:day,week,month'],
             'proof_radius_m' => ['nullable', 'integer', 'min:10', 'max:500'],
+            'face_width_m' => ['nullable', 'numeric', 'min:0.1', 'max:99'],
+            'face_height_m' => ['nullable', 'numeric', 'min:0.1', 'max:99'],
+            'facing' => ['nullable', 'in:N,E,S,W'],
+            'illuminated' => ['nullable', 'boolean'],
             'images' => ['nullable', 'array'],
             'images.*' => ['image', 'max:4096'],
         ]);
+        $validated['illuminated'] = $request->boolean('illuminated');
+
+        return $validated;
     }
 }

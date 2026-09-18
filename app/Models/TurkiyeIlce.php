@@ -16,7 +16,12 @@ class TurkiyeIlce extends Model
 
     protected $table = 'turkiye_ilceler';
 
-    protected $fillable = ['id', 'province_id', 'name', 'postal_code'];
+    protected $fillable = ['id', 'province_id', 'name', 'postal_code', 'population', 'population_year'];
+
+    protected $casts = [
+        'population' => 'integer',
+        'population_year' => 'integer',
+    ];
 
     public function il(): BelongsTo
     {

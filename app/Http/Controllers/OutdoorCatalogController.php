@@ -7,7 +7,9 @@ use App\Models\Country;
 use App\Models\OohInventory;
 use App\Models\TurkiyeIl;
 use App\Models\TurkiyeIlce;
+use App\Models\OohProof;
 use App\Services\OutdoorInventoryService;
+use App\Services\OutdoorLocationInsightService;
 use App\Services\OutdoorOccupancyService;
 use App\Services\OutdoorPlanBasket;
 use App\Services\WorldPlaceService;
@@ -85,15 +87,40 @@ class OutdoorCatalogController extends Controller
         if (Schema::hasTable('countries')) {
             $with[] = 'country';
         }
+        if (\App\Support\OutdoorSchema::insightsReady()) {
+            $with[] = 'insight';
+        }
         $inventory = OohInventory::query()
             ->with($with)
             ->where('slug', $slug)
             ->where('status', OohInventory::STATUS_PUBLISHED)
             ->firstOrFail();
+        $insights = app(OutdoorLocationInsightService::class);
+        $insight = $insights->ensure($inventory);
+        if ($insight) {
+            $inventory->setRelation('insight', $insight);
+        }
+        $streetViewSrc = $insights->streetViewEmbedSrc($inventory);
         $calendar = $occupancy->calendar($inventory);
         $lines = $basket->lines($request);
 
-        return view('outdoor.show', compact('inventory', 'calendar', 'lines'));
+        return view('outdoor.show', compact('inventory', 'calendar', 'lines', 'insight', 'streetViewSrc'));
+    }
+
+    public function verify(string $token)
+    {
+        abort_unless(\App\Support\OutdoorSchema::inventoriesReady(), 404);
+        $inventory = OohInventory::query()
+            ->with(['province', 'districtRel'])
+            ->where('qr_token', strtoupper($token))
+            ->firstOrFail();
+        $lastProof = OohProof::query()
+            ->whereHas('occupancy', fn ($q) => $q->where('ooh_inventory_id', $inventory->id))
+            ->where('is_valid', true)
+            ->latest('captured_at')
+            ->first();
+
+        return view('outdoor.verify', compact('inventory', 'lastProof'));
     }
 
     public function addToPlan(Request $request, string $slug, OutdoorPlanBasket $basket, OutdoorOccupancyService $occupancy)

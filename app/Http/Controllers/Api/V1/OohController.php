@@ -41,12 +41,20 @@ class OohController extends ApiController
         if (! \App\Support\OutdoorSchema::inventoriesReady()) {
             return $this->fail('Kayıt bulunamadı.', null, 404);
         }
+        $with = ['images', 'vendor', 'category'];
+        if (\App\Support\OutdoorSchema::insightsReady()) {
+            $with[] = 'insight';
+        }
         $inventory = OohInventory::query()
-            ->with(['images', 'vendor', 'category'])
+            ->with($with)
             ->where(fn ($q) => $q->where('id', $id)->orWhere('slug', $id))
             ->firstOrFail();
         if (! $inventory->isPublished()) {
             $this->authorize('view', $inventory);
+        }
+        if (\App\Support\OutdoorSchema::insightsReady()) {
+            app(\App\Services\OutdoorLocationInsightService::class)->ensure($inventory);
+            $inventory->load('insight');
         }
 
         return $this->ok(new OohInventoryResource($inventory));
@@ -207,10 +215,18 @@ class OohController extends ApiController
             'photo' => ['required', 'image', 'max:8192'],
             'lat' => ['required', 'numeric'],
             'lng' => ['required', 'numeric'],
+            'qr_token' => ['nullable', 'string', 'max:16'],
         ]);
         $row = \App\Models\OohOccupancy::query()->with('inventory')->findOrFail($validated['occupancy_id']);
         try {
-            $proof = $proofs->submit($row, $request->user(), $request->file('photo'), (float) $validated['lat'], (float) $validated['lng']);
+            $proof = $proofs->submit(
+                $row,
+                $request->user(),
+                $request->file('photo'),
+                (float) $validated['lat'],
+                (float) $validated['lng'],
+                $validated['qr_token'] ?? null
+            );
         } catch (RuntimeException $e) {
             return $this->fail($e->getMessage(), null, 422);
         }

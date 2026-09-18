@@ -30,6 +30,10 @@ class OohInventoryStoreRequest extends FormRequest
             'list_price' => ['nullable', 'numeric', 'min:0'],
             'price_unit' => ['required', 'in:day,week,month'],
             'proof_radius_m' => ['nullable', 'integer', 'min:10', 'max:500'],
+            'face_width_m' => ['nullable', 'numeric', 'min:0.1', 'max:99'],
+            'face_height_m' => ['nullable', 'numeric', 'min:0.1', 'max:99'],
+            'facing' => ['nullable', 'in:N,E,S,W'],
+            'illuminated' => ['nullable', 'boolean'],
             'images' => ['nullable', 'array'],
             'images.*' => ['image', 'max:4096'],
         ];

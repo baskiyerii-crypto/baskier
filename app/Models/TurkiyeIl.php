@@ -15,7 +15,12 @@ class TurkiyeIl extends Model
 
     protected $table = 'turkiye_iller';
 
-    protected $fillable = ['id', 'name'];
+    protected $fillable = ['id', 'name', 'population', 'population_year'];
+
+    protected $casts = [
+        'population' => 'integer',
+        'population_year' => 'integer',
+    ];
 
     public function ilceler(): HasMany
     {

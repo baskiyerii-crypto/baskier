@@ -20,6 +20,7 @@
             @endif
             <form method="POST" action="{{ route('outdoor-panel.jobs.proof', $job) }}" enctype="multipart/form-data" class="mt-2">
                 @csrf
+                <input name="qr_token" class="form-control form-control-sm mb-1" placeholder="Pano QR kodu" required maxlength="16">
                 <input type="file" name="photo" accept="image/*" capture="environment" required class="form-control form-control-sm mb-1">
                 @include('partials.gps-capture', [
                     'gpsMode' => 'submit',

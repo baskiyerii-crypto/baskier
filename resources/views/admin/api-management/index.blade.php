@@ -192,8 +192,32 @@
             </div>
         </div>
 
+        <div class="api-card" data-api="google">
+            <div class="api-card-head">
+                <h2>Google Maps (Street View)</h2>
+                <div class="form-check form-switch m-0">
+                    <input class="form-check-input api-toggle" type="checkbox" role="switch" name="api_google_enabled" value="1" id="api_google" @checked($google_enabled)>
+                    <label class="form-check-label" for="api_google">{{ $google_enabled ? 'Açık' : 'Kapalı' }}</label>
+                </div>
+            </div>
+            <p class="small text-muted mb-2">Maps Embed ve Street View Metadata. Anahtarı HTTP referrer ile kısıtlayın. Kapalıysa sokak görünümü gösterilmez.</p>
+            <div class="api-fields row g-3" data-disabled="{{ $google_enabled ? '0' : '1' }}">
+                <div class="col-md-8">
+                    <label class="form-label">API Key</label>
+                    <input type="password" name="google_maps_api_key" class="form-control" value="{{ $google_maps_api_key ?? '' }}">
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" form="google-test-form" class="btn btn-outline-secondary">Bağlantıyı dene</button>
+                </div>
+                @if(!empty($google_last_test))
+                    <div class="col-12 small text-muted">Son test: {{ $google_last_test }}</div>
+                @endif
+            </div>
+        </div>
+
         <button class="btn btn-primary">{{ __('panel.save') }}</button>
     </form>
+    <form method="post" action="{{ route('admin.api-management.test-google') }}" id="google-test-form" class="d-none">@csrf</form>
 </div>
 <script>
 document.querySelectorAll('.api-toggle').forEach(function (el) {

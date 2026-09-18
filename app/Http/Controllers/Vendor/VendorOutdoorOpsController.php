@@ -209,6 +209,7 @@ class VendorOutdoorOpsController extends Controller
             'photo' => ['required', 'image', 'max:8192'],
             'lat' => ['required', 'numeric', 'between:-90,90'],
             'lng' => ['required', 'numeric', 'between:-180,180'],
+            'qr_token' => ['required', 'string', 'max:16'],
         ]);
         try {
             $proof = $this->proofs->submit(
@@ -216,7 +217,8 @@ class VendorOutdoorOpsController extends Controller
                 $request->user(),
                 $request->file('photo'),
                 (float) $validated['lat'],
-                (float) $validated['lng']
+                (float) $validated['lng'],
+                $validated['qr_token']
             );
         } catch (RuntimeException $e) {
             return back()->with('error', $e->getMessage());
@@ -226,7 +228,7 @@ class VendorOutdoorOpsController extends Controller
             $proof->is_valid ? 'success' : 'error',
             $proof->is_valid
                 ? 'Asım kanıtı kaydedildi.'
-                : 'Kanıt kaydedildi ancak GPS yarıçap dışında ('.$proof->distance_m.' m). Takvim değişmedi.'
+                : 'Kanıt kaydedildi ancak GPS veya QR doğrulanamadı ('.$proof->distance_m.' m). Takvim değişmedi.'
         );
     }
 

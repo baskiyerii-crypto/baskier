@@ -18,6 +18,7 @@ class OutdoorInventoryService
     public function __construct(
         private OutdoorStaffService $staff,
         private WorldPlaceService $places,
+        private OutdoorLocationInsightService $insights,
     ) {}
 
     /**
@@ -50,6 +51,11 @@ class OutdoorInventoryService
                 'proof_radius_m' => $payload['proof_radius_m'] ?? 75,
                 'status' => OohInventory::STATUS_DRAFT,
             ];
+            foreach (['face_width_m', 'face_height_m', 'facing', 'illuminated'] as $col) {
+                if (Schema::hasColumn('ooh_inventories', $col) && array_key_exists($col, $payload)) {
+                    $row[$col] = $payload[$col];
+                }
+            }
             if (Schema::hasColumn('ooh_inventories', 'created_by_user_id')) {
                 $row['created_by_user_id'] = $actor->id;
             }
@@ -59,8 +65,9 @@ class OutdoorInventoryService
             $inventory = OohInventory::create($row);
 
             $this->storeImages($inventory, $images);
+            $this->insights->enrich($inventory);
 
-            return $inventory->load('images');
+            return $inventory->load(['images', 'insight']);
         });
     }
 
@@ -104,8 +111,9 @@ class OutdoorInventoryService
         }
         $inventory->save();
         $this->storeImages($inventory, $images);
+        $this->insights->enrich($inventory->fresh());
 
-        return $inventory->fresh('images');
+        return $inventory->fresh(['images', 'insight']);
     }
 
     public function delete(OohInventory $inventory, User $actor): void

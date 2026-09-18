@@ -44,6 +44,32 @@
             <p class="mt-1 text-xs text-slate-500">
                 <a class="underline" href="https://www.openstreetmap.org/?mlat={{ $mapLat }}&amp;mlon={{ $mapLng }}#map=17/{{ $mapLat }}/{{ $mapLng }}" target="_blank" rel="noopener">Haritada aç</a>
             </p>
+            @if(!empty($streetViewSrc))
+                <div class="mt-4 overflow-hidden rounded-2xl border border-slate-200">
+                    <iframe title="Sokak görünümü" class="h-56 w-full" loading="lazy" src="{{ $streetViewSrc }}"></iframe>
+                </div>
+            @endif
+            @if(!empty($insight))
+                <div class="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm">
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Konum bilgisi · resmi kaynak / tahmini, garanti değil</p>
+                    @if($insight->population_province)
+                        <p class="mt-2">İl nüfusu: {{ number_format($insight->population_province, 0, ',', '.') }}@if($insight->population_year) <span class="text-slate-500">(TÜİK {{ $insight->population_year }})</span>@endif</p>
+                    @endif
+                    @if($insight->population_district)
+                        <p>İlçe nüfusu: {{ number_format($insight->population_district, 0, ',', '.') }}</p>
+                    @endif
+                    @if($insight->road_name || $insight->road_ref || $insight->road_class)
+                        <p class="mt-1">Yol: {{ trim(implode(' · ', array_filter([$insight->road_ref, $insight->road_name, $insight->road_class]))) }}</p>
+                    @endif
+                    @if($insight->vehicle_aadt)
+                        <p>Araç (YOGT): {{ number_format($insight->vehicle_aadt, 0, ',', '.') }}/gün <span class="text-slate-500">(KGM {{ $insight->vehicle_aadt_year }})</span></p>
+                    @else
+                        <p>Araç: Bu noktada resmi araç sayımı yok.</p>
+                    @endif
+                    <p>Yaya: {{ $insight->pedestrianLabel() }}</p>
+                    <p>Görünürlük: {{ $insight->visibilityLabel() }}</p>
+                </div>
+            @endif
 
             <form method="POST" action="{{ route('outdoor.plan.add', $inventory->slug) }}" class="mt-5 space-y-3">
                 @csrf

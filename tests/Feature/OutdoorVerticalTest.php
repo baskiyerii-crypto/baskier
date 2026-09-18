@@ -4,7 +4,10 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\OohInventory;
+use App\Models\OohKgmTraffic;
 use App\Models\OohOccupancy;
+use App\Models\TurkiyeIl;
+use App\Models\TurkiyeIlce;
 use App\Models\OohPlan;
 use App\Models\Order;
 use App\Models\User;
@@ -742,6 +745,89 @@ class OutdoorVerticalTest extends TestCase
             ->assertOk()
             ->assertSee('Adana')
             ->assertSee('Pano ekleme yetkisi');
+    }
+
+    private function seedLocationFacts(): void
+    {
+        TurkiyeIl::query()->updateOrCreate(
+            ['id' => 34],
+            ['name' => 'İstanbul', 'population' => 15655924, 'population_year' => 2023]
+        );
+        TurkiyeIlce::query()->updateOrCreate(
+            ['id' => 1103],
+            [
+                'province_id' => 34,
+                'name' => 'Kadıköy',
+                'postal_code' => '34710',
+                'population' => 467919,
+                'population_year' => 2023,
+            ]
+        );
+        OohKgmTraffic::query()->updateOrCreate(
+            ['road_ref' => 'D100', 'lat' => 41.0, 'lng' => 29.0],
+            ['name' => 'D100 test', 'aadt' => 85421, 'year' => 2023]
+        );
+    }
+
+    public function test_catalog_shows_tuik_population_and_kgm_when_matched(): void
+    {
+        $this->seedLocationFacts();
+        [$user, $vendor] = $this->outdoorVendor();
+        $cat = $this->outdoorCategory();
+        $matched = $this->publishFace($vendor, $cat, 'D100 Pano', 41.0, 29.0);
+        $unmatched = $this->publishFace($vendor, $cat, 'Uzak Pano', 38.4, 27.1);
+
+        $this->get(route('outdoor.show', $matched->slug))
+            ->assertOk()
+            ->assertSee('15.655.924', false)
+            ->assertSee('85.421', false)
+            ->assertSee('KGM', false)
+            ->assertDontSee('maps.googleapis.com', false)
+            ->assertDontSee('streetview', false);
+
+        $this->get(route('outdoor.show', $unmatched->slug))
+            ->assertOk()
+            ->assertSee('Bu noktada resmi araç sayımı yok', false);
+    }
+
+    public function test_proof_requires_matching_qr_token(): void
+    {
+        Storage::fake('public');
+        [$user, $vendor] = $this->outdoorVendor();
+        $cat = $this->outdoorCategory();
+        $face = $this->publishFace($vendor, $cat, 'QR Pano', 41.0, 29.0);
+        $this->assertNotEmpty($face->qr_token);
+        $occ = OohOccupancy::create([
+            'ooh_inventory_id' => $face->id,
+            'starts_on' => now()->addDay()->toDateString(),
+            'ends_on' => now()->addDays(3)->toDateString(),
+            'kind' => OohOccupancy::KIND_BOOKED,
+        ]);
+
+        $bad = app(OutdoorProofService::class)->submit(
+            $occ,
+            $user,
+            UploadedFile::fake()->image('bad.jpg'),
+            41.0,
+            29.0,
+            'WRONGTOK'
+        );
+        $this->assertFalse($bad->is_valid);
+
+        $ok = app(OutdoorProofService::class)->submit(
+            $occ,
+            $user,
+            UploadedFile::fake()->image('ok.jpg'),
+            41.0,
+            29.0,
+            $face->qr_token
+        );
+        $this->assertTrue($ok->is_valid);
+
+        $this->get(route('outdoor.verify', $face->qr_token))
+            ->assertOk()
+            ->assertSee('QR Pano', false)
+            ->assertDontSee($vendor->phone ?? 'iletişim-yok', false);
     }
 
     public function test_customer_cannot_use_outdoor_or_saha_phone_login(): void

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Http;
 
 class AdminApiManagementController extends Controller
 {
-    private const API_KEYS = ['shopify', 'iyzico', 'shopier', 'basitkargo', 'openai', 'evolution'];
+    private const API_KEYS = ['shopify', 'iyzico', 'shopier', 'basitkargo', 'openai', 'evolution', 'google'];
 
     private const SECRET_KEYS = [
         'iyzico_secret_key',
@@ -19,6 +19,7 @@ class AdminApiManagementController extends Controller
         'basitkargo_api_key',
         'openai_api_key',
         'evolution_api_key',
+        'google_maps_api_key',
     ];
 
     public function index()
@@ -51,6 +52,9 @@ class AdminApiManagementController extends Controller
             'evolution_base_url' => Setting::get('evolution_base_url', config('evolution.base_url')),
             'evolution_api_key' => $this->mask(Setting::get('evolution_api_key', config('evolution.api_key'))),
             'evolution_instance' => Setting::get('evolution_instance', config('evolution.instance')),
+            'google_enabled' => Setting::apiEnabled('google', false),
+            'google_maps_api_key' => $this->mask(Setting::get('google_maps_api_key', '')),
+            'google_last_test' => Setting::get('google_last_test_result'),
         ]);
     }
 
@@ -76,6 +80,7 @@ class AdminApiManagementController extends Controller
             'evolution_base_url' => ['nullable', 'string', 'max:255'],
             'evolution_api_key' => ['nullable', 'string', 'max:255'],
             'evolution_instance' => ['nullable', 'string', 'max:120'],
+            'google_maps_api_key' => ['nullable', 'string', 'max:255'],
         ]);
 
         foreach (self::API_KEYS as $key) {
@@ -143,6 +148,38 @@ class AdminApiManagementController extends Controller
         return $ok
             ? back()->with('success', 'Shopier '.$client->mode().' uç noktasına erişildi.')
             : back()->with('error', 'Shopier uç noktasına ulaşılamadı.');
+    }
+
+    public function testGoogle()
+    {
+        if (! Setting::apiEnabled('google', false)) {
+            return back()->with('error', 'Google Maps API kapalı.');
+        }
+        $key = Setting::get('google_maps_api_key', '');
+        if ($key === '') {
+            return back()->with('error', 'Google Maps API anahtarı girilmemiş.');
+        }
+
+        try {
+            $response = Http::timeout(10)->get('https://maps.googleapis.com/maps/api/streetview/metadata', [
+                'location' => '41.0082,28.9784',
+                'key' => $key,
+            ]);
+            $status = $response->json('status');
+            $ok = $response->successful() && in_array($status, ['OK', 'ZERO_RESULTS'], true);
+            Setting::set('google_last_test_result', json_encode([
+                'timestamp' => now()->toIso8601String(),
+                'status' => $ok ? 'success' : 'failed',
+                'google_status' => $status,
+                'http_code' => $response->status(),
+            ]));
+
+            return $ok
+                ? back()->with('success', 'Google Street View Metadata yanıt verdi ('.$status.').')
+                : back()->with('error', 'Google yanıtı geçersiz: '.($status ?: 'HTTP '.$response->status()));
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Google sunucusuna erişilemedi: '.$e->getMessage());
+        }
     }
 
     private function mask(?string $val): string

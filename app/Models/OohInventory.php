@@ -5,7 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class OohInventory extends Model
@@ -31,6 +33,7 @@ class OohInventory extends Model
         'turkiye_il_id', 'turkiye_ilce_id', 'city', 'district', 'address',
         'country_code', 'lat', 'lng', 'permit_no', 'geo_fingerprint', 'list_price', 'price_unit',
         'proof_radius_m', 'status', 'rejection_reason',
+        'face_width_m', 'face_height_m', 'facing', 'illuminated', 'qr_token',
     ];
 
     protected $casts = [
@@ -40,6 +43,9 @@ class OohInventory extends Model
         'proof_radius_m' => 'integer',
         'turkiye_il_id' => 'integer',
         'turkiye_ilce_id' => 'integer',
+        'face_width_m' => 'decimal:2',
+        'face_height_m' => 'decimal:2',
+        'illuminated' => 'boolean',
     ];
 
     protected static function booted(): void
@@ -48,6 +54,9 @@ class OohInventory extends Model
             if (empty($inventory->slug)) {
                 $base = Str::slug($inventory->title) ?: 'pano';
                 $inventory->slug = $base.'-'.Str::lower(Str::random(6));
+            }
+            if (empty($inventory->qr_token) && Schema::hasColumn($inventory->getTable(), 'qr_token')) {
+                $inventory->qr_token = static::generateQrToken();
             }
         });
         static::saving(function (self $inventory): void {
@@ -123,6 +132,20 @@ class OohInventory extends Model
     public function claims(): HasMany
     {
         return $this->hasMany(OohInventoryClaim::class);
+    }
+
+    public function insight(): HasOne
+    {
+        return $this->hasOne(OohLocationInsight::class);
+    }
+
+    public static function generateQrToken(): string
+    {
+        do {
+            $token = strtoupper(Str::random(8));
+        } while (static::query()->where('qr_token', $token)->exists());
+
+        return $token;
     }
 
     public function isPublished(): bool
