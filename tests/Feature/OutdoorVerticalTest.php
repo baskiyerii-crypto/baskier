@@ -305,10 +305,13 @@ class OutdoorVerticalTest extends TestCase
             ->assertJsonPath('success', true)
             ->assertJsonPath('data.title', 'API Pano');
 
-        $this->actingAs($user)->get(route('vendor.documents.index'))
+        $this->actingAs($user)->get(route('outdoor-panel.documents.index'))
             ->assertOk()
             ->assertSee('value="outdoor_permit"', false)
-            ->assertSee('value="tax_plate"', false);
+            ->assertSee('value="tax_plate"', false)
+            ->assertDontSee('Ürünlerim', false);
+        $this->actingAs($user)->get(route('vendor.documents.index'))
+            ->assertRedirect(route('outdoor-panel.documents.index'));
     }
 
     public function test_decline_and_hold_expiry_notify_planner(): void
@@ -589,7 +592,13 @@ class OutdoorVerticalTest extends TestCase
         $this->actingAs($user)->get(route('outdoor-panel.dashboard'))->assertOk();
         $this->actingAs($user)->get(route('vendor.dashboard'))
             ->assertRedirect(route('outdoor-panel.dashboard'));
-        $this->actingAs($user)->get(route('vendor.products.create'))->assertForbidden();
+        $this->actingAs($user)->get(route('vendor.products.create'))
+            ->assertRedirect(route('outdoor-panel.dashboard'));
+        $this->actingAs($user)->get(route('vendor.documents.index'))
+            ->assertRedirect(route('outdoor-panel.documents.index'));
+        $this->actingAs($user)->get(route('outdoor-panel.documents.index'))
+            ->assertOk()
+            ->assertDontSee('Ürünlerim', false);
         $this->get('/satici-panel/outdoor')->assertRedirect('/acik-hava-panel/envanter');
         $this->assertSame(301, $this->get('/satici-panel/outdoor')->getStatusCode());
 

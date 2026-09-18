@@ -28,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\EnsureRole::class,
             'vendor.not_suspended' => \App\Http\Middleware\EnsureVendorNotSuspended::class,
+            'vendor.outdoor_shell' => \App\Http\Middleware\RedirectOutdoorOnlyFromVendorPanel::class,
         ]);
     })
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule): void {

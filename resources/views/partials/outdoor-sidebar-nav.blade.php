@@ -36,5 +36,6 @@
     @endif
 @endif
 
-<a href="{{ route('vendor.documents.index') }}" class="nav-link {{ request()->routeIs('vendor.documents.*') ? 'active' : '' }}"><span>Belgeler</span></a>
-<a href="{{ route('vendor.subscriptions.index') }}" class="nav-link {{ request()->routeIs('vendor.subscriptions.*') ? 'active' : '' }}"><span>Modüller</span></a>
+<a href="{{ route('outdoor-panel.documents.index') }}" class="nav-link {{ request()->routeIs('outdoor-panel.documents.*') ? 'active' : '' }}"><span>Belgeler</span></a>
+<a href="{{ route('outdoor-panel.subscriptions.index') }}" class="nav-link {{ request()->routeIs('outdoor-panel.subscriptions.*') ? 'active' : '' }}"><span>Modüller</span></a>
+<a href="{{ route('outdoor-panel.balance.index') }}" class="nav-link {{ request()->routeIs('outdoor-panel.balance.*') ? 'active' : '' }}"><span>Bakiye</span></a>

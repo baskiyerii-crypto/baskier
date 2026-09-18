@@ -1,11 +1,14 @@
-@extends('layouts.vendor')
+@extends($layout ?? 'layouts.vendor')
 @section('title', 'Bakiye')
 @section('content')
+@php $isOutdoorPanel = $isOutdoorPanel ?? false; @endphp
 <div class="card p-4 mb-4">
-    <h2 class="h6 mb-2">Tabela gorusme bakiyesi</h2>
+    <h2 class="h6 mb-2">{{ $isOutdoorPanel ? 'Açık hava bakiyesi' : 'Tabela gorusme bakiyesi' }}</h2>
     <p class="h4 text-success">TL {{ number_format($vendor->balance, 2, ',', '.') }}</p>
+    @unless($isOutdoorPanel)
     <p class="small text-muted">Gorusme ucreti: TL {{ number_format($meetingFee, 2, ',', '.') }}</p>
-    <form method="POST" action="{{ route('vendor.balance.topup') }}" class="d-flex gap-2 align-items-end">
+    @endunless
+    <form method="POST" action="{{ route($isOutdoorPanel ? 'outdoor-panel.balance.topup' : 'vendor.balance.topup') }}" class="d-flex gap-2 align-items-end">
         @csrf
         <div>
             <label class="form-label small">Tutar (TL)</label>

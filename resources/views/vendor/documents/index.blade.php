@@ -1,7 +1,8 @@
-@extends('layouts.vendor')
+@extends($layout ?? 'layouts.vendor')
 @section('title', 'Belgeler ve Doğrulama')
 
 @section('content')
+@php $isOutdoorPanel = $isOutdoorPanel ?? false; @endphp
 <div class="container-fluid px-0">
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -137,19 +138,35 @@
             Tüm belgeleriniz güvenli özel depolamada saklanır ve yalnızca yetkili yönetici incelemesi için kullanılır. Yüklenen dosyalar gerçek dosya içerik kontrolünden ve güvenlik taramasından geçirilir.
         </p>
 
-        <form method="post" action="{{ route('vendor.documents.store') }}" enctype="multipart/form-data">
+        <form method="post" action="{{ route($isOutdoorPanel ? 'outdoor-panel.documents.store' : 'vendor.documents.store') }}" enctype="multipart/form-data">
             @csrf
             <div class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label small fw-semibold">Belge Türü <span class="text-danger">*</span></label>
                     <select name="document_type" class="form-select" required>
-                        @if($vendor->hasPhysicalTrack() || $vendor->hasOutdoorTrack() || empty($vendor->registration_tracks))
+                        @if($isOutdoorPanel)
+                            @if($vendor->isMunicipalityOwner())
+                                <optgroup label="Belediye">
+                                    <option value="municipality_authority">{{ __('panel.doc_municipality_authority') }}</option>
+                                    <option value="outdoor_permit">{{ __('panel.outdoor_permit') }}</option>
+                                </optgroup>
+                            @else
+                                <optgroup label="Kurumsal">
+                                    <option value="tax_plate">{{ __('panel.doc_tax_plate') }}</option>
+                                    <option value="trade_registry">{{ __('panel.doc_trade_registry') }}</option>
+                                </optgroup>
+                                <optgroup label="Açık hava">
+                                    <option value="outdoor_permit">{{ __('panel.outdoor_permit') }}</option>
+                                </optgroup>
+                            @endif
+                        @else
+                            @if($vendor->hasPhysicalTrack() || $vendor->hasOutdoorTrack() || empty($vendor->registration_tracks))
                             <optgroup label="Fiziki Mağaza / Üretim">
                                 <option value="tax_plate">{{ __('panel.doc_tax_plate') }}</option>
                                 <option value="company_registration">{{ __('panel.doc_company_registration') }}</option>
                             </optgroup>
-                        @endif
-                        @if($vendor->hasOutdoorTrack())
+                            @endif
+                            @if($vendor->hasOutdoorTrack())
                             <optgroup label="Açık hava">
                                 <option value="outdoor_permit">{{ __('panel.outdoor_permit') }}</option>
                                 @if($vendor->isMunicipalityOwner())
@@ -159,14 +176,15 @@
                                     <option value="trade_registry">{{ __('panel.doc_trade_registry') }}</option>
                                 @endif
                             </optgroup>
-                        @endif
-                        @if($vendor->hasFreelancerTrack())
+                            @endif
+                            @if($vendor->hasFreelancerTrack())
                             <optgroup label="Freelancer Mesleki Belgeler">
                                 <option value="diploma">{{ __('panel.doc_diploma') }}</option>
                                 <option value="certificate">{{ __('panel.doc_certificate') }}</option>
                                 <option value="portfolio_accreditation">{{ __('panel.doc_portfolio_accreditation') }}</option>
                                 <option value="course">{{ __('panel.doc_course') }}</option>
                             </optgroup>
+                            @endif
                         @endif
                         <optgroup label="Diğer">
                             <option value="other">{{ __('panel.doc_other') }}</option>

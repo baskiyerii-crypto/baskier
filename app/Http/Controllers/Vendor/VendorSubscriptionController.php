@@ -23,22 +23,28 @@ class VendorSubscriptionController extends Controller
     public function index(Request $request)
     {
         $vendor = $this->getVendor($request);
-
-        return view('vendor.subscriptions.index', [
+        $payload = [
             'vendor' => $vendor,
             'freelancerMonthlyFee' => Setting::freelancerMonthlyFee(),
             'quotesMonthlyFee' => Setting::quotesMonthlyFee(),
             'tabelaMonthlyFee' => Setting::tabelaMonthlyFee(),
             'ozalitMonthlyFee' => Setting::ozalitMonthlyFee(),
             'outdoorMonthlyFee' => Setting::outdoorMonthlyFee(),
-        ]);
+        ];
+
+        if ($request->routeIs('outdoor-panel.*')) {
+            return view('outdoor-panel.subscriptions', $payload);
+        }
+
+        return view('vendor.subscriptions.index', $payload);
     }
 
     public function activate(Request $request)
     {
         $vendor = $this->getVendor($request);
+        $allowed = $request->routeIs('outdoor-panel.*') ? 'outdoor' : 'freelancer,quotes,tabela,ozalit,outdoor';
         $validated = $request->validate([
-            'module' => ['required', 'in:freelancer,quotes,tabela,ozalit,outdoor'],
+            'module' => ['required', 'in:'.$allowed],
         ]);
 
         $module = $validated['module'];

@@ -22,7 +22,10 @@ class VendorBalanceController extends Controller
         $vendor = $this->getVendor($request);
         $transactions = $vendor->balanceTransactions()->latest()->paginate(20);
         $meetingFee = Setting::meetingFee();
-        return view('vendor.balance.index', compact('vendor', 'transactions', 'meetingFee'));
+        $isOutdoorPanel = $request->routeIs('outdoor-panel.*');
+        $layout = $isOutdoorPanel ? 'layouts.outdoor' : 'layouts.vendor';
+
+        return view('vendor.balance.index', compact('vendor', 'transactions', 'meetingFee', 'isOutdoorPanel', 'layout'));
     }
 
     public function topUp(Request $request)

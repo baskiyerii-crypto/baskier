@@ -207,7 +207,7 @@ Route::middleware(['auth', 'role:customer'])->prefix('hesabim')->name('customer.
 });
 
 // Satıcı paneli
-Route::middleware(['auth', 'role:vendor', 'vendor.not_suspended'])->prefix('satici-panel')->name('vendor.')->group(function () {
+Route::middleware(['auth', 'role:vendor', 'vendor.not_suspended', 'vendor.outdoor_shell'])->prefix('satici-panel')->name('vendor.')->group(function () {
     Route::get('/', [VendorDashboardController::class, 'index'])->name('dashboard');
     Route::get('/urunler', [VendorProductController::class, 'index'])->name('products.index');
     Route::get('/urunler/sablon', [VendorProductController::class, 'downloadTemplate'])->name('products.template');
@@ -300,6 +300,12 @@ Route::middleware(['auth', 'role:vendor', 'vendor.not_suspended'])->prefix('acik
     Route::post('temsil', [OutdoorRepresentationController::class, 'invite'])->name('representations.invite');
     Route::post('temsil/{representation}/onayla', [OutdoorRepresentationController::class, 'accept'])->name('representations.accept');
     Route::post('temsil/{representation}/iptal', [OutdoorRepresentationController::class, 'revoke'])->name('representations.revoke');
+    Route::get('belgeler', [VendorDocumentController::class, 'index'])->name('documents.index');
+    Route::post('belgeler', [VendorDocumentController::class, 'store'])->name('documents.store')->middleware('throttle:document_upload');
+    Route::get('moduller', [VendorSubscriptionController::class, 'index'])->name('subscriptions.index');
+    Route::post('moduller/aktiflestir', [VendorSubscriptionController::class, 'activate'])->name('subscriptions.activate');
+    Route::get('bakiye', [VendorBalanceController::class, 'index'])->name('balance.index');
+    Route::post('bakiye', [VendorBalanceController::class, 'topUp'])->name('balance.topup');
 });
 
 // Yönetici paneli

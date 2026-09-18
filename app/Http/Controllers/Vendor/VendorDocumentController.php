@@ -44,7 +44,10 @@ class VendorDocumentController extends Controller
             ];
         }
 
-        return view('vendor.documents.index', compact('vendor', 'documents', 'criteria'));
+        $isOutdoorPanel = $request->routeIs('outdoor-panel.*');
+        $layout = $isOutdoorPanel ? 'layouts.outdoor' : 'layouts.vendor';
+
+        return view('vendor.documents.index', compact('vendor', 'documents', 'criteria', 'isOutdoorPanel', 'layout'));
     }
 
     public function store(Request $request)
