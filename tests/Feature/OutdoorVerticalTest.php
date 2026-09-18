@@ -443,7 +443,7 @@ class OutdoorVerticalTest extends TestCase
             'email' => $email,
             'password' => 'Password123!',
             'password_confirmation' => 'Password123!',
-            'role' => 'vendor',
+            'role' => 'outdoor',
             'registration_tracks' => ['outdoor'],
             'accept_terms' => '1',
             'accept_privacy' => '1',

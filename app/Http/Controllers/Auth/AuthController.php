@@ -109,11 +109,18 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+        $signupKind = $request->input('role');
+        if ($signupKind === 'outdoor') {
+            $request->merge([
+                'registration_tracks' => ['outdoor'],
+            ]);
+        }
+
         $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Password::defaults()],
-            'role' => ['required', 'in:customer,vendor'],
+            'role' => ['required', 'in:customer,vendor,outdoor'],
             'accept_terms' => ['accepted'],
             'accept_privacy' => ['accepted'],
             'accept_terms_scrolled_at' => ['required', 'date'],
@@ -133,13 +140,24 @@ class AuthController extends Controller
             'freelancer_doc_types.*' => ['in:certificate,diploma,course,other'],
         ];
 
-        if ($request->input('role') === 'vendor') {
-            $tracks = array_values(array_unique($request->input('registration_tracks', [])));
-            $rules['registration_tracks'] = ['required', 'array', 'min:1'];
+        $isVendorLike = in_array($signupKind, ['vendor', 'outdoor'], true);
+        if ($isVendorLike) {
+            $tracks = $signupKind === 'outdoor'
+                ? ['outdoor']
+                : array_values(array_unique(array_filter(
+                    $request->input('registration_tracks', []),
+                    fn ($t) => $t !== 'outdoor'
+                )));
+            $rules['registration_tracks'] = $signupKind === 'outdoor'
+                ? ['nullable', 'array']
+                : ['required', 'array', 'min:1'];
+            if ($signupKind === 'vendor') {
+                $rules['registration_tracks.*'] = ['in:physical_products,physical_quote,freelancer'];
+            }
             $rules['accept_vendor_agreement'] = ['accepted'];
             $rules['accept_vendor_agreement_scrolled_at'] = ['required', 'date'];
 
-            $isOutdoor = in_array('outdoor', $tracks, true);
+            $isOutdoor = $signupKind === 'outdoor' || in_array('outdoor', $tracks, true);
             $outdoorRole = $request->input('outdoor_role');
             $ownerKind = $request->input('owner_kind');
             $isMunicipality = $isOutdoor && $outdoorRole === Vendor::OUTDOOR_ROLE_OWNER
@@ -177,7 +195,7 @@ class AuthController extends Controller
                 $rules['freelancer_docs'] = ['required', 'array', 'min:1'];
             }
 
-            if (BusinessType::query()->exists()) {
+            if ($signupKind === 'vendor' && BusinessType::query()->exists()) {
                 $rules['business_type_ids'] = ['required', 'array', 'min:1'];
             }
 
@@ -192,26 +210,37 @@ class AuthController extends Controller
         $validated = $request->validate($rules);
 
         if (($validated['role'] ?? '') === 'vendor') {
-            $tracks = array_values(array_unique($validated['registration_tracks'] ?? []));
+            $tracks = array_values(array_unique(array_filter(
+                $validated['registration_tracks'] ?? [],
+                fn ($t) => $t !== 'outdoor'
+            )));
             if ($tracks === []) {
                 throw ValidationException::withMessages([
                     'registration_tracks' => __('panel.select_at_least_one_track'),
                 ]);
             }
+            $validated['registration_tracks'] = $tracks;
+        }
+        if (($validated['role'] ?? '') === 'outdoor') {
+            $validated['registration_tracks'] = ['outdoor'];
         }
 
         $user = null;
         DB::transaction(function () use ($request, $validated, &$user) {
+            $accountKind = $validated['role'];
+            $userRole = $accountKind === 'outdoor' ? 'vendor' : $accountKind;
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
-                'role' => $validated['role'],
+                'role' => $userRole,
                 'is_active' => true,
             ]);
 
-            if ($validated['role'] === 'vendor') {
-                $tracks = array_values(array_unique($validated['registration_tracks'] ?? []));
+            if (in_array($accountKind, ['vendor', 'outdoor'], true)) {
+                $tracks = $accountKind === 'outdoor'
+                    ? ['outdoor']
+                    : array_values(array_unique($validated['registration_tracks'] ?? []));
                 $isOutdoor = in_array('outdoor', $tracks, true);
                 $outdoorRole = $isOutdoor ? ($validated['outdoor_role'] ?? Vendor::OUTDOOR_ROLE_OWNER) : null;
                 $ownerKind = $outdoorRole === Vendor::OUTDOOR_ROLE_OWNER
@@ -251,7 +280,9 @@ class AuthController extends Controller
                     'owner_kind' => $ownerKind,
                 ]);
                 $user->update(['vendor_id' => $vendor->id]);
-                $vendor->businessTypes()->sync($request->input('business_type_ids', []));
+                if ($accountKind === 'vendor') {
+                    $vendor->businessTypes()->sync($request->input('business_type_ids', []));
+                }
                 if (in_array('outdoor', $tracks, true)) {
                     app(\App\Services\OutdoorStaffService::class)->ensureOwner($vendor);
                 }
