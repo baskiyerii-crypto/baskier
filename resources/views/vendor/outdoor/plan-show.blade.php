@@ -1,4 +1,4 @@
-@extends('layouts.vendor')
+@extends('layouts.outdoor')
 @section('title', 'Kampanya planı')
 @section('content')
 <h1 class="h5">{{ $plan->title }}</h1>

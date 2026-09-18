@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        View::composer(['layouts.admin', 'layouts.vendor', 'layouts.account', 'notifications.index'], function ($view): void {
+        View::composer(['layouts.admin', 'layouts.vendor', 'layouts.outdoor', 'layouts.account', 'notifications.index'], function ($view): void {
             $user = auth()->user();
             $unread = 0;
             $recent = collect();

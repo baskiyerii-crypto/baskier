@@ -25,6 +25,7 @@ class OutdoorPlanService
         private ContactShareService $shares,
         private CommissionService $commissions,
         private NotificationService $notifications,
+        private OutdoorRepresentationService $representations,
     ) {}
 
     /**
@@ -71,7 +72,9 @@ class OutdoorPlanService
                     'list_price_snapshot' => $inventory->list_price,
                 ]);
                 $this->occupancy->placeHold($inventory, $start, $end, $item->id);
-                $byVendor[$inventory->vendor_id][] = $item;
+                foreach ($this->representations->sellerVendorIdsForInventory($inventory) as $sellerId) {
+                    $byVendor[$sellerId][] = $item;
+                }
             }
 
             foreach ($byVendor as $vendorId => $items) {
@@ -87,7 +90,7 @@ class OutdoorPlanService
                         'Yeni açık hava plan talebi',
                         $plan->title.' · '.count($items).' pano',
                         ['type' => 'ooh_plan', 'plan_id' => $plan->id],
-                        route('vendor.outdoor.requests.show', $request)
+                        route('outdoor-panel.requests.show', $request)
                     );
                 }
             }
@@ -128,9 +131,7 @@ class OutdoorPlanService
                     'Açık hava teklifi geldi',
                     $request->vendor?->name.' · ₺'.number_format($amount, 2, ',', '.'),
                     ['type' => 'ooh_quote', 'plan_id' => $request->ooh_plan_id],
-                    $request->plan?->planner_type === OohPlan::PLANNER_VENDOR
-                        ? route('vendor.outdoor.plans.show', $request->ooh_plan_id)
-                        : route('customer.outdoor.plans.show', $request->ooh_plan_id)
+                    $this->plannerPlanUrl($request->plan)
                 );
             }
 
@@ -152,9 +153,11 @@ class OutdoorPlanService
                 'status' => OohVendorRequest::STATUS_DECLINED,
                 'resolved_at' => now(),
             ]);
-            $itemIds = $request->plan->items()->where('owner_vendor_id', $request->vendor_id)->pluck('id');
-            foreach ($itemIds as $itemId) {
-                $this->occupancy->releasePlanItem((int) $itemId);
+            foreach ($this->itemIdsCoveredByRequest($request) as $itemId) {
+                if ($this->itemStillHasOpenRequest($request->plan, $itemId, (int) $request->id)) {
+                    continue;
+                }
+                $this->occupancy->releasePlanItem($itemId);
             }
             $this->refreshPlanStatus($request->plan);
         });
@@ -162,9 +165,7 @@ class OutdoorPlanService
         $planner = $request->plan?->planner;
         if ($planner) {
             $plan = $request->plan;
-            $url = $plan->planner_type === OohPlan::PLANNER_VENDOR
-                ? route('vendor.outdoor.plans.show', $plan)
-                : route('customer.outdoor.plans.show', $plan);
+            $url = $this->plannerPlanUrl($plan);
             $this->notifications->notify(
                 $planner,
                 'Açık hava talebi reddedildi',
@@ -211,10 +212,11 @@ class OutdoorPlanService
                 false
             );
 
-            $itemIds = $request->plan->items()->where('owner_vendor_id', $request->vendor_id)->pluck('id');
+            $itemIds = $this->itemIdsCoveredByRequest($request);
             foreach ($itemIds as $itemId) {
-                $this->occupancy->convertHoldToBooked((int) $itemId);
+                $this->occupancy->convertHoldToBooked($itemId);
             }
+            $this->rejectCompetingRequests($request, $itemIds);
 
             [$rate, $commissionAmount, $vendorAmount] = $this->commissions->calculate((float) $quote->amount, 'outdoor');
             $order = Order::create([
@@ -261,15 +263,103 @@ class OutdoorPlanService
         });
     }
 
+    /**
+     * @return \Illuminate\Support\Collection<int, OohPlanItem>
+     */
+    public function itemsCoveredByRequest(OohVendorRequest $request)
+    {
+        $request->loadMissing(['plan.items.inventory', 'vendor']);
+        $seller = $request->vendor;
+        $ownerIds = [(int) $request->vendor_id];
+        if ($seller && $seller->isOutdoorAgency()) {
+            $ownerIds = array_merge($ownerIds, $this->representations->representedOwnerIds($seller));
+        }
+
+        $ownerIds = array_values(array_unique(array_map('intval', $ownerIds)));
+
+        return $request->plan->items
+            ->filter(fn ($item) => in_array((int) $item->owner_vendor_id, $ownerIds, true))
+            ->values();
+    }
+
+    /**
+     * @return list<int>
+     */
+    private function itemIdsCoveredByRequest(OohVendorRequest $request): array
+    {
+        return $this->itemsCoveredByRequest($request)->pluck('id')->map(fn ($id) => (int) $id)->all();
+    }
+
+    /**
+     * @param  list<int>  $acceptedItemIds
+     */
+    private function rejectCompetingRequests(OohVendorRequest $accepted, array $acceptedItemIds): void
+    {
+        if ($acceptedItemIds === []) {
+            return;
+        }
+
+        $accepted->loadMissing('plan.vendorRequests.vendor');
+        foreach ($accepted->plan->vendorRequests as $other) {
+            if ((int) $other->id === (int) $accepted->id) {
+                continue;
+            }
+            if (! in_array($other->status, [OohVendorRequest::STATUS_PENDING, OohVendorRequest::STATUS_QUOTED], true)) {
+                continue;
+            }
+            $otherIds = $this->itemIdsCoveredByRequest($other);
+            if (array_intersect($acceptedItemIds, $otherIds) === []) {
+                continue;
+            }
+            $other->quotes()->where('status', OohQuote::STATUS_PENDING)->update(['status' => OohQuote::STATUS_REJECTED]);
+            $other->update([
+                'status' => OohVendorRequest::STATUS_DECLINED,
+                'resolved_at' => now(),
+            ]);
+        }
+    }
+
+    private function itemStillHasOpenRequest(OohPlan $plan, int $itemId, int $exceptRequestId): bool
+    {
+        $plan->loadMissing('vendorRequests.vendor', 'items');
+        foreach ($plan->vendorRequests as $req) {
+            if ((int) $req->id === $exceptRequestId) {
+                continue;
+            }
+            if (! in_array($req->status, [OohVendorRequest::STATUS_PENDING, OohVendorRequest::STATUS_QUOTED], true)) {
+                continue;
+            }
+            if (in_array($itemId, $this->itemIdsCoveredByRequest($req), true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function plannerPlanUrl(?OohPlan $plan): ?string
+    {
+        if (! $plan) {
+            return null;
+        }
+
+        return $plan->planner_type === OohPlan::PLANNER_VENDOR
+            ? route('outdoor-panel.plans.show', $plan)
+            : route('customer.outdoor.plans.show', $plan);
+    }
+
     private function refreshPlanStatus(OohPlan $plan): void
     {
         $statuses = $plan->vendorRequests()->pluck('status');
-        if ($statuses->every(fn ($s) => $s === OohVendorRequest::STATUS_ACCEPTED)) {
+        $open = $statuses->contains(fn ($s) => in_array($s, [OohVendorRequest::STATUS_PENDING, OohVendorRequest::STATUS_QUOTED], true));
+        $accepted = $statuses->contains(OohVendorRequest::STATUS_ACCEPTED);
+
+        if (! $open && $accepted) {
             $plan->update(['status' => OohPlan::STATUS_ACCEPTED]);
 
             return;
         }
-        if ($statuses->contains(OohVendorRequest::STATUS_ACCEPTED)) {
+        if ($accepted && $open) {
             $plan->update(['status' => OohPlan::STATUS_PARTIAL]);
 
             return;

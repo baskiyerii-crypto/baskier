@@ -1,4 +1,4 @@
-@extends('layouts.vendor')
+@extends('layouts.outdoor')
 @section('title', 'Çift ilan raporlarım')
 @section('content')
 <h1 class="h5">Raporlarım</h1>

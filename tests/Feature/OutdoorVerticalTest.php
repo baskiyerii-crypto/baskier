@@ -36,6 +36,8 @@ class OutdoorVerticalTest extends TestCase
             'outdoor_enabled' => true,
             'outdoor_expires_at' => now()->addMonth(),
             'registration_tracks' => ['outdoor'],
+            'outdoor_role' => Vendor::OUTDOOR_ROLE_OWNER,
+            'owner_kind' => Vendor::OWNER_KIND_COMPANY,
         ]);
         $user->update(['vendor_id' => $vendor->id]);
         app(OutdoorStaffService::class)->ensureOwner($vendor);
@@ -197,7 +199,7 @@ class OutdoorVerticalTest extends TestCase
         $cat = $this->outdoorCategory();
         $face = $this->publishFace($other, $cat, 'Sahte İlan');
 
-        $this->actingAs($ownerUser)->post(route('vendor.outdoor.claims.store'), [
+        $this->actingAs($ownerUser)->post(route('outdoor-panel.claims.store'), [
             'ooh_inventory_id' => $face->id,
             'evidence' => 'Ruhsat bende',
             'permit_no' => 'PRM-'.$owner->id,
@@ -214,7 +216,7 @@ class OutdoorVerticalTest extends TestCase
             'user_id' => $field->id,
             'staff_role' => VendorMember::ROLE_FIELD,
         ]);
-        $this->actingAs($field)->get(route('vendor.outdoor.inventories.create'))->assertForbidden();
+        $this->actingAs($field)->get(route('outdoor-panel.inventories.create'))->assertForbidden();
     }
 
     public function test_outdoor_category_does_not_leak_into_tabela_rfq(): void
@@ -400,5 +402,200 @@ class OutdoorVerticalTest extends TestCase
         $cityNames = collect($this->getJson('/api/v1/geography/places?country=DE')->json('data.cities'))
             ->pluck('name');
         $this->assertTrue($cityNames->contains('Hamburg'));
+    }
+
+    /**
+     * @return array{0: User, 1: Vendor}
+     */
+    private function outdoorAgency(string $name = 'Ajans Co'): array
+    {
+        [$user, $vendor] = $this->outdoorVendor($name);
+        $vendor->forceFill([
+            'outdoor_role' => Vendor::OUTDOOR_ROLE_AGENCY,
+            'owner_kind' => null,
+        ])->save();
+
+        return [$user, $vendor->fresh()];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function registerVendorPayload(string $email, array $extra = []): array
+    {
+        $now = now()->toIso8601String();
+
+        return array_merge([
+            'name' => 'Açık Hava Test',
+            'email' => $email,
+            'password' => 'Password123!',
+            'password_confirmation' => 'Password123!',
+            'role' => 'vendor',
+            'registration_tracks' => ['outdoor'],
+            'accept_terms' => '1',
+            'accept_privacy' => '1',
+            'accept_terms_scrolled_at' => $now,
+            'accept_privacy_scrolled_at' => $now,
+            'accept_vendor_agreement' => '1',
+            'accept_vendor_agreement_scrolled_at' => $now,
+        ], $extra);
+    }
+
+    public function test_agency_register_without_permit_and_municipality_uses_authority_file(): void
+    {
+        Storage::fake('private');
+
+        $this->post(route('register'), $this->registerVendorPayload('ajans-reg@test.com', [
+            'outdoor_role' => 'agency',
+            'company_name' => 'Ajans A.S.',
+            'tax_office' => 'Kadıköy',
+            'tax_number' => '1111111111',
+            'tax_plate' => UploadedFile::fake()->image('vergi.jpg'),
+        ]))->assertRedirect(route('outdoor-panel.dashboard'));
+
+        $agency = Vendor::query()->where('email', 'ajans-reg@test.com')->firstOrFail();
+        $this->assertSame(Vendor::OUTDOOR_ROLE_AGENCY, $agency->outdoor_role);
+        $this->assertDatabaseMissing('vendor_documents', [
+            'vendor_id' => $agency->id,
+            'document_type' => 'outdoor_permit',
+        ]);
+
+        $this->post(route('logout'));
+
+        $this->post(route('register'), $this->registerVendorPayload('belediye-reg@test.com', [
+            'outdoor_role' => 'owner',
+            'owner_kind' => 'municipality',
+            'company_name' => 'Kadıköy Belediyesi',
+            'tax_number' => '2222222222',
+            'municipality_authority' => UploadedFile::fake()->image('yetki.jpg'),
+        ]))->assertRedirect(route('outdoor-panel.dashboard'));
+
+        $muni = Vendor::query()->where('email', 'belediye-reg@test.com')->firstOrFail();
+        $this->assertSame(Vendor::OWNER_KIND_MUNICIPALITY, $muni->owner_kind);
+        $this->assertDatabaseMissing('vendor_documents', [
+            'vendor_id' => $muni->id,
+            'document_type' => 'tax_plate',
+        ]);
+        $this->assertDatabaseHas('vendor_documents', [
+            'vendor_id' => $muni->id,
+            'document_type' => 'municipality_authority',
+        ]);
+
+        $this->post(route('logout'));
+
+        $this->post(route('register'), $this->registerVendorPayload('sirket-reg@test.com', [
+            'outdoor_role' => 'owner',
+            'owner_kind' => 'company',
+            'company_name' => 'Mecra Ltd',
+            'tax_office' => 'Beşiktaş',
+            'tax_number' => '3333333333',
+            'tax_plate' => UploadedFile::fake()->image('levha.jpg'),
+        ]))->assertRedirect(route('outdoor-panel.dashboard'));
+
+        $company = Vendor::query()->where('email', 'sirket-reg@test.com')->firstOrFail();
+        $this->assertSame(Vendor::OUTDOOR_ROLE_OWNER, $company->outdoor_role);
+        $this->assertSame(Vendor::OWNER_KIND_COMPANY, $company->owner_kind);
+        $this->assertDatabaseMissing('vendor_documents', [
+            'vendor_id' => $company->id,
+            'document_type' => 'outdoor_permit',
+        ]);
+    }
+
+    public function test_nn_representation_and_plan_fans_out_to_owner_and_agency(): void
+    {
+        [$ownerAUser, $ownerA] = $this->outdoorVendor('Sahip A');
+        [$ownerBUser, $ownerB] = $this->outdoorVendor('Sahip B');
+        [$agencyUser, $agency] = $this->outdoorAgency('Ajans 1');
+        [$agency2User, $agency2] = $this->outdoorAgency('Ajans 2');
+        $reps = app(\App\Services\OutdoorRepresentationService::class);
+
+        $bindA = $reps->invite($ownerA, $agencyUser->email);
+        $reps->accept($bindA, $agency);
+        $bindB = $reps->invite($agency, $ownerBUser->email);
+        $reps->accept($bindB, $ownerB);
+        $bindA2 = $reps->invite($ownerA, $agency2User->email);
+        $reps->accept($bindA2, $agency2);
+
+        $this->assertCount(2, $reps->representedOwnerIds($agency));
+        $this->assertSame(2, \App\Models\OohRepresentation::query()
+            ->where('owner_vendor_id', $ownerA->id)
+            ->where('status', \App\Models\OohRepresentation::STATUS_ACTIVE)
+            ->count());
+
+        $cat = $this->outdoorCategory();
+        $face = $this->publishFace($ownerA, $cat, 'Ajanslı Pano');
+        $customer = User::factory()->create(['role' => 'customer', 'phone' => '05550009988']);
+        $start = now()->addDays(14)->toDateString();
+        $end = now()->addDays(20)->toDateString();
+        $plan = app(OutdoorPlanService::class)->submit($customer, [
+            ['inventory_id' => $face->id, 'starts_on' => $start, 'ends_on' => $end],
+        ]);
+
+        $this->assertSame(3, $plan->vendorRequests()->count());
+        $this->assertTrue($plan->vendorRequests()->where('vendor_id', $ownerA->id)->exists());
+        $this->assertTrue($plan->vendorRequests()->where('vendor_id', $agency->id)->exists());
+        $this->assertTrue($plan->vendorRequests()->where('vendor_id', $agency2->id)->exists());
+
+        $agencyReq = $plan->vendorRequests()->where('vendor_id', $agency->id)->firstOrFail();
+        $quote = app(OutdoorPlanService::class)->quote($agencyReq, $agencyUser, 1800, 'ajans teklif', true);
+        app(OutdoorPlanService::class)->accept($agencyReq->fresh(), $quote->fresh(), $customer, true, true);
+
+        $this->assertSame(1, OohOccupancy::query()->where('kind', OohOccupancy::KIND_BOOKED)->where('ooh_inventory_id', $face->id)->count());
+        $this->assertFalse($plan->vendorRequests()->whereIn('status', ['pending', 'quoted'])->exists());
+        $this->assertSame(Order::query()->where('type', 'outdoor')->value('vendor_id'), $agency->id);
+    }
+
+    public function test_exclusive_agency_is_the_only_seller_on_submit(): void
+    {
+        [$ownerUser, $owner] = $this->outdoorVendor('Münhasır Sahip');
+        [$agencyUser, $agency] = $this->outdoorAgency('Münhasır Ajans');
+        [$otherUser, $other] = $this->outdoorAgency('İkinci Ajans');
+        $reps = app(\App\Services\OutdoorRepresentationService::class);
+        $bind = $reps->invite($owner, $agencyUser->email, true);
+        $reps->accept($bind, $agency);
+
+        $this->expectException(\RuntimeException::class);
+        $reps->invite($owner, $otherUser->email, true);
+    }
+
+    public function test_exclusive_plan_does_not_fan_out_to_owner_or_second_agency(): void
+    {
+        [$ownerUser, $owner] = $this->outdoorVendor('Münhasır Sahip 2');
+        [$agencyUser, $agency] = $this->outdoorAgency('Münhasır Ajans 2');
+        [$otherUser, $other] = $this->outdoorAgency('Dışarıdaki Ajans');
+        $reps = app(\App\Services\OutdoorRepresentationService::class);
+        $bind = $reps->invite($owner, $agencyUser->email, true);
+        $reps->accept($bind, $agency);
+        $otherBind = $reps->invite($owner, $otherUser->email, false);
+        $reps->accept($otherBind, $other);
+
+        $cat = $this->outdoorCategory();
+        $face = $this->publishFace($owner, $cat, 'Münhasır Pano');
+        $customer = User::factory()->create(['role' => 'customer']);
+        $plan = app(OutdoorPlanService::class)->submit($customer, [
+            ['inventory_id' => $face->id, 'starts_on' => now()->addDays(5)->toDateString(), 'ends_on' => now()->addDays(8)->toDateString()],
+        ]);
+
+        $this->assertSame(1, $plan->vendorRequests()->count());
+        $this->assertSame($agency->id, (int) $plan->vendorRequests()->first()->vendor_id);
+        $this->assertFalse($plan->vendorRequests()->where('vendor_id', $owner->id)->exists());
+        $this->assertFalse($plan->vendorRequests()->where('vendor_id', $other->id)->exists());
+    }
+
+    public function test_outdoor_only_login_uses_outdoor_panel_and_blocks_product_create(): void
+    {
+        [$user, $vendor] = $this->outdoorVendor();
+
+        $this->actingAs($user)->get(route('outdoor-panel.dashboard'))->assertOk();
+        $this->actingAs($user)->get(route('vendor.dashboard'))
+            ->assertRedirect(route('outdoor-panel.dashboard'));
+        $this->actingAs($user)->get(route('vendor.products.create'))->assertForbidden();
+        $this->get('/satici-panel/outdoor')->assertRedirect('/acik-hava-panel/envanter');
+        $this->assertSame(301, $this->get('/satici-panel/outdoor')->getStatusCode());
+
+        $this->actingAs($user)->get(route('outdoor-panel.inventories.create'))->assertOk();
+        [$agencyUser] = $this->outdoorAgency();
+        $this->actingAs($agencyUser)->get(route('outdoor-panel.inventories.create'))->assertForbidden();
+        $this->actingAs($agencyUser)->get(route('outdoor-panel.pool'))->assertOk();
     }
 }

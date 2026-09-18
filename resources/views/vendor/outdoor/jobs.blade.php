@@ -1,4 +1,4 @@
-@extends('layouts.vendor')
+@extends('layouts.outdoor')
 @section('title', 'Asım işleri')
 @section('content')
 @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
@@ -12,13 +12,13 @@
             <strong>{{ $job->inventory?->title }}</strong>
             <div class="small">{{ $job->starts_on->toDateString() }} – {{ $job->ends_on->toDateString() }}</div>
             @if($role !== 'field')
-                <form method="POST" action="{{ route('vendor.outdoor.jobs.assign', $job) }}" class="d-flex gap-2 mt-2">
+                <form method="POST" action="{{ route('outdoor-panel.jobs.assign', $job) }}" class="d-flex gap-2 mt-2">
                     @csrf
                     <input name="assigned_user_id" class="form-control form-control-sm" placeholder="Kullanıcı ID" required>
                     <button class="btn btn-outline-secondary btn-sm">Ata</button>
                 </form>
             @endif
-            <form method="POST" action="{{ route('vendor.outdoor.jobs.proof', $job) }}" enctype="multipart/form-data" class="mt-2">
+            <form method="POST" action="{{ route('outdoor-panel.jobs.proof', $job) }}" enctype="multipart/form-data" class="mt-2">
                 @csrf
                 <input type="file" name="photo" accept="image/*" capture="environment" required class="form-control form-control-sm mb-1">
                 @include('partials.gps-capture', [

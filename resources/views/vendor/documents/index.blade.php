@@ -152,6 +152,12 @@
                         @if($vendor->hasOutdoorTrack())
                             <optgroup label="Açık hava">
                                 <option value="outdoor_permit">{{ __('panel.outdoor_permit') }}</option>
+                                @if($vendor->isMunicipalityOwner())
+                                    <option value="municipality_authority">{{ __('panel.doc_municipality_authority') }}</option>
+                                @endif
+                                @if($vendor->isOutdoorAgency() || $vendor->isOutdoorOwner())
+                                    <option value="trade_registry">{{ __('panel.doc_trade_registry') }}</option>
+                                @endif
                             </optgroup>
                         @endif
                         @if($vendor->hasFreelancerTrack())

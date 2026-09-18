@@ -7,11 +7,14 @@
     $showFreelancer = ! $isField && $v?->hasActiveFreelancerModule() && Route::has('vendor.freelancer.index');
     $showTabela = ! $isField && $v?->hasActiveTabelaModule() && Route::has('vendor.tabela.index');
     $showOzalit = ! $isField && $v?->hasActiveOzalitModule() && Route::has('vendor.ozalit.index');
-    $showOutdoor = (bool) $v?->hasActiveOutdoorModule() && Route::has('vendor.outdoor.inventories.index');
+    $showOutdoorPanel = (bool) $v?->hasActiveOutdoorModule() && Route::has('outdoor-panel.dashboard');
 @endphp
 <a href="{{ route('vendor.dashboard') }}" class="nav-link {{ request()->routeIs('vendor.dashboard') ? 'active' : '' }}">
     <span>Özet</span>
 </a>
+@if($showOutdoorPanel)
+    <a href="{{ route('outdoor-panel.dashboard') }}" class="nav-link"><span>Açık hava paneli</span></a>
+@endif
 
 @if(! $isField)
 <details class="nav-acc" @if(request()->routeIs('vendor.orders.*','vendor.order-questions.*','vendor.direct-quotes.*')) open @endif>
@@ -67,26 +70,6 @@
     <summary>{{ __('panel.nav_module_ozalit') }} <span>▾</span></summary>
     <div class="nav-acc-body">
         <a href="{{ route('vendor.ozalit.index') }}" class="nav-link {{ request()->routeIs('vendor.ozalit.*') ? 'active' : '' }}"><span>{{ __('panel.nav_ozalit_requests') }}</span></a>
-    </div>
-</details>
-@endif
-
-@if($showOutdoor)
-<details class="nav-acc" @if(request()->routeIs('vendor.outdoor.*')) open @endif>
-    <summary>{{ __('panel.nav_module_outdoor') }} <span>▾</span></summary>
-    <div class="nav-acc-body">
-        @if(! $isField)
-            <a href="{{ route('vendor.outdoor.inventories.index') }}" class="nav-link {{ request()->routeIs('vendor.outdoor.inventories.index','vendor.outdoor.inventories.edit') ? 'active' : '' }}"><span>Envanter</span></a>
-            <a href="{{ route('vendor.outdoor.inventories.create') }}" class="nav-link {{ request()->routeIs('vendor.outdoor.inventories.create') ? 'active' : '' }}"><span>Yeni pano</span></a>
-            <a href="{{ route('vendor.outdoor.requests.index') }}" class="nav-link {{ request()->routeIs('vendor.outdoor.requests.*') ? 'active' : '' }}"><span>Talepler</span></a>
-            <a href="{{ route('vendor.outdoor.pool') }}" class="nav-link {{ request()->routeIs('vendor.outdoor.pool') ? 'active' : '' }}"><span>Envanter havuzu</span></a>
-            <a href="{{ route('vendor.outdoor.plans.index') }}" class="nav-link {{ request()->routeIs('vendor.outdoor.plans.*') ? 'active' : '' }}"><span>Havuz planlarım</span></a>
-        @endif
-        <a href="{{ route('vendor.outdoor.jobs') }}" class="nav-link {{ request()->routeIs('vendor.outdoor.jobs*') ? 'active' : '' }}"><span>Asım işleri</span></a>
-        @if($oohRole === 'owner')
-            <a href="{{ route('vendor.outdoor.staff') }}" class="nav-link {{ request()->routeIs('vendor.outdoor.staff*') ? 'active' : '' }}"><span>Ekip</span></a>
-            <a href="{{ route('vendor.outdoor.claims') }}" class="nav-link {{ request()->routeIs('vendor.outdoor.claims*') ? 'active' : '' }}"><span>Çift ilan raporları</span></a>
-        @endif
     </div>
 </details>
 @endif

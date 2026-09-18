@@ -16,6 +16,9 @@ class VendorDashboardController extends Controller
         if (! $vendor) {
             abort(403, 'Satıcı hesabı bulunamadı.');
         }
+        if ($vendor->prefersOutdoorPanel() && \Illuminate\Support\Facades\Route::has('outdoor-panel.dashboard')) {
+            return redirect()->route('outdoor-panel.dashboard');
+        }
         $vendor->load('businessTypes');
         $productsCount = $vendor->products()->count();
         $products = $vendor->products()->with('category')->latest()->limit(10)->get();

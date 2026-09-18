@@ -29,6 +29,9 @@ class VendorProductController extends Controller
         if ($tracks === [] || $vendor->hasTrack('physical_products')) {
             return;
         }
+        if ($vendor->prefersOutdoorPanel()) {
+            abort(403, 'Hazır ürün satışı kolu gerekli.');
+        }
 
         $tracks[] = 'physical_products';
         $vendor->forceFill([

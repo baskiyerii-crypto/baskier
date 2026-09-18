@@ -9,8 +9,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Vendor extends Model
 {
-    /** @use HasFactory<\Database\Factories\VendorFactory> */
     use HasFactory;
+
+    public const OUTDOOR_ROLE_OWNER = 'owner';
+
+    public const OUTDOOR_ROLE_AGENCY = 'agency';
+
+    public const OWNER_KIND_COMPANY = 'company';
+
+    public const OWNER_KIND_MUNICIPALITY = 'municipality';
+
 
     protected $fillable = [
         'user_id',
@@ -48,6 +56,8 @@ class Vendor extends Model
         'ozalit_expires_at',
         'outdoor_enabled',
         'outdoor_expires_at',
+        'outdoor_role',
+        'owner_kind',
         'risk_band',
         'risk_score',
         'contract_suspended_at',
@@ -113,7 +123,41 @@ class Vendor extends Model
 
     public function hasOutdoorTrack(): bool
     {
-        return $this->hasTrack('outdoor');
+        return $this->hasTrack('outdoor') || $this->outdoor_role !== null;
+    }
+
+    public function isOutdoorOwner(): bool
+    {
+        return $this->outdoorRole() === self::OUTDOOR_ROLE_OWNER;
+    }
+
+    public function isOutdoorAgency(): bool
+    {
+        return $this->outdoorRole() === self::OUTDOOR_ROLE_AGENCY;
+    }
+
+    public function isMunicipalityOwner(): bool
+    {
+        return $this->isOutdoorOwner() && $this->owner_kind === self::OWNER_KIND_MUNICIPALITY;
+    }
+
+    public function outdoorRole(): ?string
+    {
+        $role = $this->outdoor_role;
+        if ($role) {
+            return $role;
+        }
+
+        return $this->hasTrack('outdoor') ? self::OUTDOOR_ROLE_OWNER : null;
+    }
+
+    public function prefersOutdoorPanel(): bool
+    {
+        if (! $this->hasOutdoorTrack() && $this->outdoor_role === null) {
+            return false;
+        }
+
+        return ! $this->hasTrack('physical_products') && ! $this->hasTrack('physical_quote');
     }
 
     public function hasActiveFreelancerModule(): bool
@@ -156,8 +200,13 @@ class Vendor extends Model
             return true;
         }
 
+        $types = ['tax_plate', 'company_registration'];
+        if ($this->isMunicipalityOwner()) {
+            $types[] = 'municipality_authority';
+        }
+
         return $this->documents()
-            ->whereIn('document_type', ['tax_plate', 'company_registration'])
+            ->whereIn('document_type', $types)
             ->where('status', 'approved')
             ->where(function ($query) {
                 $query->whereNull('expires_at')
@@ -279,6 +328,16 @@ class Vendor extends Model
     public function oohInventories(): HasMany
     {
         return $this->hasMany(OohInventory::class);
+    }
+
+    public function outdoorRepresentationsAsOwner(): HasMany
+    {
+        return $this->hasMany(OohRepresentation::class, 'owner_vendor_id');
+    }
+
+    public function outdoorRepresentationsAsAgency(): HasMany
+    {
+        return $this->hasMany(OohRepresentation::class, 'agency_vendor_id');
     }
 
     public function payoutRequests(): HasMany

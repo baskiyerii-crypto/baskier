@@ -37,9 +37,17 @@ class VendorOutdoorOpsController extends Controller
         return $vendor;
     }
 
+    private function assertOwner($vendor): void
+    {
+        if ($vendor->isOutdoorAgency()) {
+            abort(403, 'Asım, ekip ve çift ilan raporları mecra sahibine aittir.');
+        }
+    }
+
     public function staffIndex(Request $request)
     {
         $vendor = $this->vendor($request);
+        $this->assertOwner($vendor);
         $this->staff->assertCanManageInventory($request->user(), $vendor);
         $members = $vendor->members()->with('user')->get();
 
@@ -49,6 +57,7 @@ class VendorOutdoorOpsController extends Controller
     public function staffInvite(Request $request)
     {
         $vendor = $this->vendor($request);
+        $this->assertOwner($vendor);
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email'],
@@ -74,6 +83,7 @@ class VendorOutdoorOpsController extends Controller
     public function jobs(Request $request)
     {
         $vendor = $this->vendor($request);
+        $this->assertOwner($vendor);
         $user = $request->user();
         $role = $this->staff->roleFor($user, $vendor);
         $query = OohOccupancy::query()
@@ -91,6 +101,7 @@ class VendorOutdoorOpsController extends Controller
     public function assign(Request $request, OohOccupancy $occupancy)
     {
         $vendor = $this->vendor($request);
+        $this->assertOwner($vendor);
         $occupancy->loadMissing('inventory');
         abort_unless((int) $occupancy->inventory?->vendor_id === (int) $vendor->id, 403);
         $this->staff->assertCanOperate($request->user(), $vendor);
@@ -112,6 +123,7 @@ class VendorOutdoorOpsController extends Controller
     public function proof(Request $request, OohOccupancy $occupancy)
     {
         $vendor = $this->vendor($request);
+        $this->assertOwner($vendor);
         $occupancy->loadMissing('inventory');
         abort_unless((int) $occupancy->inventory?->vendor_id === (int) $vendor->id, 403);
         $validated = $request->validate([
@@ -142,6 +154,7 @@ class VendorOutdoorOpsController extends Controller
     public function claims(Request $request)
     {
         $vendor = $this->vendor($request);
+        $this->assertOwner($vendor);
         $this->staff->assertCanManageInventory($request->user(), $vendor);
         $claims = OohInventoryClaim::query()
             ->with('inventory')
@@ -155,6 +168,7 @@ class VendorOutdoorOpsController extends Controller
     public function storeClaim(Request $request)
     {
         $vendor = $this->vendor($request);
+        $this->assertOwner($vendor);
         $validated = $request->validate([
             'ooh_inventory_id' => ['required', 'exists:ooh_inventories,id'],
             'evidence' => ['nullable', 'string', 'max:5000'],

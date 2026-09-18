@@ -55,7 +55,7 @@ class VendorDocumentController extends Controller
         }
 
         $validated = $request->validate([
-            'document_type' => ['required', 'string', 'in:tax_plate,company_registration,certificate,diploma,portfolio_accreditation,course,outdoor_permit,other'],
+            'document_type' => ['required', 'string', 'in:tax_plate,company_registration,certificate,diploma,portfolio_accreditation,course,outdoor_permit,municipality_authority,trade_registry,other'],
             'issuing_institution' => ['nullable', 'string', 'max:255'],
             'document_number' => ['nullable', 'string', 'max:128'],
             'issued_at' => ['nullable', 'date'],

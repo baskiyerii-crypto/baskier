@@ -187,6 +187,10 @@
                 @include('partials.notification-bell', ['variant' => 'bootstrap'])
                 <span class="sep"></span>
                 <span class="badge bg-light text-dark border">{{ auth()->user()?->publicCode() }}</span>
+                @if($sidebarVendor && $sidebarVendor->hasActiveOutdoorModule() && \Illuminate\Support\Facades\Route::has('outdoor-panel.dashboard'))
+                    <a href="{{ route('outdoor-panel.dashboard') }}">Açık hava paneli</a>
+                    <span class="sep"></span>
+                @endif
                 <a href="{{ route('home') }}" target="_blank">{{ __('panel.view_site') }} ↗</a>
                 <span class="sep"></span>
                 <span class="text-muted small fw-medium">{{ auth()->user()->name ?? '' }}</span>

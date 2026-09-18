@@ -95,6 +95,8 @@ final class UiLabels
             'portfolio_accreditation' => __('panel.doc_portfolio_accreditation'),
             'course' => __('panel.doc_course'),
             'outdoor_permit' => __('panel.outdoor_permit'),
+            'municipality_authority' => __('panel.doc_municipality_authority'),
+            'trade_registry' => __('panel.doc_trade_registry'),
             'other' => __('panel.doc_other'),
         ];
     }

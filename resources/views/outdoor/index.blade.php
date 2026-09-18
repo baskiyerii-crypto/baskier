@@ -48,7 +48,7 @@
             <div class="flex items-center justify-between gap-3">
                 <p class="font-semibold">Plan sepeti ({{ count($basket) }})</p>
                 @auth
-                    <form method="POST" action="{{ auth()->user()->isVendor() ? route('vendor.outdoor.plans.store') : route('customer.outdoor.plans.store') }}">
+                    <form method="POST" action="{{ auth()->user()->isVendor() ? route('outdoor-panel.plans.store') : route('customer.outdoor.plans.store') }}">
                         @csrf
                         <button class="by-btn-cta">Plan talebi gönder</button>
                     </form>

@@ -47,6 +47,8 @@ class OutdoorVendorUserSeeder extends Seeder
             'outdoor_enabled' => true,
             'outdoor_expires_at' => null,
             'registration_tracks' => ['outdoor'],
+            'outdoor_role' => \App\Models\Vendor::OUTDOOR_ROLE_OWNER,
+            'owner_kind' => \App\Models\Vendor::OWNER_KIND_COMPANY,
             'verification_status' => 'verified',
         ])->save();
 

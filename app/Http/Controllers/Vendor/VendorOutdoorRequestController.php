@@ -54,8 +54,9 @@ class VendorOutdoorRequestController extends Controller
         $this->authorize('view', $vendorRequest);
         $this->staff->assertCanOperate($request->user(), $vendor);
         $vendorRequest->load(['plan.items.inventory.images', 'plan.planner', 'quotes']);
+        $quotedItems = $this->plans->itemsCoveredByRequest($vendorRequest);
 
-        return view('vendor.outdoor.request-show', compact('vendor', 'vendorRequest'));
+        return view('vendor.outdoor.request-show', compact('vendor', 'vendorRequest', 'quotedItems'));
     }
 
     public function quote(Request $request, OohVendorRequest $vendorRequest)
@@ -142,6 +143,6 @@ class VendorOutdoorRequestController extends Controller
         }
         $basket->clear($request);
 
-        return redirect()->route('vendor.outdoor.plans.show', $plan)->with('success', 'Havuz planı ilgili sahiplere iletildi.');
+        return redirect()->route('outdoor-panel.plans.show', $plan)->with('success', 'Plan talebi ilgili satıcılara iletildi.');
     }
 }

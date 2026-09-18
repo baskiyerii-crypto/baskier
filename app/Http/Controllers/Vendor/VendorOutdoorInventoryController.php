@@ -10,6 +10,7 @@ use App\Models\TurkiyeIl;
 use App\Models\TurkiyeIlce;
 use App\Services\OutdoorInventoryService;
 use App\Services\OutdoorOccupancyService;
+use App\Services\OutdoorRepresentationService;
 use App\Services\OutdoorStaffService;
 use App\Services\WorldPlaceService;
 use App\Support\IsoCountries;
@@ -24,6 +25,7 @@ class VendorOutdoorInventoryController extends Controller
         private OutdoorInventoryService $inventories,
         private OutdoorOccupancyService $occupancy,
         private WorldPlaceService $places,
+        private OutdoorRepresentationService $representations,
     ) {}
 
     private function vendor(Request $request)
@@ -42,9 +44,17 @@ class VendorOutdoorInventoryController extends Controller
         return $vendor;
     }
 
+    private function assertOwner($vendor): void
+    {
+        if ($vendor->isOutdoorAgency()) {
+            abort(403, 'Ajans envanter yönetemez. Temsil ettiğiniz panoları kullanın.');
+        }
+    }
+
     public function index(Request $request)
     {
         $vendor = $this->vendor($request);
+        $this->assertOwner($vendor);
         $this->staff->assertCanOperate($request->user(), $vendor);
         $items = $vendor->oohInventories()->with('images', 'category')->latest()->paginate(20);
         $role = $this->staff->roleFor($request->user(), $vendor);
@@ -55,6 +65,7 @@ class VendorOutdoorInventoryController extends Controller
     public function create(Request $request)
     {
         $vendor = $this->vendor($request);
+        $this->assertOwner($vendor);
         $this->authorize('create', OohInventory::class);
         $this->staff->assertCanManageInventory($request->user(), $vendor);
         $categories = Category::query()->where('channel', Category::CHANNEL_OUTDOOR)->where('is_active', true)->orderBy('name')->get();
@@ -78,6 +89,7 @@ class VendorOutdoorInventoryController extends Controller
     public function store(Request $request)
     {
         $vendor = $this->vendor($request);
+        $this->assertOwner($vendor);
         $this->authorize('create', OohInventory::class);
         $validated = $this->rules($request);
         try {
@@ -92,6 +104,7 @@ class VendorOutdoorInventoryController extends Controller
     public function edit(Request $request, OohInventory $inventory)
     {
         $vendor = $this->vendor($request);
+        $this->assertOwner($vendor);
         abort_unless((int) $inventory->vendor_id === (int) $vendor->id, 403);
         $this->authorize('update', $inventory);
         $this->staff->assertCanManageInventory($request->user(), $vendor);
@@ -126,6 +139,7 @@ class VendorOutdoorInventoryController extends Controller
     public function update(Request $request, OohInventory $inventory)
     {
         $vendor = $this->vendor($request);
+        $this->assertOwner($vendor);
         abort_unless((int) $inventory->vendor_id === (int) $vendor->id, 403);
         $this->authorize('update', $inventory);
         $validated = $this->rules($request);
@@ -141,6 +155,7 @@ class VendorOutdoorInventoryController extends Controller
     public function submit(Request $request, OohInventory $inventory)
     {
         $vendor = $this->vendor($request);
+        $this->assertOwner($vendor);
         abort_unless((int) $inventory->vendor_id === (int) $vendor->id, 403);
         $this->authorize('update', $inventory);
         try {
@@ -155,6 +170,7 @@ class VendorOutdoorInventoryController extends Controller
     public function block(Request $request, OohInventory $inventory)
     {
         $vendor = $this->vendor($request);
+        $this->assertOwner($vendor);
         abort_unless((int) $inventory->vendor_id === (int) $vendor->id, 403);
         $this->staff->assertCanOperate($request->user(), $vendor);
         $validated = $request->validate([
@@ -177,12 +193,11 @@ class VendorOutdoorInventoryController extends Controller
     public function pool(Request $request)
     {
         $vendor = $this->vendor($request);
+        abort_unless($vendor->isOutdoorAgency(), 403, 'Temsil panoları yalnız ajans içindir.');
         $this->staff->assertCanOperate($request->user(), $vendor);
-        $items = $this->inventories->poolForVendor(
-            $vendor,
-            $request->integer('il') ?: null,
-            $request->query('ulke') ?: null
-        );
+        $items = $this->representations->representedInventoriesQuery($vendor)
+            ->paginate(20)
+            ->withQueryString();
 
         return view('vendor.outdoor.pool', compact('vendor', 'items'));
     }
@@ -190,7 +205,7 @@ class VendorOutdoorInventoryController extends Controller
     private function afterSaveRedirect(OohInventory $inventory, string $success)
     {
         $similar = $this->inventories->similarListings($inventory);
-        $redirect = redirect()->route('vendor.outdoor.inventories.edit', $inventory)->with('success', $success);
+        $redirect = redirect()->route('outdoor-panel.inventories.edit', $inventory)->with('success', $success);
         if ($similar->isNotEmpty()) {
             $titles = $similar->pluck('title')->take(3)->implode(', ');
             $redirect->with('warning', 'Aynı ruhsat/konumda başka ilan var: '.$titles.'. Çift ilan raporu açabilir veya yönetici kararına bırakabilirsiniz.');

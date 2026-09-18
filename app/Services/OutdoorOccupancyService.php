@@ -45,7 +45,7 @@ class OutdoorOccupancyService
             }
             $notified[$planner->id] = true;
             $url = $plan && $plan->planner_type === OohPlan::PLANNER_VENDOR
-                ? route('vendor.outdoor.plans.show', $plan)
+                ? route('outdoor-panel.plans.show', $plan)
                 : ($plan ? route('customer.outdoor.plans.show', $plan) : null);
             $this->notifications->notify(
                 $planner,

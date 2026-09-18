@@ -1,4 +1,4 @@
-@extends('layouts.vendor')
+@extends('layouts.outdoor')
 @section('title', isset($inventory) ? 'Pano düzenle' : 'Yeni pano')
 @section('content')
 @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
@@ -8,7 +8,7 @@
     <div class="alert alert-warning">Aynı ruhsat/konumda başka ilan: {{ $similar->pluck('title')->implode(', ') }}. Çift ilan raporu açabilir veya yönetici onayına bırakabilirsiniz.</div>
 @endif
 <div class="card p-4" style="max-width:720px;">
-    <form method="POST" enctype="multipart/form-data" action="{{ isset($inventory) ? route('vendor.outdoor.inventories.update', $inventory) : route('vendor.outdoor.inventories.store') }}">
+    <form method="POST" enctype="multipart/form-data" action="{{ isset($inventory) ? route('outdoor-panel.inventories.update', $inventory) : route('outdoor-panel.inventories.store') }}">
         @csrf
         @if(isset($inventory)) @method('PUT') @endif
         <div class="mb-3"><label class="form-label">Başlık</label><input name="title" class="form-control" value="{{ old('title', $inventory->title ?? '') }}" required></div>
@@ -92,8 +92,8 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
     @if(isset($inventory))
-        <form method="POST" action="{{ route('vendor.outdoor.inventories.submit', $inventory) }}" class="mt-3">@csrf<button class="btn btn-outline-primary btn-sm">İncelemeye gönder</button></form>
-        <form method="POST" action="{{ route('vendor.outdoor.inventories.block', $inventory) }}" class="mt-3 d-flex gap-2">
+        <form method="POST" action="{{ route('outdoor-panel.inventories.submit', $inventory) }}" class="mt-3">@csrf<button class="btn btn-outline-primary btn-sm">İncelemeye gönder</button></form>
+        <form method="POST" action="{{ route('outdoor-panel.inventories.block', $inventory) }}" class="mt-3 d-flex gap-2">
             @csrf
             <input type="date" name="starts_on" class="form-control" required>
             <input type="date" name="ends_on" class="form-control" required>

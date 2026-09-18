@@ -1,4 +1,4 @@
-@extends('layouts.vendor')
+@extends('layouts.outdoor')
 @section('title', 'Ekip')
 @section('content')
 @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
@@ -12,7 +12,7 @@
     @endforeach
     </tbody>
 </table>
-<form method="POST" action="{{ route('vendor.outdoor.staff.invite') }}" class="card p-3" style="max-width:480px;">
+<form method="POST" action="{{ route('outdoor-panel.staff.invite') }}" class="card p-3" style="max-width:480px;">
     @csrf
     <div class="mb-2"><input name="name" class="form-control" placeholder="Ad" required></div>
     <div class="mb-2"><input name="email" type="email" class="form-control" placeholder="E-posta" required></div>

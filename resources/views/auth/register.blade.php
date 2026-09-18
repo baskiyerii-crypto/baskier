@@ -132,13 +132,44 @@
                         </div>
                     </div>
 
-                    <div id="outdoor-permit-fields" class="mt-6" style="display:none;">
+                    <div id="outdoor-role-fields" class="mt-6" style="display:none;">
                         <div class="by-divider mb-4"></div>
-                        <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('panel.outdoor_permit') }}</p>
-                        <p class="mt-1 text-sm text-slate-600">{{ __('panel.outdoor_permit_help') }}</p>
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('panel.outdoor_role') }}</p>
+                        <p class="mt-1 text-sm text-slate-600">{{ __('panel.outdoor_role_help') }}</p>
+                        <div class="mt-3 grid gap-2 md:grid-cols-2">
+                            <label class="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white/70 px-4 py-3 text-sm">
+                                <input type="radio" name="outdoor_role" value="owner" class="ooh-role" @checked(old('outdoor_role', 'owner') === 'owner') onchange="window.toggleVendorTracks && window.toggleVendorTracks()">
+                                <span class="font-semibold">{{ __('panel.outdoor_role_owner') }}</span>
+                            </label>
+                            <label class="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white/70 px-4 py-3 text-sm">
+                                <input type="radio" name="outdoor_role" value="agency" class="ooh-role" @checked(old('outdoor_role') === 'agency') onchange="window.toggleVendorTracks && window.toggleVendorTracks()">
+                                <span class="font-semibold">{{ __('panel.outdoor_role_agency') }}</span>
+                            </label>
+                        </div>
+                        @error('outdoor_role')<div class="mt-2 text-sm font-semibold text-rose-600">{{ $message }}</div>@enderror
+                        <div id="owner-kind-fields" class="mt-4" style="display:none;">
+                            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('panel.owner_kind') }}</p>
+                            <div class="mt-3 grid gap-2 md:grid-cols-2">
+                                <label class="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white/70 px-4 py-3 text-sm">
+                                    <input type="radio" name="owner_kind" value="company" class="ooh-kind" @checked(old('owner_kind', 'company') === 'company') onchange="window.toggleVendorTracks && window.toggleVendorTracks()">
+                                    <span class="font-semibold">{{ __('panel.owner_kind_company') }}</span>
+                                </label>
+                                <label class="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white/70 px-4 py-3 text-sm">
+                                    <input type="radio" name="owner_kind" value="municipality" class="ooh-kind" @checked(old('owner_kind') === 'municipality') onchange="window.toggleVendorTracks && window.toggleVendorTracks()">
+                                    <span class="font-semibold">{{ __('panel.owner_kind_municipality') }}</span>
+                                </label>
+                            </div>
+                            @error('owner_kind')<div class="mt-2 text-sm font-semibold text-rose-600">{{ $message }}</div>@enderror
+                        </div>
+                    </div>
+
+                    <div id="municipality-doc-fields" class="mt-6" style="display:none;">
+                        <div class="by-divider mb-4"></div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('panel.doc_municipality_authority') }}</p>
+                        <p class="mt-1 text-sm text-slate-600">{{ __('panel.municipality_docs_help') }}</p>
                         <div class="mt-4">
-                            <input type="file" class="form-control mt-1" name="outdoor_permit" accept=".pdf,image/*">
-                            @error('outdoor_permit')<div class="mt-2 text-sm font-semibold text-rose-600">{{ $message }}</div>@enderror
+                            <input type="file" class="form-control mt-1" name="municipality_authority" accept=".pdf,image/*">
+                            @error('municipality_authority')<div class="mt-2 text-sm font-semibold text-rose-600">{{ $message }}</div>@enderror
                         </div>
                     </div>
                     <div id="freelancer-doc-fields" class="mt-6" style="display:none;">
@@ -206,15 +237,24 @@ window.toggleVendorBiz = function () {
 window.toggleVendorTracks = function () {
     var checks = document.querySelectorAll('.track-cb:checked');
     var tracks = Array.from(checks).map(function (c) { return c.value; });
-    var physical = tracks.indexOf('physical_products') >= 0 || tracks.indexOf('physical_quote') >= 0 || tracks.indexOf('outdoor') >= 0;
-    var freelancer = tracks.indexOf('freelancer') >= 0;
     var outdoor = tracks.indexOf('outdoor') >= 0;
+    var roleEl = document.querySelector('.ooh-role:checked');
+    var kindEl = document.querySelector('.ooh-kind:checked');
+    var role = roleEl ? roleEl.value : 'owner';
+    var kind = kindEl ? kindEl.value : 'company';
+    var municipality = outdoor && role === 'owner' && kind === 'municipality';
+    var physical = tracks.indexOf('physical_products') >= 0 || tracks.indexOf('physical_quote') >= 0 || (outdoor && !municipality);
+    var freelancer = tracks.indexOf('freelancer') >= 0;
     var tax = document.getElementById('physical-tax-fields');
     var docs = document.getElementById('freelancer-doc-fields');
-    var permit = document.getElementById('outdoor-permit-fields');
+    var roleBox = document.getElementById('outdoor-role-fields');
+    var kindBox = document.getElementById('owner-kind-fields');
+    var muni = document.getElementById('municipality-doc-fields');
     if (tax) tax.style.display = physical ? 'block' : 'none';
     if (docs) docs.style.display = freelancer ? 'block' : 'none';
-    if (permit) permit.style.display = outdoor ? 'block' : 'none';
+    if (roleBox) roleBox.style.display = outdoor ? 'block' : 'none';
+    if (kindBox) kindBox.style.display = outdoor && role === 'owner' ? 'block' : 'none';
+    if (muni) muni.style.display = municipality ? 'block' : 'none';
 };
 document.addEventListener('DOMContentLoaded', function () {
     try {

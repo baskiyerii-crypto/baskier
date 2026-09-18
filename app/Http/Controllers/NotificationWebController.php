@@ -45,6 +45,11 @@ class NotificationWebController extends Controller
             return 'layouts.admin';
         }
         if ($user->isVendor()) {
+            $vendor = $user->vendor;
+            if ($vendor && $vendor->prefersOutdoorPanel()) {
+                return 'layouts.outdoor';
+            }
+
             return 'layouts.vendor';
         }
 

@@ -1,4 +1,4 @@
-@extends('layouts.vendor')
+@extends('layouts.outdoor')
 @section('title', 'Açık hava talepleri')
 @section('content')
 @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
@@ -8,7 +8,7 @@
 @else
     <div class="list-group">
         @foreach($requests as $r)
-            <a class="list-group-item list-group-item-action" href="{{ route('vendor.outdoor.requests.show', $r) }}">
+            <a class="list-group-item list-group-item-action" href="{{ route('outdoor-panel.requests.show', $r) }}">
                 <strong>{{ $r->plan?->title }}</strong>
                 <span class="small text-muted">{{ $r->status }} · {{ $r->plan?->planner?->name }}</span>
             </a>

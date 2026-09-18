@@ -100,6 +100,16 @@ class User extends Authenticatable
         return $this->role === 'vendor';
     }
 
+    public function vendorHomeRoute(): string
+    {
+        $vendor = $this->relationLoaded('vendor') ? $this->vendor : $this->vendor()->first();
+        if ($vendor && $vendor->prefersOutdoorPanel() && \Illuminate\Support\Facades\Route::has('outdoor-panel.dashboard')) {
+            return 'outdoor-panel.dashboard';
+        }
+
+        return 'vendor.dashboard';
+    }
+
     public function isCustomer(): bool
     {
         return $this->role === 'customer';

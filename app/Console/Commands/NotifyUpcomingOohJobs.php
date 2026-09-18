@@ -50,7 +50,7 @@ class NotifyUpcomingOohJobs extends Command
                     'Yarın asım işi var',
                     ($job->inventory?->title ?? 'Pano').' · '.$job->starts_on->toDateString(),
                     ['type' => 'ooh_job', 'occupancy_id' => $job->id],
-                    route('vendor.outdoor.jobs')
+                    route('outdoor-panel.jobs')
                 );
                 $count++;
             }

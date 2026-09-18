@@ -70,7 +70,7 @@ class AuthController extends Controller
                 return redirect()->intended(route('admin.dashboard'));
             }
             if ($user->isVendor()) {
-                return redirect()->intended(route('vendor.dashboard'));
+                return redirect()->intended(route($user->vendorHomeRoute()));
             }
 
             return redirect()->intended(route('customer.dashboard'));
@@ -138,16 +138,34 @@ class AuthController extends Controller
             $rules['accept_vendor_agreement'] = ['accepted'];
             $rules['accept_vendor_agreement_scrolled_at'] = ['required', 'date'];
 
-            $needsPhysical = in_array('physical_products', $tracks, true)
-                || in_array('physical_quote', $tracks, true)
-                || in_array('outdoor', $tracks, true);
-            $freelancerOnly = in_array('freelancer', $tracks, true) && ! $needsPhysical;
+            $isOutdoor = in_array('outdoor', $tracks, true);
+            $outdoorRole = $request->input('outdoor_role');
+            $ownerKind = $request->input('owner_kind');
+            $isMunicipality = $isOutdoor && $outdoorRole === Vendor::OUTDOOR_ROLE_OWNER
+                && $ownerKind === Vendor::OWNER_KIND_MUNICIPALITY;
 
-            if ($needsPhysical) {
+            $needsPhysical = in_array('physical_products', $tracks, true)
+                || in_array('physical_quote', $tracks, true);
+            $needsTaxPlate = $needsPhysical || ($isOutdoor && ! $isMunicipality);
+            $freelancerOnly = in_array('freelancer', $tracks, true) && ! $needsPhysical && ! $isOutdoor;
+
+            if ($isOutdoor) {
+                $rules['outdoor_role'] = ['required', 'in:owner,agency'];
+            }
+            if ($isOutdoor && $outdoorRole === Vendor::OUTDOOR_ROLE_OWNER) {
+                $rules['owner_kind'] = ['required', 'in:company,municipality'];
+            }
+
+            if ($needsTaxPlate) {
                 $rules['company_name'] = ['required', 'string', 'max:255'];
                 $rules['tax_office'] = ['required', 'string', 'max:255'];
                 $rules['tax_number'] = ['required', 'string', 'max:32'];
                 $rules['tax_plate'] = ['required', 'file', 'max:12288', 'mimes:pdf,jpg,jpeg,png,webp'];
+            } elseif ($isMunicipality) {
+                $rules['company_name'] = ['required', 'string', 'max:255'];
+                $rules['tax_office'] = ['nullable', 'string', 'max:255'];
+                $rules['tax_number'] = ['required', 'string', 'max:32'];
+                $rules['municipality_authority'] = ['required', 'file', 'max:12288', 'mimes:pdf,jpg,jpeg,png,webp'];
             } else {
                 $rules['company_name'] = ['nullable', 'string', 'max:255'];
                 $rules['tax_office'] = ['nullable', 'string', 'max:255'];
@@ -156,10 +174,6 @@ class AuthController extends Controller
 
             if ($freelancerOnly || in_array('freelancer', $tracks, true)) {
                 $rules['freelancer_docs'] = ['required', 'array', 'min:1'];
-            }
-
-            if (in_array('outdoor', $tracks, true)) {
-                $rules['outdoor_permit'] = ['required', 'file', 'max:12288', 'mimes:pdf,jpg,jpeg,png,webp'];
             }
 
             if (BusinessType::query()->exists()) {
@@ -190,9 +204,15 @@ class AuthController extends Controller
 
             if ($validated['role'] === 'vendor') {
                 $tracks = array_values(array_unique($validated['registration_tracks'] ?? []));
-                $needsPhysical = in_array('physical_products', $tracks, true)
+                $isOutdoor = in_array('outdoor', $tracks, true);
+                $outdoorRole = $isOutdoor ? ($validated['outdoor_role'] ?? Vendor::OUTDOOR_ROLE_OWNER) : null;
+                $ownerKind = $outdoorRole === Vendor::OUTDOOR_ROLE_OWNER
+                    ? ($validated['owner_kind'] ?? Vendor::OWNER_KIND_COMPANY)
+                    : null;
+                $isMunicipality = $ownerKind === Vendor::OWNER_KIND_MUNICIPALITY;
+                $needsTaxPlate = in_array('physical_products', $tracks, true)
                     || in_array('physical_quote', $tracks, true)
-                    || in_array('outdoor', $tracks, true);
+                    || ($isOutdoor && ! $isMunicipality);
 
                 $geo = app(\App\Services\WorldPlaceService::class)->normalize(
                     $validated['country_code'] ?? 'TR',
@@ -219,6 +239,8 @@ class AuthController extends Controller
                     'freelancer_enabled' => in_array('freelancer', $tracks, true),
                     'quotes_enabled' => in_array('physical_quote', $tracks, true),
                     'outdoor_enabled' => false,
+                    'outdoor_role' => $outdoorRole,
+                    'owner_kind' => $ownerKind,
                 ]);
                 $user->update(['vendor_id' => $vendor->id]);
                 $vendor->businessTypes()->sync($request->input('business_type_ids', []));
@@ -228,7 +250,7 @@ class AuthController extends Controller
 
                 $storageService = app(\App\Services\DocumentStorageService::class);
 
-                if ($needsPhysical && $request->hasFile('tax_plate')) {
+                if ($needsTaxPlate && $request->hasFile('tax_plate')) {
                     try {
                         $stored = $storageService->storeUploadedDocument($request->file('tax_plate'), $vendor->id);
                         VendorDocument::create([
@@ -248,7 +270,26 @@ class AuthController extends Controller
                     }
                 }
 
-                if (in_array('outdoor', $tracks, true) && $request->hasFile('outdoor_permit')) {
+                if ($isMunicipality && $request->hasFile('municipality_authority')) {
+                    try {
+                        $stored = $storageService->storeUploadedDocument($request->file('municipality_authority'), $vendor->id);
+                        VendorDocument::create([
+                            'vendor_id' => $vendor->id,
+                            'document_type' => 'municipality_authority',
+                            'disk' => $stored['disk'],
+                            'file_path' => $stored['file_path'],
+                            'path' => $stored['file_path'],
+                            'original_filename' => $stored['original_filename'],
+                            'mime_type' => $stored['mime_type'],
+                            'file_size' => $stored['file_size'],
+                            'quarantine_status' => $stored['quarantine_status'],
+                            'status' => 'pending',
+                        ]);
+                    } catch (\Throwable $e) {
+                    }
+                }
+
+                if ($isOutdoor && $request->hasFile('outdoor_permit')) {
                     try {
                         $stored = $storageService->storeUploadedDocument($request->file('outdoor_permit'), $vendor->id);
                         VendorDocument::create([
@@ -297,7 +338,9 @@ class AuthController extends Controller
         Auth::login($user);
 
         if ($user->isVendor()) {
-            return redirect()->route('vendor.dashboard')->with('info', __('panel.vendor_application_received'));
+            $user->load('vendor');
+
+            return redirect()->route($user->vendorHomeRoute())->with('info', __('panel.vendor_application_received'));
         }
 
         return redirect()->route('otp.show')->with('success', __('panel.verify_dual_help'));

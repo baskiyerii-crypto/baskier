@@ -1,10 +1,10 @@
-@extends('layouts.vendor')
-@section('title', 'Havuz')
+@extends('layouts.outdoor')
+@section('title', 'Temsil ettiğim panolar')
 @section('content')
-<h1 class="h5">Diğer sahiplerin yayınlanmış panoları</h1>
-<p class="small text-muted">Boş tarihleri katalogdan plan sepetine ekleyip kampanya talebi oluşturabilirsiniz. Teklif yine asıl sahibe gider.</p>
+<h1 class="h5">Temsil ettiğim yayınlanmış panolar</h1>
+<p class="small text-muted">Ajans kopya ilan açmaz. Teklif, bağlı olduğunuz sahiplerin panoları için size gelir.</p>
 @if($items->isEmpty())
-    <div class="card p-4 text-muted mt-3">Havuzda pano yok.</div>
+    <div class="card p-4 text-muted mt-3">Bağlı yayınlanmış pano yok. Sahip davetini onaylayın.</div>
 @else
     <div class="row g-3 mt-1">
         @foreach($items as $inv)
@@ -13,12 +13,6 @@
                     <strong>{{ $inv->title }}</strong>
                     <div class="small text-muted">{{ $inv->vendor?->name }} · {{ $inv->country_code }} {{ $inv->city }}</div>
                     <a class="btn btn-outline-primary btn-sm mt-2" href="{{ route('outdoor.show', $inv->slug) }}">Katalogda aç</a>
-                    <form method="POST" action="{{ route('vendor.outdoor.claims.store') }}" class="mt-2">
-                        @csrf
-                        <input type="hidden" name="ooh_inventory_id" value="{{ $inv->id }}">
-                        <input name="evidence" class="form-control form-control-sm mb-1" placeholder="Bu envanter benim, çünkü...">
-                        <button class="btn btn-outline-danger btn-sm">Çift ilan bildir</button>
-                    </form>
                 </div>
             </div>
         @endforeach
